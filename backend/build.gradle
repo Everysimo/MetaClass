@@ -16,7 +16,6 @@ repositories {
 }
 
 dependencies {
-	implementation 'com.google.googlejavaformat:google-java-format:$googleJavaFormatVersion'
 	implementation 'org.springframework.boot:spring-boot-starter'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
