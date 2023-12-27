@@ -6,13 +6,13 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class TestStartUp implements ApplicationListener<ApplicationReadyEvent> {
-    @Override
-    public void onApplicationEvent(ApplicationReadyEvent event) {
-        System.out.println("Applicazione avviata con successo");
-    }
+  @Override
+  public void onApplicationEvent(ApplicationReadyEvent event) {
+    System.out.println("Applicazione avviata con successo");
+  }
 
-    @Override
-    public boolean supportsAsyncExecution() {
-        return ApplicationListener.super.supportsAsyncExecution();
-    }
+  @Override
+  public boolean supportsAsyncExecution() {
+    return ApplicationListener.super.supportsAsyncExecution();
+  }
 }
