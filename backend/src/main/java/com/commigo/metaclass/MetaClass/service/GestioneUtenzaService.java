@@ -4,5 +4,5 @@ import com.commigo.metaclass.MetaClass.model.Utente;
 
 
 public interface GestioneUtenzaService{
-    public Utente loginMeta();
+    public boolean loginMeta(Utente u);
 }
