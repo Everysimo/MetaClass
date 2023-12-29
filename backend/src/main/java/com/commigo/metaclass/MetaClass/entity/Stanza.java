@@ -76,7 +76,7 @@ public class Stanza {
     @Min(value = 1, message = "Il valore del  parametro non deve essere inferiore ad 1")
     @Max(value = 999, message = "Il valore del  parametro non deve superare 999")
     @NotBlank(message = "Il numero massimo dei posti non può essere vuota")
-    private String MAX_Posti;
+    private int MAX_Posti;
 
     /**
      *Chiave Esterna sullo Scenario
