@@ -1,4 +1,4 @@
-package com.commigo.metaclass.MetaClass.Entity;
+package com.commigo.metaclass.MetaClass.entity;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
