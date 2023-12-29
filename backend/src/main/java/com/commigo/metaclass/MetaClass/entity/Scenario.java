@@ -29,6 +29,7 @@ public class Scenario {
     @NotBlank
     private String nome;
 
+
     @NotNull(message = "La descrizione non può essere nulla")
     @Column
     @Size(min = MIN_LENGTH, max = MAX_LENGTH, message = "Lunghezza della descrizione non valida")
