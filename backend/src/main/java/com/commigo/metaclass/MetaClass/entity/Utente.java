@@ -19,7 +19,7 @@ import java.time.LocalDateTime;
 public class Utente {
 
     /**
-     * Costante per valore intero di 50.
+     * Costante per valore intero di 254.
      */
     public static final int MAX_NAME_LENGTH = 254;
 
@@ -54,6 +54,7 @@ public class Utente {
     private long Id;
 
 
+    @NotNull(message = "Il nome non può essere nullo")
     @Column(length = MAX_NAME_LENGTH)
     @Size(min = MIN_NAME_LENGTH, max = MAX_NAME_LENGTH,
             message = "Lunghezza nome non valida")
