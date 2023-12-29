@@ -40,6 +40,14 @@ public class Scenario {
     @NotBlank
     private float media_valutazione;
 
+    /**
+     *Chiave Esterna sulla Categoria
+     */
+    @NotNull(message = "La categoria non può essere nulla")
+    @ManyToOne()
+    @JoinColumn(name = "id_categoria")
+    private Categoria categoria;
+
     @Column(name = "Data_Creazione", updatable = false)
     @CreationTimestamp
     private LocalDateTime data_creazione;
