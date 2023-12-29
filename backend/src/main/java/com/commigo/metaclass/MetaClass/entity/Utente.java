@@ -1,17 +1,32 @@
 package com.commigo.metaclass.MetaClass.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
 @Entity
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Utente {
+
+    /**
+     * Costante per valore intero di 50.
+     */
+    public static final int MAX_NAME_LENGTH = 50;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private long Id;
 
-    @Column(columnDefinition = "VARCHAR(255) DEFAULT 'NotSet' NOT NULL")
+    @NotNull(message = "Il nome non può essere nullo")
+    @Column(length = MAX_NAME_LENGTH)
     private String Nome;
 
     @Column(columnDefinition = "VARCHAR(255) DEFAULT 'NotSet' NOT NULL")
@@ -44,90 +59,4 @@ public class Utente {
     @Column(columnDefinition = "DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL")
     private LocalDateTime DataAggiornamento;
 
-    // Costruttore vuoto necessario per JPA
-    public Utente() {
-
-    }
-
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
-    }
-
-    public String getNome() {
-        return Nome;
-    }
-
-    public void setNome(String nome) {
-        Nome = nome;
-    }
-
-    public String getCognome() {
-        return Cognome;
-    }
-
-    public void setCognome(String cognome) {
-        Cognome = cognome;
-    }
-
-    public int getEtà() {
-        return Età;
-    }
-
-    public void setEtà(int età) {
-        Età = età;
-    }
-
-    public boolean isAdmin() {
-        return isAdmin;
-    }
-
-    public void setAdmin(boolean admin) {
-        isAdmin = admin;
-    }
-
-    public String getSesso() {
-        return Sesso;
-    }
-
-    public void setSesso(String sesso) {
-        Sesso = sesso;
-    }
-
-    public String getEmail() {
-        return Email;
-    }
-
-    public void setEmail(String email) {
-        Email = email;
-    }
-
-    public String getTelefono() {
-        return Telefono;
-    }
-
-    public void setTelefono(String telefono) {
-        Telefono = telefono;
-    }
-
-    public String getIdMeta() {
-        return idMeta;
-    }
-
-    public void setIdMeta(String idMeta) {
-        this.idMeta = idMeta;
-    }
-
-    public String getTokenAuth() {
-        return TokenAuth;
-    }
-
-    public void setTokenAuth(String tokenAuth) {
-        TokenAuth = tokenAuth;
-    }
-
-    //costruttore da fare
 }
