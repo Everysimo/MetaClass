@@ -22,7 +22,7 @@ public class Ruolo {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private long Id;
 
 
     @NotNull(message = "Il nome non può essere nullo")
