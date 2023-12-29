@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class GestioneUtenzaController {
 
     @Autowired
-    @Qualifier("UserService")
+    @Qualifier("GestioneUtenzaService")
     private GestioneUtenzaService utenzaService;
 
     @RequestMapping(value="/login", method = RequestMethod.POST)
@@ -24,7 +24,7 @@ public class GestioneUtenzaController {
                    throw new RuntimeException("login non effettuato");
             }
             if(session.getAttribute("userID")==null) {
-                session.setAttribute("UserID", u.getId());
+                session.setAttribute("UserID", u);
             }
             return true;
         }catch(RuntimeException e){
