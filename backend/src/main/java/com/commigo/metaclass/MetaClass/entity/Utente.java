@@ -1,5 +1,6 @@
 package com.commigo.metaclass.MetaClass.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
@@ -121,4 +122,8 @@ public class Utente {
     @UpdateTimestamp
     private LocalDateTime DataAggiornamento;
 
+    @ManyToOne
+    @JoinColumn(name = "report_id")
+    @JsonIgnore
+    private Report report;
 }
