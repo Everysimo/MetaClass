@@ -9,7 +9,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 
-import java.sql.Time;
 import java.time.LocalDateTime;
 
 @Entity
@@ -47,7 +46,7 @@ public class FeedbackMeeting {
      *Chiave Esterna sull' utente
      */
     @NotNull(message = "L'utente non può essere nullo")
-    @OneToMany()
+    @ManyToOne()
     @JoinColumn(name = "id_utente")
     private Utente utente;
 
@@ -55,5 +54,10 @@ public class FeedbackMeeting {
     @ManyToOne()
     @JoinColumn(name = "id_meeting")
     private Meeting meeting;
+
+    @NotNull(message = "Il report non può essere nullo")
+    @ManyToOne()
+    @JoinColumn(name = "id_report")
+    private Report report;
 
 }
