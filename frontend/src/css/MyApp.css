@@ -1,0 +1,161 @@
+html, body{
+	margin: 0;
+	padding: 0;
+}
+
+* {
+	box-sizing: border-box;
+    font-family: Arial, sans-serif;
+  	font-weight: 300;
+    text-align: center;
+}
+
+body{ position: relative; }
+
+.wrapper {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;  
+    min-width: 345px;
+    color: #002f53;
+}
+
+header {
+    top: 0;
+    background-color: #002f53;
+    color: #ffffff;
+    position: sticky;
+    z-index: 9;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    min-height: 80px;
+}
+
+header img,
+footer img {
+    background-color: white;
+    padding: 1%;
+    border-radius: 10px;
+}
+
+header .App-logo,
+footer .App-logo {
+    width: 150px;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}
+
+header a{
+    color: white;
+    margin: 10px;
+    font-size: 20px;
+    text-decoration: none;
+    transition: color 0.5s ease;
+}
+header a:hover{ color: #c70049; }
+#header { text-align: right; }
+#header-resp { display: none; }
+#header-left { text-align: left;}
+
+footer {
+    background-color: #c70049;
+    display: inline-block;
+    color: white;
+    z-index: 5;
+    min-height: 400px;
+}
+
+button {
+    padding: 10px 20px; /* Add padding for better appearance */
+    background-color: #002f53; /* Set button background color */
+    border: none; /* Remove default border */
+    color: white; /* Set text color */
+    border-radius: 10px; /* Add rounded corners */
+    cursor: pointer; /* Change cursor to pointer on hover */
+    font-size: large;
+    margin: 5%;
+    transition: background-color 0.5s ease, transform 0.5s ease, box-shadow 0.5s ease; /* Slower transitions */
+}
+
+/* Style when hovering over the <button> tag */
+button:hover {
+    background-color: #c70049; /* Change button background color on hover */
+    transform: translateY(-3px); /* Apply a slightly larger vertical shift */
+    box-shadow: 0 8px 12px rgba(0, 0, 0, 0.15); /* Increase the shadow effect */
+}
+
+section {
+    position: relative;
+    align-items: center;
+    justify-content: center;
+    margin: 0;
+    padding: 5%;
+    display: block;
+    background-color: white;
+    min-height: 0;
+    z-index: 2;
+    box-shadow: 12px 2px 20px 12px rgba(0, 0, 0, 0.5); /* Increase the shadow effect */
+}
+
+section h1{
+    font-size: xxx-large;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+section p{
+    font-size: x-large;
+    text-align: left;
+}
+
+.sec {
+    z-index: 1;
+    min-height: 400px;
+    box-shadow: none;
+}
+
+.bg {
+    background-image: linear-gradient(to bottom, rgba(0, 47, 83, 0.8), rgba(199, 0, 73, 0.7));/* url("../img/vr3_fhd.jpg");*/
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    position: fixed;
+    top: 0px;
+    bottom: 0px;
+    left: 0px;
+    right: 0px;
+    -webkit-transform: translateZ(0);
+    pointer-events: none;
+}
+
+.App-logo {
+    width: 20%;
+    pointer-events: none;
+}
+
+.table-container {
+    text-align: center;
+    padding: 5%;
+    border-radius: 10px;
+}
+
+.table-row {
+    display: flex;
+    align-items: center;
+    padding: 10px 0;
+}
+
+.table-cell {
+    flex: 1;
+    padding: 0 10px;
+    word-wrap: break-word;
+}
+
+@media only screen and (max-width: 1000px) {
+    #header { display: none; }
+    #header-resp {
+        display: inline-block;
+        text-align: right;
+    }
+    section { min-height: 0;}
+    section h1{ font-size: xx-large; }
+    section p { font-size: larger;}
+}
