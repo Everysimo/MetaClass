@@ -3,6 +3,7 @@ package com.commigo.metaclass.MetaClass.Entity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -16,7 +17,8 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class Ruolo {
 
-    public static final int MAX_ROLE_NAME_LENGTH = 20;
+    public static final int MAX_NAME_LENGTH = 254;
+    public static final int MIN_NAME_LENGTH = 1;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -24,7 +26,8 @@ public class Ruolo {
 
 
     @NotNull(message = "Il nome non può essere nullo")
-    @Column(length = MAX_ROLE_NAME_LENGTH)
+    @Column
+    @Size(min = MIN_NAME_LENGTH, max = MAX_NAME_LENGTH, message = "Lunghezza del nome non valida")
     @NotBlank
     private String Nome;
 
