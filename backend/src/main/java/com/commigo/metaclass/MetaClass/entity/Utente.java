@@ -1,4 +1,4 @@
-package com.commigo.metaclass.MetaClass.model;
+package com.commigo.metaclass.MetaClass.entity;
 
 import jakarta.persistence.*;
 

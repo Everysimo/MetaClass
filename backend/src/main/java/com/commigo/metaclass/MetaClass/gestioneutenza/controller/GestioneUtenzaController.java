@@ -1,7 +1,7 @@
-package com.commigo.metaclass.MetaClass.controller;
+package com.commigo.metaclass.MetaClass.gestioneutenza.controller;
 
-import com.commigo.metaclass.MetaClass.model.Utente;
-import com.commigo.metaclass.MetaClass.service.GestioneUtenzaService;
+import com.commigo.metaclass.MetaClass.entity.Utente;
+import com.commigo.metaclass.MetaClass.gestioneutenza.service.GestioneUtenzaService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
