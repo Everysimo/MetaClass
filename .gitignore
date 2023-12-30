@@ -10,7 +10,6 @@ backend/HELP.md
 backend/gradle.gradle
 
 ### INTELLIJ IDEA ###
-.idea/
 !**backend/src/main/**/out/
 !**backend/src/test/**/out/
 backend/.idea/
