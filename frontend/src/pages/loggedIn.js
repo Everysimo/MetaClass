@@ -1,0 +1,21 @@
+/**/
+import {MyFooter, MyHeader} from "../components/MyApp-components";
+import React from "react";
+
+export const loggedIn = () =>{
+    return(
+        <div className='wrapper'>
+            <body>
+                <header>
+                    <MyHeader />
+                </header>
+                <section className={"sec"}>
+
+                </section>
+                <footer>
+                    <MyFooter />
+                </footer>
+            </body>
+        </div>
+    );
+}

@@ -1,9 +1,9 @@
 import '../css/MyApp.css';
-import {SectionGenerator, DivGenerator} from '../functions/functions';
+import {SectionGenerator, DivGenerator} from '../components/functions';
 import React from "react";
-import {MyFooter, MyHeader} from "../functions/MyApp-components";
+import {MyFooter, MyHeader} from "../components/MyApp-components";
 
-export default function MyApp(){
+export default function UnloggedHome(){
     const par1 =
         <div>
             <h1>
@@ -50,20 +50,20 @@ export default function MyApp(){
     const sectionClass = "sec";
     return(
         <div className='wrapper'>
-            <header>
-                <MyHeader />
-            </header>
             <body>
+                <header>
+                    <MyHeader />
+                </header>
                 <SectionGenerator class={sectionClass} ID={"sec1"}/>
                 <SectionGenerator content={div1}/>
                 <SectionGenerator class={sectionClass} ID={"sec2"}/>
                 <SectionGenerator content={div2}/>
                 <SectionGenerator class={sectionClass} ID={"sec3"}/>
                 <SectionGenerator content={div3}/>
+                <footer>
+                    <MyFooter />
+                </footer>
             </body>
-            <footer>
-                <MyFooter />
-            </footer>
         </div>
     );
 }
