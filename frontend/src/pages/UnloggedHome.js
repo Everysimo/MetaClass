@@ -1,5 +1,5 @@
 import '../css/MyApp.css';
-import {SectionGenerator, DivGenerator, MyButton} from '../functions/functions';
+import {SectionGenerator, DivGenerator} from '../functions/functions';
 import React from "react";
 import {MyFooter, MyHeader} from "../functions/MyApp-components";
 
@@ -9,7 +9,6 @@ export default function MyApp(){
             <h1>
                 section 1
             </h1>
-
             <p>
                 Welcome to our cutting-edge VR educational system!<br/>
                 At our company, we've revolutionized the concept of interactive learning
@@ -45,7 +44,6 @@ export default function MyApp(){
                 empowering teachers to create customized lessons tailored to their curriculum.
             </p>
         </div>;
-
     const div1 = <DivGenerator content={par1}/>
     const div2 = <DivGenerator content={par2}/>
     const div3 = <DivGenerator content={par3}/>
@@ -55,17 +53,13 @@ export default function MyApp(){
             <header>
                 <MyHeader />
             </header>
-
             <body>
-
-
                 <SectionGenerator class={sectionClass} ID={"sec1"}/>
                 <SectionGenerator content={div1}/>
                 <SectionGenerator class={sectionClass} ID={"sec2"}/>
                 <SectionGenerator content={div2}/>
                 <SectionGenerator class={sectionClass} ID={"sec3"}/>
                 <SectionGenerator content={div3}/>
-
             </body>
             <footer>
                 <MyFooter />
