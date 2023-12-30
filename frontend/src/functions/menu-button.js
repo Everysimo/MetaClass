@@ -4,7 +4,6 @@ import MCLogo from "../img/MetaClassLogo.png";
 
 const BurgerButton = () => {
     const [isOpen, setIsOpen] = useState(false);
-
     const handleClick = () => {
         setIsOpen(!isOpen);
     };
