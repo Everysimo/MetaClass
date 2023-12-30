@@ -49,21 +49,19 @@ export default function UnloggedHome(){
     const div3 = <DivGenerator content={par3}/>
     const sectionClass = "sec";
     return(
-        <div className='wrapper'>
-            <body>
-                <header>
-                    <MyHeader />
-                </header>
-                <SectionGenerator class={sectionClass} ID={"sec1"}/>
-                <SectionGenerator content={div1}/>
-                <SectionGenerator class={sectionClass} ID={"sec2"}/>
-                <SectionGenerator content={div2}/>
-                <SectionGenerator class={sectionClass} ID={"sec3"}/>
-                <SectionGenerator content={div3}/>
-                <footer>
-                    <MyFooter />
-                </footer>
-            </body>
-        </div>
+        <body>
+            <header>
+                <MyHeader />
+            </header>
+            <SectionGenerator class={sectionClass} ID={"sec1"}/>
+            <SectionGenerator content={div1}/>
+            <SectionGenerator class={sectionClass} ID={"sec2"}/>
+            <SectionGenerator content={div2}/>
+            <SectionGenerator class={sectionClass} ID={"sec3"}/>
+            <SectionGenerator content={div3}/>
+            <footer>
+                <MyFooter />
+            </footer>
+        </body>
     );
 }
