@@ -14,6 +14,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class Categoria {
 
+    
     public static final int MAX_NAME_LENGTH = 254;
     public static final int MIN_NAME_LENGTH = 1;
 
