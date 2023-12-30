@@ -1,6 +1,8 @@
 package com.commigo.metaclass.MetaClass.entity;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
@@ -46,7 +48,7 @@ public class Stanza {
     private String Nome;
 
     /**
-     *Codice della Stanza
+     * Codice della Stanza
      */
     @NotNull(message = "Il codice della stanza non può essere nullo")
     @Column(length = MAX_NAME_LENGTH, unique = true)
@@ -55,7 +57,7 @@ public class Stanza {
     private String Codice_Stanza;
 
     /**
-     *Descrizione della Stanza
+     * Descrizione della Stanza
      */
     @NotNull(message = "La descrizione della stanza non può essere nulla")
     @Column(length = MAX_DESCR_LENGTH)
@@ -64,13 +66,13 @@ public class Stanza {
     private String Descrizione;
 
     /**
-     *Tipo di Accesso alla Stanza, ovvero la stanza è pubblica o privata
+     * Tipo di Accesso alla Stanza, ovvero la stanza è pubblica o privata
      */
     @NotNull(message = "Il tipo di accesso non può essere nullo")
     private boolean Tipo_Accesso;
 
     /**
-     *Identifica il numero massimo di posti nella stanza
+     * Identifica il numero massimo di posti nella stanza
      */
     @NotNull(message = "Il numero massimo di posti non può essere nullo")
     @Min(value = 1, message = "Il valore del  parametro non deve essere inferiore ad 1")
@@ -79,7 +81,7 @@ public class Stanza {
     private int MAX_Posti;
 
     /**
-     *Chiave Esterna sullo Scenario
+     * Chiave Esterna sullo Scenario
      */
     @NotNull(message = "Lo scenario non può essere nullo")
     @ManyToOne()
@@ -93,5 +95,15 @@ public class Stanza {
     @Column(name = "Data_Aggiornamento")
     @UpdateTimestamp
     private LocalDateTime Data_Aggiornamento;
+
+
+    public Stanza(String nome, String codiceStanza, String descrizione, boolean tipoAccesso, int maxPosti)
+    {
+        this.Nome = nome;
+        this.Codice_Stanza = codiceStanza;
+        this.Descrizione = descrizione;
+        this.Tipo_Accesso = tipoAccesso;
+        this.MAX_Posti = maxPosti;
+    }
 
 }
