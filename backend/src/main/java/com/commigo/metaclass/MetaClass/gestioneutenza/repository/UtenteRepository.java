@@ -7,4 +7,6 @@ import org.springframework.stereotype.Repository;
 @Repository("UtenteRepository")
 public interface UtenteRepository extends JpaRepository<Utente, Long> {
 
+    Utente findFirstByMetaId(String idMeta);
+
 }
