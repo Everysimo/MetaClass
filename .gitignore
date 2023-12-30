@@ -1,0 +1,54 @@
+### .gitignore METACLASS ###
+
+### GRADLE ###
+!backend/gradle/wrapper/gradle-wrapper.jar
+!**backend/src/main/**/build/
+!**backend/src/test/**/build/
+backend/.gradle/
+backend/build/
+backend/HELP.md
+backend/gradle.gradle
+
+### INTELLIJ IDEA ###
+.idea/
+!**backend/src/main/**/out/
+!**backend/src/test/**/out/
+backend/.idea/
+backend/out/
+frontend/.idea/
+*.iws
+*.iml
+*.ipr
+
+### Node.js ###
+frontend/node_modules
+frontend/.pnp/
+frontend/.pnp.js
+
+## OTHER ###
+frontend/coverage
+frontend/build
+frontend/.DS_Store
+frontend/.env.local
+frontend/.env.development.local
+frontend/.env.test.local
+frontend/.env.production.local
+
+frontend/npm-debug.log*
+frontend/yarn-debug.log*
+frontend/yarn-error.log*
+
+### STS ###
+backend/.apt_generated
+backend/.classpath
+backend/.factorypath
+backend/.project
+backend/.settings
+backend/.springBeans
+backend/.sts4-cache
+bin/
+!**/src/main/**/bin/
+!**/src/test/**/bin/
+
+### VS CODE ###
+frontend/.vscode/
