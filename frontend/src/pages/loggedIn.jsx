@@ -1,5 +1,6 @@
 /**/
-import {MyFooter, MyHeader} from "../components/MyApp-components";
+import {MyHeader} from "../components/Header/Header";
+import {MyFooter} from "../components/Footer/Footer";
 import React from "react";
 
 export const loggedIn = () =>{

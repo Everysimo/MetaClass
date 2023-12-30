@@ -10,57 +10,13 @@ html, body{
     text-align: center;
 }
 
-body{ position: relative; }
-
-body {
+body{
+    position: relative;
     display: flex;
     flex-direction: column;
     min-height: 100vh;  
     min-width: 345px;
     color: #002f53;
-}
-
-header {
-    top: 0;
-    background-color: #002f53;
-    color: #ffffff;
-    position: sticky;
-    z-index: 9;
-    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
-    min-height: 80px;
-}
-
-header img,
-footer img {
-    background-color: white;
-    padding: 1%;
-    border-radius: 10px;
-}
-
-header .App-logo,
-footer .App-logo {
-    width: 150px;
-    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
-}
-
-header a{
-    color: white;
-    margin: 10px;
-    font-size: 20px;
-    text-decoration: none;
-    transition: color 0.5s ease;
-}
-header a:hover{ color: #c70049; }
-#header { text-align: right; }
-#header-resp { display: none; }
-#header-left { text-align: left;}
-
-footer {
-    background-color: #c70049;
-    display: inline-block;
-    color: white;
-    z-index: 5;
-    min-height: 400px;
 }
 
 button {
@@ -118,11 +74,11 @@ section p{
     background-repeat: no-repeat;
     background-size: cover;
     position: fixed;
-    top: 0px;
-    bottom: 0px;
-    left: 0px;
-    right: 0px;
-    -webkit-transform: translateZ(0);
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    transform: translateZ(0);
     pointer-events: none;
 }
 
@@ -150,11 +106,6 @@ section p{
 }
 
 @media only screen and (max-width: 1000px) {
-    #header { display: none; }
-    #header-resp {
-        display: inline-block;
-        text-align: right;
-    }
     section { min-height: 0;}
     section h1{ font-size: xx-large; }
     section p { font-size: larger;}
