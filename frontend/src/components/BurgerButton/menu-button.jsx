@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import '../css/MenuStyles.css';
-import MCLogo from "../img/MetaClassLogo.png";
+import './menu-button.css';
+import MCLogo from "../../img/MetaClassLogo.png";
+import { Link } from "react-router-dom";
 
 const BurgerButton = () => {
     const [isOpen, setIsOpen] = useState(false);
@@ -21,10 +22,10 @@ const BurgerButton = () => {
             </div>
             <div className={menuClass}>
                 <ul>
-                    <li><a href="#" className="table-cell">HOME</a></li>
-                    <li><a href="#" id="goToCorsi-resp" className="table-cell">CORSI</a></li>
-                    <li><a href="#" id="goToFooter-resp" className="table-cell">CONTATTI</a></li>
-                    <li><a href="#" className="table-cell">ABOUT US</a></li>
+                    <li><Link to="/login">LOGIN</Link></li>
+                    <li><Link to="/">HOME</Link></li>
+                    <li><Link to="/">ABOUT</Link></li>
+                    <li><Link to="/">CONTACTS</Link></li>
                 </ul>
                 <img src={MCLogo} className='App-logo' alt='no image' id={"menu2-image"}></img>;
             </div>
@@ -35,10 +36,10 @@ const BurgerButton = () => {
 export function MyMenu(){
     return(
         <div>
-            <a href="/login">LOGIN</a>
-            <a href="/">HOME</a>
-            <a href="/">ABOUT</a>
-            <a href="/">CONTACTS</a>
+            <Link to="/login">LOGIN</Link>
+            <Link to="/">HOME</Link>
+            <Link to="/">ABOUT</Link>
+            <Link to="/">CONTACTS</Link>
         </div>
     );
 }

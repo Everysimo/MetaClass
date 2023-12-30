@@ -1,0 +1,7 @@
+footer {
+    background-color: #c70049;
+    display: inline-block;
+    color: white;
+    z-index: 5;
+    min-height: 400px;
+}
