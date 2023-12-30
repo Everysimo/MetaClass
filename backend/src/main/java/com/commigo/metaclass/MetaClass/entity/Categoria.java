@@ -20,7 +20,7 @@ public class Categoria {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private long Id;
 
     @NotNull(message = "Il nome non può essere nullo")
     @Column(unique = true)

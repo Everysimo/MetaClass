@@ -1,11 +1,10 @@
 package com.commigo.metaclass.MetaClass.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -15,7 +14,6 @@ import java.time.LocalDateTime;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Utente {
 
     /**
@@ -51,6 +49,8 @@ public class Utente {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Getter
+    @Setter
     private long Id;
 
 
@@ -78,9 +78,8 @@ public class Utente {
 
     @NotNull(message = "L'età non può essere nulla")
     @Column(length = MAX_ETA_LENGTH)
-    @Size(min = MIN_ETA_LENGTH, max = MAX_ETA_LENGTH,
-            message = "Lunghezza età non valida")
-    @NotBlank(message = "l'età non può essere vuota")
+    @Min(value = MIN_ETA_LENGTH, message = "L'età deve essere maggiore o uguale a 10")
+    @Max(value = MAX_ETA_LENGTH, message = "L'età deve essere minore o uguale a 114")
     private int Età;
 
     @NotNull(message = "IsAdmin non può essere nullo")
@@ -90,7 +89,6 @@ public class Utente {
     @Email(message = "Formato email non valida")
     private String Email;
 
-    @NotNull(message = "Telefono non può essere nulla")
     @Column(length = MAX_PHONE_LENGTH)
     @Size(min = MAX_PHONE_LENGTH, max = MAX_PHONE_LENGTH,
             message = "Lunghezza telefono non valida")
@@ -100,11 +98,11 @@ public class Utente {
 
     //da valutare la lunghezza della stringa
     @NotNull(message = "IdMeta non può essere nulla")
-    @Column(length = MAX_NAME_LENGTH)
+    @Column(length = MAX_NAME_LENGTH, unique = true)
     @Size(min = MIN_NAME_LENGTH, max = MAX_NAME_LENGTH,
             message = "Lunghezza IdMeta non valida")
     @NotBlank(message = "Il IdMeta non può essere vuoto")
-    private String IdMeta;
+    private String metaId;
 
     //da valutare la lunghezza della stringa
     @NotNull(message = "TokenAuth non può essere nulla")
@@ -121,4 +119,24 @@ public class Utente {
     @UpdateTimestamp
     private LocalDateTime DataAggiornamento;
 
+    @ManyToOne
+    @JoinColumn(name = "report_id")
+    private Report report;
+
+    @JsonCreator
+    public Utente(@JsonProperty("Nome") String Nome,
+                  @JsonProperty("Cognome") String Cognome,
+                  @JsonProperty("Sesso") String Sesso,
+                  @JsonProperty("Età") int Età,
+                  @JsonProperty("Email") String Email,
+                  @JsonProperty("metaId") String IdMeta,
+                  @JsonProperty("TokenAuth") String TokenAuth) {
+        this.Nome = Nome;
+        this.Cognome = Cognome;
+        this.Sesso = Sesso;
+        this.Età = Età;
+        this.Email = Email;
+        this.metaId = IdMeta;
+        this.TokenAuth = TokenAuth;
+    }
 }
