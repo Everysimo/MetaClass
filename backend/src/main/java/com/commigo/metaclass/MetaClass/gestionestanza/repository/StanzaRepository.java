@@ -7,6 +7,6 @@ import org.springframework.stereotype.Repository;
 @Repository("StanzaRepository")
 public interface StanzaRepository extends JpaRepository<Stanza, Long> {
 
-    //Stanza findByCodice_Stanza(String codice);
+    Stanza findStanzaByCodice(String codice);
 
 }

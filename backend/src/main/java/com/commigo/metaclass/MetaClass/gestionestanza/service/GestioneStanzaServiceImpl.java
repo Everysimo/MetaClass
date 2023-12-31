@@ -1,12 +1,9 @@
 package com.commigo.metaclass.MetaClass.gestionestanza.service;
 
-import com.commigo.metaclass.MetaClass.entity.Stanza;
 import com.commigo.metaclass.MetaClass.entity.StatoPartecipazione;
-import com.commigo.metaclass.MetaClass.entity.Utente;
-import com.commigo.metaclass.MetaClass.gestionestanza.repository.StanzaRepository;
-import com.commigo.metaclass.MetaClass.gestionestanza.repository.RuoloRepository;
-import com.commigo.metaclass.MetaClass.gestionestanza.repository.StatoPartecipazioneRepository;
-import com.commigo.metaclass.MetaClass.gestionestanza.repository.UtenteRepository;
+import com.commigo.metaclass.MetaClass.entity.*;
+import com.commigo.metaclass.MetaClass.gestionestanza.repository.*;
+import com.commigo.metaclass.MetaClass.gestioneutenza.repository.UtenteRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -15,32 +12,42 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 @Transactional    //ogni operazione è una transazione
 public class GestioneStanzaServiceImpl implements GestioneStanzaService{
-/*
+
     private final StanzaRepository stanzaRepository;
     private final StatoPartecipazioneRepository statoPartecipazioneRepository;
     private final UtenteRepository utenteRepository;
     private final RuoloRepository ruoloRepository;
     @Override
-    public boolean richiestaAccessoStanza(String codiceStanza, long id_utente) {
+    public boolean richiestaAccessoStanza(String codiceStanza, String id_utente) {
 
-        Stanza stanza = stanzaRepository.findByCodice_Stanza(codiceStanza);
-        if(stanza == null){
+        Stanza stanza = stanzaRepository.findStanzaByCodice(codiceStanza);
+        if (stanza == null) {
+            System.out.println("NULL"+ "codiceStanza" + codiceStanza);
             return false;
-        }else if(!stanza.isTipo_Accesso()){
-            StatoPartecipazione statoPartecipazione = statoPartecipazioneRepository.findByUtenteAndStanza(id_utente, stanza.getId());
-            if(statoPartecipazione == null){
-                Utente u = utenteRepository.findById(id_utente);
-                //Dobbiamo cambiare i costruttori delle Entity altrimenti non va
-                //Dobbiamo capire come impostare soltanto 4 ruoli e non crearne sempre di nuovi
-                //statoPartecipazione = new StatoPartecipazione(stanza, u, ruoloRepository.findByNome("Partecipante"), true, false, u.getNome());
-            } else if (!statoPartecipazione.isBannato()){
+        } else if (!stanza.isTipo_Accesso()) {
+            Utente u = utenteRepository.findFirstByMetaId(id_utente);
+            StatoPartecipazione statoPartecipazione = statoPartecipazioneRepository.findStatoPartecipazioneByUtenteAndStanza(u, stanza);
+            if (statoPartecipazione == null) {
+                statoPartecipazione = new StatoPartecipazione(stanza, u, getRuolo(Ruolo.PARTECIPANTE), true, false, u.getNome());
+            } else if (!statoPartecipazione.isBannato()) {
                 statoPartecipazione.setInAttesa(true);
             }
             return true;
-        }
-        else
+        } else {
+            System.out.println("NoNULL");
             return false;
+        }
     }
 
-    */
+    public Ruolo getRuolo(String nome){
+
+        Ruolo ruolo = ruoloRepository.findByNome(nome);
+        if(ruolo == null){
+            ruolo = new Ruolo(nome);
+            ruoloRepository.save(ruolo);
+        }
+
+        return ruolo;
+    }
+
 }

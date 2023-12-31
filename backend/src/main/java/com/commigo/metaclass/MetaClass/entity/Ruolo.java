@@ -20,23 +20,30 @@ public class Ruolo {
     public static final int MAX_NAME_LENGTH = 254;
     public static final int MIN_NAME_LENGTH = 1;
 
+    public static final String PARTECIPANTE = "Partecipante";
+    public static final String ORGANIZZATORE = "Organizzatore";
+    public static final String ORGANIZZATORE_MASTER = "Organizzatore_Master";
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long Id;
+    private long id;
 
 
     @NotNull(message = "Il nome non può essere nullo")
     @Column
     @Size(min = MIN_NAME_LENGTH, max = MAX_NAME_LENGTH, message = "Lunghezza del nome non valida")
     @NotBlank
-    private String Nome;
+    private String nome;
 
     @Column(name = "Data_Creazione", updatable = false)
     @CreationTimestamp
-    private LocalDateTime Data_Creazione;
+    private LocalDateTime data_creazione;
 
     @Column(name = "Data_Aggiornamento")
     @UpdateTimestamp
-    private LocalDateTime Data_Aggiornamento;
+    private LocalDateTime data_aggiornamento;
 
+    public Ruolo(String nome) {
+        nome = nome;
+    }
 }

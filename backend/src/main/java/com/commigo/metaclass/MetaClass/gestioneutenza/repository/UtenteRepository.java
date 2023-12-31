@@ -14,8 +14,7 @@ import java.util.Map;
 public interface UtenteRepository extends JpaRepository<Utente, Long> {
 
     Utente findFirstByMetaId(String idMeta);
-    Utente findUtenteById(Long id);
-
+    Utente findUtenteById(long id);
 
     //il valore restituito indica il numero di righe modificate, quindi:
     // 1 se tutto ok
