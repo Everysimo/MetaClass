@@ -64,7 +64,7 @@ public class Stanza {
     private String Descrizione;
 
     /**
-     *Tipo di Accesso alla Stanza, ovvero la stanza è pubblica o privata
+     *Tipo di Accesso alla Stanza, ovvero la stanza è pubblica (1) o privata (0)
      */
     @NotNull(message = "Il tipo di accesso non può essere nullo")
     private boolean Tipo_Accesso;

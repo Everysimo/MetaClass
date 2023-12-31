@@ -1,12 +1,12 @@
-package com.commigo.metaclass.MetaClass.gestioneutenza.controller;
+package com.commigo.metaclass.MetaClass.gestionestanza.controller;
 
-public class RispostaLoginAndLogout {
+public class RispostaRichiestaAccessoStanza {
 
     private boolean successo;
     private String messaggio;
 
     // Costruttore
-    public RispostaLoginAndLogout(boolean successo, String messaggio) {
+    public RispostaRichiestaAccessoStanza(boolean successo, String messaggio) {
         this.successo = successo;
         this.messaggio = messaggio;
     }
