@@ -51,7 +51,7 @@ public class Utente {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Getter
     @Setter
-    private long Id;
+    private long id;
 
 
     @NotNull(message = "Il nome non può essere nullo")
@@ -59,14 +59,14 @@ public class Utente {
     @Size(min = MIN_NAME_LENGTH, max = MAX_NAME_LENGTH,
             message = "Lunghezza nome non valida")
     @NotBlank(message = "Il nome non può essere vuoto")
-    private String Nome;
+    private String nome;
 
     @NotNull(message = "Il cognome non può essere nullo")
     @Column(length = MAX_NAME_LENGTH)
     @Size(min = MIN_NAME_LENGTH, max = MAX_NAME_LENGTH,
             message = "Lunghezza cognome non valida")
     @NotBlank(message = "Il cognome non può essere vuoto")
-    private String Cognome;
+    private String cognome;
 
     @NotNull(message = "Il sesso non può essere nullo")
     @Column(length = SEX_LENGTH)
@@ -74,27 +74,27 @@ public class Utente {
             message = "Lunghezza sesso non valida")
     @NotBlank(message = "Il sesso non può essere vuoto")
     @Pattern(regexp = "^[MFO]$", message = "Il genere deve essere 'M', 'F' o 'O'")
-    private String Sesso;
+    private String sesso;
 
     @NotNull(message = "L'età non può essere nulla")
     @Column(length = MAX_ETA_LENGTH)
     @Min(value = MIN_ETA_LENGTH, message = "L'età deve essere maggiore o uguale a 10")
     @Max(value = MAX_ETA_LENGTH, message = "L'età deve essere minore o uguale a 114")
-    private int Età;
+    private int età;
 
     @NotNull(message = "IsAdmin non può essere nullo")
-    private boolean IsAdmin;
+    private boolean isAdmin;
 
     @NotNull(message = "L'email non può essere nulla")
     @Email(message = "Formato email non valida")
-    private String Email;
+    private String email;
 
     @Column(length = MAX_PHONE_LENGTH)
     @Size(min = MAX_PHONE_LENGTH, max = MAX_PHONE_LENGTH,
             message = "Lunghezza telefono non valida")
     @Pattern(regexp = "^[0-9]{10}$",
             message = "Formato telefono non valido")
-    private String Telefono;
+    private String telefono;
 
     //da valutare la lunghezza della stringa
     @NotNull(message = "IdMeta non può essere nulla")
@@ -110,33 +110,33 @@ public class Utente {
     @Size(min = MIN_NAME_LENGTH, max = MAX_NAME_LENGTH,
             message = "Lunghezza TokenAuth non valida")
     @NotBlank(message = "Il TokenAuth non può essere vuoto")
-    private String TokenAuth;
+    private String tokenAuth;
 
     @Column(updatable = false)
     @CreationTimestamp
-    private LocalDateTime DataCreazione;
+    private LocalDateTime dataCreazione;
 
     @UpdateTimestamp
-    private LocalDateTime DataAggiornamento;
+    private LocalDateTime dataAggiornamento;
 
     @ManyToOne
     @JoinColumn(name = "report_id")
     private Report report;
 
     @JsonCreator
-    public Utente(@JsonProperty("Nome") String Nome,
-                  @JsonProperty("Cognome") String Cognome,
-                  @JsonProperty("Sesso") String Sesso,
-                  @JsonProperty("Età") int Età,
-                  @JsonProperty("Email") String Email,
+    public Utente(@JsonProperty("nome") String Nome,
+                  @JsonProperty("cognome") String Cognome,
+                  @JsonProperty("sesso") String Sesso,
+                  @JsonProperty("età") int Età,
+                  @JsonProperty("email") String Email,
                   @JsonProperty("metaId") String IdMeta,
-                  @JsonProperty("TokenAuth") String TokenAuth) {
-        this.Nome = Nome;
-        this.Cognome = Cognome;
-        this.Sesso = Sesso;
-        this.Età = Età;
-        this.Email = Email;
+                  @JsonProperty("tokenAuth") String TokenAuth) {
+        this.nome = Nome;
+        this.cognome = Cognome;
+        this.sesso = Sesso;
+        this.età = Età;
+        this.email = Email;
         this.metaId = IdMeta;
-        this.TokenAuth = TokenAuth;
+        this.tokenAuth = TokenAuth;
     }
 }

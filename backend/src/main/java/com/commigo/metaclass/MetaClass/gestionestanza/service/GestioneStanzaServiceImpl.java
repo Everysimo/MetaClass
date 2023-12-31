@@ -15,7 +15,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 @Transactional    //ogni operazione è una transazione
 public class GestioneStanzaServiceImpl implements GestioneStanzaService{
-
+/*
     private final StanzaRepository stanzaRepository;
     private final StatoPartecipazioneRepository statoPartecipazioneRepository;
     private final UtenteRepository utenteRepository;
@@ -41,4 +41,6 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService{
         else
             return false;
     }
+
+    */
 }

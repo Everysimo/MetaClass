@@ -1,8 +1,12 @@
 package com.commigo.metaclass.MetaClass.gestioneutenza.service;
 
 import com.commigo.metaclass.MetaClass.entity.Utente;
+import com.commigo.metaclass.MetaClass.gestioneutenza.controller.ResponseBoolMessage;
+
+import java.util.Map;
 
 
 public interface GestioneUtenzaService{
-    public boolean loginMeta(Utente u);
+    boolean loginMeta(Utente u);
+    ResponseBoolMessage modificaDatiUtente(Long Id, Map<String, Object> dataMap, Utente u);
 }

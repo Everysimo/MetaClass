@@ -21,6 +21,7 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'mysql:mysql-connector-java:8.0.28'
 	implementation 'org.projectlombok:lombok:1.18.30'
+	implementation 'com.google.code.gson:gson:2.10.1'
 	annotationProcessor 'org.projectlombok:lombok:1.18.30'
 	implementation 'org.hibernate:hibernate-validator:7.0.2.Final'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'

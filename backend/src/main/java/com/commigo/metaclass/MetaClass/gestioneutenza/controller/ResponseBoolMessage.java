@@ -1,12 +1,12 @@
 package com.commigo.metaclass.MetaClass.gestioneutenza.controller;
 
-public class RispostaLoginAndLogout {
+public class ResponseBoolMessage {
 
     private boolean successo;
     private String messaggio;
 
     // Costruttore
-    public RispostaLoginAndLogout(boolean successo, String messaggio) {
+    public ResponseBoolMessage(boolean successo, String messaggio) {
         this.successo = successo;
         this.messaggio = messaggio;
     }

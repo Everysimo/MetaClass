@@ -1,22 +1,15 @@
 package com.commigo.metaclass.MetaClass.gestionestanza.controller;
 
-import com.commigo.metaclass.MetaClass.entity.*;
-import com.commigo.metaclass.MetaClass.gestionestanza.service.GestioneStanzaService;
-import jakarta.servlet.http.HttpSession;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 public class GestioneStanzaControl {
 
-    @Autowired
-    @Qualifier("GestioneStanzaService")
-    private GestioneStanzaService stanzaService;
+   // @Autowired
+    //@Qualifier("GestioneStanzaService")
+    //private GestioneStanzaService stanzaService;
 
+    /*
     @PostMapping(value = "/richiestaAccessoStanza")
     public ResponseEntity<RispostaRichiestaAccessoStanza> richiestaAccessoStanza(Utente u, String codiceStanza, HttpSession session) {
         try {
@@ -32,5 +25,7 @@ public class GestioneStanzaControl {
                     .body(new RispostaRichiestaAccessoStanza(false, "Errore durante la richiesta: " + e.getMessage()));
         }
     }
+
+    */
 
 }
