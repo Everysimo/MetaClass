@@ -9,6 +9,7 @@ const BurgerButton = () => {
         setIsOpen(!isOpen);
     };
 
+
     const buttonClass = `hamburger-menu ${isOpen ? 'open' : ''}`;
     const menuClass = `menu2 ${isOpen ? 'menu2Open' : ''}`;
 
