@@ -38,7 +38,7 @@ public class GestioneAmministrazioneController {
     }
 
     @PostMapping(value = "admin/updateScenario")
-    public ResponseEntity<ResponseBoolMessage> updateCategoria(@RequestBody String requestBody, HttpSession session) throws JsonProcessingException {
+    public ResponseEntity<ResponseBoolMessage> updateScenario(@RequestBody String requestBody, HttpSession session) throws JsonProcessingException {
 
         // Convertita la stringa JSON in un oggetto Scenario usando ObjectMapper
         ObjectMapper objectMapper = new ObjectMapper();
