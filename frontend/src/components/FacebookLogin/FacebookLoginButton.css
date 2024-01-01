@@ -1,12 +1,20 @@
 .loginForm{
     border-radius: 25px;
     box-shadow: 7px 3px 21px 1px rgba(0,0,0,0.79);
-    padding: 5%;
+    padding: 10%;
     background: white;
-    margin: auto;
     justify-content: center;
+    word-break: break-word;
+    margin: auto;
 }
 
-.logoutButton{
-    background: #c70049;
+.logoutButton{ background: #c70049;}
+
+.logoutButton:hover{ background: #002f53; }
+
+@media only screen and (max-width: 1000px) {
+    .loginForm {
+        margin-top: 20%;
+        margin-bottom: 20%;
+    }
 }

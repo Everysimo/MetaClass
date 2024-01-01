@@ -1,30 +1,37 @@
-import React, { Component } from "react";
+import React, {Component, useState} from "react";
 import './FacebookLoginButton.css'
 import FacebookLogin from "@greatsumini/react-facebook-login";
 
 export default class Facebook extends Component {
+
     state = {
-        isLoggedIn: false,
-        userID: "",
-        name: "",
+        metaId: "",
+        nome: "",
         email: "",
-        picture: ""
+        cognome: "",
+        tokenAuth: ""
     };
 
     responseFacebook = response => {
         this.setState({
-            isLoggedIn: true,
-            userID: response.userID,
-            name: response.name,
-            email: response.email,
-            picture: response.picture.data.url
+            nome: response.name.split(' ').slice(0, -1).join(' '),
+            cognome: response.name.split(' ').slice(-1).join(' '),
+            email: response.email
+        }, ()=>{
+            console.log(JSON.stringify(this.state))
         });
     };
 
+    responseLogin = response => {
+        this.setState({
+            tokenAuth: response.accessToken,
+            metaId: response.userID
+        })
+    }
+
     logoutFunct = () =>{
         this.setState({
-            isLoggedIn: false,
-            userID: "",
+            metaId: "",
             name: "",
             email: "",
             picture: ""
@@ -32,49 +39,25 @@ export default class Facebook extends Component {
     }
     render() {
         let fbContent;
-
-        if (this.state.isLoggedIn) {
-            fbContent = (
-                <div className={"loginForm"}>
-                    <div className={"table-row"}>
-                        <span className={"table-cell"}>
-                            <h2>Welcome {this.state.name}</h2>
-                        </span>
-                    </div>
-                    <div className={"table-row"}>
-                        <span className={"table-cell"}>
-                            <h3>Email: {this.state.email}</h3>
-                        </span>
-                    </div>
-                    <div className={"table-row"}>
-                        <span className={"table-cell"}>
-                            <button onClick={this.logoutFunct} className={"logoutButton"}>Logout</button>
-                            <button>Account</button>
-                        </span>
-                    </div>
-                </div>
+        fbContent = (
+            <div className={"loginForm"}>
+                <h2>To use this system, you need to login via Facebook</h2>
+                <FacebookLogin
+                    appId="3381145492205390"
+                    onSuccess={(response) => {
+                        this.responseLogin(response)
+                    }}
+                    onFail={(error) => {
+                        console.log('Login Failed!', error);
+                    }}
+                    onProfileSuccess={(response) => {
+                        this.responseFacebook(response)
+                    }}
+                >
+                    Accedi con Facebook
+                </FacebookLogin>
+            </div>
         );
-        } else {
-            fbContent = (
-                <div className={"loginForm"}>
-                    <h2>To use this system, you need to login via Facebook</h2>
-                    <FacebookLogin
-                        appId="3381145492205390"
-                        onSuccess={(response) => {
-                            console.log('Login Success!', response);
-                        }}
-                        onFail={(error) => {
-                            console.log('Login Failed!', error);
-                        }}
-                        onProfileSuccess={(response) => {
-                            console.log('Get Profile Success!', response);
-                            this.responseFacebook(response);
-                        }} >
-                        Accedi con Facebook
-                    </FacebookLogin>
-                </div>
-            );
-        }
         return <div>{fbContent}</div>;
     }
 }
