@@ -1,15 +1,14 @@
-import React, {Component, useState} from "react";
+import React, {Component} from "react";
 import './FacebookLoginButton.css'
 import FacebookLogin from "@greatsumini/react-facebook-login";
-
 export default class Facebook extends Component {
 
     state = {
-        metaId: "",
         nome: "",
-        email: "",
         cognome: "",
-        tokenAuth: ""
+        email: "",
+        tokenAuth: "",
+        metaId: ""
     };
 
     responseFacebook = response => {
@@ -17,11 +16,22 @@ export default class Facebook extends Component {
             nome: response.name.split(' ').slice(0, -1).join(' '),
             cognome: response.name.split(' ').slice(-1).join(' '),
             email: response.email
-        }, ()=>{
-            console.log(JSON.stringify(this.state))
-        });
+        },
+            this.componentDidMount
+        );
     };
 
+    componentDidMount() {
+        // Simple POST request with a JSON body using fetch
+        const requestOptions = {
+            method: 'POST',
+            headers: { 'Content-Type': 'user-parameters' },
+            body: JSON.stringify(this.state)
+        };
+        //da sostituire l'input con la chiamata API al server
+        fetch('https://reqres.in/api/posts', requestOptions)
+            .then(response => response.json());
+    }
     responseLogin = response => {
         this.setState({
             tokenAuth: response.accessToken,
@@ -29,14 +39,6 @@ export default class Facebook extends Component {
         })
     }
 
-    logoutFunct = () =>{
-        this.setState({
-            metaId: "",
-            name: "",
-            email: "",
-            picture: ""
-        })
-    }
     render() {
         let fbContent;
         fbContent = (
