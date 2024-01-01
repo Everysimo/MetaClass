@@ -1,5 +1,6 @@
 package com.commigo.metaclass.MetaClass.gestioneutenza.controller;
 
+import com.commigo.metaclass.MetaClass.entity.Stanza;
 import com.commigo.metaclass.MetaClass.entity.Utente;
 import com.commigo.metaclass.MetaClass.gestioneutenza.service.GestioneUtenzaService;
 import com.google.gson.Gson;
@@ -8,11 +9,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -80,5 +79,35 @@ public class GestioneUtenzaController {
             }
             return responseHTTP;
 
+    }
+
+    @GetMapping(value = "/visualizzaStanze")
+    public ResponseEntity<ResponseListMessage<Stanza>> visualizzaStanze(HttpSession session){
+        List<Stanza> stanze;
+        try {
+            String IdMeta = (String) session.getAttribute("UserMetaID");
+
+            if(IdMeta==null)
+                return ResponseEntity.status(403).body(new ResponseListMessage<Stanza>(null, "Utente non loggato"));
+            stanze = utenzaService.getStanzeByUserId(IdMeta);
+            if(stanze == null){
+                return ResponseEntity.status(500)
+                        .body(new ResponseListMessage<Stanza>(null,
+                                "Errore la ricerca delle stanze"));
+            }else if(stanze.isEmpty()){
+                return ResponseEntity
+                        .ok(new ResponseListMessage<Stanza>(stanze,
+                                "non hai accesso a nessuna stanza"));
+            }else{
+                return ResponseEntity
+                        .ok(new ResponseListMessage<Stanza>(stanze,
+                                "operazione effettuata con successo"));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(500)
+                    .body(new ResponseListMessage<Stanza>(null,
+                            "Errore durante l'operazione"));
+        }
     }
 }

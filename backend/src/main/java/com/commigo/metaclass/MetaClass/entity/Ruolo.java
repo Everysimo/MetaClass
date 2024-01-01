@@ -44,6 +44,6 @@ public class Ruolo {
     private LocalDateTime data_aggiornamento;
 
     public Ruolo(String nome) {
-        nome = nome;
+        this.nome = nome;
     }
 }
