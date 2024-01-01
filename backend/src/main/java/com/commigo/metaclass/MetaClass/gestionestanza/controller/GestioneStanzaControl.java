@@ -4,6 +4,7 @@ import com.commigo.metaclass.MetaClass.entity.Scenario;
 import com.commigo.metaclass.MetaClass.entity.Stanza;
 import com.commigo.metaclass.MetaClass.entity.Utente;
 import com.commigo.metaclass.MetaClass.gestionestanza.service.GestioneStanzaService;
+import com.commigo.metaclass.MetaClass.gestioneutenza.controller.ResponseBoolMessage;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -26,7 +27,7 @@ public class GestioneStanzaControl {
     private GestioneStanzaService stanzaService;
 
     @PostMapping(value = "/accessoStanza")
-    public ResponseEntity<RispostaRichiestaAccessoStanza> richiestaAccessoStanza(@RequestBody String requestBody, HttpSession session) {
+    public ResponseEntity<ResponseBoolMessage> richiestaAccessoStanza(@RequestBody String requestBody, HttpSession session) {
         try {
 
             ObjectMapper objectMapper = new ObjectMapper();
@@ -38,7 +39,7 @@ public class GestioneStanzaControl {
         } catch (RuntimeException | JsonProcessingException e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new RispostaRichiestaAccessoStanza(false, "Errore durante la richiesta: " + e.getMessage()));
+                    .body(new ResponseBoolMessage(false, "Errore durante la richiesta: " + e.getMessage()));
         }
     }
 

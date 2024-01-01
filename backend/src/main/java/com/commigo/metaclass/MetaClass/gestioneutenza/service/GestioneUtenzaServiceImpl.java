@@ -1,5 +1,6 @@
 package com.commigo.metaclass.MetaClass.gestioneutenza.service;
 
+import com.commigo.metaclass.MetaClass.entity.Ruolo;
 import com.commigo.metaclass.MetaClass.entity.Stanza;
 import com.commigo.metaclass.MetaClass.entity.StatoPartecipazione;
 import com.commigo.metaclass.MetaClass.entity.Utente;
@@ -10,6 +11,7 @@ import com.commigo.metaclass.MetaClass.gestioneutenza.repository.UtenteRepositor
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -95,5 +97,30 @@ public class GestioneUtenzaServiceImpl implements GestioneUtenzaService{
         }catch (Exception e) {
             e.printStackTrace(); // Stampa la traccia dell'eccezione per debugging
             return null;        }
+    }
+
+    @Override
+    public ResponseBoolMessage upgradeUtente(String id_Uogm, long id_Uog, long id_stanza){
+
+        Utente ogm = utenteRepository.findFirstByMetaId(id_Uogm);
+        Utente og = utenteRepository.findUtenteById(id_Uog);
+        Stanza stanza = stanzaRepository.findStanzaById(id_stanza);
+
+        StatoPartecipazione stato_ogm = statoPartecipazioneRepository.findStatoPartecipazioneByUtenteAndStanza(ogm, stanza);
+        if(stato_ogm.getRuolo().getNome().equalsIgnoreCase("Organizzatore_Master")){
+            StatoPartecipazione stato_og = statoPartecipazioneRepository.findStatoPartecipazioneByUtenteAndStanza(og, stanza);
+            if(stato_og.getRuolo().getNome().equalsIgnoreCase("Partecipante")){
+                stato_og.getRuolo().setNome(Ruolo.ORGANIZZATORE);
+                return new ResponseBoolMessage(true, "L'utente selezionato ora è un organizzatore");
+
+            }else if (stato_og.getRuolo().getNome().equalsIgnoreCase("Organizzatore")){
+                return new ResponseBoolMessage(false, "L'utente selezionato è già un'organizzatore");
+
+            }else{
+                return new ResponseBoolMessage(false, "L'utente selezionato ora non può essere declassato ad organizzatore");
+            }
+        }else{
+            return new ResponseBoolMessage(false, "Non puoi promuovere un'utente perché non sei un'organizzatore master");
+        }
     }
 }

@@ -2,10 +2,9 @@ package com.commigo.metaclass.MetaClass.gestionestanza.service;
 
 import com.commigo.metaclass.MetaClass.entity.StatoPartecipazione;
 import com.commigo.metaclass.MetaClass.entity.*;
-import com.commigo.metaclass.MetaClass.gestionestanza.controller.RispostaRichiestaAccessoStanza;
 import com.commigo.metaclass.MetaClass.gestionestanza.repository.*;
+import com.commigo.metaclass.MetaClass.gestioneutenza.controller.ResponseBoolMessage;
 import com.commigo.metaclass.MetaClass.gestioneutenza.repository.UtenteRepository;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -23,7 +22,7 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService {
     private final RuoloRepository ruoloRepository;
 
     @Override
-    public ResponseEntity<RispostaRichiestaAccessoStanza> richiestaAccessoStanza(String codiceStanza, String id_utente) {
+    public ResponseEntity<ResponseBoolMessage> richiestaAccessoStanza(String codiceStanza, String id_utente) {
         try {
             Stanza stanza = stanzaRepository.findStanzaByCodice(codiceStanza);
 
@@ -32,36 +31,36 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService {
 
             if (statoPartecipazione == null) {
                 statoPartecipazione = new StatoPartecipazione(stanza, u, getRuolo(Ruolo.PARTECIPANTE), true, false, u.getNome());
-                return ResponseEntity.ok(new RispostaRichiestaAccessoStanza(true, "La stanza è privata, sei in attesa di entrare"));
+                return ResponseEntity.ok(new ResponseBoolMessage(true, "La stanza è privata, sei in attesa di entrare"));
 
             } else if (statoPartecipazione.isBannato()) {
-                return ResponseEntity.ok(new RispostaRichiestaAccessoStanza(false, "Sei stato bannato da questa stanza, non puoi entrare"));
+                return ResponseEntity.ok(new ResponseBoolMessage(false, "Sei stato bannato da questa stanza, non puoi entrare"));
 
             } else if (statoPartecipazione.isInAttesa()) {
-                return ResponseEntity.ok(new RispostaRichiestaAccessoStanza(true, "Sei già in attesa di entrare in questa stanza"));
+                return ResponseEntity.ok(new ResponseBoolMessage(true, "Sei già in attesa di entrare in questa stanza"));
 
             } else {
-                return ResponseEntity.ok(new RispostaRichiestaAccessoStanza(true, "Sei già all'interno di questa stanza"));
+                return ResponseEntity.ok(new ResponseBoolMessage(true, "Sei già all'interno di questa stanza"));
             }
 
 
         } catch (RuntimeException e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new RispostaRichiestaAccessoStanza(false, "Errore durante la richiesta: " + e.getMessage()));
+                    .body(new ResponseBoolMessage(false, "Errore durante la richiesta: " + e.getMessage()));
         }
 
     }
 
     @Override
-    public ResponseEntity<RispostaRichiestaAccessoStanza> accessoStanza(String codiceStanza, String id_utente) {
+    public ResponseEntity<ResponseBoolMessage> accessoStanza(String codiceStanza, String id_utente) {
 
         Stanza stanza = stanzaRepository.findStanzaByCodice(codiceStanza);
         if (stanza == null) {
-            return ResponseEntity.ok(new RispostaRichiestaAccessoStanza(false, "Stanza non trovata"));
+            return ResponseEntity.ok(new ResponseBoolMessage(false, "Stanza non trovata"));
         } else if (!stanza.isTipo_Accesso()) {
 
-            RispostaRichiestaAccessoStanza richiesta = richiestaAccessoStanza(codiceStanza, id_utente).getBody();
+            ResponseBoolMessage richiesta = richiestaAccessoStanza(codiceStanza, id_utente).getBody();
             return ResponseEntity.ok(richiesta);
 
         } else {
@@ -72,19 +71,19 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService {
 
                 if (statoPartecipazione == null) {
                     statoPartecipazione = new StatoPartecipazione(stanza, u, getRuolo(Ruolo.PARTECIPANTE), false, false, u.getNome());
-                    return ResponseEntity.ok(new RispostaRichiestaAccessoStanza(true, "Stai per effettuare l'accesso alla stanza"));
+                    return ResponseEntity.ok(new ResponseBoolMessage(true, "Stai per effettuare l'accesso alla stanza"));
 
 
                 } else if (statoPartecipazione.isBannato()) {
-                    return ResponseEntity.ok(new RispostaRichiestaAccessoStanza(false, "Sei stato bannato da questa stanza, non puoi entrare"));
+                    return ResponseEntity.ok(new ResponseBoolMessage(false, "Sei stato bannato da questa stanza, non puoi entrare"));
                 } else {
-                    return ResponseEntity.ok(new RispostaRichiestaAccessoStanza(true, "Sei già all'interno di questa stanza"));
+                    return ResponseEntity.ok(new ResponseBoolMessage(true, "Sei già all'interno di questa stanza"));
                 }
 
             } catch (RuntimeException e) {
                 e.printStackTrace();
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                        .body(new RispostaRichiestaAccessoStanza(false, "Errore durante la richiesta: " + e.getMessage()));
+                        .body(new ResponseBoolMessage(false, "Errore durante la richiesta: " + e.getMessage()));
             }
         }
     }
