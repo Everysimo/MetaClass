@@ -96,4 +96,12 @@ public class Stanza {
     @UpdateTimestamp
     private LocalDateTime Data_Aggiornamento;
 
+    public Stanza(String nome, String codiceStanza, String descrizione, boolean tipoAccesso, int maxPosti)
+    {
+        this.Nome = nome;
+        this.codice = codiceStanza;
+        this.Descrizione = descrizione;
+        this.Tipo_Accesso = tipoAccesso;
+        this.MAX_Posti = maxPosti;
+    }
 }
