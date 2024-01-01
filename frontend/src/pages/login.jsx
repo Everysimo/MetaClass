@@ -3,14 +3,22 @@ import '../css/MyApp.css';
 import '../css/index.css';
 import {MyHeader} from '../components/Header/Header';
 import {MyFooter} from "../components/Footer/Footer";
-import {SectionGenerator} from "../components/functions";
+import Facebook from "../components/FacebookLogin/FacebookLoginButton";
 export const Login = () =>{
     return(
         <body>
             <header>
                 <MyHeader />
             </header>
-            <SectionGenerator class={"sec"} ID={"sec1"}/>
+            <section className={"sec"} id={"sec1"}>
+                <div className={"table-container"}>
+                    <div className={"table-row"}>
+                        <div className={"table-cell"}>
+                            <Facebook />
+                        </div>
+                    </div>
+                </div>
+            </section>
             <footer>
                 <MyFooter />
             </footer>
