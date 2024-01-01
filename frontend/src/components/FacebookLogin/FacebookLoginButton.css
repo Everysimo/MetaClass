@@ -1,0 +1,12 @@
+.loginForm{
+    border-radius: 25px;
+    box-shadow: 7px 3px 21px 1px rgba(0,0,0,0.79);
+    padding: 5%;
+    background: white;
+    margin: auto;
+    justify-content: center;
+}
+
+.logoutButton{
+    background: #c70049;
+}

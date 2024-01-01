@@ -1,6 +1,7 @@
 package com.commigo.metaclass.MetaClass.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
@@ -48,11 +49,12 @@ public class Stanza {
     /**
      *Codice della Stanza
      */
+
     @NotNull(message = "Il codice della stanza non può essere nullo")
     @Column(length = MAX_NAME_LENGTH, unique = true)
     @Size(min = 6, max = 6, message = "Lunghezza del codice stanza non valido")
     @NotBlank(message = "Il codice stanza  non può essere vuoto")
-    private String Codice_Stanza;
+    private String codice;
 
     /**
      *Descrizione della Stanza
@@ -94,4 +96,12 @@ public class Stanza {
     @UpdateTimestamp
     private LocalDateTime Data_Aggiornamento;
 
+    public Stanza(String nome, String codiceStanza, String descrizione, boolean tipoAccesso, int maxPosti)
+    {
+        this.Nome = nome;
+        this.codice = codiceStanza;
+        this.Descrizione = descrizione;
+        this.Tipo_Accesso = tipoAccesso;
+        this.MAX_Posti = maxPosti;
+    }
 }

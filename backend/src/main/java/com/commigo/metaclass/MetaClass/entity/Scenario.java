@@ -1,10 +1,13 @@
 package com.commigo.metaclass.MetaClass.entity;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
-import lombok.*;
+import jakarta.validation.constraints.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -14,6 +17,7 @@ import java.time.LocalDateTime;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@JsonIgnoreProperties({"id_categoria"})
 public class Scenario {
 
     public static final int MAX_LENGTH = 254;
@@ -34,12 +38,12 @@ public class Scenario {
     @Column
     @Size(min = MIN_LENGTH, max = MAX_LENGTH, message = "Lunghezza della descrizione non valida")
     @NotBlank
-    private String descrizione_scenario;
+    private String descrizione;
 
-    @NotNull(message = "la media non può essere nulla")
-    @Size(min = 1, max = 5, message = "Lunghezza della media non valida")
-    @NotBlank
-    private float media_valutazione;
+    @DecimalMin(value = "1", message = "Il valore della media deve essere almeno 1")
+    @DecimalMax(value = "5", message = "Il valore della media non può superare 5")
+    @Column(nullable = false, columnDefinition = "FLOAT DEFAULT 1.0")
+    private float media_valutazione = 1;
 
     /**
      *Chiave Esterna sulla Categoria
@@ -56,4 +60,11 @@ public class Scenario {
     @Column(name = "Data_Aggiornamento")
     @UpdateTimestamp
     private LocalDateTime data_aggiornamento;
+
+    @JsonCreator
+    public Scenario(@JsonProperty("nome") String Nome,
+                  @JsonProperty("descrizione") String Descrizione){
+        this.nome = Nome;
+        this.descrizione = Descrizione;
+    }
 }

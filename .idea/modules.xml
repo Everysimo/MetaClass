@@ -4,6 +4,7 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/MetaClass.iml" filepath="$PROJECT_DIR$/.idea/MetaClass.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/com.commigo.metaclass.MetaClass.main.iml" filepath="$PROJECT_DIR$/.idea/modules/com.commigo.metaclass.MetaClass.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/com.commigo.metaclass.MetaClass.main~1.iml" filepath="$PROJECT_DIR$/.idea/modules/com.commigo.metaclass.MetaClass.main~1.iml" />
     </modules>
   </component>
 </project>

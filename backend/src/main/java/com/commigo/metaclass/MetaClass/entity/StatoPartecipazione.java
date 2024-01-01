@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
 @Entity
@@ -16,7 +17,8 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
-public class StatoPartecipazione {
+@IdClass(value = StatoPartecipazione.class)
+public class StatoPartecipazione implements Serializable {
 
 
     /**
@@ -45,7 +47,6 @@ public class StatoPartecipazione {
     /**
      *Chiave Esterna sulla ruolo dell'utente
      */
-    @Id
     @NotNull(message = "Il ruolo  non può essere nullo")
     @ManyToOne()
     @JoinColumn(name = "id_ruolo")
@@ -81,4 +82,12 @@ public class StatoPartecipazione {
     @UpdateTimestamp
     private LocalDateTime Data_Aggiornamento;
 
+    public StatoPartecipazione(Stanza stanza, Utente utente, Ruolo ruolo, boolean isInAttesa, boolean isBannato, String nomeInStanza) {
+        this.stanza = stanza;
+        this.utente = utente;
+        this.ruolo = ruolo;
+        this.isInAttesa = isInAttesa;
+        this.isBannato = isBannato;
+        NomeInStanza = nomeInStanza;
+    }
 }
