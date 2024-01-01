@@ -20,18 +20,18 @@ public class Categoria {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long Id;
+    private long id;
 
     @NotNull(message = "Il nome non può essere nullo")
     @Column(unique = true)
     @Size(min = MIN_NAME_LENGTH, max = MAX_NAME_LENGTH, message = "Lunghezza del nome non valida")
     @NotBlank
-    private String Nome;
+    private String nome;
 
 
     @NotNull(message = "La descrizione non può essere nulla")
     @Column
     @Size(min = MIN_NAME_LENGTH, max = MAX_NAME_LENGTH, message = "Lunghezza della descrizione non valida")
     @NotBlank
-    private String Descrizione_Categoria;
+    private String descrizione_categoria;
 }
