@@ -112,13 +112,13 @@ public class GestioneUtenzaController {
     }
 
     @GetMapping(value = "/promuoviOrganizzatore")
-    public ResponseEntity<ResponseBoolMessage> promuoviOrganizzatore(@RequestBody long id_og, long id_stanza, HttpSession session) {
+    public ResponseEntity<ResponseBoolMessage> promuoviOrganizzatore(@RequestBody Utente og, Stanza stanza, HttpSession session) {
         try {
             String IdMeta = (String) session.getAttribute("UserMetaID");
             if (IdMeta == null) {
                 return ResponseEntity.status(403).body(new ResponseBoolMessage(false, "Utente non loggato"));
             }else{
-                return ResponseEntity.ok(utenzaService.upgradeUtente(IdMeta, id_og, id_stanza));
+                return ResponseEntity.ok(utenzaService.upgradeUtente(IdMeta, og, stanza));
             }
         } catch (Exception e) {
             e.printStackTrace();
