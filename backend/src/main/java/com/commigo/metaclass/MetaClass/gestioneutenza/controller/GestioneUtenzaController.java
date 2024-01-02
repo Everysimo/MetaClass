@@ -41,7 +41,7 @@ public class GestioneUtenzaController {
     }
 
     @PostMapping(value = "/logout")
-    public ResponseEntity<ResponseBoolMessage> logout(@RequestBody String MetaId, HttpSession session){
+    public ResponseEntity<ResponseBoolMessage> logout(@RequestBody String MetaId, HttpSession session) {
         try {
             if (session.getAttribute("UserMetaID") != null) {
                 session.removeAttribute("UserMetaID");
@@ -61,44 +61,44 @@ public class GestioneUtenzaController {
             @RequestBody Map<String, Object> dataMap,
             HttpSession session) {
 
-            Utente u = null;
-            ResponseBoolMessage response;
-            ResponseEntity<ResponseBoolMessage> responseHTTP;
+        Utente u = null;
+        ResponseBoolMessage response;
+        ResponseEntity<ResponseBoolMessage> responseHTTP;
 
-            response = utenzaService.modificaDatiUtente(Id, dataMap, u);
-            if(response.isSuccesso()) {
-                 if(u!=null){
-                    // Converti l'oggetto utente in formato JSON
-                    String userJson = new Gson().toJson(u);
-                    System.out.println(userJson);
-                    session.setAttribute("UserModified", userJson);
-                 }
-                 responseHTTP = ResponseEntity.ok(response);
-            }else{
-                responseHTTP = ResponseEntity.status(500).body(response);
+        response = utenzaService.modificaDatiUtente(Id, dataMap, u);
+        if (response.isSuccesso()) {
+            if (u != null) {
+                // Converti l'oggetto utente in formato JSON
+                String userJson = new Gson().toJson(u);
+                System.out.println(userJson);
+                session.setAttribute("UserModified", userJson);
             }
-            return responseHTTP;
+            responseHTTP = ResponseEntity.ok(response);
+        } else {
+            responseHTTP = ResponseEntity.status(500).body(response);
+        }
+        return responseHTTP;
 
     }
 
     @GetMapping(value = "/visualizzaStanze")
-    public ResponseEntity<ResponseListMessage<Stanza>> visualizzaStanze(HttpSession session){
+    public ResponseEntity<ResponseListMessage<Stanza>> visualizzaStanze(HttpSession session) {
         List<Stanza> stanze;
         try {
             String IdMeta = (String) session.getAttribute("UserMetaID");
 
-            if(IdMeta==null)
+            if (IdMeta == null)
                 return ResponseEntity.status(403).body(new ResponseListMessage<Stanza>(null, "Utente non loggato"));
             stanze = utenzaService.getStanzeByUserId(IdMeta);
-            if(stanze == null){
+            if (stanze == null) {
                 return ResponseEntity.status(500)
                         .body(new ResponseListMessage<Stanza>(null,
                                 "Errore la ricerca delle stanze"));
-            }else if(stanze.isEmpty()){
+            } else if (stanze.isEmpty()) {
                 return ResponseEntity
                         .ok(new ResponseListMessage<Stanza>(stanze,
                                 "non hai accesso a nessuna stanza"));
-            }else{
+            } else {
                 return ResponseEntity
                         .ok(new ResponseListMessage<Stanza>(stanze,
                                 "operazione effettuata con successo"));
@@ -110,4 +110,22 @@ public class GestioneUtenzaController {
                             "Errore durante l'operazione"));
         }
     }
+
+    @GetMapping(value = "/promuoviOrganizzatore")
+    public ResponseEntity<ResponseBoolMessage> promuoviOrganizzatore(@RequestBody long id_og, long id_stanza, HttpSession session) {
+        try {
+            String IdMeta = (String) session.getAttribute("UserMetaID");
+            if (IdMeta == null) {
+                return ResponseEntity.status(403).body(new ResponseBoolMessage(false, "Utente non loggato"));
+            }else{
+                return ResponseEntity.ok(utenzaService.upgradeUtente(IdMeta, id_og, id_stanza));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(500)
+                    .body(new ResponseBoolMessage(false,
+                            "Errore durante l'operazione"));
+        }
+    }
+
 }

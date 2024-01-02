@@ -12,6 +12,7 @@
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="com.commigo.metaclass.MetaClass.main~1" target="17" />
+      <module name="com.commigo.metaclass.MetaClass.test" target="17" />
     </bytecodeTargetLevel>
   </component>
 </project>
