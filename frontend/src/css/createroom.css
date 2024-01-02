@@ -1,0 +1,13 @@
+
+/*css del div che contiene tutto (riquadro)*/
+.total-body{
+
+    margin: 1px;
+
+    /*crea bordi*/
+    border-width: 2px;
+    border-style: solid;
+    border-color: #002f53;
+    border-radius: 10px 10px 10px 10px;
+    box-shadow: 5px 5px 20px rgba(0, 0, 0, 0.2);
+}
