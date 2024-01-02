@@ -1,5 +1,6 @@
 package com.commigo.metaclass.MetaClass.entity;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
@@ -96,7 +97,12 @@ public class Stanza {
     @UpdateTimestamp
     private LocalDateTime Data_Aggiornamento;
 
-    public Stanza(String nome, String codiceStanza, String descrizione, boolean tipoAccesso, int maxPosti)
+    @JsonCreator
+    public Stanza(@JsonProperty("nome") String nome,
+                  @JsonProperty("codiceStanza") String codiceStanza,
+                  @JsonProperty("descrizione") String descrizione,
+                  @JsonProperty("tipoAccesso") boolean tipoAccesso,
+                  @JsonProperty("maxPosti") int maxPosti)
     {
         this.Nome = nome;
         this.codice = codiceStanza;
