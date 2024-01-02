@@ -48,7 +48,6 @@ public class Utente {
      */
     private static final int MAX_PHONE_LENGTH = 10;
 
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Getter
@@ -129,12 +128,10 @@ public class Utente {
     public Utente(@JsonProperty("nome") String Nome,
                   @JsonProperty("cognome") String Cognome,
                   @JsonProperty("email") String Email,
-                  @JsonProperty("metaId") String IdMeta,
-                  @JsonProperty("tokenAuth") String TokenAuth) {
+                  @JsonProperty("metaId") String IdMeta){
         this.nome = Nome;
         this.cognome = Cognome;
         this.email = Email;
         this.metaId = IdMeta;
-        this.tokenAuth = TokenAuth;
     }
 }

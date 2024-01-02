@@ -22,6 +22,7 @@ public class GestioneUtenzaController {
     private GestioneUtenzaService utenzaService;
 
     @PostMapping(value = "/login")
+    @CrossOrigin
     public ResponseEntity<ResponseBoolMessage> login(@RequestBody Utente u, HttpSession session) {
         try {
             if (!utenzaService.loginMeta(u)) {
