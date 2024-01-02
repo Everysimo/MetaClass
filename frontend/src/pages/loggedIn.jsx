@@ -1,19 +1,34 @@
-/**/
-import {MyHeader} from "../components/Header/Header";
-import {MyFooter} from "../components/Footer/Footer";
-import React from "react";
+// LoggedIn.js
+import React from 'react';
+import '../css/MyApp.css';
+import '../css/index.css';
+import '../css/LoggedHome.css';
+import { MyHeader } from '../components/Header/Header';
+import { MyFooter } from "../components/Footer/Footer";
+import LogoutButton from "../components/LogoutButton/logoutButton";
 
-export const loggedIn = () =>{
-    return(
+export const LoggedIn = () => {
+    const nome = localStorage.getItem('nome');
+    return (
         <body>
-            <header>
-                <MyHeader />
-            </header>
-            <section className={"sec"}>
-            </section>
-            <footer>
-                <MyFooter />
-            </footer>
+        <header>
+            <MyHeader />
+        </header>
+        <section className={"sec"} id={"sec1"}>
+            <div className={"logoutForm"}>
+                <div className={"table-container"}>
+                    <div className={"table-row"}>
+                        <div className={"table-cell"}>
+                            <h2>Welcome back, {nome}</h2>
+                            <LogoutButton />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <footer>
+            <MyFooter />
+        </footer>
         </body>
     );
-}
+};

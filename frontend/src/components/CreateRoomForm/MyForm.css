@@ -1,0 +1,105 @@
+
+/*gestisce la principale*/
+.primary{
+    display: flex;
+        justify-content: left;
+
+    margin: 10px;
+}
+
+/*gestisce la parte destra e quella sinistra dei box*/
+.left-label{
+    display: inline-block;
+
+    margin-top: 5%;
+    margin-bottom: 5%;
+    margin-left: 10%;
+}
+
+.right-label{
+
+    margin-top: 15%;
+    margin-bottom: 5%;
+    margin-right: 10%;
+}
+
+/*css del form di testo*/
+.input-field{
+    border: 2px solid #002f53;
+    border-radius: 14px;
+
+    width: 200px;
+    height: 30px;
+}
+
+/*modifica la textarea*/
+.textarea-field {
+    border: 2px solid #002f53;
+    border-radius: 14px;
+
+    width: 200px;
+}
+
+/*gestione della select*/
+.select-field{
+    border: 2px solid #002f53;
+    border-radius: 14px;
+
+    background-color: #002f53;
+    color: white;
+    font-weight: bold;
+    padding: 3%;
+}
+
+/*gestione del form del num MAX di persone*/
+.number-field{
+    border: 2px solid #002f53;
+    border-radius: 14px;
+}
+
+/*gestisce la div dove inserire il pin*/
+.text-box{
+    width: 300px;
+    height: 50px;
+    border: 1px solid #002f53;
+
+    background-color: #002f53;
+
+}
+
+.text-box>p{
+    text-align: center;
+    color: white;
+}
+
+.pin-box{
+    border: 1px solid #002f53;
+    width: 300px;
+    height: 100px;
+
+}
+/*gestisce il field di inserimento del codice*/
+.pin-field{
+
+    border: 2px solid #002f53;
+    border-radius: 14px;
+
+    margin-top: 40px;
+}
+
+/*gestisce i label di testo */
+.textp{
+    font-weight: bold;
+    font-size: 14px;
+    color: #002f53;
+}
+
+.button-create{
+    width: 100px;
+}
+/*
+.divider {
+    height: 100vh;
+    width: 2px;
+    background-color: red;
+}*/
