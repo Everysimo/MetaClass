@@ -1,0 +1,11 @@
+.logoutForm{
+    border-radius: 25px;
+    box-shadow: 7px 3px 21px 1px rgba(0,0,0,0.79);
+    padding: 10%;
+    background: white;
+    justify-content: center;
+    word-break: break-word;
+    margin: auto;
+    width: 50%;
+    height: 50%;
+}
