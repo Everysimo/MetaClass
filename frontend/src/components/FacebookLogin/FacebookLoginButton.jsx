@@ -3,15 +3,17 @@ import './FacebookLoginButton.css'
 import FacebookLogin from "@greatsumini/react-facebook-login";
 
 export default class Facebook extends Component {
-
-    state = {
-        isLoggedIn: localStorage.getItem('isLoggedIn') === 'true',
-        nome: "",
-        cognome: "",
-        email: "",
-        tokenAuth: "",
-        metaId: ""
-    };
+    constructor(props) {
+        super(props);
+        this.state = {
+            isLoggedIn: localStorage.getItem('isLoggedIn') === 'true',
+            nome: "",
+            cognome: "",
+            email: "",
+            tokenAuth: "",
+            metaId: ""
+        };
+    }
 
     responseFacebook = (response) => {
         if (response && response.name) {
@@ -28,7 +30,7 @@ export default class Facebook extends Component {
                 },
                 () => {
                     this.saveLoginStatusToLocalStorage();
-                    this.componentDidMount(); // Save user data to backend server after login
+                    this.componentDidMount()
                 }
             );
         } else {
@@ -57,17 +59,32 @@ export default class Facebook extends Component {
             metaId: ""
         });
     };
-    async componentDidMount() {
-        // Simple POST request with a JSON body using fetch
+    async componentDidMount (){
+
+        const { nome, cognome, email, tokenAuth, metaId } = this.state;
+
+        const dataToSend = {
+            nome,
+            cognome,
+            email,
+            tokenAuth,
+            metaId
+        };
         const requestOptions = {
             method: 'POST',
-            headers: { 'Content-Type': 'user-parameters' },
-            body: JSON.stringify(this.state)
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(dataToSend)
         };
-        //da sostituire l'input con la chiamata API al server
-        fetch('https://reqres.in/api/posts', requestOptions)
-            .then(response => response.json());
+        try {
+            const response = await fetch('http://localhost:8080/login', requestOptions);
+            const responseData = await response.json();
+            console.log('Server response:', responseData);
+        } catch (error) {
+            console.error('Error:', error);
+        }
     }
+
+
     responseLogin = response => {
         this.setState({
             tokenAuth: response.accessToken,
@@ -90,7 +107,7 @@ export default class Facebook extends Component {
                         <h2>To use this system, you need to login via Facebook</h2>
                         <FacebookLogin
                             appId="3381145492205390"
-                            onSuccess={this.responseFacebook}
+                            onSuccess={this.responseLogin}
                             onFail={(error) => {
                                 console.log('Login Failed!', error);
                             }}
