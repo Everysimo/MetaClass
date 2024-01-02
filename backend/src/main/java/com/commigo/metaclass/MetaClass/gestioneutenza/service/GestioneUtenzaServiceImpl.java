@@ -100,11 +100,9 @@ public class GestioneUtenzaServiceImpl implements GestioneUtenzaService{
     }
 
     @Override
-    public ResponseBoolMessage upgradeUtente(String id_Uogm, long id_Uog, long id_stanza){
+    public ResponseBoolMessage upgradeUtente(String id_Uogm, Utente og, Stanza stanza){
 
         Utente ogm = utenteRepository.findFirstByMetaId(id_Uogm);
-        Utente og = utenteRepository.findUtenteById(id_Uog);
-        Stanza stanza = stanzaRepository.findStanzaById(id_stanza);
 
         StatoPartecipazione stato_ogm = statoPartecipazioneRepository.findStatoPartecipazioneByUtenteAndStanza(ogm, stanza);
         if(stato_ogm.getRuolo().getNome().equalsIgnoreCase("Organizzatore_Master")){
