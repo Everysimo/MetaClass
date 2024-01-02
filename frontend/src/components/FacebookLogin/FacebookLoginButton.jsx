@@ -13,7 +13,6 @@ export default class Facebook extends Component {
             nome: "",
             cognome: "",
             email: "",
-            tokenAuth: "",
             metaId: ""
         };
     }
@@ -58,7 +57,6 @@ export default class Facebook extends Component {
             nome,
             cognome,
             email,
-            tokenAuth,
             metaId
         };
         const requestOptions = {
@@ -67,6 +65,7 @@ export default class Facebook extends Component {
             body: JSON.stringify(dataToSend)
         };
         try {
+            console.log(JSON.stringify(dataToSend));
             const response = await fetch('http://localhost:8080/login', requestOptions);
             const responseData = await response.json();
             console.log('Server response:', responseData);
@@ -78,7 +77,6 @@ export default class Facebook extends Component {
 
     responseLogin = response => {
         this.setState({
-            tokenAuth: response.accessToken,
             metaId: response.userID
         })
     }
@@ -104,7 +102,8 @@ export default class Facebook extends Component {
                             }}
                             onProfileSuccess={this.responseFacebook}
                         >
-                            Login with Facebook <FontAwesomeIcon icon={faFacebook} size={"xl"} style={{color: '#ffffff'}}/>
+                            Login with Facebook
+                            <FontAwesomeIcon icon={faFacebook} size={"xl"} style={{color: '#ffffff'}}/>
                         </FacebookLogin>
                     </>
                 )}
