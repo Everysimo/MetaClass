@@ -17,6 +17,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class FeedbackMeeting {
 
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long Id;
