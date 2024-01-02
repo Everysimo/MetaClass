@@ -10,10 +10,6 @@
     height: 50%;
 }
 
-.logoutButton{ background: #c70049;}
-
-.logoutButton:hover{ background: #002f53; }
-
 @media only screen and (max-width: 1000px) {
     .loginForm {
         margin-top: 20%;

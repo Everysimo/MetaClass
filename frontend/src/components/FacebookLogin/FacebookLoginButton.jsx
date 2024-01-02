@@ -1,6 +1,9 @@
 import React, { Component } from "react";
-import './FacebookLoginButton.css'
+import "./FacebookLoginButton.css";
 import FacebookLogin from "@greatsumini/react-facebook-login";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faFacebook } from "@fortawesome/free-brands-svg-icons";
+import LogoutButton from "../LogoutButton/logoutButton";
 
 export default class Facebook extends Component {
     constructor(props) {
@@ -44,20 +47,8 @@ export default class Facebook extends Component {
     saveLoginStatusToLocalStorage = () => {
         // Save the isLoggedIn status to localStorage as a JSON string
         localStorage.setItem('isLoggedIn', JSON.stringify(true));
+        localStorage.setItem('nome', this.state.nome);
         // No need to reload here
-    };
-
-    handleLogout = () => {
-        // Perform logout actions: clear user data, update localStorage, etc.
-        localStorage.setItem('isLoggedIn', JSON.stringify(false));
-        this.setState({
-            isLoggedIn: false, // Update the state to reflect the logout
-            nome: "",
-            cognome: "",
-            email: "",
-            tokenAuth: "",
-            metaId: ""
-        });
     };
     async componentDidMount (){
 
@@ -100,7 +91,7 @@ export default class Facebook extends Component {
                 {isLoggedIn ? (
                     <>
                         <h2>Welcome, {nome}!</h2>
-                        <button onClick={this.handleLogout}>Logout</button>
+                        <LogoutButton />
                     </>
                 ) : (
                     <>
@@ -113,7 +104,7 @@ export default class Facebook extends Component {
                             }}
                             onProfileSuccess={this.responseFacebook}
                         >
-                            Accedi con Facebook
+                            Login with Facebook <FontAwesomeIcon icon={faFacebook} size={"xl"} style={{color: '#ffffff'}}/>
                         </FacebookLogin>
                     </>
                 )}

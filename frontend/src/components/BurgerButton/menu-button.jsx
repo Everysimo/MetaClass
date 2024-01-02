@@ -23,7 +23,7 @@ const BurgerButton = () => {
             <div className={menuClass}>
                 <ul>
                     {isLoggedIn()? (
-                        <li><Link to="/">ACCOUNT</Link></li>
+                        <li><Link to="/loggedIn">ACCOUNT</Link></li>
                     ) : (
                         <li><Link to="/login">LOGIN</Link></li>
                     )}
@@ -31,7 +31,7 @@ const BurgerButton = () => {
                     <li><Link to="/">ABOUT</Link></li>
                     <li><Link to="/">CONTACTS</Link></li>
                 </ul>
-                <img src={MCLogo} className='App-logo' alt='no image' id={"menu2-image"}></img>
+                <img src={MCLogo} className='App-logo' alt='no image' id={"menu2-image"} />
             </div>
         </div>
     );

@@ -1,6 +1,6 @@
 import {BrowserRouter as Router, Routes, Route} from "react-router-dom";
 import {Login} from "./pages/login";
-import {LoggedIn, loggedIn} from "./pages/loggedIn"
+import {LoggedIn} from "./pages/loggedIn"
 import UnloggedHome from "./pages/UnloggedHome";
 import React from "react";
 export const Rts = () =>{
