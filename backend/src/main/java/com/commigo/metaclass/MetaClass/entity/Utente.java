@@ -1,6 +1,7 @@
 package com.commigo.metaclass.MetaClass.entity;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
@@ -14,6 +15,7 @@ import java.time.LocalDateTime;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@JsonIgnoreProperties({"isLoggedIn"})
 public class Utente {
 
     /**
@@ -126,15 +128,11 @@ public class Utente {
     @JsonCreator
     public Utente(@JsonProperty("nome") String Nome,
                   @JsonProperty("cognome") String Cognome,
-                  @JsonProperty("sesso") String Sesso,
-                  @JsonProperty("età") int Età,
                   @JsonProperty("email") String Email,
                   @JsonProperty("metaId") String IdMeta,
                   @JsonProperty("tokenAuth") String TokenAuth) {
         this.nome = Nome;
         this.cognome = Cognome;
-        this.sesso = Sesso;
-        this.età = Età;
         this.email = Email;
         this.metaId = IdMeta;
         this.tokenAuth = TokenAuth;

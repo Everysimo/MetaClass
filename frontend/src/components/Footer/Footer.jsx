@@ -1,4 +1,4 @@
-import MCLogo from "../../img/MetaClassLogo.png";
+import Comm from "../../img/commigo.png";
 import './footer.css'
 import '../../css/MyApp.css'
 import React from "react";
@@ -28,10 +28,10 @@ export function MyFooter() {
         <div className={"table-container"}>
             <div className={"table-row"}>
                 <div className={"table-cell"}>
-                    <img src={MCLogo} className='App-logo' alt='no image'></img>
-                    <GenerateRows Nomi={stringsArray} />
+                    <img src={Comm} className='App-logo' alt='no image'></img>
                 </div>
             </div>
+            <GenerateRows Nomi={stringsArray}/>
         </div>
     );
 }
