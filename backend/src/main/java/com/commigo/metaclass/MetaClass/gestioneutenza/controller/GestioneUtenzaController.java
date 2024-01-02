@@ -3,6 +3,8 @@ package com.commigo.metaclass.MetaClass.gestioneutenza.controller;
 import com.commigo.metaclass.MetaClass.entity.Stanza;
 import com.commigo.metaclass.MetaClass.entity.Utente;
 import com.commigo.metaclass.MetaClass.gestioneutenza.service.GestioneUtenzaService;
+import com.commigo.metaclass.MetaClass.utility.response.Response;
+import com.commigo.metaclass.MetaClass.utility.response.ResponseUtils;
 import com.google.gson.Gson;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,21 +25,18 @@ public class GestioneUtenzaController {
 
     @PostMapping(value = "/login")
     @CrossOrigin
-    public ResponseEntity<ResponseBoolMessage> login(@RequestBody Utente u, HttpSession session) {
+    public ResponseEntity<Response<Boolean>> login(@RequestBody Utente u, HttpSession session) {
         try {
-            if (!utenzaService.loginMeta(u)) {
-                throw new RuntimeException("Login non effettuato");
-            } else if (session.getAttribute("UserMetaID") == null) {
-                session.setAttribute("UserMetaID", u.getMetaId());
-                return ResponseEntity.ok(new ResponseBoolMessage(true, "Login effettuato con successo"));
-            } else {
-                // Utente già loggato
-                return ResponseEntity.ok(new ResponseBoolMessage(true, "Utente già loggato"));
-            }
+            if (!utenzaService.loginMeta(u))
+                return ResponseUtils.getResponseError("Login non effettuato");
+
+            if (session.getAttribute("UserMetaID") != null)
+                return ResponseUtils.getResponseOk("Utente già loggato");
+
+            session.setAttribute("UserMetaID", u.getMetaId());
+            return ResponseUtils.getResponseOk("Login effettuato con successo");
         } catch (RuntimeException e) {
-            e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new ResponseBoolMessage(false, "Errore durante il login: " + e.getMessage()));
+            return ResponseUtils.getResponseError("Errore durante il login: " + e.getMessage());
         }
     }
 
