@@ -40,8 +40,8 @@ public class GestioneUtenzaController {
         }
     }
 
-    @PostMapping(value = "/logout")
-    public ResponseEntity<ResponseBoolMessage> logout(@RequestBody String MetaId, HttpSession session) {
+    @GetMapping(value = "/logout")
+    public ResponseEntity<ResponseBoolMessage> logout(HttpSession session) {
         try {
             if (session.getAttribute("UserMetaID") != null) {
                 session.removeAttribute("UserMetaID");
