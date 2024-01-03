@@ -48,7 +48,7 @@ public class Stanza {
     private String Nome;
 
     /**
-     *Codice della Stanza
+     * Codice della Stanza
      */
 
     @NotNull(message = "Il codice della stanza non può essere nullo")
@@ -58,7 +58,7 @@ public class Stanza {
     private String codice;
 
     /**
-     *Descrizione della Stanza
+     * Descrizione della Stanza
      */
     @NotNull(message = "La descrizione della stanza non può essere nulla")
     @Column(length = MAX_DESCR_LENGTH)
@@ -82,7 +82,7 @@ public class Stanza {
     private int MAX_Posti;
 
     /**
-     *Chiave Esterna sullo Scenario
+     * Chiave Esterna sullo Scenario
      */
     @NotNull(message = "Lo scenario non può essere nullo")
     @ManyToOne()
