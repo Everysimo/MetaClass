@@ -14,5 +14,4 @@ public interface GestioneUtenzaService{
     Response<Boolean> modificaDatiUtente(Long Id, Map<String, Object> dataMap, Utente u);
     List<Stanza> getStanzeByUserId(String MetaId);
 
-    ResponseBoolMessage upgradeUtente(String id_Uogm, Utente og, Stanza stanza);
 }

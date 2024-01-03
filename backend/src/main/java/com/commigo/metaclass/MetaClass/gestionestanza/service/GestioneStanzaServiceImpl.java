@@ -102,6 +102,35 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService {
 
     }
 
+    @Override
+    public ResponseBoolMessage upgradeUtente(String id_Uogm, long id_og, long id_stanza){
+
+        Utente ogm = utenteRepository.findFirstByMetaId(id_Uogm);
+        Utente og = utenteRepository.findUtenteById(id_og);
+        Stanza stanza = stanzaRepository.findStanzaById(id_stanza);
+
+        System.out.println(ogm.toString());
+        //System.out.println(id_stanza);
+        //System.out.println(stanza.toString());
+
+        StatoPartecipazione stato_ogm = statoPartecipazioneRepository.findStatoPartecipazioneByUtenteAndStanza(ogm, stanza);
+        if(stato_ogm.getRuolo().getNome().equalsIgnoreCase("Organizzatore_Master")){
+            StatoPartecipazione stato_og = statoPartecipazioneRepository.findStatoPartecipazioneByUtenteAndStanza(og, stanza);
+            if(stato_og.getRuolo().getNome().equalsIgnoreCase("Partecipante")){
+                stato_og.getRuolo().setNome(Ruolo.ORGANIZZATORE);
+                return new ResponseBoolMessage(true, "L'utente selezionato ora è un organizzatore");
+
+            }else if (stato_og.getRuolo().getNome().equalsIgnoreCase("Organizzatore")){
+                return new ResponseBoolMessage(false, "L'utente selezionato è già un'organizzatore");
+
+            }else{
+                return new ResponseBoolMessage(false, "L'utente selezionato ora non può essere declassato ad organizzatore");
+            }
+        }else{
+            return new ResponseBoolMessage(false, "Non puoi promuovere un'utente perché non sei un'organizzatore master");
+        }
+    }
+
     public Ruolo getRuolo(String nome){
 
         Ruolo ruolo = ruoloRepository.findByNome(nome);
