@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import './accediStanza.css';
 
 const AccediStanza = () => {
     const [codiceStanza, setCodiceStanza] = useState('');

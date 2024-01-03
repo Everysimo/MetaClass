@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-
+import './creaScenario.css';
 
 sendDataToServer = async() =>{
     const {nome, descrizione} = this.state;
