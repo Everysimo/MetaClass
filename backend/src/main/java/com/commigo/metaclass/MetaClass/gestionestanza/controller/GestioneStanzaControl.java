@@ -24,6 +24,7 @@ public class GestioneStanzaControl {
     @Qualifier("GestioneStanzaService")
     private GestioneStanzaService stanzaService;
 
+    //MICHELE: So che funziona, ma valuta anche @RequestBody Stanza s
     @PostMapping(value = "/creaStanza")
     public ResponseEntity<Response<Boolean>> creaStanza(@RequestBody String requestBody, HttpSession session)
     {
@@ -84,6 +85,7 @@ public class GestioneStanzaControl {
         }
     }
 
+    //MICHELE: sostituisci ResponseBoolMessage con Response<Boolean>
     @PostMapping(value = "/accessoStanza")
     public ResponseEntity<ResponseBoolMessage> richiestaAccessoStanza(@RequestBody String requestBody, HttpSession session)
     {

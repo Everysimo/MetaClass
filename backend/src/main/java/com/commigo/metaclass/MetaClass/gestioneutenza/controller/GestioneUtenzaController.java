@@ -41,32 +41,32 @@ public class GestioneUtenzaController {
     }
 
     @GetMapping(value = "/logout")
-    public ResponseEntity<ResponseBoolMessage> logout(HttpSession session) {
+    public ResponseEntity<Response<Boolean>> logout(HttpSession session) {
         try {
             if (session.getAttribute("UserMetaID") != null) {
                 session.removeAttribute("UserMetaID");
-                return ResponseEntity.ok(new ResponseBoolMessage(true, "Logout effettuato con successo"));
+                return ResponseEntity.ok(new Response<Boolean>(true, "Logout effettuato con successo"));
             } else {
-                return ResponseEntity.ok(new ResponseBoolMessage(true, "Utente non loggato"));
+                return ResponseEntity.ok(new Response<Boolean>(true, "Utente non loggato"));
             }
         } catch (Exception e) {
             e.printStackTrace();
-            return ResponseEntity.status(500).body(new ResponseBoolMessage(false, "Errore durante il logout"));
+            return ResponseEntity.status(500).body(new Response<Boolean>(false, "Errore durante il logout"));
         }
     }
 
     @PostMapping(value = "/modifyUserData/{Id}")
-    public ResponseEntity<ResponseBoolMessage> modifyUserData(
+    public ResponseEntity<Response<Boolean>> modifyUserData(
             @PathVariable Long Id,
             @RequestBody Map<String, Object> dataMap,
             HttpSession session) {
 
         Utente u = null;
-        ResponseBoolMessage response;
-        ResponseEntity<ResponseBoolMessage> responseHTTP;
+        Response<Boolean> response;
+        ResponseEntity<Response<Boolean>> responseHTTP;
 
         response = utenzaService.modificaDatiUtente(Id, dataMap, u);
-        if (response.isSuccesso()) {
+        if (response.getSuccesso()) {
             if (u != null) {
                 // Converti l'oggetto utente in formato JSON
                 String userJson = new Gson().toJson(u);
@@ -82,35 +82,36 @@ public class GestioneUtenzaController {
     }
 
     @GetMapping(value = "/visualizzaStanze")
-    public ResponseEntity<ResponseListMessage<Stanza>> visualizzaStanze(HttpSession session) {
+    public ResponseEntity<Response<List<Stanza>>> visualizzaStanze(HttpSession session) {
         List<Stanza> stanze;
         try {
             String IdMeta = (String) session.getAttribute("UserMetaID");
 
             if (IdMeta == null)
-                return ResponseEntity.status(403).body(new ResponseListMessage<Stanza>(null, "Utente non loggato"));
+                return ResponseEntity.status(403).body(new Response<List<Stanza>>(null, "Utente non loggato"));
             stanze = utenzaService.getStanzeByUserId(IdMeta);
             if (stanze == null) {
                 return ResponseEntity.status(500)
-                        .body(new ResponseListMessage<Stanza>(null,
+                        .body(new Response<List<Stanza>>(null,
                                 "Errore la ricerca delle stanze"));
             } else if (stanze.isEmpty()) {
                 return ResponseEntity
-                        .ok(new ResponseListMessage<Stanza>(stanze,
+                        .ok(new Response<List<Stanza>>(stanze,
                                 "non hai accesso a nessuna stanza"));
             } else {
                 return ResponseEntity
-                        .ok(new ResponseListMessage<Stanza>(stanze,
+                        .ok(new Response<List<Stanza>>(stanze,
                                 "operazione effettuata con successo"));
             }
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(500)
-                    .body(new ResponseListMessage<Stanza>(null,
+                    .body(new Response<List<Stanza>>(null,
                             "Errore durante l'operazione"));
         }
     }
 
+    //MICHELE: sposta questa featura in stanza e sostituisci ResponseBoolMessage in Response<Boolean>
     @GetMapping(value = "/promuoviOrganizzatore")
     public ResponseEntity<ResponseBoolMessage> promuoviOrganizzatore(@RequestBody Utente og, Stanza stanza, HttpSession session) {
         try {

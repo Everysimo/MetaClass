@@ -128,10 +128,15 @@ public class Utente {
     public Utente(@JsonProperty("nome") String Nome,
                   @JsonProperty("cognome") String Cognome,
                   @JsonProperty("email") String Email,
+                  @JsonProperty("età") Integer Eta,
+                  @JsonProperty("sesso") String Sesso,
                   @JsonProperty("metaId") String IdMeta){
         this.nome = Nome;
         this.cognome = Cognome;
         this.email = Email;
         this.metaId = IdMeta;
+        this.età = Eta;
+        this.sesso = Sesso;
+        this.tokenAuth="TODO";
     }
 }

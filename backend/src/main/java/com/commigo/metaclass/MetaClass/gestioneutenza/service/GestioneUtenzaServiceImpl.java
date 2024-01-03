@@ -8,6 +8,7 @@ import com.commigo.metaclass.MetaClass.gestionestanza.repository.StanzaRepositor
 import com.commigo.metaclass.MetaClass.gestionestanza.repository.StatoPartecipazioneRepository;
 import com.commigo.metaclass.MetaClass.gestioneutenza.controller.ResponseBoolMessage;
 import com.commigo.metaclass.MetaClass.gestioneutenza.repository.UtenteRepository;
+import com.commigo.metaclass.MetaClass.utility.response.Response;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -51,24 +52,24 @@ public class GestioneUtenzaServiceImpl implements GestioneUtenzaService{
      * @return
      */
     @Override
-    public ResponseBoolMessage modificaDatiUtente(Long Id, Map<String, Object> dataMap, Utente u) {
+    public Response<Boolean> modificaDatiUtente(Long Id, Map<String, Object> dataMap, Utente u) {
 
         try {
             Utente existingUser = utenteRepository.findUtenteById(Id);
             if(existingUser == null) {
-                return new ResponseBoolMessage(false, "l'utente non esiste");
+                return new Response<Boolean>(false, "l'utente non esiste");
             }else{
                 if(utenteRepository.updateAttributes(Id, dataMap)>0){
                     u = utenteRepository.findUtenteById(Id);
-                    return new ResponseBoolMessage(true, "modifica effettuata con successo");
+                    return new Response<Boolean>(true, "modifica effettuata con successo");
                 }else{
                     u = existingUser;
-                    return new ResponseBoolMessage(true, "nessuna modifica effettuata");
+                    return new Response<Boolean>(true, "nessuna modifica effettuata");
                 }
             }
         }catch (Exception e) {
             e.printStackTrace(); // Stampa la traccia dell'eccezione per debugging
-            return new ResponseBoolMessage(false, "errore nella modifica dei dati");
+            return new Response<Boolean>(false, "errore nella modifica dei dati");
         }
     }
 

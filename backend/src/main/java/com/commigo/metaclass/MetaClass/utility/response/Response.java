@@ -11,8 +11,8 @@ import lombok.Setter;
 @NoArgsConstructor
 public class Response<Type> {
 
-    private Type successValue;
+    private Type successo;
 
-    private String responseMessage;
+    private String messaggio;
 
 }
