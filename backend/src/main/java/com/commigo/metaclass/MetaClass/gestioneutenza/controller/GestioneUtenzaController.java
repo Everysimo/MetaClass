@@ -81,6 +81,7 @@ public class GestioneUtenzaController {
 
     }
 
+    @CrossOrigin
     @GetMapping(value = "/visualizzaStanze")
     public ResponseEntity<Response<List<Stanza>>> visualizzaStanze(HttpSession session) {
         List<Stanza> stanze;
