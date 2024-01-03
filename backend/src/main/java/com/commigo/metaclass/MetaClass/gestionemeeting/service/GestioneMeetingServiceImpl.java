@@ -1,8 +1,10 @@
 package com.commigo.metaclass.MetaClass.gestionemeeting.service;
 
 import com.commigo.metaclass.MetaClass.entity.Meeting;
+import com.commigo.metaclass.MetaClass.entity.Stanza;
 import com.commigo.metaclass.MetaClass.entity.Utente;
 import com.commigo.metaclass.MetaClass.gestionemeeting.repository.MeetingRepository;
+import com.commigo.metaclass.MetaClass.gestionestanza.repository.StanzaRepository;
 import com.commigo.metaclass.MetaClass.gestioneutenza.repository.UtenteRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +20,7 @@ import java.util.Optional;
 public class GestioneMeetingServiceImpl implements GestioneMeetingService{
 
     private final MeetingRepository meetingRepository;
+    private final StanzaRepository stanzaRepository;
 
 /**
 *
@@ -25,18 +28,27 @@ public class GestioneMeetingServiceImpl implements GestioneMeetingService{
  * @return
 */
     @Override
-    public boolean creaScheduling(Meeting meeting) {
-        try {
+    public boolean creaScheduling(Meeting meeting) throws RuntimeException{
             //cerca il meeting per verificare se registrato o meno
             Optional<Meeting> m = meetingRepository.findById(meeting.getId());
             if (!m.isPresent()) {
+
+                //ricerca della stanza da associare a meeting
+                Stanza s = stanzaRepository.findStanzaById(meeting.getStanza().getId());
+                if(s==null){
+                    throw new RuntimeException("nessuna stanza ha quell'id");
+                }
+                if(meetingRepository.hasOverlappingMeetings(meeting.getInizio(), meeting.getFine())){
+                    throw new RuntimeException("il meeting si accavalla con un altro meeting");
+                }
+                meeting.setStanza(s);
+
+                //salvo lo scenario iniziale
+                meeting.setScenario_iniziale(s.getScenario());
+
                 // Meeting non presente nel database, lo salva
                 meetingRepository.save(meeting);
             }
             return true;
-        } catch (Exception e) {
-            e.printStackTrace(); // Stampa la traccia dell'eccezione per debugging
-            return false;
-        }
     }
 }
