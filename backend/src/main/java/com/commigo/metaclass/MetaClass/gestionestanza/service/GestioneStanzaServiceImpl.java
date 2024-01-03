@@ -155,6 +155,24 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService {
         }
     }
 
+    @Override
+    public Response<Boolean> deleteRoom(String id_Uogm, Long id_stanza){
+
+        Utente ogm = utenteRepository.findFirstByMetaId(id_Uogm);
+        Stanza stanza = stanzaRepository.findStanzaById(id_stanza);
+        if(stanza == null) {
+            return new Response<Boolean>(false, "La stanza selezionata non esiste");
+        }
+
+        StatoPartecipazione stato_ogm = statoPartecipazioneRepository.findStatoPartecipazioneByUtenteAndStanza(ogm, stanza);
+        if(stato_ogm.getRuolo().getNome().equalsIgnoreCase(Ruolo.ORGANIZZATORE_MASTER)){
+            stanzaRepository.delete(stanza);
+            return new Response<Boolean>(true, "Stanza eliminata con successo");
+        }else{
+            return new Response<Boolean>(false, "Non puoi eliminare una stanza se non sei un'organizzatore master");
+        }
+    }
+
     public Ruolo getRuolo(String nome){
 
         Ruolo ruolo = ruoloRepository.findByNome(nome);
