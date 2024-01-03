@@ -10,7 +10,7 @@ import LogoutButton from "../components/LogoutButton/logoutButton";
 export const LoggedIn = () => {
     const nome = localStorage.getItem('nome');
     return (
-        <body>
+        <>
         <header>
             <MyHeader />
         </header>
@@ -29,6 +29,6 @@ export const LoggedIn = () => {
         <footer>
             <MyFooter />
         </footer>
-        </body>
+        </>
     );
 };
