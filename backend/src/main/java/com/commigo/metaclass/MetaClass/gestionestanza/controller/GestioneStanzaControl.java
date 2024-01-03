@@ -88,7 +88,6 @@ public class GestioneStanzaControl {
         }
     }
 
-    //MICHELE: sostituisci ResponseBoolMessage con Response<Boolean>
     @PostMapping(value = "/accessoStanza")
     public ResponseEntity<ResponseBoolMessage> richiestaAccessoStanza(@RequestBody String requestBody, HttpSession session)
     {
@@ -107,21 +106,36 @@ public class GestioneStanzaControl {
     }
 
     @PostMapping(value = "/promuoviOrganizzatore")
-    public ResponseEntity<ResponseBoolMessage> promuoviOrganizzatore(@RequestBody RichiestaDTO request, HttpSession session) {
-        System.out.println(request.getId_stanza());
+    public ResponseEntity<Response<Boolean>> promuoviOrganizzatore(@RequestBody RichiestaDTO request, HttpSession session) {
         try {
             String IdMeta = (String) session.getAttribute("UserMetaID");
             if (IdMeta == null) {
-                return ResponseEntity.status(403).body(new ResponseBoolMessage(false, "Utente non loggato"));
+                return ResponseEntity.status(403).body(new Response<Boolean>(false, "Utente non loggato"));
             }else{
                 return ResponseEntity.ok(stanzaService.upgradeUtente(IdMeta, request.getId_og(), request.getId_stanza()));
             }
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(500)
-                    .body(new ResponseBoolMessage(false,
+                    .body(new Response<Boolean>(false,
                             "Errore durante l'operazione"));
         }
     }
 
+    @PostMapping(value = "/declassaOrganizzatore")
+    public ResponseEntity<Response<Boolean>> declassaOrganizzatore(@RequestBody RichiestaDTO request, HttpSession session) {
+        try {
+            String IdMeta = (String) session.getAttribute("UserMetaID");
+            if (IdMeta == null) {
+                return ResponseEntity.status(403).body(new Response<Boolean>(false, "Utente non loggato"));
+            }else{
+                return ResponseEntity.ok(stanzaService.downgradeUtente(IdMeta, request.getId_og(), request.getId_stanza()));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(500)
+                    .body(new Response<Boolean>(false,
+                            "Errore durante l'operazione"));
+        }
+    }
 }
