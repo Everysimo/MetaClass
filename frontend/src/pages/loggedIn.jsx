@@ -5,21 +5,12 @@ import '../css/index.css';
 import '../css/LoggedHome.css';
 import { MyHeader } from '../components/Header/Header';
 import { MyFooter } from "../components/Footer/Footer";
-import {useNavigate} from "react-router-dom";
+import LogoutButton from "../components/LogoutButton/logoutButton";
 
-function useHandleLogout() {
-    const navigate = useNavigate();
-    const handleLogout = () => {
-        localStorage.setItem('isLoggedIn', 'false');
-        navigate('/');
-    };
-    return handleLogout;
-}
 export const LoggedIn = () => {
-    const handleLogout = useHandleLogout();
-
+    const nome = localStorage.getItem('nome');
     return (
-        <body>
+        <>
         <header>
             <MyHeader />
         </header>
@@ -28,7 +19,8 @@ export const LoggedIn = () => {
                 <div className={"table-container"}>
                     <div className={"table-row"}>
                         <div className={"table-cell"}>
-                            <button onClick={handleLogout}>Logout</button>
+                            <h2>Welcome back, {nome}</h2>
+                            <LogoutButton />
                         </div>
                     </div>
                 </div>
@@ -37,6 +29,6 @@ export const LoggedIn = () => {
         <footer>
             <MyFooter />
         </footer>
-        </body>
+        </>
     );
 };

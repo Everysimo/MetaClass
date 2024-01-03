@@ -3,6 +3,8 @@ package com.commigo.metaclass.MetaClass.gestioneutenza.controller;
 import com.commigo.metaclass.MetaClass.entity.Stanza;
 import com.commigo.metaclass.MetaClass.entity.Utente;
 import com.commigo.metaclass.MetaClass.gestioneutenza.service.GestioneUtenzaService;
+import com.commigo.metaclass.MetaClass.utility.response.Response;
+import com.commigo.metaclass.MetaClass.utility.response.ResponseUtils;
 import com.google.gson.Gson;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,51 +24,49 @@ public class GestioneUtenzaController {
     private GestioneUtenzaService utenzaService;
 
     @PostMapping(value = "/login")
-    public ResponseEntity<ResponseBoolMessage> login(@RequestBody Utente u, HttpSession session) {
+    @CrossOrigin
+    public ResponseEntity<Response<Boolean>> login(@RequestBody Utente u, HttpSession session) {
         try {
-            if (!utenzaService.loginMeta(u)) {
-                throw new RuntimeException("Login non effettuato");
-            } else if (session.getAttribute("UserMetaID") == null) {
-                session.setAttribute("UserMetaID", u.getMetaId());
-                return ResponseEntity.ok(new ResponseBoolMessage(true, "Login effettuato con successo"));
-            } else {
-                // Utente già loggato
-                return ResponseEntity.ok(new ResponseBoolMessage(true, "Utente già loggato"));
-            }
+            if (!utenzaService.loginMeta(u))
+                return ResponseUtils.getResponseError("Login non effettuato");
+
+            if (session.getAttribute("UserMetaID") != null)
+                return ResponseUtils.getResponseOk("Utente già loggato");
+
+            session.setAttribute("UserMetaID", u.getMetaId());
+            return ResponseUtils.getResponseOk("Login effettuato con successo");
         } catch (RuntimeException e) {
-            e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new ResponseBoolMessage(false, "Errore durante il login: " + e.getMessage()));
+            return ResponseUtils.getResponseError("Errore durante il login: " + e.getMessage());
         }
     }
 
     @GetMapping(value = "/logout")
-    public ResponseEntity<ResponseBoolMessage> logout(HttpSession session) {
+    public ResponseEntity<Response<Boolean>> logout(HttpSession session) {
         try {
             if (session.getAttribute("UserMetaID") != null) {
                 session.removeAttribute("UserMetaID");
-                return ResponseEntity.ok(new ResponseBoolMessage(true, "Logout effettuato con successo"));
+                return ResponseEntity.ok(new Response<Boolean>(true, "Logout effettuato con successo"));
             } else {
-                return ResponseEntity.ok(new ResponseBoolMessage(true, "Utente non loggato"));
+                return ResponseEntity.ok(new Response<Boolean>(true, "Utente non loggato"));
             }
         } catch (Exception e) {
             e.printStackTrace();
-            return ResponseEntity.status(500).body(new ResponseBoolMessage(false, "Errore durante il logout"));
+            return ResponseEntity.status(500).body(new Response<Boolean>(false, "Errore durante il logout"));
         }
     }
 
     @PostMapping(value = "/modifyUserData/{Id}")
-    public ResponseEntity<ResponseBoolMessage> modifyUserData(
+    public ResponseEntity<Response<Boolean>> modifyUserData(
             @PathVariable Long Id,
             @RequestBody Map<String, Object> dataMap,
             HttpSession session) {
 
         Utente u = null;
-        ResponseBoolMessage response;
-        ResponseEntity<ResponseBoolMessage> responseHTTP;
+        Response<Boolean> response;
+        ResponseEntity<Response<Boolean>> responseHTTP;
 
         response = utenzaService.modificaDatiUtente(Id, dataMap, u);
-        if (response.isSuccesso()) {
+        if (response.getSuccesso()) {
             if (u != null) {
                 // Converti l'oggetto utente in formato JSON
                 String userJson = new Gson().toJson(u);
@@ -82,43 +82,44 @@ public class GestioneUtenzaController {
     }
 
     @GetMapping(value = "/visualizzaStanze")
-    public ResponseEntity<ResponseListMessage<Stanza>> visualizzaStanze(HttpSession session) {
+    public ResponseEntity<Response<List<Stanza>>> visualizzaStanze(HttpSession session) {
         List<Stanza> stanze;
         try {
             String IdMeta = (String) session.getAttribute("UserMetaID");
 
             if (IdMeta == null)
-                return ResponseEntity.status(403).body(new ResponseListMessage<Stanza>(null, "Utente non loggato"));
+                return ResponseEntity.status(403).body(new Response<List<Stanza>>(null, "Utente non loggato"));
             stanze = utenzaService.getStanzeByUserId(IdMeta);
             if (stanze == null) {
                 return ResponseEntity.status(500)
-                        .body(new ResponseListMessage<Stanza>(null,
+                        .body(new Response<List<Stanza>>(null,
                                 "Errore la ricerca delle stanze"));
             } else if (stanze.isEmpty()) {
                 return ResponseEntity
-                        .ok(new ResponseListMessage<Stanza>(stanze,
+                        .ok(new Response<List<Stanza>>(stanze,
                                 "non hai accesso a nessuna stanza"));
             } else {
                 return ResponseEntity
-                        .ok(new ResponseListMessage<Stanza>(stanze,
+                        .ok(new Response<List<Stanza>>(stanze,
                                 "operazione effettuata con successo"));
             }
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(500)
-                    .body(new ResponseListMessage<Stanza>(null,
+                    .body(new Response<List<Stanza>>(null,
                             "Errore durante l'operazione"));
         }
     }
 
+    //MICHELE: sposta questa featura in stanza e sostituisci ResponseBoolMessage in Response<Boolean>
     @GetMapping(value = "/promuoviOrganizzatore")
-    public ResponseEntity<ResponseBoolMessage> promuoviOrganizzatore(@RequestBody long id_og, long id_stanza, HttpSession session) {
+    public ResponseEntity<ResponseBoolMessage> promuoviOrganizzatore(@RequestBody Utente og, Stanza stanza, HttpSession session) {
         try {
             String IdMeta = (String) session.getAttribute("UserMetaID");
             if (IdMeta == null) {
                 return ResponseEntity.status(403).body(new ResponseBoolMessage(false, "Utente non loggato"));
             }else{
-                return ResponseEntity.ok(utenzaService.upgradeUtente(IdMeta, id_og, id_stanza));
+                return ResponseEntity.ok(utenzaService.upgradeUtente(IdMeta, og, stanza));
             }
         } catch (Exception e) {
             e.printStackTrace();

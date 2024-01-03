@@ -4,8 +4,7 @@ import com.commigo.metaclass.MetaClass.entity.Categoria;
 import com.commigo.metaclass.MetaClass.entity.Scenario;
 import com.commigo.metaclass.MetaClass.entity.Stanza;
 import com.commigo.metaclass.MetaClass.gestioneamministrazione.service.GestioneAmministrazioneService;
-import com.commigo.metaclass.MetaClass.gestioneutenza.controller.ResponseBoolMessage;
-import com.commigo.metaclass.MetaClass.gestioneutenza.controller.ResponseListMessage;
+import com.commigo.metaclass.MetaClass.utility.response.Response;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -28,22 +27,22 @@ public class GestioneAmministrazioneController {
     private GestioneAmministrazioneService gestioneamministrazione;
 
     @PostMapping(value = "admin/updateCategoria")
-    public ResponseEntity<ResponseBoolMessage> updateCategoria(@RequestBody Categoria c, HttpSession session) {
+    public ResponseEntity<Response<Boolean>> updateCategoria(@RequestBody Categoria c, HttpSession session) {
         try {
             if (!gestioneamministrazione.updateCategoria(c)) {
                 throw new Exception("Errore durante l'inserimento della categoria");
             } else {
-                return ResponseEntity.ok(new ResponseBoolMessage(true,
+                return ResponseEntity.ok(new Response<Boolean>(true,
                         "categoria creata con successo"));
             }
         } catch (Exception e) {
             e.printStackTrace();
-            return ResponseEntity.status(500).body(new ResponseBoolMessage(false, e.getMessage()));
+            return ResponseEntity.status(500).body(new Response<Boolean>(false, e.getMessage()));
         }
     }
 
     @PostMapping(value = "admin/updateScenario")
-    public ResponseEntity<ResponseBoolMessage> updateCategoria(@RequestBody String requestBody, HttpSession session)
+    public ResponseEntity<Response<Boolean>> updateCategoria(@RequestBody String requestBody, HttpSession session)
             throws JsonProcessingException {
 
         // Convertita la stringa JSON in un oggetto Scenario usando ObjectMapper
@@ -60,37 +59,37 @@ public class GestioneAmministrazioneController {
             if (!gestioneamministrazione.updateScenario(s, idCategoria)) {
                 throw new Exception("Errore durante l'inserimento dello scenario");
             } else {
-                return ResponseEntity.ok(new ResponseBoolMessage(true,
+                return ResponseEntity.ok(new Response<Boolean>(true,
                         "scenario creato con successo"));
             }
         } catch (Exception e) {
             e.printStackTrace();
-            return ResponseEntity.status(500).body(new ResponseBoolMessage(false, e.getMessage()));
+            return ResponseEntity.status(500).body(new Response<Boolean>(false, e.getMessage()));
         }
     }
 
     @GetMapping(value = "admin/allStanze")
-    public ResponseEntity<ResponseListMessage<Stanza>> visualizzaStanze() {
+    public ResponseEntity<Response<List<Stanza>>> visualizzaStanze() {
         List<Stanza> stanze;
         try {
             stanze = gestioneamministrazione.getStanze();
             if(stanze == null){
                 return ResponseEntity.status(500)
-                        .body(new ResponseListMessage<Stanza>(null,
+                        .body(new Response<List<Stanza>>(null,
                                 "Errore la ricerca delle stanze"));
             }else if(stanze.isEmpty()){
                 return ResponseEntity
-                        .ok(new ResponseListMessage<Stanza>(stanze,
+                        .ok(new Response<List<Stanza>>(stanze,
                                 "nessuna stanza creata"));
             }else{
                 return ResponseEntity
-                        .ok(new ResponseListMessage<Stanza>(stanze,
+                        .ok(new Response<List<Stanza>>(stanze,
                                 "operazione effettuata con successo"));
             }
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(500)
-                    .body(new ResponseListMessage<Stanza>(null,
+                    .body(new Response<List<Stanza>>(null,
                             "Errore durante l'operazione"));
         }
     }
