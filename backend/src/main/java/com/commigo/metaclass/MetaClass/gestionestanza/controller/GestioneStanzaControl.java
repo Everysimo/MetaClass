@@ -92,13 +92,17 @@ public class GestioneStanzaControl {
     public ResponseEntity<ResponseBoolMessage> richiestaAccessoStanza(@RequestBody String requestBody, HttpSession session)
     {
         try {
+            String IdMeta = (String) session.getAttribute("UserMetaID");
+            if (IdMeta == null) {
+                return ResponseEntity.status(403).body(new ResponseBoolMessage(false, "Utente non loggato"));
+            }else {
 
-            ObjectMapper objectMapper = new ObjectMapper();
-            JsonNode jsonNode = objectMapper.readTree(requestBody);
-            String codiceStanza = jsonNode.get("codice").asText();
+                ObjectMapper objectMapper = new ObjectMapper();
+                JsonNode jsonNode = objectMapper.readTree(requestBody);
+                String codiceStanza = jsonNode.get("codice").asText();
 
-            return ResponseEntity.ok(stanzaService.accessoStanza(codiceStanza, (String) session.getAttribute("UserMetaID")).getBody());
-
+                return ResponseEntity.ok(stanzaService.accessoStanza(codiceStanza, (String) session.getAttribute("UserMetaID")).getBody());
+            }
         } catch (RuntimeException | JsonProcessingException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(new ResponseBoolMessage(false, "Errore durante la richiesta: " + e.getMessage()));
