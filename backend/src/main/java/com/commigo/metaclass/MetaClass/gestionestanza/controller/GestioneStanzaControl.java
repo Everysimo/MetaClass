@@ -1,8 +1,10 @@
 package com.commigo.metaclass.MetaClass.gestionestanza.controller;
 
 import com.commigo.metaclass.MetaClass.entity.Stanza;
+import com.commigo.metaclass.MetaClass.entity.Utente;
 import com.commigo.metaclass.MetaClass.gestionestanza.service.GestioneStanzaService;
 import com.commigo.metaclass.MetaClass.gestioneutenza.controller.ResponseBoolMessage;
+import com.commigo.metaclass.MetaClass.gestioneutenza.service.GestioneUtenzaService;
 import com.commigo.metaclass.MetaClass.utility.response.Response;
 import com.commigo.metaclass.MetaClass.utility.response.ResponseUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -13,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -103,5 +106,22 @@ public class GestioneStanzaControl {
         }
     }
 
+    @PostMapping(value = "/promuoviOrganizzatore")
+    public ResponseEntity<ResponseBoolMessage> promuoviOrganizzatore(@RequestBody RichiestaDTO request, HttpSession session) {
+        System.out.println(request.getId_stanza());
+        try {
+            String IdMeta = (String) session.getAttribute("UserMetaID");
+            if (IdMeta == null) {
+                return ResponseEntity.status(403).body(new ResponseBoolMessage(false, "Utente non loggato"));
+            }else{
+                return ResponseEntity.ok(stanzaService.upgradeUtente(IdMeta, request.getId_og(), request.getId_stanza()));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(500)
+                    .body(new ResponseBoolMessage(false,
+                            "Errore durante l'operazione"));
+        }
+    }
 
 }

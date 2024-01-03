@@ -111,22 +111,4 @@ public class GestioneUtenzaController {
         }
     }
 
-    //MICHELE: sposta questa featura in stanza e sostituisci ResponseBoolMessage in Response<Boolean>
-    @GetMapping(value = "/promuoviOrganizzatore")
-    public ResponseEntity<ResponseBoolMessage> promuoviOrganizzatore(@RequestBody Utente og, Stanza stanza, HttpSession session) {
-        try {
-            String IdMeta = (String) session.getAttribute("UserMetaID");
-            if (IdMeta == null) {
-                return ResponseEntity.status(403).body(new ResponseBoolMessage(false, "Utente non loggato"));
-            }else{
-                return ResponseEntity.ok(utenzaService.upgradeUtente(IdMeta, og, stanza));
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.status(500)
-                    .body(new ResponseBoolMessage(false,
-                            "Errore durante l'operazione"));
-        }
-    }
-
 }
