@@ -15,10 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 public class GestioneStanzaControl {
@@ -134,6 +131,24 @@ public class GestioneStanzaControl {
                 return ResponseEntity.status(403).body(new Response<Boolean>(false, "Utente non loggato"));
             }else{
                 return ResponseEntity.ok(stanzaService.downgradeUtente(IdMeta, request.getId_og(), request.getId_stanza()));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(500)
+                    .body(new Response<Boolean>(false,
+                            "Errore durante l'operazione"));
+        }
+    }
+
+    @PostMapping(value = "/eliminaStanza/{Id}")
+
+    public ResponseEntity<Response<Boolean>> eliminaStanza(@PathVariable Long Id, HttpSession session) {
+        try {
+            String IdMeta = (String) session.getAttribute("UserMetaID");
+            if (IdMeta == null) {
+                return ResponseEntity.status(403).body(new Response<Boolean>(false, "Utente non loggato"));
+            }else{
+                return ResponseEntity.ok(stanzaService.deleteRoom(IdMeta, Id));
             }
         } catch (Exception e) {
             e.printStackTrace();
