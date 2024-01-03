@@ -13,6 +13,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.Map;
+
 @Service("GestioneStanzaService")
 @RequiredArgsConstructor
 @Transactional    //ogni operazione è una transazione
@@ -170,6 +172,38 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService {
             return new Response<Boolean>(true, "Stanza eliminata con successo");
         }else{
             return new Response<Boolean>(false, "Non puoi eliminare una stanza se non sei un'organizzatore master");
+        }
+    }
+
+    @Override
+    public Response<Boolean> modificaDatiStanza(String id, Long Id, Map<String, Object> dataMap, Stanza stanza) {
+
+        try {
+            Utente ogm = utenteRepository.findFirstByMetaId(id);
+            stanza = stanzaRepository.findStanzaById(Id);
+
+            StatoPartecipazione statoutente = statoPartecipazioneRepository.findStatoPartecipazioneByUtenteAndStanza(ogm, stanza);
+            if(statoutente.getRuolo().getNome().equalsIgnoreCase(Ruolo.ORGANIZZATORE_MASTER) || statoutente.getRuolo().getNome().equalsIgnoreCase(Ruolo.ORGANIZZATORE)){
+
+                Stanza existingStanza = stanzaRepository.findStanzaById(Id);
+                if(existingStanza == null) {
+                    return new Response<Boolean>(false, "La stanza non esiste");
+                }else{
+                    if(stanzaRepository.updateAttributes(Id, dataMap)>0){
+                        stanza = stanzaRepository.findStanzaById(Id);
+                        return new Response<Boolean>(true, "modifica effettuata con successo");
+                    }else{
+                        stanza = existingStanza;
+                        return new Response<Boolean>(true, "nessuna modifica effettuata");
+                    }
+                }
+            }else{
+                return new Response<Boolean>(false, "Non puoi effettuare modifiche sulla stanza se non sei almeno un organizzatore");
+            }
+
+        }catch (Exception e) {
+            e.printStackTrace(); // Stampa la traccia dell'eccezione per debugging
+            return new Response<Boolean>(false, "errore nella modifica dei dati");
         }
     }
 

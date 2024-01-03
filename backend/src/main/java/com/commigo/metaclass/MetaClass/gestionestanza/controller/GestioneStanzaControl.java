@@ -10,12 +10,15 @@ import com.commigo.metaclass.MetaClass.utility.response.ResponseUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.Gson;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
 
 @RestController
 public class GestioneStanzaControl {
@@ -156,5 +159,46 @@ public class GestioneStanzaControl {
                     .body(new Response<Boolean>(false,
                             "Errore durante l'operazione"));
         }
+    }
+
+    @PostMapping(value = "/modifyRoomData/{Id}")
+    public ResponseEntity<Response<Boolean>> modifyRoomData(
+            @PathVariable Long Id,
+            @RequestBody Map<String, Object> dataMap,
+            HttpSession session) {
+
+        try {
+            String IdMeta = (String) session.getAttribute("UserMetaID");
+            if (IdMeta == null) {
+                return ResponseEntity.status(403).body(new Response<Boolean>(false, "Utente non loggato"));
+            }else {
+
+                Stanza stanza = null;
+                Response<Boolean> response;
+                ResponseEntity<Response<Boolean>> responseHTTP;
+                response = stanzaService.modificaDatiStanza(IdMeta, Id, dataMap, stanza);
+
+                if (response.getSuccesso()) {
+                    if (stanza != null) {
+                        // Converti l'oggetto utente in formato JSON
+                        String stanzaJson = new Gson().toJson(stanza);
+                        System.out.println(stanzaJson);
+                        session.setAttribute("RoomModified", stanzaJson);
+                    }
+                    responseHTTP = ResponseEntity.ok(response);
+                } else {
+                    responseHTTP = ResponseEntity.status(500).body(response);
+                }
+                return responseHTTP;
+
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(500)
+                    .body(new Response<Boolean>(false,
+                            "Errore durante l'operazione"));
+        }
+
     }
 }
