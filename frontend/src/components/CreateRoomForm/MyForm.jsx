@@ -1,4 +1,3 @@
-
 import React, {Component} from 'react'
 import "./MyForm.css"
 import {Divider} from "@chakra-ui/react";

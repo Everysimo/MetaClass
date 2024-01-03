@@ -4,7 +4,7 @@ import { MyHeader } from '../components/Header/Header'
 import { MyFooter } from '../components/Footer/Footer'
 
 import "../css/createroom.css";
-import MyCreateForm from '../components/CreateRoomForm/MyCreateForm';
+import MyForm from "../components/CreateRoomForm/MyForm";
 
 export const CreateRoom = () => {
 
@@ -17,7 +17,7 @@ export const CreateRoom = () => {
                 <div className="total-body">
                     <div>
                         <div>
-                            <MyCreateForm/>
+                            <MyForm/>
                         </div>
                     </div>
                 </div>
