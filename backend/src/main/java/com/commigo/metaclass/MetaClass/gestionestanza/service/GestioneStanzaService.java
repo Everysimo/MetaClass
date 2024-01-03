@@ -6,12 +6,12 @@ import com.commigo.metaclass.MetaClass.gestioneutenza.controller.ResponseBoolMes
 import com.commigo.metaclass.MetaClass.utility.response.Response;
 import org.springframework.http.ResponseEntity;
 
-public interface GestioneStanzaService
-{
-    ResponseEntity<ResponseBoolMessage> accessoStanza (String codiceStanza, String id_utente);
+import java.util.Map;
+
+public interface GestioneStanzaService {
+    ResponseEntity<ResponseBoolMessage> accessoStanza(String codiceStanza, String id_utente);
 
     /**
-     *
      * Questo metodo crea una nuova stanza.
      * La istanza della stanza creata viene ritornata.
      *
@@ -25,10 +25,12 @@ public interface GestioneStanzaService
     Stanza creaStanza(String nome, String Codice_Stanza, String Descrizione, boolean Tipo_Accesso, int MAX_Posti);
 
     ResponseEntity<ResponseBoolMessage> richiestaAccessoStanza(String codiceStanza, String id_utente);
+
     Response<Boolean> upgradeUtente(String id_Uogm, long og, long stanza);
 
     Response<Boolean> downgradeUtente(String id_Uogm, long og, long stanza);
 
     Response<Boolean> deleteRoom(String id_Uogm, Long id_stanza);
 
+    Response<Boolean> modificaDatiStanza(String id, Long Id, Map<String, Object> dataMap, Stanza stanza);
 }

@@ -25,7 +25,7 @@ public interface UtenteRepository extends JpaRepository<Utente, Long> {
             "u.nome = COALESCE(:#{#attributes['nome']}, u.nome), " +
             "u.cognome = COALESCE(:#{#attributes['cognome']}, u.cognome), " +
             "u.sesso = COALESCE(:#{#attributes['sesso']}, u.sesso), " +
-            "u.età = COALESCE(:#{#attributes['eta']}, u.età), " +
+            "u.dataDiNascita = COALESCE(:#{#attributes['nascita']}, u.dataDiNascita), " +
             "u.email = COALESCE(:#{#attributes['email']}, u.email), " +
             "u.telefono = COALESCE(:#{#attributes['telefono']}, u.telefono), " +
             "u.metaId = COALESCE(:#{#attributes['metaId']}, u.metaId), " +

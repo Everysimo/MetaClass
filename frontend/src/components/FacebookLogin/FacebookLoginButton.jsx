@@ -4,6 +4,7 @@ import FacebookLogin from "@greatsumini/react-facebook-login";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFacebook } from "@fortawesome/free-brands-svg-icons";
 import LogoutButton from "../LogoutButton/logoutButton";
+import initializeFacebookSDK from "./fbSDK";
 
 export default class Facebook extends Component {
     constructor(props) {
@@ -20,24 +21,7 @@ export default class Facebook extends Component {
     }
 
     componentDidMount() {
-        // Initialize Facebook SDK here
-        window.fbAsyncInit = function() {
-            window.FB.init({
-                appId: '3381145492205390',
-                autoLogAppEvents: true,
-                xfbml: true,
-                version: 'v12.0'
-            });
-        };
-
-        // Load the SDK asynchronously
-        (function(d, s, id) {
-            var js, fjs = d.getElementsByTagName(s)[0];
-            if (d.getElementById(id)) return;
-            js = d.createElement(s); js.id = id;
-            js.src = "https://connect.facebook.net/en_US/sdk.js";
-            fjs.parentNode.insertBefore(js, fjs);
-        }(document, 'script', 'facebook-jssdk'));
+        initializeFacebookSDK(); // Call the initialization function here
     }
 
     handleUserID = (response) => {
@@ -49,6 +33,17 @@ export default class Facebook extends Component {
             console.error('Invalid response or missing userID property');
         }
     };
+    handleGender = (response) =>{
+        if(response.gender === "male"){
+            return "M";
+        }
+        else if (response.gender === "female"){
+            return "F";
+        }
+        else{
+            return "O";
+        }
+    }
 
     responseFacebook = (response) => {
         if (response && response.name) {
@@ -56,13 +51,15 @@ export default class Facebook extends Component {
             const nome = nameParts.slice(0, -1).join(' ');
             const cognome = nameParts.slice(-1).join(' ');
 
+            const gender = this.handleGender(response); // Call handleGender with response
+
             this.setState(
                 {
                     nome,
                     cognome,
                     email: response.email,
                     eta: response.birthday,
-                    sesso: response.gender,
+                    sesso: gender, // Set the gender obtained from handleGender
                     isLoggedIn: true
                 },
                 () => {
@@ -75,8 +72,10 @@ export default class Facebook extends Component {
         }
     };
 
+
     saveLoginStatusToLocalStorage = () => {
         localStorage.setItem('isLoggedIn', JSON.stringify(true));
+        localStorage.setItem('ID', this.state.metaId);
         localStorage.setItem('nome', this.state.nome);
     };
 
@@ -127,8 +126,7 @@ export default class Facebook extends Component {
                             }}
                             onProfileSuccess={this.responseFacebook}
                         >
-                            Login with Facebook
-                            <FontAwesomeIcon icon={faFacebook} size={"xl"} style={{ color: '#ffffff' }} />
+                            Login with Facebook <FontAwesomeIcon icon={faFacebook} size={"xl"} style={{ color: '#ffffff' }} />
                         </FacebookLogin>
                     </>
                 )}
