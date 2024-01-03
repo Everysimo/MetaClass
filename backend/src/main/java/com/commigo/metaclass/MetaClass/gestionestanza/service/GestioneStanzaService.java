@@ -29,4 +29,6 @@ public interface GestioneStanzaService
 
     Response<Boolean> downgradeUtente(String id_Uogm, long og, long stanza);
 
+    Response<Boolean> deleteRoom(String id_Uogm, Long id_stanza);
+
 }
