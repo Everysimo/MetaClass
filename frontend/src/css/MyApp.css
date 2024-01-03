@@ -65,9 +65,11 @@ section p{
 
 .sec {
     z-index: 1;
-    min-height: 400px;
+    min-height: 500px;
     box-shadow: none;
 }
+
+.noShadow{ box-shadow: 0 -5px 16px -4px #000000; }
 
 #sec1, #sec2, #sec3{
     background-position: center;

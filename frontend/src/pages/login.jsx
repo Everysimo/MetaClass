@@ -6,7 +6,7 @@ import {MyFooter} from "../components/Footer/Footer";
 import Facebook from "../components/FacebookLogin/FacebookLoginButton";
 export const Login = () =>{
     return(
-        <body>
+        <>
             <header>
                 <MyHeader />
             </header>
@@ -22,6 +22,6 @@ export const Login = () =>{
             <footer>
                 <MyFooter />
             </footer>
-        </body>
+        </>
     );
 }

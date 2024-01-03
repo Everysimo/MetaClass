@@ -9,23 +9,22 @@ import MyForm from '../components/CreateRoomForm/MyForm';
 export const CreateRoom = () => {
 
     return(
-        <body>
-        <header>
-            <MyHeader/>
-        </header>
-
-        <section >
-            <div className="total-body">
-                <div>
+        <>
+            <header>
+                <MyHeader/>
+            </header>
+            <section >
+                <div className="total-body">
                     <div>
-                        <MyForm/>
+                        <div>
+                            <MyForm/>
+                        </div>
                     </div>
                 </div>
-            </div>
-        </section>
-        <footer>
-            <MyFooter/>
-        </footer>
-        </body>
+            </section>
+            <footer>
+                <MyFooter/>
+            </footer>
+        </>
     );
 }

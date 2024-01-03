@@ -13,9 +13,42 @@ export default class Facebook extends Component {
             nome: "",
             cognome: "",
             email: "",
+            eta: "",
+            sesso: "",
             metaId: ""
         };
     }
+
+    componentDidMount() {
+        // Initialize Facebook SDK here
+        window.fbAsyncInit = function() {
+            window.FB.init({
+                appId: '3381145492205390',
+                autoLogAppEvents: true,
+                xfbml: true,
+                version: 'v12.0'
+            });
+        };
+
+        // Load the SDK asynchronously
+        (function(d, s, id) {
+            var js, fjs = d.getElementsByTagName(s)[0];
+            if (d.getElementById(id)) return;
+            js = d.createElement(s); js.id = id;
+            js.src = "https://connect.facebook.net/en_US/sdk.js";
+            fjs.parentNode.insertBefore(js, fjs);
+        }(document, 'script', 'facebook-jssdk'));
+    }
+
+    handleUserID = (response) => {
+        if (response && response.userID) {
+            this.setState({
+                metaId: response.userID
+            });
+        } else {
+            console.error('Invalid response or missing userID property');
+        }
+    };
 
     responseFacebook = (response) => {
         if (response && response.name) {
@@ -28,40 +61,38 @@ export default class Facebook extends Component {
                     nome,
                     cognome,
                     email: response.email,
-                    isLoggedIn: true // Set isLoggedIn to true after successful login
+                    eta: response.birthday,
+                    sesso: response.gender,
+                    isLoggedIn: true
                 },
                 () => {
                     this.saveLoginStatusToLocalStorage();
-                    this.componentDidMount()
+                    this.sendDataToServer();
                 }
             );
         } else {
-            // Handle cases where the response doesn't contain the expected properties
             console.error('Invalid response or missing name property');
-            // You can add further error handling or logging here
         }
     };
 
-
     saveLoginStatusToLocalStorage = () => {
-        // Save the isLoggedIn status to localStorage as a JSON string
         localStorage.setItem('isLoggedIn', JSON.stringify(true));
         localStorage.setItem('nome', this.state.nome);
-        // No need to reload here
     };
-    async componentDidMount (){
 
-        const { nome, cognome, email, tokenAuth, metaId } = this.state;
-
+    sendDataToServer = async () => {
+        const { nome, cognome, email, eta, sesso, metaId } = this.state;
         const dataToSend = {
             nome,
             cognome,
             email,
+            eta,
+            sesso,
             metaId
         };
         const requestOptions = {
             method: 'POST',
-            headers: {'Content-Type': 'application/json'},
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(dataToSend)
         };
         try {
@@ -72,18 +103,10 @@ export default class Facebook extends Component {
         } catch (error) {
             console.error('Error:', error);
         }
-    }
-
-
-    responseLogin = response => {
-        this.setState({
-            metaId: response.userID
-        })
-    }
+    };
 
     render() {
         const { isLoggedIn, nome } = this.state;
-
         return (
             <div className={"loginForm"}>
                 {isLoggedIn ? (
@@ -95,15 +118,17 @@ export default class Facebook extends Component {
                     <>
                         <h2>To use this system, you need to login via Facebook</h2>
                         <FacebookLogin
+                            scope={"public_profile,user_gender,user_birthday"}
+                            fields={"id,name,birthday,gender,email"}
                             appId="3381145492205390"
-                            onSuccess={this.responseLogin}
+                            onSuccess={this.handleUserID}
                             onFail={(error) => {
                                 console.log('Login Failed!', error);
                             }}
                             onProfileSuccess={this.responseFacebook}
                         >
                             Login with Facebook
-                            <FontAwesomeIcon icon={faFacebook} size={"xl"} style={{color: '#ffffff'}}/>
+                            <FontAwesomeIcon icon={faFacebook} size={"xl"} style={{ color: '#ffffff' }} />
                         </FacebookLogin>
                     </>
                 )}

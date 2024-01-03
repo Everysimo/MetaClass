@@ -12,7 +12,7 @@ export default function UnloggedHome(){
     const div3 = <DivGenerator content={par3}/>
     const sectionClass = "sec";
     return(
-        <body>
+        <>
             <header>
                 <MyHeader />
             </header>
@@ -21,10 +21,10 @@ export default function UnloggedHome(){
             <SectionGenerator class={sectionClass} ID={"sec2"}/>
             <SectionGenerator content={div2}/>
             <SectionGenerator class={sectionClass} ID={"sec3"}/>
-            <SectionGenerator content={div3}/>
+            <SectionGenerator class={"noShadow"} content={div3}/>
             <footer>
                 <MyFooter />
             </footer>
-        </body>
+        </>
     );
 }
