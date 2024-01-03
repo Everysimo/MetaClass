@@ -8,8 +8,11 @@ import jakarta.validation.constraints.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.springframework.format.annotation.DateTimeFormat;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 @Entity
 @Data
@@ -77,11 +80,10 @@ public class Utente {
     @Pattern(regexp = "^[MFO]$", message = "Il genere deve essere 'M', 'F' o 'O'")
     private String sesso;
 
-    @NotNull(message = "L'età non può essere nulla")
-    @Column(length = MAX_ETA_LENGTH)
-    @Min(value = MIN_ETA_LENGTH, message = "L'età deve essere maggiore o uguale a 10")
-    @Max(value = MAX_ETA_LENGTH, message = "L'età deve essere minore o uguale a 114")
-    private int età;
+    @NotNull(message = "La data di nascita non può essere nulla")
+    @Past(message = "La data di nascita deve essere passata")
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    private LocalDate dataDiNascita;
 
     @NotNull(message = "IsAdmin non può essere nullo")
     private boolean isAdmin;
@@ -128,15 +130,19 @@ public class Utente {
     public Utente(@JsonProperty("nome") String Nome,
                   @JsonProperty("cognome") String Cognome,
                   @JsonProperty("email") String Email,
-                  @JsonProperty("età") Integer Eta,
+                  @JsonProperty("eta") String Data,
                   @JsonProperty("sesso") String Sesso,
                   @JsonProperty("metaId") String IdMeta){
         this.nome = Nome;
         this.cognome = Cognome;
         this.email = Email;
         this.metaId = IdMeta;
-        this.età = Eta;
         this.sesso = Sesso;
         this.tokenAuth="TODO";
+
+        // Definire il formato della stringa
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        this.dataDiNascita = LocalDate.parse(Data, formatter);
+
     }
 }
