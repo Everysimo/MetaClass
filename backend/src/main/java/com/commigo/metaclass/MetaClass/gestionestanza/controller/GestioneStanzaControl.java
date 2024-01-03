@@ -25,7 +25,7 @@ public class GestioneStanzaControl {
     private GestioneStanzaService stanzaService;
 
     //MICHELE: So che funziona, ma valuta anche @RequestBody Stanza s
-    @PostMapping(value = "/creaStanza")
+    @PostMapping(value = "/creastanza")
     public ResponseEntity<Response<Boolean>> creaStanza(@RequestBody String requestBody, HttpSession session)
     {
         try
