@@ -49,6 +49,43 @@ export default class MyForm extends Component{
     };
 
 
+    /*funzione per inviare i parametri a crea stanza*/
+
+    sendDataToServer = async() =>{
+        const {name, descript, option, num, code} = this.state;
+        const dataToSend = {
+            name,
+            descript,
+            option,
+            num,
+            code
+        };
+
+        const requestOption = {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(dataToSend)
+        };
+
+        try{
+                console.log("la stringa json:", JSON.stringify(dataToSend));
+                    //col fetch faccio la richiesta, al URL descritto
+                const response = await fetch('http://localhost:8080/creastanza', requestOption);
+                    //con la await attento la risposta dal fetch
+                const responseData = await response.json();
+                console.log("Risposta dal server:", responseData);
+        }catch(error){
+            console.error('ERRORE:', error);
+        }
+
+
+    }
+
+    callFunction = () => {
+
+        this.sendDataToServer();
+        console.log("dati del form", this.state)
+    }
     render(){
     return(
         <div className={'primary'}>
@@ -113,7 +150,7 @@ export default class MyForm extends Component{
                         />
                     </div>
                 <br/>
-                <button className={'button-create'} type="button" onClick={() => console.log("dati del form", this.state)}> Create</button>
+                <button className={'button-create'} type="button" onClick={() =>  this.callFunction() }> Create</button>
             </div>
         </div>
     )};
