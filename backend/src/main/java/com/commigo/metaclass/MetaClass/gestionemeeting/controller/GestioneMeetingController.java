@@ -27,9 +27,9 @@ public class GestioneMeetingController {
     private GestioneMeetingService meetingService;
     @PostMapping(value = "/schedulingMeeting")
     public ResponseEntity<Response<Boolean>> schedulingMeeting(@Valid @RequestBody Meeting m, BindingResult result) {
-      //  try {
-            //controlla se i parametri passati al meeting sono corretti (esclusi gli ID esterni)
-            System.out.println(m);
+        try {
+
+            //controlla se i parametri passati al meeting sono corretti
             if (result.hasErrors()) {
                 return ResponseEntity.badRequest()
                         .body(new Response<Boolean>(false,
@@ -37,18 +37,16 @@ public class GestioneMeetingController {
             }
 
 
-            return ResponseEntity.ok(new Response<Boolean>(true, "Meeting schedulato con successo"));
-/*
             if (!meetingService.creaScheduling(m)) {
                 throw new RuntimeException("Meeting non effettuato");
             } else {
                 return ResponseEntity.ok(new Response<Boolean>(true, "Meeting schedulato con successo"));
             }
+
         } catch (RuntimeException e) {
-            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new Response<Boolean>(false, "Errore durante il login: " + e.getMessage()));
+                    .body(new Response<Boolean>(false, "Errore durante la schedulazione del meeting: " + e.getMessage()));
         }
-    }*/
+    }
 }
-}
+

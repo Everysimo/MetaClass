@@ -6,13 +6,11 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Past;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -21,7 +19,6 @@ import java.time.format.DateTimeFormatter;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@JsonIgnoreProperties({"id_stanza"})
 public class Meeting {
 
     /**
@@ -42,18 +39,20 @@ public class Meeting {
     @Column(length = MAX_NAME_LENGTH)
     @Size(min = MIN_NAME_LENGTH, max = MAX_NAME_LENGTH,
             message = "Lunghezza nome non valida")
-    //@NotBlank(message = "Il nome non può essere vuoto")
+    @NotBlank(message = "Il nome non può essere vuoto")
+    @Pattern(regexp = "^[A-Z][a-z]*$",
+            message = "Il nome deve iniziare con una lettera maiuscola seguita da lettere " +
+                      "minuscole senza spazi o caratteri speciali")
     private String nome;
 
-    //da definire la regola inizio<fine
     @NotNull(message = "L'inizio non può essere nullo")
-    @Past(message = "La data di nascita non può essere successiva "+ "o coincidente alla data odierna")
-    @NotBlank(message = "L'inizio non può essere vuoto")
+    @Future(message = "l'inizio deve essere successivo alla data odierna")
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME, pattern = "yyyy-MM-dd HH:mm")
     private LocalDateTime inizio;
 
     @NotNull(message = "La fine non può essere nulla")
-    @Past(message = "La data di nascita non può essere successiva "+ "o coincidente alla data odierna")
-    @NotBlank(message = "La fine non può essere vuota")
+    @Future(message = "la fine deve essere successivo alla data odierna")
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME, pattern = "yyyy-MM-dd HH:mm")
     private LocalDateTime fine;
 
     /**
@@ -72,18 +71,30 @@ public class Meeting {
     @JoinColumn(name = "id_stanza")
     private Stanza stanza;
 
+    @AssertTrue(message = "L'inizio deve essere precedente alla fine")
+    public boolean isStartDateBeforeEndDate() {
+        // La validazione sarà passata solo se la data di inizio è precedente a quella di fine
+        return inizio == null || fine == null || inizio.isBefore(fine);
+    }
+
     @JsonCreator
     public Meeting(@JsonProperty("nome") String Nome,
                    @JsonProperty("inizio") String Inizio,
-                   @JsonProperty("fine") String Fine){
+                   @JsonProperty("fine")  String Fine,
+                   @JsonProperty("id_stanza") Long stanza){
 
         this.nome = Nome;
 
         // Definire il formato della stringa
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 
-        this.inizio = LocalDateTime.parse(Inizio.replace("T"," "), formatter);
-        this.fine = LocalDateTime.parse(Fine.replace("T"," "), formatter);
+        this.inizio = LocalDateTime.parse(Inizio, formatter);
+        this.fine = LocalDateTime.parse(Fine.replace("|"," "), formatter);
+
+        this.stanza = new Stanza();
+        this.stanza.setId(stanza);
+
+        this.scenario_iniziale = new Scenario();
 
     }
 
