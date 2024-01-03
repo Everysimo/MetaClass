@@ -18,7 +18,6 @@ import java.time.LocalDateTime;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Stanza {
 
     /**
@@ -45,7 +44,7 @@ public class Stanza {
     @Column(length = MAX_NAME_LENGTH)
     @Size(min = 1, max = MAX_NAME_LENGTH, message = "Lunghezza nome non valida")
     @NotBlank(message = "Il nome non può essere vuoto")
-    private String Nome;
+    private String nome;
 
     /**
      * Codice della Stanza
@@ -64,13 +63,13 @@ public class Stanza {
     @Column(length = MAX_DESCR_LENGTH)
     @Size(min = 1, max = MAX_DESCR_LENGTH, message = "Lunghezza della descrizione non valida")
     @NotBlank(message = "La descrizione non può essere vuota")
-    private String Descrizione;
+    private String descrizione;
 
     /**
      *Tipo di Accesso alla Stanza, ovvero la stanza è pubblica (1) o privata (0)
      */
     @NotNull(message = "Il tipo di accesso non può essere nullo")
-    private boolean Tipo_Accesso;
+    private boolean tipo_Accesso;
 
     /**
      *Identifica il numero massimo di posti nella stanza
@@ -79,7 +78,7 @@ public class Stanza {
     @Min(value = 1, message = "Il valore del  parametro non deve essere inferiore ad 1")
     @Max(value = 999, message = "Il valore del  parametro non deve superare 999")
     @NotBlank(message = "Il numero massimo dei posti non può essere vuota")
-    private int MAX_Posti;
+    private int max_Posti;
 
     /**
      * Chiave Esterna sullo Scenario
@@ -91,11 +90,11 @@ public class Stanza {
 
     @Column(name = "Data_Creazione", updatable = false)
     @CreationTimestamp
-    private LocalDateTime Data_Creazione;
+    private LocalDateTime data_Creazione;
 
     @Column(name = "Data_Aggiornamento")
     @UpdateTimestamp
-    private LocalDateTime Data_Aggiornamento;
+    private LocalDateTime data_Aggiornamento;
 
     @JsonCreator
     public Stanza(@JsonProperty("nome") String nome,
@@ -103,11 +102,12 @@ public class Stanza {
                   @JsonProperty("descrizione") String descrizione,
                   @JsonProperty("tipoAccesso") boolean tipoAccesso,
                   @JsonProperty("maxPosti") int maxPosti)
+
     {
-        this.Nome = nome;
+        this.nome = nome;
         this.codice = codiceStanza;
-        this.Descrizione = descrizione;
-        this.Tipo_Accesso = tipoAccesso;
-        this.MAX_Posti = maxPosti;
+        this.descrizione = descrizione;
+        this.tipo_Accesso = tipoAccesso;
+        this.max_Posti = maxPosti;
     }
 }
