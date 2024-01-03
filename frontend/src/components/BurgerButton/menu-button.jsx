@@ -23,7 +23,7 @@ const BurgerButton = () => {
             <div className={menuClass}>
                 <ul>
                     {isLoggedIn()? (
-                        <li><Link to="/loggedIn">ACCOUNT</Link></li>
+                        <li><Link to="/Account">ACCOUNT</Link></li>
                     ) : (
                         <li><Link to="/login">LOGIN</Link></li>
                     )}
@@ -41,7 +41,7 @@ export function MyMenu() {
     return (
         <div>
             {isLoggedIn() ? (
-                <Link to="/loggedIn">ACCOUNT</Link>
+                <Link to="/Account">ACCOUNT</Link>
             ) : (
                 <Link to="/login">LOGIN</Link>
             )}
