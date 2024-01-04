@@ -7,6 +7,7 @@ import com.commigo.metaclass.MetaClass.entity.Utente;
 import com.commigo.metaclass.MetaClass.gestionestanza.repository.StanzaRepository;
 import com.commigo.metaclass.MetaClass.gestionestanza.repository.StatoPartecipazioneRepository;
 import com.commigo.metaclass.MetaClass.gestioneutenza.controller.ResponseBoolMessage;
+import com.commigo.metaclass.MetaClass.gestioneutenza.exception.DataNotFoundException;
 import com.commigo.metaclass.MetaClass.gestioneutenza.repository.UtenteRepository;
 import com.commigo.metaclass.MetaClass.utility.response.Response;
 import jakarta.transaction.Transactional;
@@ -52,15 +53,15 @@ public class GestioneUtenzaServiceImpl implements GestioneUtenzaService{
      * @return
      */
     @Override
-    public Response<Boolean> modificaDatiUtente(Long Id, Map<String, Object> dataMap, Utente u) {
+    public Response<Boolean> modificaDatiUtente(String SessionID, Utente u) {
 
         try {
-            Utente existingUser = utenteRepository.findUtenteById(Id);
+            Utente existingUser = utenteRepository.findFirstByMetaId(SessionID);
             if(existingUser == null) {
                 return new Response<Boolean>(false, "l'utente non esiste");
             }else{
-                if(utenteRepository.updateAttributes(Id, dataMap)>0){
-                    u = utenteRepository.findUtenteById(Id);
+                if(utenteRepository.updateAttributes(SessionID, u)>0){
+                    u = utenteRepository.findFirstByMetaId(SessionID);
                     return new Response<Boolean>(true, "modifica effettuata con successo");
                 }else{
                     u = existingUser;
@@ -97,7 +98,23 @@ public class GestioneUtenzaServiceImpl implements GestioneUtenzaService{
             }
         }catch (Exception e) {
             e.printStackTrace(); // Stampa la traccia dell'eccezione per debugging
-            return null;        }
+            return null;
+        }
     }
 
+/**
+*
+ * @param sessionID
+ * @return
+*/
+    @Override
+    public Utente getUtenteByUserId(String sessionID) throws DataNotFoundException {
+            Utente existingUser = utenteRepository.findFirstByMetaId(sessionID);
+            if(existingUser == null) {
+                throw new DataNotFoundException("Utente non presente nel database");
+            }else{
+                return existingUser;
+            }
+    }
 }
+
