@@ -15,6 +15,7 @@ public interface UtenteRepository extends JpaRepository<Utente, Long> {
 
     Utente findFirstByMetaId(String idMeta);
     Utente findUtenteById(long id);
+    Long findByMetaId(String metaID);
 
     //il valore restituito indica il numero di righe modificate, quindi:
     // 1 se tutto ok
@@ -25,12 +26,15 @@ public interface UtenteRepository extends JpaRepository<Utente, Long> {
             "u.nome = COALESCE(:#{#attributes['nome']}, u.nome), " +
             "u.cognome = COALESCE(:#{#attributes['cognome']}, u.cognome), " +
             "u.sesso = COALESCE(:#{#attributes['sesso']}, u.sesso), " +
-            "u.dataDiNascita = COALESCE(:#{#attributes['nascita']}, u.dataDiNascita), " +
+            "u.dataDiNascita = COALESCE(:#{#attributes['dataDiNascita']}, u.dataDiNascita), " +
             "u.email = COALESCE(:#{#attributes['email']}, u.email), " +
             "u.telefono = COALESCE(:#{#attributes['telefono']}, u.telefono), " +
             "u.metaId = COALESCE(:#{#attributes['metaId']}, u.metaId), " +
             "u.tokenAuth = COALESCE(:#{#attributes['tokenAuth']}, u.tokenAuth) " +
-            "WHERE u.id = :Id")
-    int updateAttributes(@Param("Id") Long Id, @Param("attributes") Map<String, Object> attributes);
+            "WHERE u.metaId = :SessionID")
+    int updateAttributes(@Param("SessionID") String SessionID, @Param("attributes") Utente attributes);
+
+
+
 
 }

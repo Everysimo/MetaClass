@@ -1,41 +1,48 @@
-import React, { useState } from 'react';
-import './accediStanza.css';
+import React, {Component} from 'react'
+import './accediStanza.css'
+import {wait} from "@testing-library/user-event/dist/utils";
+export default class AccediStanza extends Component{
+    //stato di partenza dei parametri
+    state = {
+        codiceStanza: "",
+        //tipoAccesso: false,
+        isVisible: true,
+    };
+    //funzione similar costruttore per settare i valori
+    responseForm = response => {
+        this.setState({
+            codiceStanza: response.codiceStanza,
+            //tipoAccesso: response.tipoAccesso,
+            isVisible: response.isVisible,
+        });
+    };
+//le varie handle richiamate quando passo i valori nelle input form
 
-const AccediStanza = () => {
-    const [codiceStanza, setCodiceStanza] = useState('');
-    const [isVisible, setIsVisible] = useState(true);
-
-
-    const handleInputChange = (event) => {
-        setCodiceStanza(event.target.value);
+    handleCodeChange = (e) => {
+        this.setState({codiceStanza: e.target.value})
     };
 
-    const handleClear = () => {
-        setCodiceStanza('');
+    /*handleOptionChange = (e) => {
+        this.setState({tipoAccesso: e.target.value})
+    };*/
+
+    //simposta invibile il div
+     handleClose = () => {
+        // Nascondi la card impostando isVisible su false
+         this.setState({isVisible: false});
+    };
+     handleClear = () => {
+        this.setState({codiceStanza: ('')});
     };
 
-    const handleSend = () => {
-        console.log('Dati inseriti:', codiceStanza);
+    /*funzione per inviare i parametri a crea stanza*/
 
-        // Resetta il campo di inserimento
-        setCodiceStanza('');
-        if (/^\d{6}$/.test(codiceStanza)) {
-            // Esegui azione con i dati inseriti (ad esempio, invia a un server)
-            console.log('Dati inseriti:', codiceStanza);
-
-            // Resetta il campo di inserimento
-            setCodiceStanza('');
-        } else {
-            // Gestisci il caso in cui il formato non è corretto (mostra un messaggio di errore, ad esempio)
-            alert('Il formato inserito non è corretto. Assicurati che siano 6 cifre numeriche.');
-        }
-        sendDataToServer();
-    };
-
-    const sendDataToServer = async() =>{
-        const {codiceStanza} = this.state;
+    sendDataToServer = async() =>{
+        const {codiceStanza/*, tipoAccesso*/} = this.state;
         const dataToSend = {
-            codiceStanza: codiceStanza,
+            codiceStanza,
+            //tipoAccesso,
+
         };
 
         const requestOption = {
@@ -54,37 +61,66 @@ const AccediStanza = () => {
         }catch(error){
             console.error('ERRORE:', error);
         }
+
+
     }
 
-    const handleClose = () => {
-        // Nascondi la card impostando isVisible su false
-        setIsVisible(false);
+    callFunction = () => {
+        if (this.state.codiceStanza.length !== 6) {
+            this.setState({
+                isErrorPopupVisible: true,
+                errorMessage: "Il codice stanza deve essere di 6 cifre",
+            });
+        }
+        this.sendDataToServer();
+        console.log("dati del form", this.state)
+        wait(100);
+        this.handleClear();
+    }
+    handleErrorPopupClose = () => {
+        this.setState({
+            isErrorPopupVisible: false,
+            errorMessage: "",
+        });
     };
 
-    return (
-        <div className={`card ${isVisible ? '' : 'hidden'}`}>
-            <button className="close-button" onClick={handleClose}>
-                X
-            </button>
-            <div className="card-content">
-                <label>
-                    insert room code:
-                    <input
-                        type="text"
-                        value={this.state.codiceStanza}
-                        onChange={handleInputChange}
-                        maxLength={6}
-                        minLength={6}
-                        pattern="\d*"
-                    />
-                </label>
-                <div className="button-container">
-                    <button onClick={handleClear}>Cancella</button>
-                    <button onClick={handleSend}>Invia</button>
+    renderErrorPopup = () => {
+        return (
+            <div className={`error-popup ${this.state.isErrorPopupVisible ? '' : 'hidden'}`}>
+                {this.state.errorMessage}
+                <button  onClick={this.handleErrorPopupClose}>Chiudi</button>
+            </div>
+        );
+    };
+
+    render(){
+        return (
+            <div>
+                {this.renderErrorPopup()}
+                <div className={`card ${this.state.isVisible ? '' : 'hidden'}`}>
+                    <button className="close-button" onClick={this.handleClose}>
+                        X
+                    </button>
+                <div className="card-content">
+                    <label>
+                        insert room code:
+                        <input
+                            type="number"
+                            placeholder={'Codice di 6 cifre'}
+                            value={this.state.codiceStanza}
+                            onChange={this.handleCodeChange}
+                            maxLength={6}
+                            minLength={6}
+                            min={0}
+                        />
+                    </label>
+                        <div className="button-container">
+                            <button onClick={this.handleClear}>Cancella</button>
+                            <button onClick={() =>  this.callFunction()}>Invia</button>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
-    );
-};
-
-export default AccediStanza;
+        );
+    };
+}
