@@ -1,5 +1,6 @@
 package com.commigo.metaclass.MetaClass.entity;
 
+import com.commigo.metaclass.MetaClass.gestioneutenza.exception.DataFormatException;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -13,6 +14,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 
 @Entity
 @Data
@@ -132,7 +134,7 @@ public class Utente {
                   @JsonProperty("email") String Email,
                   @JsonProperty("eta") String Data,
                   @JsonProperty("sesso") String Sesso,
-                  @JsonProperty("metaId") String IdMeta){
+                  @JsonProperty("metaId") String IdMeta) throws DataFormatException {
         this.nome = Nome;
         this.cognome = Cognome;
         this.email = Email;
@@ -140,9 +142,14 @@ public class Utente {
         this.sesso = Sesso;
         this.tokenAuth="TODO";
 
-        // Definire il formato della stringa
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-        this.dataDiNascita = LocalDate.parse(Data, formatter);
+        try {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+            this.dataDiNascita = LocalDate.parse(Data, formatter);
+        } catch (DateTimeParseException e) {
+            // Se c'è un errore di formato, gestisci l'eccezione come desideri
+            throw new DataFormatException("Formato della data di nascita non valido. Formato richiesto: dd/MM/yyyy");
+
+        }
 
     }
 }

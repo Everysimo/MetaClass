@@ -1,8 +1,10 @@
 package com.commigo.metaclass.MetaClass.entity;
 
 import com.commigo.metaclass.MetaClass.gestioneamministrazione.repository.ScenarioRepository;
+import com.commigo.metaclass.MetaClass.gestionemeeting.controller.CustomExceptionHandler;
 import com.commigo.metaclass.MetaClass.gestionestanza.repository.StanzaRepository;
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
@@ -11,9 +13,12 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 
+import java.time.DateTimeException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 
 @Entity
 @Data
@@ -47,12 +52,12 @@ public class Meeting {
 
     @NotNull(message = "L'inizio non può essere nullo")
     @Future(message = "l'inizio deve essere successivo alla data odierna")
-    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME, pattern = "yyyy-MM-dd HH:mm")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
     private LocalDateTime inizio;
 
     @NotNull(message = "La fine non può essere nulla")
     @Future(message = "la fine deve essere successivo alla data odierna")
-    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME, pattern = "yyyy-MM-dd HH:mm")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
     private LocalDateTime fine;
 
     /**
@@ -79,17 +84,14 @@ public class Meeting {
 
     @JsonCreator
     public Meeting(@JsonProperty("nome") String Nome,
-                   @JsonProperty("inizio") String Inizio,
-                   @JsonProperty("fine")  String Fine,
+                   @JsonProperty("inizio") LocalDateTime Inizio,
+                   @JsonProperty("fine")  LocalDateTime Fine,
                    @JsonProperty("id_stanza") Long stanza){
 
         this.nome = Nome;
 
-        // Definire il formato della stringa
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
-
-        this.inizio = LocalDateTime.parse(Inizio, formatter);
-        this.fine = LocalDateTime.parse(Fine.replace("|"," "), formatter);
+        this.inizio = Inizio;
+        this.fine = Fine;
 
         this.stanza = new Stanza();
         this.stanza.setId(stanza);
