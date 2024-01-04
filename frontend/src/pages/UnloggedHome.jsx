@@ -5,6 +5,8 @@ import {MyHeader} from "../components/Header/Header";
 import {MyFooter} from "../components/Footer/Footer";
 import '../data'
 import {par1, par2, par3} from "../data";
+import AccediStanza from "../components/enterRoomPopup/accediStanza";
+import CreaScenario from "../components/CreaScenarioForm/CreaScenario";
 
 export default function UnloggedHome(){
     const div1 = <DivGenerator content={par1}/>
