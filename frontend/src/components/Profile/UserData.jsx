@@ -2,7 +2,7 @@ import React, {useEffect, useState} from 'react';
 import axios from "axios";
 
 const UserData = () => {
-    const Id = localStorage.getItem("ID");
+    const Id = localStorage.getItem("UserMetaID");
 
     const [data, setData] = useState([]);
         const [error, setError] = useState(null);
@@ -22,7 +22,7 @@ const UserData = () => {
             };
 
             fetchData();
-        }, []); // L'array vuoto assicura che la richiesta venga effettuata solo al montaggio del componente
+        }, [Id]); // L'array vuoto assicura che la richiesta venga effettuata solo al montaggio del componente
 
         return (
             <div>

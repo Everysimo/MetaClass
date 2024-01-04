@@ -75,7 +75,7 @@ export default class Facebook extends Component {
 
     saveLoginStatusToLocalStorage = () => {
         localStorage.setItem('isLoggedIn', JSON.stringify(true));
-        localStorage.setItem('ID', this.state.metaId);
+        localStorage.setItem('UserMetaID', this.state.metaId);
         localStorage.setItem('nome', this.state.nome);
     };
 
