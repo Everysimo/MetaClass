@@ -53,7 +53,7 @@ public class GestioneUtenzaController {
                 session.removeAttribute("UserMetaID");
                 return ResponseEntity.ok(new Response<Boolean>(true, "Logout effettuato con successo"));
             } else {
-                return ResponseEntity.ok(new Response<Boolean>(true, "Utente non loggato"));
+                return ResponseEntity.status(401).body(new Response<Boolean>(true, "Utente non loggato"));
             }
         } catch (Exception e) {
             e.printStackTrace();
