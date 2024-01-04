@@ -1,6 +1,7 @@
 package com.commigo.metaclass.MetaClass.gestionestanza.service;
 
 import com.commigo.metaclass.MetaClass.entity.Stanza;
+import com.commigo.metaclass.MetaClass.utility.response.types.AccessResponse;
 import com.commigo.metaclass.MetaClass.utility.response.types.Response;
 import org.springframework.http.ResponseEntity;
 

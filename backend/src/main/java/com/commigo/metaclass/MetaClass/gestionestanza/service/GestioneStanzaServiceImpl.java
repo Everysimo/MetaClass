@@ -9,6 +9,7 @@ import com.commigo.metaclass.MetaClass.utility.response.ResponseUtils;
 import com.commigo.metaclass.MetaClass.utility.response.types.Response;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.apache.tomcat.util.http.ResponseUtil;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -30,11 +31,15 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService {
 
         Stanza stanza = stanzaRepository.findStanzaByCodice(codiceStanza);
         if (stanza == null) {
-            return ResponseUtils.getResponseError(HttpStatus.OK,"Stanza non trovata");
+            return ResponseUtils.getResponseError(HttpStatus.INTERNAL_SERVER_ERROR,"Stanza non trovata");
         } else if (!stanza.isTipo_Accesso()) {
 
             Response<Boolean> richiesta = richiestaAccessoStanza(codiceStanza, id_utente).getBody();
-            return ResponseEntity.ok(richiesta);
+            if(richiesta.getValue()){
+                return ResponseUtils.getResponseOk(richiesta.getMessage());
+            }else{
+                return ResponseUtils.getResponseError(HttpStatus.INTERNAL_SERVER_ERROR, richiesta.getMessage());
+            }
 
         } else {
 
@@ -44,18 +49,18 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService {
 
                 if (statoPartecipazione == null) {
                     statoPartecipazione = new StatoPartecipazione(stanza, u, getRuolo(Ruolo.PARTECIPANTE), false, false, u.getNome());
-                    return ResponseEntity.ok(new Response<>(true, "Stai per effettuare l'accesso alla stanza"));
+                    return ResponseUtils.getResponseOk("Stai per effettuare l'accesso alla stanza");
 
 
                 } else if (statoPartecipazione.isBannato()) {
-                    return ResponseEntity.ok(new Response<>(false, "Sei stato bannato da questa stanza, non puoi entrare"));
+                    return ResponseUtils.getResponseError(HttpStatus.INTERNAL_SERVER_ERROR, "Sei stato bannato da questa stanza, non puoi entrare");
                 } else {
-                    return ResponseEntity.ok(new Response<>(true, "Sei già all'interno di questa stanza"));
+                    return ResponseUtils.getResponseError(HttpStatus.INTERNAL_SERVER_ERROR, "Sei già all'interno di questa stanza");
                 }
 
             } catch (RuntimeException e) {
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                        .body(new Response<>(false, "Errore durante la richiesta: " + e.getMessage()));
+                return ResponseUtils.getResponseError(HttpStatus.INTERNAL_SERVER_ERROR,
+                         "Errore durante la richiesta: " + e.getMessage());
             }
         }
     }
@@ -83,22 +88,22 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService {
 
             if (statoPartecipazione == null) {
                 statoPartecipazione = new StatoPartecipazione(stanza, u, getRuolo(Ruolo.PARTECIPANTE), true, false, u.getNome());
-                return ResponseEntity.ok(new Response<>(true, "La stanza è privata, sei in attesa di entrare"));
+                return ResponseUtils.getResponseOk("La stanza è privata, sei in attesa di entrare");
 
             } else if (statoPartecipazione.isBannato()) {
-                return ResponseEntity.ok(new Response<>(false, "Sei stato bannato da questa stanza, non puoi entrare"));
+                return ResponseUtils.getResponseError(HttpStatus.INTERNAL_SERVER_ERROR, "Sei stato bannato da questa stanza, non puoi entrare");
 
             } else if (statoPartecipazione.isInAttesa()) {
-                return ResponseEntity.ok(new Response<>(true, "Sei già in attesa di entrare in questa stanza"));
+                return ResponseUtils.getResponseError(HttpStatus.INTERNAL_SERVER_ERROR, "Sei già in attesa di entrare in questa stanza");
 
             } else {
-                return ResponseEntity.ok(new Response<>(true, "Sei già all'interno di questa stanza"));
+                return ResponseUtils.getResponseError(HttpStatus.INTERNAL_SERVER_ERROR, "Sei già all'interno di questa stanza");
             }
 
 
         } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new Response<>(false, "Errore durante la richiesta: " + e.getMessage()));
+            return ResponseUtils.getResponseError(HttpStatus.INTERNAL_SERVER_ERROR,
+                    "Errore durante la richiesta: " + e.getMessage());
         }
 
     }
@@ -116,16 +121,16 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService {
             StatoPartecipazione stato_og = statoPartecipazioneRepository.findStatoPartecipazioneByUtenteAndStanza(og, stanza);
             if(stato_og.getRuolo().getNome().equalsIgnoreCase(Ruolo.PARTECIPANTE)){
                 stato_og.getRuolo().setNome(Ruolo.ORGANIZZATORE);
-                return new Response<>(true, "L'utente selezionato ora è un organizzatore");
+                return ResponseUtils.getResponseOk("L'utente selezionato ora è un organizzatore").getBody();
 
             }else if (stato_og.getRuolo().getNome().equalsIgnoreCase(Ruolo.ORGANIZZATORE)){
-                return new Response<>(false, "L'utente selezionato è già un'organizzatore");
+                return ResponseUtils.getResponseError(HttpStatus.INTERNAL_SERVER_ERROR, "L'utente selezionato è già un'organizzatore").getBody();
 
             }else{
-                return new Response<>(false, "L'utente selezionato non può essere declassato ad organizzatore");
+                return ResponseUtils.getResponseError(HttpStatus.INTERNAL_SERVER_ERROR,"L'utente selezionato non può essere declassato ad organizzatore").getBody();
             }
         }else{
-            return new Response<>(false, "Non puoi promuovere un'utente perché non sei un'organizzatore master");
+            return ResponseUtils.getResponseError(HttpStatus.INTERNAL_SERVER_ERROR,"Non puoi promuovere un'utente perché non sei un'organizzatore master").getBody();
         }
     }
 
@@ -142,16 +147,16 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService {
             StatoPartecipazione stato_og = statoPartecipazioneRepository.findStatoPartecipazioneByUtenteAndStanza(og, stanza);
             if(stato_og.getRuolo().getNome().equalsIgnoreCase(Ruolo.ORGANIZZATORE)){
                 stato_og.getRuolo().setNome(Ruolo.PARTECIPANTE);
-                return new Response<>(true, "L'utente selezionato ora è un partecipante");
+                return ResponseUtils.getResponseOk("L'utente selezionato ora è un partecipante").getBody();
 
             }else if (stato_og.getRuolo().getNome().equalsIgnoreCase(Ruolo.PARTECIPANTE)){
-                return new Response<>(false, "L'utente selezionato è già un partecipante");
+                return ResponseUtils.getResponseError(HttpStatus.INTERNAL_SERVER_ERROR,"L'utente selezionato è già un partecipante").getBody();
 
             }else{
-                return new Response<>(false, "L'utente selezionato non può essere declassato");
+                return ResponseUtils.getResponseError(HttpStatus.INTERNAL_SERVER_ERROR,"L'utente selezionato non può essere declassato").getBody();
             }
         }else{
-            return new Response<>(false, "Non puoi declassare un'utente perché non sei un'organizzatore master");
+            return ResponseUtils.getResponseError(HttpStatus.INTERNAL_SERVER_ERROR,"Non puoi declassare un'utente perché non sei un'organizzatore master").getBody();
         }
     }
 
@@ -161,15 +166,15 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService {
         Utente ogm = utenteRepository.findFirstByMetaId(id_Uogm);
         Stanza stanza = stanzaRepository.findStanzaById(id_stanza);
         if(stanza == null) {
-            return new Response<>(false, "La stanza selezionata non esiste");
+            return ResponseUtils.getResponseError(HttpStatus.INTERNAL_SERVER_ERROR,"La stanza selezionata non esiste").getBody();
         }
 
         StatoPartecipazione stato_ogm = statoPartecipazioneRepository.findStatoPartecipazioneByUtenteAndStanza(ogm, stanza);
         if(stato_ogm.getRuolo().getNome().equalsIgnoreCase(Ruolo.ORGANIZZATORE_MASTER)){
             stanzaRepository.delete(stanza);
-            return new Response<>(true, "Stanza eliminata con successo");
+            return ResponseUtils.getResponseOk("Stanza eliminata con successo").getBody();
         }else{
-            return new Response<>(false, "Non puoi eliminare una stanza se non sei un'organizzatore master");
+            return ResponseUtils.getResponseError(HttpStatus.INTERNAL_SERVER_ERROR,"Non puoi eliminare una stanza se non sei un'organizzatore master").getBody();
         }
     }
 
@@ -185,22 +190,22 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService {
 
                 Stanza existingStanza = stanzaRepository.findStanzaById(Id);
                 if(existingStanza == null) {
-                    return new Response<>(false, "La stanza non esiste");
+                    return ResponseUtils.getResponseError(HttpStatus.INTERNAL_SERVER_ERROR,"La stanza non esiste").getBody();
                 }else{
                     if(stanzaRepository.updateAttributes(Id, dataMap)>0){
                         stanza = stanzaRepository.findStanzaById(Id);
-                        return new Response<>(true, "modifica effettuata con successo");
+                        return ResponseUtils.getResponseOk("modifica effettuata con successo").getBody();
                     }else{
                         stanza = existingStanza;
-                        return new Response<>(true, "nessuna modifica effettuata");
+                        return ResponseUtils.getResponseOk("nessuna modifica effettuata").getBody();
                     }
                 }
             }else{
-                return new Response<>(false, "Non puoi effettuare modifiche sulla stanza se non sei almeno un organizzatore");
+                return ResponseUtils.getResponseError(HttpStatus.INTERNAL_SERVER_ERROR,"Non puoi effettuare modifiche sulla stanza se non sei almeno un organizzatore").getBody();
             }
 
         }catch (Exception e) {
-            return new Response<>(false, "errore nella modifica dei dati");
+            return ResponseUtils.getResponseError(HttpStatus.INTERNAL_SERVER_ERROR,"errore nella modifica dei dati").getBody();
         }
     }
 
