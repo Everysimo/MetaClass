@@ -1,23 +1,21 @@
 
 import React from 'react'
-import { MyHeader } from '../components/Header/Header'
-import { MyFooter } from '../components/Footer/Footer'
+import {MyHeader} from "../components/Header/Header";
+import {MyFooter} from "../components/Footer/Footer";
+import MyModifyForm from "../components/ModifyRoomForm/MyModifyForm";
 
-import "../css/createroom.css";
-import MyCreateForm from "../components/CreateRoomForm/MyCreateForm";
-
-export const CreateRoom = () => {
+export const ModifyRoom = () => {
 
     return(
         <>
             <header>
                 <MyHeader/>
             </header>
-            <section >
+            <section>
                 <div className="total-body">
                     <div>
                         <div>
-                            <MyCreateForm/>
+                            <MyModifyForm/>
                         </div>
                     </div>
                 </div>
@@ -27,4 +25,5 @@ export const CreateRoom = () => {
             </footer>
         </>
     );
+
 }
