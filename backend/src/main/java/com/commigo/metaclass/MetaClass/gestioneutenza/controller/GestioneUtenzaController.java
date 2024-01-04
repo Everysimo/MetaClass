@@ -13,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Enumeration;
 import java.util.List;
 import java.util.Map;
 
@@ -43,6 +44,11 @@ public class GestioneUtenzaController {
     @GetMapping(value = "/logout")
     public ResponseEntity<Response<Boolean>> logout(HttpSession session) {
         try {
+            Enumeration<String> attributes = session.getAttributeNames();
+            while (attributes.hasMoreElements()) {
+                String attribute = (String) attributes.nextElement();
+                System.out.println(attribute+" : "+session.getAttribute(attribute));
+            }
             if (session.getAttribute("UserMetaID") != null) {
                 session.removeAttribute("UserMetaID");
                 return ResponseEntity.ok(new Response<Boolean>(true, "Logout effettuato con successo"));
@@ -103,7 +109,7 @@ public class GestioneUtenzaController {
             } else if (stanze.isEmpty()) {
                 return ResponseEntity
                         .ok(new Response<List<Stanza>>(stanze,
-                                "non hai accesso a nessuna stanza"));
+                                "non hai acceduto a nessuna stanza"));
             } else {
                 return ResponseEntity
                         .ok(new Response<List<Stanza>>(stanze,
