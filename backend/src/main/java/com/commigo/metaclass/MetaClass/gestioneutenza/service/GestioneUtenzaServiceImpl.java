@@ -47,8 +47,7 @@ public class GestioneUtenzaServiceImpl implements GestioneUtenzaService{
     }
 
     /**
-     * @param Id
-     * @param dataMap
+     * @param SessionID
      * @param u
      * @return
      */
