@@ -7,25 +7,23 @@ import MyModifyForm from "../components/ModifyRoomForm/MyModifyForm";
 export const ModifyRoom = () => {
 
     return(
-
-        <body>
-        <header>
-            <MyHeader/>
-        </header>
-        <section>
-            <div className="total-body">
-                <div>
+        <>
+            <header>
+                <MyHeader/>
+            </header>
+            <section>
+                <div className="total-body">
                     <div>
-                        <MyModifyForm/>
+                        <div>
+                            <MyModifyForm/>
+                        </div>
                     </div>
                 </div>
-            </div>
-        </section>
-        <footer>
-        <MyFooter/>
-        </footer>
-
-        </body>
+            </section>
+            <footer>
+                <MyFooter/>
+            </footer>
+        </>
     );
 
 }

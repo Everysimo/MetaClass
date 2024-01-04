@@ -4,7 +4,7 @@ import { MyHeader } from '../components/Header/Header'
 import { MyFooter } from '../components/Footer/Footer'
 
 import "../css/createroom.css";
-import MyForm from "../components/CreateRoomForm/MyForm";
+import MyForm from "../components/CreateRoomForm/MyCreateForm";
 
 export const CreateRoom = () => {
 
