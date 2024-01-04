@@ -3,8 +3,8 @@ package com.commigo.metaclass.MetaClass.gestioneutenza.controller;
 import com.commigo.metaclass.MetaClass.entity.Stanza;
 import com.commigo.metaclass.MetaClass.entity.Utente;
 import com.commigo.metaclass.MetaClass.gestioneutenza.service.GestioneUtenzaService;
-import com.commigo.metaclass.MetaClass.utility.response.Response;
 import com.commigo.metaclass.MetaClass.utility.response.ResponseUtils;
+import com.commigo.metaclass.MetaClass.utility.response.types.Response;
 import com.google.gson.Gson;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +14,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Map;
 
 @RestController
 public class GestioneUtenzaController {
@@ -28,7 +27,7 @@ public class GestioneUtenzaController {
     public ResponseEntity<Response<Boolean>> login(@RequestBody Utente u, HttpSession session) {
         try {
             if (!utenzaService.loginMeta(u))
-                return ResponseUtils.getResponseError("Login non effettuato");
+                return ResponseUtils.getResponseError(HttpStatus.INTERNAL_SERVER_ERROR,"Login non effettuato");
 
             if (session.getAttribute("UserMetaID") != null)
                 return ResponseUtils.getResponseOk("Utente già loggato");
@@ -36,7 +35,7 @@ public class GestioneUtenzaController {
             session.setAttribute("UserMetaID", u.getMetaId());
             return ResponseUtils.getResponseOk("Login effettuato con successo");
         } catch (RuntimeException e) {
-            return ResponseUtils.getResponseError("Errore durante il login: " + e.getMessage());
+            return ResponseUtils.getResponseError(HttpStatus.INTERNAL_SERVER_ERROR,"Errore durante il login: " + e.getMessage());
         }
     }
 
@@ -45,19 +44,17 @@ public class GestioneUtenzaController {
         try {
             if (session.getAttribute("UserMetaID") != null) {
                 session.removeAttribute("UserMetaID");
-                return ResponseEntity.ok(new Response<Boolean>(true, "Logout effettuato con successo"));
+                return ResponseEntity.ok(new Response<>(true, "Logout effettuato con successo"));
             } else {
-                return ResponseEntity.ok(new Response<Boolean>(true, "Utente non loggato"));
+                return ResponseEntity.ok(new Response<>(true, "Utente non loggato"));
             }
         } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.status(500).body(new Response<Boolean>(false, "Errore durante il logout"));
+            return ResponseEntity.status(500).body(new Response<>(false, "Errore durante il logout"));
         }
     }
 
     @PostMapping(value = "/modifyUserData")
-    public ResponseEntity<Response<Boolean>> modifyUserData(
-            @RequestBody Utente u,
+    public ResponseEntity<Response<Boolean>> modifyUserData(@RequestBody Utente u,
             HttpSession session) {
 
         Response<Boolean> response;
@@ -66,12 +63,11 @@ public class GestioneUtenzaController {
 
         if((sessionID = (String) session.getAttribute("UserMetaID"))==null){
             return ResponseEntity.status(403)
-                    .body(new Response<Boolean>(false,
-                            "utente non loggato"));
+                    .body(new Response<>(false, "utente non loggato"));
         }
 
         response = utenzaService.modificaDatiUtente(sessionID, u);
-        if (response.getSuccesso()) {
+        if (response.getValue()) {
             if (u != null) {
                 // Converti l'oggetto utente in formato JSON
                 String userJson = new Gson().toJson(u);
@@ -94,53 +90,43 @@ public class GestioneUtenzaController {
             String IdMeta = (String) session.getAttribute("UserMetaID");
 
             if (IdMeta == null)
-                return ResponseEntity.status(403).body(new Response<List<Stanza>>(null, "Utente non loggato"));
+                return ResponseEntity.status(403).body(new Response<>(null, "Utente non loggato"));
             stanze = utenzaService.getStanzeByUserId(IdMeta);
             if (stanze == null) {
                 return ResponseEntity.status(500)
-                        .body(new Response<List<Stanza>>(null,
-                                "Errore la ricerca delle stanze"));
+                        .body(new Response<>(null, "Errore la ricerca delle stanze"));
             } else if (stanze.isEmpty()) {
                 return ResponseEntity
-                        .ok(new Response<List<Stanza>>(stanze,
-                                "non hai accesso a nessuna stanza"));
+                        .ok(new Response<>(stanze, "Non hai accesso a nessuna stanza"));
             } else {
                 return ResponseEntity
-                        .ok(new Response<List<Stanza>>(stanze,
-                                "operazione effettuata con successo"));
+                        .ok(new Response<>(stanze, "operazione effettuata con successo"));
             }
         } catch (Exception e) {
-            e.printStackTrace();
             return ResponseEntity.status(500)
-                    .body(new Response<List<Stanza>>(null,
-                            "Errore durante l'operazione"));
+                    .body(new Response<>(null, "Errore durante l'operazione"));
         }
     }
 
 
     @GetMapping(value = "/userDetails")
     public ResponseEntity<Response<Utente>> visualizzaDatiUtente(HttpSession session) {
-        Utente utente = null;
+        Utente utente;
         try {
             String IdMeta = (String) session.getAttribute("UserMetaID");
 
             if (IdMeta == null)
-                return ResponseEntity.status(403).body(new Response<Utente>(null, "Utente non loggato"));
+                return ResponseEntity.status(403).body(new Response<>(null, "Utente non loggato"));
             utente = utenzaService.getUtenteByUserId(IdMeta);
             if (utente == null) {
                 return ResponseEntity.status(500)
-                        .body(new Response<Utente>(null,
-                                "Errore la ricerca dell'utente"));
+                        .body(new Response<>(null,"Errore la ricerca dell'utente"));
             } else {
-                return ResponseEntity
-                        .ok(new Response<Utente>(utente,
-                                "operazione effettuata con successo"));
+                return ResponseEntity.ok(new Response<>(utente, "operazione effettuata con successo"));
             }
         } catch (Exception e) {
-            e.printStackTrace();
             return ResponseEntity.status(500)
-                    .body(new Response<Utente>(null,
-                            "Errore durante l'operazione"));
+                    .body(new Response<>(null, "Errore durante l'operazione"));
         }
     }
 

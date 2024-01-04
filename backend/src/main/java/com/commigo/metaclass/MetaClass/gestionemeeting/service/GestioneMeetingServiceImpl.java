@@ -2,10 +2,8 @@ package com.commigo.metaclass.MetaClass.gestionemeeting.service;
 
 import com.commigo.metaclass.MetaClass.entity.Meeting;
 import com.commigo.metaclass.MetaClass.entity.Stanza;
-import com.commigo.metaclass.MetaClass.entity.Utente;
 import com.commigo.metaclass.MetaClass.gestionemeeting.repository.MeetingRepository;
 import com.commigo.metaclass.MetaClass.gestionestanza.repository.StanzaRepository;
-import com.commigo.metaclass.MetaClass.gestioneutenza.repository.UtenteRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

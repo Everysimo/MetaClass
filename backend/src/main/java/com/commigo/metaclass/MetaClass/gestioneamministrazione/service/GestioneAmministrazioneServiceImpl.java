@@ -33,8 +33,7 @@ public class GestioneAmministrazioneServiceImpl implements GestioneAmministrazio
      */
     @Override
     public boolean updateCategoria(Categoria c) {
-         Categoria cat;
-         if((cat = categoriaRepository.findByNome(c.getNome()))==null){
+         if(categoriaRepository.findByNome(c.getNome())==null){
              categoriaRepository.save(c);
              return true;
          }
@@ -69,7 +68,6 @@ public class GestioneAmministrazioneServiceImpl implements GestioneAmministrazio
         try{
             return stanzaRepository.findAll();
         }catch(Exception e){
-            e.printStackTrace();
             return null;
         }
     }

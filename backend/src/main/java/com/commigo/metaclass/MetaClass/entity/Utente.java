@@ -1,6 +1,6 @@
 package com.commigo.metaclass.MetaClass.entity;
 
-import com.commigo.metaclass.MetaClass.gestioneutenza.exception.DataFormatException;
+import com.commigo.metaclass.MetaClass.exceptions.DataFormatException;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -62,24 +62,32 @@ public class Utente {
 
     @NotNull(message = "Il nome non può essere nullo")
     @Column(length = MAX_NAME_LENGTH)
-    @Size(min = MIN_NAME_LENGTH, max = MAX_NAME_LENGTH,
-            message = "Lunghezza nome non valida")
+    @Size(min = MIN_NAME_LENGTH,
+            max = MAX_NAME_LENGTH,
+            message = "Lunghezza nome errata")
+    @Pattern(regexp="^[A-Z][a-z]*",
+            message="Formato nome errato")
     @NotBlank(message = "Il nome non può essere vuoto")
     private String nome;
 
     @NotNull(message = "Il cognome non può essere nullo")
     @Column(length = MAX_NAME_LENGTH)
-    @Size(min = MIN_NAME_LENGTH, max = MAX_NAME_LENGTH,
-            message = "Lunghezza cognome non valida")
+    @Size(min = MIN_NAME_LENGTH,
+            max = MAX_NAME_LENGTH,
+            message = "Lunghezza cognome errata")
+    @Pattern(regexp ="^[A-Z][a-z]*",
+            message="Formato cognome errato")
     @NotBlank(message = "Il cognome non può essere vuoto")
     private String cognome;
 
     @NotNull(message = "Il sesso non può essere nullo")
     @Column(length = SEX_LENGTH)
-    @Size(min = SEX_LENGTH, max = SEX_LENGTH,
+    @Size(min = SEX_LENGTH,
+            max = SEX_LENGTH,
             message = "Lunghezza sesso non valida")
     @NotBlank(message = "Il sesso non può essere vuoto")
-    @Pattern(regexp = "^[MFO]$", message = "Il genere deve essere 'M', 'F' o 'O'")
+    @Pattern(regexp = "^[MFO]$",
+            message = "Il genere deve essere 'M', 'F' o 'O'")
     private String sesso;
 
     @NotNull(message = "La data di nascita non può essere nulla")
@@ -95,7 +103,8 @@ public class Utente {
     private String email;
 
     @Column(length = MAX_PHONE_LENGTH)
-    @Size(min = MAX_PHONE_LENGTH, max = MAX_PHONE_LENGTH,
+    @Size(min = MAX_PHONE_LENGTH,
+            max = MAX_PHONE_LENGTH,
             message = "Lunghezza telefono non valida")
     @Pattern(regexp = "^[0-9]{10}$",
             message = "Formato telefono non valido")
@@ -104,7 +113,8 @@ public class Utente {
     //da valutare la lunghezza della stringa
     @NotNull(message = "IdMeta non può essere nulla")
     @Column(length = MAX_NAME_LENGTH, unique = true)
-    @Size(min = MIN_NAME_LENGTH, max = MAX_NAME_LENGTH,
+    @Size(min = MIN_NAME_LENGTH,
+            max = MAX_NAME_LENGTH,
             message = "Lunghezza IdMeta non valida")
     @NotBlank(message = "Il IdMeta non può essere vuoto")
     private String metaId;
@@ -112,7 +122,8 @@ public class Utente {
     //da valutare la lunghezza della stringa
     @NotNull(message = "TokenAuth non può essere nulla")
     @Column(length = MAX_NAME_LENGTH)
-    @Size(min = MIN_NAME_LENGTH, max = MAX_NAME_LENGTH,
+    @Size(min = MIN_NAME_LENGTH,
+            max = MAX_NAME_LENGTH,
             message = "Lunghezza TokenAuth non valida")
     @NotBlank(message = "Il TokenAuth non può essere vuoto")
     private String tokenAuth;
