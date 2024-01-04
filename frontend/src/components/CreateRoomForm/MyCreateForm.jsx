@@ -1,9 +1,9 @@
 
 import React, {Component} from 'react'
-import "./MyForm.css"
+import "./MyCreateForm.css"
 import {Divider} from "@chakra-ui/react";
 
-export default class MyForm extends Component{
+export default class MyCreateForm extends Component{
 
 
     //stato di partenza dei parametri
@@ -12,7 +12,7 @@ export default class MyForm extends Component{
         codiceStanza: "",
         descrizione: "",
         tipoAccesso: false,
-        maxPosti: 0
+        maxPosti: 0,
     };
 
     //funzione similar costruttore per settare i valori
@@ -49,6 +49,7 @@ export default class MyForm extends Component{
 
 
     /*funzione per inviare i parametri a crea stanza*/
+
 
     sendDataToServer = async() =>{
         const {nome, codiceStanza, descrizione, tipoAccesso, maxPosti} = this.state;
@@ -93,6 +94,7 @@ export default class MyForm extends Component{
                 <input
                     className={'input-field'}
                     placeholder={"Aggiungi Nome"}
+                    required
                     type="text"
                     value={this.state.nome}
                     onChange={this.handleNameChange}
@@ -103,6 +105,7 @@ export default class MyForm extends Component{
                     <textarea
                         className={'textarea-field'}
                         placeholder={'Aggiungi descrizione'}
+                        required
                         rows={5}
                         style={{resize: 'none', width: '300px'}}
                         type="text"
@@ -112,15 +115,15 @@ export default class MyForm extends Component{
                 </div>
 
                 <p className={'textp'}>Scegli: pubblica o privata:</p>
-                <select className={'select-field'} value={this.state.tipoAccesso} onChange={this.handleOptionChange}>
-                    <option value=""> -Scegli un'opzione-</option>
-                    <option value="public">Pubblica</option>
-                    <option value="private">Privata</option>
+                <select className={'select-field'} value={this.state.tipoAccesso} onChange={this.handleOptionChange} required>
+                    <option value={false}>Pubblica</option>
+                    <option value={true}>Privata</option>
                 </select>
 
                 <p className={'textp'}>Inserisci numero MAX utenti:</p>
                 <input
                     className={'number-field'}
+                    required
                     placeholder={'MAX Posti'}
                     type="number"
                     min="1" max="999"
@@ -140,6 +143,7 @@ export default class MyForm extends Component{
                     <div className={'pin-box'}>
                         <input
                             className={'pin-field'}
+                            required
                             placeholder={'Codice di 6 cifre'}
                             type="text"
                             maxLength={6}

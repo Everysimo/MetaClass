@@ -1,0 +1,5 @@
+
+.totality{
+    display: flex;
+        flex-wrap: wrap;    /*importantissimo perché appena vede lo spazio va a capo*/
+}
