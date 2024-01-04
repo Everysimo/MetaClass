@@ -5,6 +5,7 @@ import {LoggedInHome} from "./pages/LoggedInHome"
 import UnloggedHome from "./pages/UnloggedHome";
 import {CreateRoom} from "./pages/createroom";
 import {ModifyRoom} from "./pages/modifyroom";
+import {UserProfile} from "./pages/userprofile";
 import {Account} from "./pages/Account";
 
 
@@ -18,7 +19,8 @@ export const Rts = () =>{
                 <Route path="/createroom" element={<CreateRoom/>}/>
                 <Route path="/modifyroom" element={<ModifyRoom/>}/>
                 <Route path="/LoggedInHome" element={<LoggedInHome />}/>
-                <Route path={"/Account"} element={<Account />}/>
+                <Route path="/userprofile" element={<UserProfile/>}/>
+                <Route path="/Account" element={<Account />}/>
             </Routes>
         </Router>
     )

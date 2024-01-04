@@ -10,12 +10,11 @@ import { fetchUserDetails } from '../functions/fetchUserDetails';
 
 export const Account = () => {
     const [userDetails, setUserDetails] = useState(null);
-    const Id = localStorage.getItem('ID'); // Replace with the actual user ID
 
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const data = await fetchUserDetails(Id);
+                const data = await fetchUserDetails();
                 setUserDetails(data);
             } catch (error) {
                 // Handle error scenarios here
@@ -24,7 +23,7 @@ export const Account = () => {
         };
 
         fetchData();
-    }, [Id]);
+    }, []);
     return (
         <>
             <header>
