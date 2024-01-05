@@ -2,7 +2,7 @@
 import React from "react"
 import {MyHeader} from "../components/Header/Header";
 import {MyFooter} from "../components/Footer/Footer";
-import UserData from "../components/Profile/UserData";
+import RoomList from "../components/RoomList/RoomList";
 
 export const UserProfile = () => {
 
@@ -15,7 +15,7 @@ export const UserProfile = () => {
 
     <section>
         <div>
-            <UserData/>
+            <RoomList/>
         </div>
     </section>
 
