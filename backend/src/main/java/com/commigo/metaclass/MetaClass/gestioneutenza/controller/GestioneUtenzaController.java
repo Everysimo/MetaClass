@@ -101,38 +101,34 @@ public class GestioneUtenzaController {
         } catch (ServerRuntimeException se) {
             return ResponseEntity.status(500).body(new Response<>(false, se.getMessage()));
         }catch(Exception e){
-            e.printStackTrace();
             return ResponseEntity.status(500).body(new Response<>(false, "errore"));
         }
     }
 
     @PostMapping(value = "/modifyUserData")
     public ResponseEntity<Response<Boolean>> modifyUserData(@RequestBody Utente u,
-            HttpSession session) {
+                                                            HttpServletRequest request) {
+        try{
+            Response<Boolean> response;
+            ResponseEntity<Response<Boolean>> responseHTTP;
 
-        Response<Boolean> response;
-        ResponseEntity<Response<Boolean>> responseHTTP;
-        String sessionID;
-
-        if((sessionID = (String) session.getAttribute("UserMetaID"))==null){
-            return ResponseEntity.status(403)
-                    .body(new Response<>(false, "utente non loggato"));
-        }
-
-        response = utenzaService.modificaDatiUtente(sessionID, u);
-        if (response.getValue()) {
-            if (u != null) {
-                // Converti l'oggetto utente in formato JSON
-                String userJson = new Gson().toJson(u);
-                System.out.println(userJson);
-                session.setAttribute("UserModified", userJson);
+            if (!validationToken.isTokenValid(request)) {
+                throw new RuntimeException403("Token non valido");
             }
-            responseHTTP = ResponseEntity.ok(response);
-        } else {
-            responseHTTP = ResponseEntity.status(500).body(response);
-        }
-        return responseHTTP;
 
+            String metaID = jwtTokenUtil.getMetaIdFromToken(validationToken.getToken());
+
+            response = utenzaService.modificaDatiUtente(metaID,u);
+            if (!response.getValue()) {
+                responseHTTP = ResponseEntity.ok(response);
+            } else {
+                responseHTTP = ResponseEntity.status(403).body(response);
+            }
+            return responseHTTP;
+
+        }catch(RuntimeException403 e){
+            return ResponseEntity.status(403).body(new Response<>(null, e.getMessage()));
+        }
     }
 
     @CrossOrigin
@@ -163,13 +159,15 @@ public class GestioneUtenzaController {
 
 
     @GetMapping(value = "/userDetails")
-    public ResponseEntity<Response<Utente>> visualizzaDatiUtente(HttpSession session) {
+    public ResponseEntity<Response<Utente>> visualizzaDatiUtente(HttpServletRequest request) {
         Utente utente;
         try {
-            String IdMeta = (String) session.getAttribute("UserMetaID");
 
-            if (IdMeta == null)
-                return ResponseEntity.status(403).body(new Response<>(null, "Utente non loggato"));
+            if (!validationToken.isTokenValid(request)) {
+                throw new RuntimeException403("Token non valido");
+            }
+
+            String IdMeta = jwtTokenUtil.getMetaIdFromToken(validationToken.getToken());
             utente = utenzaService.getUtenteByUserId(IdMeta);
             if (utente == null) {
                 return ResponseEntity.status(500)
@@ -177,6 +175,8 @@ public class GestioneUtenzaController {
             } else {
                 return ResponseEntity.ok(new Response<>(utente, "operazione effettuata con successo"));
             }
+        }catch (RuntimeException403 e) {
+                return ResponseEntity.status(403).body(new Response<>(null, e.getMessage()));
         } catch (Exception e) {
             return ResponseEntity.status(500)
                     .body(new Response<>(null, "Errore durante l'operazione"));

@@ -11,14 +11,15 @@ public class ValidationToken {
 
     @Autowired
     private JwtTokenUtil jwtTokenUtil;
+    private String token;
 
     public boolean isTokenValid(HttpServletRequest request) {
-        String token = request.getHeader("Authorization");
+        this.token = request.getHeader("Authorization");
 
-        if (token != null && token.startsWith("Bearer ")) {
-            token = token.substring(7);
+        if (this.token != null && this.token.startsWith("Bearer ")) {
+            this.token = this.token.substring(7);
 
-            return jwtTokenUtil.validateToken(token);
+            return jwtTokenUtil.validateToken(this.token);
         }
 
         return false;
