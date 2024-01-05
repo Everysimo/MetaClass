@@ -2,6 +2,11 @@ package com.commigo.metaclass.MetaClass.gestionemeeting.service;
 
 import com.commigo.metaclass.MetaClass.entity.Meeting;
 
+import java.util.Optional;
+
 public interface GestioneMeetingService {
-    public boolean creaScheduling(Meeting meeting);
+    boolean creaScheduling(Meeting meeting);
+    Meeting findMeetingById(Long id);
+
+    Meeting saveMeeting(Meeting meeting);
 }
