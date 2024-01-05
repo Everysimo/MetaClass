@@ -1,9 +1,11 @@
 package com.commigo.metaclass.MetaClass.gestionestanza.controller;
 
 import com.commigo.metaclass.MetaClass.entity.Stanza;
+import com.commigo.metaclass.MetaClass.entity.Utente;
 import com.commigo.metaclass.MetaClass.gestionestanza.service.GestioneStanzaService;
 import com.commigo.metaclass.MetaClass.utility.request.RequestUtils;
 import com.commigo.metaclass.MetaClass.utility.response.ResponseUtils;
+import com.commigo.metaclass.MetaClass.utility.response.types.AccessResponse;
 import com.commigo.metaclass.MetaClass.utility.response.types.Response;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -19,6 +21,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.naming.NamingException;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -56,12 +60,12 @@ public class GestioneStanzaControl {
     }
 
     @PostMapping(value = "/accessoStanza")
-    public ResponseEntity<Response<Boolean>> richiestaAccessoStanza(@RequestBody String requestBody, HttpSession session)
+    public ResponseEntity<AccessResponse<Boolean>> richiestaAccessoStanza(@RequestBody String requestBody, HttpSession session)
     {
         try {
             String IdMeta = (String) session.getAttribute("UserMetaID");
             if (IdMeta == null) {
-                return ResponseEntity.status(403).body(new Response<>(false, "Utente non loggato"));
+                return ResponseEntity.status(403).body(new AccessResponse<>(false, "Utente non loggato", false));
             }else {
 
                 ObjectMapper objectMapper = new ObjectMapper();
@@ -72,8 +76,14 @@ public class GestioneStanzaControl {
             }
         } catch (RuntimeException | JsonProcessingException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new Response<>(false, "Errore durante la richiesta: " + e.getMessage()));
+                    .body(new AccessResponse<>(false, "Errore durante la richiesta: " + e.getMessage(), false));
         }
+    }
+
+    @PostMapping(value = "/visualizzaStanza/{Id}")
+    public List<Utente> richiestaAccessoStanza(@PathVariable Long Id, HttpSession session)
+    {
+        return stanzaService.visualizzaStanza(Id);
     }
 
     @PostMapping(value = "/promuoviOrganizzatore")

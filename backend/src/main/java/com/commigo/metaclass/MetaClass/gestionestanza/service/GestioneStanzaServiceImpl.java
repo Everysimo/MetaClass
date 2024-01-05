@@ -6,13 +6,18 @@ import com.commigo.metaclass.MetaClass.gestionestanza.repository.*;
 import com.commigo.metaclass.MetaClass.gestioneutenza.repository.UtenteRepository;
 import com.commigo.metaclass.MetaClass.utility.Validator;
 import com.commigo.metaclass.MetaClass.utility.response.ResponseUtils;
+import com.commigo.metaclass.MetaClass.utility.response.types.AccessResponse;
 import com.commigo.metaclass.MetaClass.utility.response.types.Response;
+import jakarta.persistence.Access;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.TypedQuery;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Map;
 
 @Service("GestioneStanzaService")
@@ -26,15 +31,19 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService {
     private final UtenteRepository utenteRepository;
 
     @Override
-    public ResponseEntity<Response<Boolean>> accessoStanza(String codiceStanza, String id_utente) {
+    public ResponseEntity<AccessResponse<Boolean>> accessoStanza(String codiceStanza, String id_utente) {
 
         Stanza stanza = stanzaRepository.findStanzaByCodice(codiceStanza);
         if (stanza == null) {
-            return ResponseUtils.getResponseError(HttpStatus.OK,"Stanza non trovata");
+            return ResponseEntity.status(403).body(new AccessResponse<>(false, "La stanza non esiste", false));
         } else if (!stanza.isTipo_Accesso()) {
 
-            Response<Boolean> richiesta = richiestaAccessoStanza(codiceStanza, id_utente).getBody();
-            return ResponseEntity.ok(richiesta);
+            AccessResponse<Boolean> richiesta = richiestaAccessoStanza(codiceStanza, id_utente).getBody();
+            if(richiesta.getValue()){
+                return ResponseEntity.ok(new AccessResponse<>(richiesta.getValue(), richiesta.getMessage(), richiesta.isInAttesa()));
+            }else{
+                return ResponseEntity.status(403).body(new AccessResponse<>(richiesta.getValue(), richiesta.getMessage(), richiesta.isInAttesa()));
+            }
 
         } else {
 
@@ -43,19 +52,24 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService {
                 StatoPartecipazione statoPartecipazione = statoPartecipazioneRepository.findStatoPartecipazioneByUtenteAndStanza(u, stanza);
 
                 if (statoPartecipazione == null) {
-                    statoPartecipazione = new StatoPartecipazione(stanza, u, getRuolo(Ruolo.PARTECIPANTE), false, false, u.getNome());
-                    return ResponseEntity.ok(new Response<>(true, "Stai per effettuare l'accesso alla stanza"));
 
+                    statoPartecipazione = new StatoPartecipazione(stanza, u, getRuolo(Ruolo.PARTECIPANTE), false, false, u.getNome());
+                    return ResponseEntity.ok(new AccessResponse<>(true, "Stai per effettuare l'accesso alla stanza", false));
 
                 } else if (statoPartecipazione.isBannato()) {
-                    return ResponseEntity.ok(new Response<>(false, "Sei stato bannato da questa stanza, non puoi entrare"));
+
+                    return ResponseEntity.status(403).body(new AccessResponse<>(false, "Sei stato bannato da questa stanza, non puoi entrare", false));
+
                 } else {
-                    return ResponseEntity.ok(new Response<>(true, "Sei già all'interno di questa stanza"));
+
+                    return ResponseEntity.status(403).body(new AccessResponse<>(false, "Sei già all'interno di questa stanza", false));
+
                 }
 
             } catch (RuntimeException e) {
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                        .body(new Response<>(false, "Errore durante la richiesta: " + e.getMessage()));
+
+                return ResponseEntity.status(403).body(new AccessResponse<>(false, "Errore durante la richiesta: " + e.getMessage(), false));
+
             }
         }
     }
@@ -74,7 +88,7 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService {
     }
 
     @Override
-    public ResponseEntity<Response<Boolean>> richiestaAccessoStanza(String codiceStanza, String id_utente) {
+    public ResponseEntity<AccessResponse<Boolean>> richiestaAccessoStanza(String codiceStanza, String id_utente) {
         try {
             Stanza stanza = stanzaRepository.findStanzaByCodice(codiceStanza);
 
@@ -82,23 +96,28 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService {
             StatoPartecipazione statoPartecipazione = statoPartecipazioneRepository.findStatoPartecipazioneByUtenteAndStanza(u, stanza);
 
             if (statoPartecipazione == null) {
+
                 statoPartecipazione = new StatoPartecipazione(stanza, u, getRuolo(Ruolo.PARTECIPANTE), true, false, u.getNome());
-                return ResponseEntity.ok(new Response<>(true, "La stanza è privata, sei in attesa di entrare"));
+                return ResponseEntity.ok(new AccessResponse<>(true, "La stanza è privata, sei in attesa di entrare", true));
 
             } else if (statoPartecipazione.isBannato()) {
-                return ResponseEntity.ok(new Response<>(false, "Sei stato bannato da questa stanza, non puoi entrare"));
+
+                return ResponseEntity.status(403).body(new AccessResponse<>(false, "Sei stato bannato da questa stanza, non richiedere di entrare", false));
 
             } else if (statoPartecipazione.isInAttesa()) {
-                return ResponseEntity.ok(new Response<>(true, "Sei già in attesa di entrare in questa stanza"));
+
+                return ResponseEntity.status(403).body(new AccessResponse<>(false, "Sei già in attesa di entrare in questa stanza", true));
 
             } else {
-                return ResponseEntity.ok(new Response<>(true, "Sei già all'interno di questa stanza"));
+
+                return ResponseEntity.status(403).body(new AccessResponse<>(false, "Sei già all'interno di questa stanza", false));
+
             }
 
 
         } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new Response<>(false, "Errore durante la richiesta: " + e.getMessage()));
+            return ResponseEntity.status(403).body(new AccessResponse<>(false,
+                    "Errore durante la richiesta: " + e.getMessage(), false));
         }
 
     }
@@ -116,16 +135,18 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService {
             StatoPartecipazione stato_og = statoPartecipazioneRepository.findStatoPartecipazioneByUtenteAndStanza(og, stanza);
             if(stato_og.getRuolo().getNome().equalsIgnoreCase(Ruolo.PARTECIPANTE)){
                 stato_og.getRuolo().setNome(Ruolo.ORGANIZZATORE);
-                return new Response<>(true, "L'utente selezionato ora è un organizzatore");
+
+                return ResponseEntity.ok(new Response<Boolean>(true, "L'utente selezionato ora è un organizzatore")).getBody();
 
             }else if (stato_og.getRuolo().getNome().equalsIgnoreCase(Ruolo.ORGANIZZATORE)){
-                return new Response<>(false, "L'utente selezionato è già un'organizzatore");
+
+                return ResponseEntity.status(403).body(new Response<Boolean>(false, "L'utente selezionato è già un'organizzatore")).getBody();
 
             }else{
-                return new Response<>(false, "L'utente selezionato non può essere declassato ad organizzatore");
+                return ResponseEntity.status(403).body(new Response<Boolean>(false, "L'utente selezionato non può essere declassato ad organizzatore")).getBody();
             }
         }else{
-            return new Response<>(false, "Non puoi promuovere un'utente perché non sei un'organizzatore master");
+            return ResponseEntity.status(403).body(new Response<Boolean>(false, "Non puoi promuovere un'utente perché non sei un'organizzatore master")).getBody();
         }
     }
 
@@ -142,16 +163,18 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService {
             StatoPartecipazione stato_og = statoPartecipazioneRepository.findStatoPartecipazioneByUtenteAndStanza(og, stanza);
             if(stato_og.getRuolo().getNome().equalsIgnoreCase(Ruolo.ORGANIZZATORE)){
                 stato_og.getRuolo().setNome(Ruolo.PARTECIPANTE);
-                return new Response<>(true, "L'utente selezionato ora è un partecipante");
+
+                return ResponseEntity.ok(new Response<Boolean>(true, "L'utente selezionato ora è un partecipante")).getBody();
 
             }else if (stato_og.getRuolo().getNome().equalsIgnoreCase(Ruolo.PARTECIPANTE)){
-                return new Response<>(false, "L'utente selezionato è già un partecipante");
+
+                return ResponseEntity.status(403).body(new Response<Boolean>(false, "L'utente selezionato è già un partecipante")).getBody();
 
             }else{
-                return new Response<>(false, "L'utente selezionato non può essere declassato");
+                return ResponseEntity.status(403).body(new Response<Boolean>(false, "L'utente selezionato non può essere declassato")).getBody();
             }
         }else{
-            return new Response<>(false, "Non puoi declassare un'utente perché non sei un'organizzatore master");
+            return ResponseEntity.status(403).body(new Response<Boolean>(false, "Non puoi declassare un'utente perché non sei un'organizzatore master")).getBody();
         }
     }
 
@@ -161,15 +184,15 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService {
         Utente ogm = utenteRepository.findFirstByMetaId(id_Uogm);
         Stanza stanza = stanzaRepository.findStanzaById(id_stanza);
         if(stanza == null) {
-            return new Response<>(false, "La stanza selezionata non esiste");
+            return ResponseUtils.getResponseError(HttpStatus.INTERNAL_SERVER_ERROR,"La stanza selezionata non esiste").getBody();
         }
 
         StatoPartecipazione stato_ogm = statoPartecipazioneRepository.findStatoPartecipazioneByUtenteAndStanza(ogm, stanza);
         if(stato_ogm.getRuolo().getNome().equalsIgnoreCase(Ruolo.ORGANIZZATORE_MASTER)){
             stanzaRepository.delete(stanza);
-            return new Response<>(true, "Stanza eliminata con successo");
+            return ResponseEntity.ok(new Response<Boolean>(true, "Stanza eliminata con successo")).getBody();
         }else{
-            return new Response<>(false, "Non puoi eliminare una stanza se non sei un'organizzatore master");
+            return ResponseEntity.status(403).body(new Response<Boolean>(false,"Non puoi eliminare una stanza se non sei un'organizzatore master")).getBody();
         }
     }
 
@@ -185,23 +208,28 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService {
 
                 Stanza existingStanza = stanzaRepository.findStanzaById(Id);
                 if(existingStanza == null) {
-                    return new Response<>(false, "La stanza non esiste");
+                    return ResponseEntity.status(403).body(new Response<Boolean>(false,"La stanza non esiste")).getBody();
                 }else{
                     if(stanzaRepository.updateAttributes(Id, dataMap)>0){
                         stanza = stanzaRepository.findStanzaById(Id);
-                        return new Response<>(true, "modifica effettuata con successo");
+                        return ResponseEntity.ok(new Response<Boolean>(true,"modifica effettuata con successo")).getBody();
                     }else{
                         stanza = existingStanza;
-                        return new Response<>(true, "nessuna modifica effettuata");
+                        return ResponseEntity.ok(new Response<Boolean>(true,"nessuna modifica effettuata")).getBody();
                     }
                 }
             }else{
-                return new Response<>(false, "Non puoi effettuare modifiche sulla stanza se non sei almeno un organizzatore");
+                return ResponseEntity.status(403).body(new Response<Boolean>(false,"Non puoi effettuare modifiche sulla stanza se non sei almeno un organizzatore")).getBody();
             }
 
         }catch (Exception e) {
-            return new Response<>(false, "errore nella modifica dei dati");
+            return ResponseEntity.status(403).body(new Response<Boolean>(false,"errore nella modifica dei dati")).getBody();
         }
+    }
+
+    @Override
+    public List<Utente> visualizzaStanza(Long Id) {
+        return statoPartecipazioneRepository.findUtentiInStanza(Id);
     }
 
     public Ruolo getRuolo(String nome){
