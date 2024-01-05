@@ -45,24 +45,20 @@ public class GestioneUtenzaServiceImpl implements GestioneUtenzaService{
     }
 
     @Override
-    public Response<Boolean> modificaDatiUtente(String SessionID, Utente u) {
+    public Response<Boolean> modificaDatiUtente(String MetaID, Utente u) {
 
-        try {
-            Utente existingUser = utenteRepository.findFirstByMetaId(SessionID);
+            Utente existingUser = utenteRepository.findFirstByMetaId(MetaID);
             if(existingUser == null) {
                 return new Response<>(false, "l'utente non esiste");
             }else{
-                if(utenteRepository.updateAttributes(SessionID, u)>0){
-                    u = utenteRepository.findFirstByMetaId(SessionID);
+                if(utenteRepository.updateAttributes(MetaID, u)>0){
+                    u = utenteRepository.findFirstByMetaId(MetaID);
                     return new Response<>(true, "modifica effettuata con successo");
                 }else{
                     u = existingUser;
-                    return new Response<>(true, "nessuna modifica effettuata");
+                    return new Response<>(false, "nessuna modifica effettuata");
                 }
             }
-        }catch (Exception e) {
-            return new Response<>(false, "errore nella modifica dei dati");
-        }
     }
 
     /**

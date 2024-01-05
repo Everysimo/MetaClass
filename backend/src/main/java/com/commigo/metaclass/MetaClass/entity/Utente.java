@@ -3,6 +3,7 @@ package com.commigo.metaclass.MetaClass.entity;
 import com.commigo.metaclass.MetaClass.exceptions.DataFormatException;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
@@ -20,7 +21,7 @@ import java.time.format.DateTimeParseException;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@JsonIgnoreProperties({"isLoggedIn"})
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class Utente {
 
     /**
@@ -151,7 +152,7 @@ public class Utente {
     @JoinColumn(name = "report_id")
     private Report report;
 
-    @JsonCreator
+    @JsonCreator(mode = JsonCreator.Mode.DEFAULT)
     public Utente(@JsonProperty("nome") String Nome,
                   @JsonProperty("cognome") String Cognome,
                   @JsonProperty("email") String Email,
@@ -163,15 +164,14 @@ public class Utente {
         this.email = Email;
         this.metaId = IdMeta;
         this.sesso = Sesso;
-        this.tokenAuth=DEFAULT_TOKEN;
 
-        try {
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/dd/yyyy");
-            this.dataDiNascita = LocalDate.parse(Data, formatter);
-        } catch (DateTimeParseException e) {
-            // Se c'è un errore di formato, gestisci l'eccezione come desideri
-            throw new DataFormatException("Formato della data di nascita non valido. Formato richiesto: dd/MM/yyyy");
-
+        if (Data != null && !Data.isEmpty()) {
+            try {
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/dd/yyyy");
+                this.dataDiNascita = LocalDate.parse(Data, formatter);
+            } catch (DateTimeParseException e) {
+                throw new DataFormatException("Formato della data di nascita non valido. Formato richiesto: MM/dd/yyyy");
+            }
         }
 
     }
