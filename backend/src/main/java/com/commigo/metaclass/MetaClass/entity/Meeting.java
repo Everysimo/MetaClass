@@ -1,7 +1,9 @@
 package com.commigo.metaclass.MetaClass.entity;
 
+import com.commigo.metaclass.MetaClass.exceptions.DataFormatException;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
@@ -15,6 +17,7 @@ import java.time.LocalDateTime;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class Meeting {
 
     /**
@@ -73,12 +76,13 @@ public class Meeting {
         return inizio == null || fine == null || inizio.isBefore(fine);
     }
 
-    @JsonCreator
+    @JsonCreator(mode = JsonCreator.Mode.DEFAULT)
     public Meeting(@JsonProperty("nome") String Nome,
                    @JsonProperty("inizio") LocalDateTime Inizio,
-                   @JsonProperty("fine")  LocalDateTime Fine,
-                   @JsonProperty("id_stanza") Long stanza){
+                   @JsonProperty("fine") LocalDateTime Fine,
+                   @JsonProperty("id_stanza") Long stanza) {
 
+        System.out.println(Nome);
         this.nome = Nome;
 
         this.inizio = Inizio;
@@ -88,8 +92,8 @@ public class Meeting {
         this.stanza.setId(stanza);
 
         this.scenario_iniziale = new Scenario();
-
     }
+
 
 
 }
