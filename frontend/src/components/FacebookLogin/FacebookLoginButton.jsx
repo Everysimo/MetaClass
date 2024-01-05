@@ -6,6 +6,7 @@ import { faFacebook } from "@fortawesome/free-brands-svg-icons";
 import LogoutButton from "../LogoutButton/logoutButton";
 import initializeFacebookSDK from "./fbSDK";
 
+
 export default class Facebook extends Component {
     constructor(props) {
         super(props);
@@ -97,7 +98,6 @@ export default class Facebook extends Component {
         };
         try {
             console.log(document.cookie);
-            console.log(JSON.stringify(dataToSend));
             const response = await fetch('http://localhost:8080/login', requestOptions);
             const responseData = await response.json();
             console.log('Server response:', responseData);
@@ -105,13 +105,17 @@ export default class Facebook extends Component {
             const token = responseData.token;
             // Memorizza il token in sessionStorage
             sessionStorage.setItem('token', token);
+            // Update state to indicate successful login
+            this.setState({ loginSuccess: true });
         } catch (error) {
             console.error('Error:', error);
+            // Update state to indicate failed login
+            this.setState({ loginSuccess: false });
         }
     };
 
     render() {
-        const { isLoggedIn, nome } = this.state;
+        const { isLoggedIn, nome, loginSuccess } = this.state;
         return (
             <div className={"loginForm"}>
                 {isLoggedIn ? (

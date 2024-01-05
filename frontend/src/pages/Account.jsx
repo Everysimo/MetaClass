@@ -24,26 +24,17 @@ export const Account = () => {
 
         fetchData();
     }, []);
+
     return (
-        <>
-            <header>
-                <MyHeader />
-            </header>
-            <section className={"sec"} id={"sec1"}>
-                <div className={"logoutForm"}>
-                    <div className={"table-container"}>
-                        {userDetails && (
-                            <>
-                                <GenerateRows userDetails={userDetails} />
-                            </>
-                        )}
-                        <LogoutButton />
-                    </div>
+        <div className={"table-container"}>
+            {userDetails && (
+                <div className={"user-details"}>
+                    <p><strong>Name:</strong> {userDetails.name}</p>
+                    <p><strong>Email:</strong> {userDetails.email}</p>
+                    {/* Include other details as needed */}
                 </div>
-            </section>
-            <footer>
-                <MyFooter />
-            </footer>
-        </>
+            )}
+            <LogoutButton/>
+        </div>
     );
 };

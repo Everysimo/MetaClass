@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import './menu-button.css';
-import MCLogo from "../../img/MetaClassLogo.png";
+import MCLogo from "../../../img/MetaClassLogo.png";
 import { Link } from "react-router-dom";
 import isLoggedIn from "./loginCheck";
 
@@ -9,6 +9,7 @@ const BurgerButton = () => {
     const handleClick = () => {
         setIsOpen(!isOpen);
     };
+    const userID = sessionStorage.getItem('UserMetaID');
 
     const buttonClass = `hamburger-menu ${isOpen ? 'open' : ''}`;
     const menuClass = `menu2 ${isOpen ? 'menu2Open' : ''}`;
@@ -23,9 +24,15 @@ const BurgerButton = () => {
             <div className={menuClass}>
                 <ul>
                     {isLoggedIn()? (
-                        <li><Link to="/Account">ACCOUNT</Link></li>
+                        <>
+                            <li><Link to="/userprofile/:${userID}">ACCOUNT</Link></li>
+                            <li><Link to="/loggedinhome">HOME</Link></li>
+                        </>
                     ) : (
-                        <li><Link to="/login">LOGIN</Link></li>
+                        <>
+                            <li><Link to="/login">LOGIN</Link></li>
+                            <li><Link to="/">HOME</Link></li>
+                        </>
                     )}
                     <li><Link to="/">HOME</Link></li>
                     <li><Link to="/">ABOUT</Link></li>
@@ -41,7 +48,7 @@ export function MyMenu() {
     return (
         <div>
             {isLoggedIn() ? (
-                <Link to="/Account">ACCOUNT</Link>
+                <Link to="/userprofile/:">ACCOUNT</Link>
             ) : (
                 <Link to="/login">LOGIN</Link>
             )}

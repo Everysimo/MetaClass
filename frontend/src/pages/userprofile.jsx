@@ -3,25 +3,28 @@ import React from "react"
 import {MyHeader} from "../components/Header/Header";
 import {MyFooter} from "../components/Footer/Footer";
 import RoomList from "../components/RoomList/RoomList";
+import {Account} from "./Account";
 
 export const UserProfile = () => {
 
     return (
 
-    <body>
-    <header>
-        <MyHeader/>
-    </header>
+    <>
+        <header>
+            <MyHeader/>
+        </header>
+        <section className={"sec"}>
+            <div>
+                <Account />
+            </div>
+            <div>
+                <RoomList/>
+            </div>
+        </section>
 
-    <section>
-        <div>
-            <RoomList/>
-        </div>
-    </section>
-
-    <footer>
-        <MyFooter/>
-    </footer>
-    </body>
+        <footer>
+            <MyFooter/>
+        </footer>
+    </>
     );
 }
