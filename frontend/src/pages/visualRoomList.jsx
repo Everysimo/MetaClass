@@ -3,8 +3,10 @@ import React from "react"
 import {MyHeader} from "../components/Header/Header";
 import {MyFooter} from "../components/Footer/Footer";
 import RoomList from "../components/RoomList/RoomList";
+import { useParams } from 'react-router-dom';   //imoortante import per passaggio dei parametri
+export const VisualRoomList = () => {
 
-export const UserProfile = () => {
+    //const {value} = useParams();        //per passare il parametro
 
     return (
 
@@ -16,6 +18,7 @@ export const UserProfile = () => {
     <section>
         <div>
             <RoomList/>
+            {/*<p>Valore: {value}</p>      ottengo il parametro          */}
         </div>
     </section>
 

@@ -5,8 +5,13 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFacebook } from "@fortawesome/free-brands-svg-icons";
 import LogoutButton from "../LogoutButton/logoutButton";
 import initializeFacebookSDK from "./fbSDK";
+import {Link, useNavigate} from "react-router-dom";
+
+
 
 export default class Facebook extends Component {
+
+
     constructor(props) {
         super(props);
         this.state = {
@@ -110,13 +115,20 @@ export default class Facebook extends Component {
         }
     };
 
+
     render() {
         const { isLoggedIn, nome } = this.state;
+
+
         return (
+
             <div className={"loginForm"}>
                 {isLoggedIn ? (
                     <>
                         <h2>Welcome, {nome}!</h2>
+
+                        <Link to={'/LoggedInHome'}> Vai alla Pagina Loggato </Link>
+
                         <LogoutButton />
                     </>
                 ) : (

@@ -21,8 +21,9 @@ const BurgerButton = () => {
                 <div className="line"></div>
             </div>
             <div className={menuClass}>
+
                 <ul>
-                    {isLoggedIn()? (
+                    {isLoggedIn() ? (
                         <li><Link to="/Account">ACCOUNT</Link></li>
                     ) : (
                         <li><Link to="/login">LOGIN</Link></li>
@@ -31,6 +32,7 @@ const BurgerButton = () => {
                     <li><Link to="/">ABOUT</Link></li>
                     <li><Link to="/">CONTACTS</Link></li>
                 </ul>
+
                 <img src={MCLogo} className='App-logo' alt='no image' id={"menu2-image"} />
             </div>
         </div>
