@@ -49,4 +49,19 @@ public class GestioneMeetingServiceImpl implements GestioneMeetingService{
             }
             return true;
     }
+
+    @Override
+    public Meeting findMeetingById(Long id) {
+        if(meetingRepository.findById(id).isPresent())
+        {
+            return meetingRepository.findById(id).get();
+        }
+        return null;
+    }
+
+    @Override
+    public Meeting saveMeeting(Meeting meeting)
+    {
+        return meetingRepository.save(meeting);
+    }
 }

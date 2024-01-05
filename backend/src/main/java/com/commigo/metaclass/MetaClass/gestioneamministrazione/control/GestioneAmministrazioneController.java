@@ -3,6 +3,7 @@ package com.commigo.metaclass.MetaClass.gestioneamministrazione.control;
 import com.commigo.metaclass.MetaClass.entity.Categoria;
 import com.commigo.metaclass.MetaClass.entity.Scenario;
 import com.commigo.metaclass.MetaClass.entity.Stanza;
+import com.commigo.metaclass.MetaClass.entity.Utente;
 import com.commigo.metaclass.MetaClass.gestioneamministrazione.service.GestioneAmministrazioneService;
 import com.commigo.metaclass.MetaClass.utility.response.types.Response;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -10,11 +11,10 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.data.repository.query.Param;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -24,6 +24,22 @@ public class GestioneAmministrazioneController {
     @Autowired
     @Qualifier("GestioneAmministrazioneService")
     private GestioneAmministrazioneService gestioneamministrazione;
+
+    @PostMapping(value = "/annullaBan/{idstanza}")
+    public ResponseEntity<Response<Boolean>> annullaBan(@RequestBody String idUtente, @PathVariable("idstanza") Long idStanza)
+    {
+        Utente utente = gestioneamministrazione.findUtenteById(idUtente);
+        Stanza stanza = gestioneamministrazione.findStanzaById(idStanza);
+
+        if(!gestioneamministrazione.isBannedUser(utente,stanza))
+        {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new Response<>(false,"Utente non bannato"));
+        }
+
+        return ResponseEntity.ok(new Response<>(true,"Ban annullato correttamente"));
+
+    }
 
     @PostMapping(value = "admin/updateCategoria")
     public ResponseEntity<Response<Boolean>> updateCategoria(@RequestBody Categoria c) {
