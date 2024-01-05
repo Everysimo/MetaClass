@@ -36,6 +36,7 @@ public class GestioneUtenzaController {
     @Autowired
     private ValidationToken validationToken;
 
+
     @PostMapping(value = "/login")
     public ResponseEntity<LoginResponse<Boolean>> login(@RequestBody Utente u,
                                                         HttpServletResponse response,

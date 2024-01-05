@@ -1,9 +1,12 @@
 package com.commigo.metaclass.MetaClass.gestionestanza.controller;
 
 import com.commigo.metaclass.MetaClass.entity.Stanza;
+import com.commigo.metaclass.MetaClass.entity.StatoPartecipazione;
 import com.commigo.metaclass.MetaClass.entity.Utente;
 import com.commigo.metaclass.MetaClass.gestionestanza.service.GestioneStanzaService;
+import com.commigo.metaclass.MetaClass.utility.request.GestioneAccessiRequest;
 import com.commigo.metaclass.MetaClass.utility.request.RequestUtils;
+import com.commigo.metaclass.MetaClass.utility.request.RichiestaDTO;
 import com.commigo.metaclass.MetaClass.utility.response.ResponseUtils;
 import com.commigo.metaclass.MetaClass.utility.response.types.AccessResponse;
 import com.commigo.metaclass.MetaClass.utility.response.types.Response;
@@ -21,7 +24,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.naming.NamingException;
 import java.util.List;
 import java.util.Map;
 
@@ -32,7 +34,7 @@ public class GestioneStanzaControl {
     @Qualifier("GestioneStanzaService")
     private GestioneStanzaService stanzaService;
 
-    //MICHELE: So che funziona, ma valuta anche @RequestBody Stanza s
+
     @PostMapping(value = "/creastanza")
     public ResponseEntity<Response<Boolean>> creaStanza(@RequestBody String requestBody, BindingResult result)
     {
@@ -47,57 +49,14 @@ public class GestioneStanzaControl {
             String nome = jsonNode.get("nome").asText();
             String codiceStanza = jsonNode.get("codiceStanza").asText();
             String descrizione = jsonNode.get("descrizione").asText();
-            boolean tipoAccesso = jsonNode.get("tipoAccesso").asBoolean();
-            int maxPosti = jsonNode.get("maxPosti").asInt();
-
+            boolean tipoAccesso = Boolean.parseBoolean(jsonNode.get("tipoAccesso").asText());
+            int maxPosti = Integer.parseInt(jsonNode.get("maxPosti").asText());
             stanzaService.creaStanza(nome,codiceStanza,descrizione,tipoAccesso,maxPosti);
             return ResponseUtils.getResponseOk("Corretto");
         }
         catch (RuntimeException | JsonProcessingException e)
         {
             return ResponseUtils.getResponseError(HttpStatus.INTERNAL_SERVER_ERROR,"Errore durante la richiesta: " + e.getMessage());
-        }
-    }
-
-    @PostMapping(value = "/accessoStanza")
-    public ResponseEntity<AccessResponse<Boolean>> richiestaAccessoStanza(@RequestBody String requestBody, HttpSession session)
-    {
-        try {
-            String IdMeta = (String) session.getAttribute("UserMetaID");
-            if (IdMeta == null) {
-                return ResponseEntity.status(403).body(new AccessResponse<>(false, "Utente non loggato", false));
-            }else {
-
-                ObjectMapper objectMapper = new ObjectMapper();
-                JsonNode jsonNode = objectMapper.readTree(requestBody);
-                String codiceStanza = jsonNode.get("codice").asText();
-
-                return ResponseEntity.ok(stanzaService.accessoStanza(codiceStanza, (String) session.getAttribute("UserMetaID")).getBody());
-            }
-        } catch (RuntimeException | JsonProcessingException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new AccessResponse<>(false, "Errore durante la richiesta: " + e.getMessage(), false));
-        }
-    }
-
-    @PostMapping(value = "/visualizzaStanza/{Id}")
-    public List<Utente> richiestaAccessoStanza(@PathVariable Long Id, HttpSession session)
-    {
-        return stanzaService.visualizzaStanza(Id);
-    }
-
-    @PostMapping(value = "/promuoviOrganizzatore")
-    public ResponseEntity<Response<Boolean>> promuoviOrganizzatore(@RequestBody RichiestaDTO request, HttpSession session) {
-        try {
-            String IdMeta = (String) session.getAttribute("UserMetaID");
-            if (IdMeta == null) {
-                return ResponseEntity.status(403).body(new Response<>(false, "Utente non loggato"));
-            }else{
-                return ResponseEntity.ok(stanzaService.upgradeUtente(IdMeta, request.getId_og(), request.getId_stanza()));
-            }
-        } catch (Exception e) {
-            return ResponseEntity.status(500)
-                    .body(new Response<>(false, "Errore durante l'operazione"));
         }
     }
 
@@ -130,6 +89,35 @@ public class GestioneStanzaControl {
             return ResponseEntity.status(500)
                     .body(new Response<>(false, "Errore durante l'operazione"));
         }
+    }
+
+    @PostMapping(value = "/gestioneAccessi")
+    public ResponseEntity<Response<List<StatoPartecipazione>>> gestioneAccessi(@RequestBody GestioneAccessiRequest request, HttpSession session, BindingResult result)
+    {
+
+        if(result.hasErrors())
+        {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new Response<>(null,RequestUtils.errorsRequest(result)));
+        }
+
+        Stanza stanza = stanzaService.findStanza(request.getIdstanza());
+        if(stanza == null)
+        {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new Response<>(null,"Id stanza non valido"));
+        }
+
+        List<StatoPartecipazione> list = stanzaService.findStatoPartecipazioniInAttesa(stanza,true);
+
+        if(request.isAccept())
+        {
+            return ResponseEntity.ok(new Response<>(list.stream().filter((sp) -> sp.getUtente().getId() == request.getIdutente()).toList(),
+                    "Utente a cui è stata accettata la richiesta"));
+        }
+
+        return ResponseEntity.ok(new Response<>(list,"Lista stati partecipazioni in attesa della stanza"));
+
     }
 
     @PostMapping(value = "/modifyRoomData/{Id}")
@@ -169,5 +157,47 @@ public class GestioneStanzaControl {
                     .body(new Response<>(false, "Errore durante l'operazione"));
         }
 
+    }
+
+    @PostMapping(value = "/promuoviOrganizzatore")
+    public ResponseEntity<Response<Boolean>> promuoviOrganizzatore(@RequestBody RichiestaDTO request, HttpSession session) {
+        try {
+            String IdMeta = (String) session.getAttribute("UserMetaID");
+            if (IdMeta == null) {
+                return ResponseEntity.status(403).body(new Response<>(false, "Utente non loggato"));
+            }else{
+                return ResponseEntity.ok(stanzaService.upgradeUtente(IdMeta, request.getId_og(), request.getId_stanza()));
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(500)
+                    .body(new Response<>(false, "Errore durante l'operazione"));
+        }
+    }
+
+    @PostMapping(value = "/accessoStanza")
+    public ResponseEntity<AccessResponse<Boolean>> richiestaAccessoStanza(@RequestBody String requestBody, HttpSession session)
+    {
+        try {
+            String IdMeta = (String) session.getAttribute("UserMetaID");
+            if (IdMeta == null) {
+                return ResponseEntity.status(403).body(new AccessResponse<>(false, "Utente non loggato", false));
+            }else {
+
+                ObjectMapper objectMapper = new ObjectMapper();
+                JsonNode jsonNode = objectMapper.readTree(requestBody);
+                String codiceStanza = jsonNode.get("codice").asText();
+
+                return ResponseEntity.ok(stanzaService.accessoStanza(codiceStanza, (String) session.getAttribute("UserMetaID")).getBody());
+            }
+        } catch (RuntimeException | JsonProcessingException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new AccessResponse<>(false, "Errore durante la richiesta: " + e.getMessage(), false));
+        }
+    }
+
+    @PostMapping(value = "/visualizzaStanza/{Id}")
+    public List<Utente> richiestaAccessoStanza(@PathVariable Long Id, HttpSession session)
+    {
+        return stanzaService.visualizzaStanza(Id);
     }
 }

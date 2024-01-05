@@ -1,16 +1,17 @@
 package com.commigo.metaclass.MetaClass.gestionestanza.service;
 
+import com.commigo.metaclass.MetaClass.entity.Ruolo;
+import com.commigo.metaclass.MetaClass.entity.Stanza;
 import com.commigo.metaclass.MetaClass.entity.StatoPartecipazione;
-import com.commigo.metaclass.MetaClass.entity.*;
-import com.commigo.metaclass.MetaClass.gestionestanza.repository.*;
+import com.commigo.metaclass.MetaClass.entity.Utente;
+import com.commigo.metaclass.MetaClass.gestionestanza.repository.RuoloRepository;
+import com.commigo.metaclass.MetaClass.gestionestanza.repository.StanzaRepository;
+import com.commigo.metaclass.MetaClass.gestionestanza.repository.StatoPartecipazioneRepository;
 import com.commigo.metaclass.MetaClass.gestioneutenza.repository.UtenteRepository;
 import com.commigo.metaclass.MetaClass.utility.Validator;
 import com.commigo.metaclass.MetaClass.utility.response.ResponseUtils;
 import com.commigo.metaclass.MetaClass.utility.response.types.AccessResponse;
 import com.commigo.metaclass.MetaClass.utility.response.types.Response;
-import jakarta.persistence.Access;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.TypedQuery;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -87,6 +88,97 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService {
         return stanza;
     }
 
+
+
+    @Override
+    public Response<Boolean> downgradeUtente(String id_Uogm, long id_og, long id_stanza){
+
+        Utente ogm = utenteRepository.findFirstByMetaId(id_Uogm);
+        Utente og = utenteRepository.findUtenteById(id_og);
+        Stanza stanza = stanzaRepository.findStanzaById(id_stanza);
+
+
+        StatoPartecipazione stato_ogm = statoPartecipazioneRepository.findStatoPartecipazioneByUtenteAndStanza(ogm, stanza);
+        if(stato_ogm.getRuolo().getNome().equalsIgnoreCase(Ruolo.ORGANIZZATORE_MASTER)){
+            StatoPartecipazione stato_og = statoPartecipazioneRepository.findStatoPartecipazioneByUtenteAndStanza(og, stanza);
+            if(stato_og.getRuolo().getNome().equalsIgnoreCase(Ruolo.ORGANIZZATORE)){
+                stato_og.getRuolo().setNome(Ruolo.PARTECIPANTE);
+
+                return ResponseEntity.ok(new Response<>(true, "L'utente selezionato ora è un partecipante")).getBody();
+
+            }else if (stato_og.getRuolo().getNome().equalsIgnoreCase(Ruolo.PARTECIPANTE)){
+
+                return ResponseEntity.status(403).body(new Response<>(false, "L'utente selezionato è già un partecipante")).getBody();
+
+            }else{
+                return ResponseEntity.status(403).body(new Response<>(false, "L'utente selezionato non può essere declassato")).getBody();
+            }
+        }else{
+            return ResponseEntity.status(403).body(new Response<>(false, "Non puoi declassare un'utente perché non sei un'organizzatore master")).getBody();
+        }
+    }
+
+    @Override
+    public Response<Boolean> deleteRoom(String id_Uogm, Long id_stanza){
+
+        Utente ogm = utenteRepository.findFirstByMetaId(id_Uogm);
+        Stanza stanza = stanzaRepository.findStanzaById(id_stanza);
+        if(stanza == null) {
+            return ResponseUtils.getResponseError(HttpStatus.INTERNAL_SERVER_ERROR,"La stanza selezionata non esiste").getBody();
+        }
+
+        StatoPartecipazione stato_ogm = statoPartecipazioneRepository.findStatoPartecipazioneByUtenteAndStanza(ogm, stanza);
+        if(stato_ogm.getRuolo().getNome().equalsIgnoreCase(Ruolo.ORGANIZZATORE_MASTER)){
+            stanzaRepository.delete(stanza);
+            return ResponseEntity.ok(new Response<>(true, "Stanza eliminata con successo")).getBody();
+        }else{
+            return ResponseEntity.status(403).body(new Response<>(false, "Non puoi eliminare una stanza se non sei un'organizzatore master")).getBody();
+        }
+    }
+
+    @Override
+    public Response<Boolean> modificaDatiStanza(String id, Long Id, Map<String, Object> dataMap, Stanza stanza) {
+
+        try {
+            Utente ogm = utenteRepository.findFirstByMetaId(id);
+            stanza = stanzaRepository.findStanzaById(Id);
+
+            StatoPartecipazione statoutente = statoPartecipazioneRepository.findStatoPartecipazioneByUtenteAndStanza(ogm, stanza);
+            if(statoutente.getRuolo().getNome().equalsIgnoreCase(Ruolo.ORGANIZZATORE_MASTER) || statoutente.getRuolo().getNome().equalsIgnoreCase(Ruolo.ORGANIZZATORE)){
+
+                Stanza existingStanza = stanzaRepository.findStanzaById(Id);
+                if(existingStanza == null) {
+                    return ResponseEntity.status(403).body(new Response<>(false, "La stanza non esiste")).getBody();
+                }else{
+                    if(stanzaRepository.updateAttributes(Id, dataMap)>0){
+                        stanza = stanzaRepository.findStanzaById(Id);
+                        return ResponseEntity.ok(new Response<>(true, "modifica effettuata con successo")).getBody();
+                    }else{
+                        stanza = existingStanza;
+                        return ResponseEntity.ok(new Response<>(true, "nessuna modifica effettuata")).getBody();
+                    }
+                }
+            }else{
+                return ResponseEntity.status(403).body(new Response<>(false, "Non puoi effettuare modifiche sulla stanza se non sei almeno un organizzatore")).getBody();
+            }
+
+        }catch (Exception e) {
+            return ResponseEntity.status(403).body(new Response<>(false, "errore nella modifica dei dati")).getBody();
+        }
+    }
+
+    @Override
+    public Stanza findStanza(Long id)
+    {
+        return stanzaRepository.findStanzaById(id);
+    }
+
+    @Override
+    public List<StatoPartecipazione> findStatoPartecipazioniInAttesa(Stanza stanza,boolean isInAttesa)
+    {
+        return statoPartecipazioneRepository.finsAllByStanzaAndisInAttesa(stanza.getId(),isInAttesa);
+    }
+
     @Override
     public ResponseEntity<AccessResponse<Boolean>> richiestaAccessoStanza(String codiceStanza, String id_utente) {
         try {
@@ -123,6 +215,15 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService {
     }
 
     @Override
+    public StatoPartecipazione setStatoPartecipazione(Stanza stanza, Utente utente, boolean isInAttesa)
+    {
+        StatoPartecipazione sp = statoPartecipazioneRepository.findStatoPartecipazioneByUtenteAndStanza(utente,stanza);
+        sp.setInAttesa(isInAttesa);
+        statoPartecipazioneRepository.save(sp);
+        return sp;
+    }
+
+    @Override
     public Response<Boolean> upgradeUtente(String id_Uogm, long id_og, long id_stanza){
 
         Utente ogm = utenteRepository.findFirstByMetaId(id_Uogm);
@@ -136,96 +237,20 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService {
             if(stato_og.getRuolo().getNome().equalsIgnoreCase(Ruolo.PARTECIPANTE)){
                 stato_og.getRuolo().setNome(Ruolo.ORGANIZZATORE);
 
-                return ResponseEntity.ok(new Response<Boolean>(true, "L'utente selezionato ora è un organizzatore")).getBody();
+                return ResponseEntity.ok(new Response<>(true, "L'utente selezionato ora è un organizzatore")).getBody();
 
             }else if (stato_og.getRuolo().getNome().equalsIgnoreCase(Ruolo.ORGANIZZATORE)){
 
-                return ResponseEntity.status(403).body(new Response<Boolean>(false, "L'utente selezionato è già un'organizzatore")).getBody();
+                return ResponseEntity.status(403).body(new Response<>(false, "L'utente selezionato è già un'organizzatore")).getBody();
 
             }else{
-                return ResponseEntity.status(403).body(new Response<Boolean>(false, "L'utente selezionato non può essere declassato ad organizzatore")).getBody();
+                return ResponseEntity.status(403).body(new Response<>(false, "L'utente selezionato non può essere declassato ad organizzatore")).getBody();
             }
         }else{
-            return ResponseEntity.status(403).body(new Response<Boolean>(false, "Non puoi promuovere un'utente perché non sei un'organizzatore master")).getBody();
+            return ResponseEntity.status(403).body(new Response<>(false, "Non puoi promuovere un'utente perché non sei un'organizzatore master")).getBody();
         }
     }
 
-    @Override
-    public Response<Boolean> downgradeUtente(String id_Uogm, long id_og, long id_stanza){
-
-        Utente ogm = utenteRepository.findFirstByMetaId(id_Uogm);
-        Utente og = utenteRepository.findUtenteById(id_og);
-        Stanza stanza = stanzaRepository.findStanzaById(id_stanza);
-
-
-        StatoPartecipazione stato_ogm = statoPartecipazioneRepository.findStatoPartecipazioneByUtenteAndStanza(ogm, stanza);
-        if(stato_ogm.getRuolo().getNome().equalsIgnoreCase(Ruolo.ORGANIZZATORE_MASTER)){
-            StatoPartecipazione stato_og = statoPartecipazioneRepository.findStatoPartecipazioneByUtenteAndStanza(og, stanza);
-            if(stato_og.getRuolo().getNome().equalsIgnoreCase(Ruolo.ORGANIZZATORE)){
-                stato_og.getRuolo().setNome(Ruolo.PARTECIPANTE);
-
-                return ResponseEntity.ok(new Response<Boolean>(true, "L'utente selezionato ora è un partecipante")).getBody();
-
-            }else if (stato_og.getRuolo().getNome().equalsIgnoreCase(Ruolo.PARTECIPANTE)){
-
-                return ResponseEntity.status(403).body(new Response<Boolean>(false, "L'utente selezionato è già un partecipante")).getBody();
-
-            }else{
-                return ResponseEntity.status(403).body(new Response<Boolean>(false, "L'utente selezionato non può essere declassato")).getBody();
-            }
-        }else{
-            return ResponseEntity.status(403).body(new Response<Boolean>(false, "Non puoi declassare un'utente perché non sei un'organizzatore master")).getBody();
-        }
-    }
-
-    @Override
-    public Response<Boolean> deleteRoom(String id_Uogm, Long id_stanza){
-
-        Utente ogm = utenteRepository.findFirstByMetaId(id_Uogm);
-        Stanza stanza = stanzaRepository.findStanzaById(id_stanza);
-        if(stanza == null) {
-            return ResponseUtils.getResponseError(HttpStatus.INTERNAL_SERVER_ERROR,"La stanza selezionata non esiste").getBody();
-        }
-
-        StatoPartecipazione stato_ogm = statoPartecipazioneRepository.findStatoPartecipazioneByUtenteAndStanza(ogm, stanza);
-        if(stato_ogm.getRuolo().getNome().equalsIgnoreCase(Ruolo.ORGANIZZATORE_MASTER)){
-            stanzaRepository.delete(stanza);
-            return ResponseEntity.ok(new Response<Boolean>(true, "Stanza eliminata con successo")).getBody();
-        }else{
-            return ResponseEntity.status(403).body(new Response<Boolean>(false,"Non puoi eliminare una stanza se non sei un'organizzatore master")).getBody();
-        }
-    }
-
-    @Override
-    public Response<Boolean> modificaDatiStanza(String id, Long Id, Map<String, Object> dataMap, Stanza stanza) {
-
-        try {
-            Utente ogm = utenteRepository.findFirstByMetaId(id);
-            stanza = stanzaRepository.findStanzaById(Id);
-
-            StatoPartecipazione statoutente = statoPartecipazioneRepository.findStatoPartecipazioneByUtenteAndStanza(ogm, stanza);
-            if(statoutente.getRuolo().getNome().equalsIgnoreCase(Ruolo.ORGANIZZATORE_MASTER) || statoutente.getRuolo().getNome().equalsIgnoreCase(Ruolo.ORGANIZZATORE)){
-
-                Stanza existingStanza = stanzaRepository.findStanzaById(Id);
-                if(existingStanza == null) {
-                    return ResponseEntity.status(403).body(new Response<Boolean>(false,"La stanza non esiste")).getBody();
-                }else{
-                    if(stanzaRepository.updateAttributes(Id, dataMap)>0){
-                        stanza = stanzaRepository.findStanzaById(Id);
-                        return ResponseEntity.ok(new Response<Boolean>(true,"modifica effettuata con successo")).getBody();
-                    }else{
-                        stanza = existingStanza;
-                        return ResponseEntity.ok(new Response<Boolean>(true,"nessuna modifica effettuata")).getBody();
-                    }
-                }
-            }else{
-                return ResponseEntity.status(403).body(new Response<Boolean>(false,"Non puoi effettuare modifiche sulla stanza se non sei almeno un organizzatore")).getBody();
-            }
-
-        }catch (Exception e) {
-            return ResponseEntity.status(403).body(new Response<Boolean>(false,"errore nella modifica dei dati")).getBody();
-        }
-    }
 
     @Override
     public List<Utente> visualizzaStanza(Long Id) {
