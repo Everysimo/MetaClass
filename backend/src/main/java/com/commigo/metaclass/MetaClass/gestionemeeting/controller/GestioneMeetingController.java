@@ -1,14 +1,10 @@
 package com.commigo.metaclass.MetaClass.gestionemeeting.controller;
 
 import com.commigo.metaclass.MetaClass.entity.Meeting;
-import com.commigo.metaclass.MetaClass.entity.Utente;
 import com.commigo.metaclass.MetaClass.gestionemeeting.service.GestioneMeetingService;
-import com.commigo.metaclass.MetaClass.gestioneutenza.controller.ResponseBoolMessage;
-import com.commigo.metaclass.MetaClass.gestioneutenza.service.GestioneUtenzaService;
-import com.commigo.metaclass.MetaClass.utility.CheckRequestBody;
-import com.commigo.metaclass.MetaClass.utility.response.Response;
-import com.fasterxml.jackson.databind.JsonNode;
-import jakarta.servlet.http.HttpSession;
+import com.commigo.metaclass.MetaClass.utility.request.RequestUtils;
+import com.commigo.metaclass.MetaClass.utility.response.ResponseUtils;
+import com.commigo.metaclass.MetaClass.utility.response.types.Response;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -30,22 +26,20 @@ public class GestioneMeetingController {
         try {
 
             //controlla se i parametri passati al meeting sono corretti
-            if (result.hasErrors()) {
-                return ResponseEntity.badRequest()
-                        .body(new Response<Boolean>(false,
-                                CheckRequestBody.errorsRequest(result)));
+            if(result.hasErrors())
+            {
+                return ResponseUtils.getResponseError(HttpStatus.INTERNAL_SERVER_ERROR, RequestUtils.errorsRequest(result));
             }
-
 
             if (!meetingService.creaScheduling(m)) {
                 throw new RuntimeException("Meeting non effettuato");
             } else {
-                return ResponseEntity.ok(new Response<Boolean>(true, "Meeting schedulato con successo"));
+                return ResponseEntity.ok(new Response<>(true, "Meeting schedulato con successo"));
             }
 
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new Response<Boolean>(false, "Errore durante la schedulazione del meeting: " + e.getMessage()));
+                    .body(new Response<>(false, "Errore durante la schedulazione del meeting: " + e.getMessage()));
         }
     }
 }

@@ -1,23 +1,20 @@
 package com.commigo.metaclass.MetaClass.gestioneutenza.service;
 
-import com.commigo.metaclass.MetaClass.entity.Ruolo;
 import com.commigo.metaclass.MetaClass.entity.Stanza;
 import com.commigo.metaclass.MetaClass.entity.StatoPartecipazione;
 import com.commigo.metaclass.MetaClass.entity.Utente;
 import com.commigo.metaclass.MetaClass.gestionestanza.repository.StanzaRepository;
 import com.commigo.metaclass.MetaClass.gestionestanza.repository.StatoPartecipazioneRepository;
-import com.commigo.metaclass.MetaClass.gestioneutenza.controller.ResponseBoolMessage;
-import com.commigo.metaclass.MetaClass.gestioneutenza.exception.DataNotFoundException;
+import com.commigo.metaclass.MetaClass.exceptions.DataNotFoundException;
 import com.commigo.metaclass.MetaClass.gestioneutenza.repository.UtenteRepository;
-import com.commigo.metaclass.MetaClass.utility.response.Response;
+import com.commigo.metaclass.MetaClass.utility.response.types.Response;
+import com.commigo.metaclass.MetaClass.webconfig.ValidationToken;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 
@@ -38,39 +35,33 @@ public class GestioneUtenzaServiceImpl implements GestioneUtenzaService{
            if (existingUser==null) {
                 // Utente non presente nel database, lo salva
                 utenteRepository.save(u);
+           }else if(utenteRepository.updateAttributes(existingUser.getMetaId(),u)>0){
+               return true;
            }
-            return true;
+            return false;
         } catch (Exception e) {
-            e.printStackTrace(); // Stampa la traccia dell'eccezione per debugging
             return false;
         }
     }
 
-    /**
-     * @param Id
-     * @param dataMap
-     * @param u
-     * @return
-     */
     @Override
     public Response<Boolean> modificaDatiUtente(String SessionID, Utente u) {
 
         try {
             Utente existingUser = utenteRepository.findFirstByMetaId(SessionID);
             if(existingUser == null) {
-                return new Response<Boolean>(false, "l'utente non esiste");
+                return new Response<>(false, "l'utente non esiste");
             }else{
                 if(utenteRepository.updateAttributes(SessionID, u)>0){
                     u = utenteRepository.findFirstByMetaId(SessionID);
-                    return new Response<Boolean>(true, "modifica effettuata con successo");
+                    return new Response<>(true, "modifica effettuata con successo");
                 }else{
                     u = existingUser;
-                    return new Response<Boolean>(true, "nessuna modifica effettuata");
+                    return new Response<>(true, "nessuna modifica effettuata");
                 }
             }
         }catch (Exception e) {
-            e.printStackTrace(); // Stampa la traccia dell'eccezione per debugging
-            return new Response<Boolean>(false, "errore nella modifica dei dati");
+            return new Response<>(false, "errore nella modifica dei dati");
         }
     }
 
@@ -97,7 +88,6 @@ public class GestioneUtenzaServiceImpl implements GestioneUtenzaService{
                 }
             }
         }catch (Exception e) {
-            e.printStackTrace(); // Stampa la traccia dell'eccezione per debugging
             return null;
         }
     }
@@ -115,6 +105,23 @@ public class GestioneUtenzaServiceImpl implements GestioneUtenzaService{
             }else{
                 return existingUser;
             }
+    }
+
+/**
+*
+ * @param token
+ * @return
+*/
+    @Override
+    public boolean logoutMeta(String token, ValidationToken validationToken) {
+        System.out.println(token);
+       Utente u = utenteRepository.findUtenteByTokenAuth(token);
+       if(u==null)   return false;
+       u.setTokenAuth(Utente.DEFAULT_TOKEN);
+       if(utenteRepository.updateAttributes(u.getMetaId(), u)>0){
+           return true;
+       }
+       return false;
     }
 }
 

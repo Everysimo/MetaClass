@@ -3,7 +3,7 @@ import { Divider } from "@chakra-ui/react";
 import "./MyModifyForm.css";
 
 const MyModifyForm = () => {
-    const Id = localStorage.getItem('ID')
+    const Id = localStorage.getItem('UserMetaID')
     const [state, setState] = useState({
         nome: "",
         descrizione: "",

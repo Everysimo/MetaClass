@@ -1,6 +1,6 @@
 package com.commigo.metaclass.MetaClass.entity;
 
-import com.commigo.metaclass.MetaClass.gestioneutenza.exception.DataFormatException;
+import com.commigo.metaclass.MetaClass.exceptions.DataFormatException;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -53,6 +53,18 @@ public class Utente {
      */
     private static final int MAX_PHONE_LENGTH = 10;
 
+    /**
+     * Costante per valore intero di 10.
+     */
+    private static final int MIN_TOKEN_LENGTH = 1;
+
+    /**
+     * Costante per valore intero di 10.
+     */
+    private static final int MAX_TOKEN_LENGTH = 1024;
+
+    public static final String DEFAULT_TOKEN = "TODO";
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Getter
@@ -62,29 +74,37 @@ public class Utente {
 
     @NotNull(message = "Il nome non può essere nullo")
     @Column(length = MAX_NAME_LENGTH)
-    @Size(min = MIN_NAME_LENGTH, max = MAX_NAME_LENGTH,
-            message = "Lunghezza nome non valida")
+    @Size(min = MIN_NAME_LENGTH,
+            max = MAX_NAME_LENGTH,
+            message = "Lunghezza nome errata")
+    @Pattern(regexp="^[A-Z][a-z]*",
+            message="Formato nome errato")
     @NotBlank(message = "Il nome non può essere vuoto")
     private String nome;
 
     @NotNull(message = "Il cognome non può essere nullo")
     @Column(length = MAX_NAME_LENGTH)
-    @Size(min = MIN_NAME_LENGTH, max = MAX_NAME_LENGTH,
-            message = "Lunghezza cognome non valida")
+    @Size(min = MIN_NAME_LENGTH,
+            max = MAX_NAME_LENGTH,
+            message = "Lunghezza cognome errata")
+    @Pattern(regexp ="^[A-Z][a-z]*",
+            message="Formato cognome errato")
     @NotBlank(message = "Il cognome non può essere vuoto")
     private String cognome;
 
     @NotNull(message = "Il sesso non può essere nullo")
     @Column(length = SEX_LENGTH)
-    @Size(min = SEX_LENGTH, max = SEX_LENGTH,
+    @Size(min = SEX_LENGTH,
+            max = SEX_LENGTH,
             message = "Lunghezza sesso non valida")
     @NotBlank(message = "Il sesso non può essere vuoto")
-    @Pattern(regexp = "^[MFO]$", message = "Il genere deve essere 'M', 'F' o 'O'")
+    @Pattern(regexp = "^[MFO]$",
+            message = "Il genere deve essere 'M', 'F' o 'O'")
     private String sesso;
 
     @NotNull(message = "La data di nascita non può essere nulla")
     @Past(message = "La data di nascita deve essere passata")
-    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    @DateTimeFormat(pattern = "MM/dd/yyyy")
     private LocalDate dataDiNascita;
 
     @NotNull(message = "IsAdmin non può essere nullo")
@@ -95,7 +115,8 @@ public class Utente {
     private String email;
 
     @Column(length = MAX_PHONE_LENGTH)
-    @Size(min = MAX_PHONE_LENGTH, max = MAX_PHONE_LENGTH,
+    @Size(min = MAX_PHONE_LENGTH,
+            max = MAX_PHONE_LENGTH,
             message = "Lunghezza telefono non valida")
     @Pattern(regexp = "^[0-9]{10}$",
             message = "Formato telefono non valido")
@@ -104,15 +125,17 @@ public class Utente {
     //da valutare la lunghezza della stringa
     @NotNull(message = "IdMeta non può essere nulla")
     @Column(length = MAX_NAME_LENGTH, unique = true)
-    @Size(min = MIN_NAME_LENGTH, max = MAX_NAME_LENGTH,
+    @Size(min = MIN_NAME_LENGTH,
+            max = MAX_NAME_LENGTH,
             message = "Lunghezza IdMeta non valida")
     @NotBlank(message = "Il IdMeta non può essere vuoto")
     private String metaId;
 
     //da valutare la lunghezza della stringa
     @NotNull(message = "TokenAuth non può essere nulla")
-    @Column(length = MAX_NAME_LENGTH)
-    @Size(min = MIN_NAME_LENGTH, max = MAX_NAME_LENGTH,
+    @Column(length = MAX_TOKEN_LENGTH, unique = true)
+    @Size(min = MIN_TOKEN_LENGTH,
+            max = MAX_TOKEN_LENGTH,
             message = "Lunghezza TokenAuth non valida")
     @NotBlank(message = "Il TokenAuth non può essere vuoto")
     private String tokenAuth;
@@ -140,10 +163,10 @@ public class Utente {
         this.email = Email;
         this.metaId = IdMeta;
         this.sesso = Sesso;
-        this.tokenAuth="TODO";
+        this.tokenAuth=DEFAULT_TOKEN;
 
         try {
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/dd/yyyy");
             this.dataDiNascita = LocalDate.parse(Data, formatter);
         } catch (DateTimeParseException e) {
             // Se c'è un errore di formato, gestisci l'eccezione come desideri

@@ -1,7 +1,6 @@
 package com.commigo.metaclass.MetaClass.entity;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
@@ -42,7 +41,11 @@ public class Stanza {
      */
     @NotNull(message = "Il nome non può essere nullo")
     @Column(length = MAX_NAME_LENGTH)
-    @Size(min = 1, max = MAX_NAME_LENGTH, message = "Lunghezza nome non valida")
+    @Size(min = 1,
+            max = MAX_NAME_LENGTH,
+            message = "Lunghezza nome errata")
+    @Pattern(regexp="^[A-Z][a-zA-Z0-9]*$",
+            message="Formato nome errato")
     @NotBlank(message = "Il nome non può essere vuoto")
     private String nome;
 
@@ -52,7 +55,11 @@ public class Stanza {
 
     @NotNull(message = "Il codice della stanza non può essere nullo")
     @Column(length = MAX_NAME_LENGTH, unique = true)
-    @Size(min = 6, max = 6, message = "Lunghezza del codice stanza non valido")
+    @Size(min = 6,
+            max = 6,
+            message = "Lunghezza codice_stanza errato")
+    @Pattern(regexp="^[0-9]{6}$",
+            message="Formato codice_stanza errato")
     @NotBlank(message = "Il codice stanza  non può essere vuoto")
     private String codice;
 
@@ -61,7 +68,11 @@ public class Stanza {
      */
     @NotNull(message = "La descrizione della stanza non può essere nulla")
     @Column(length = MAX_DESCR_LENGTH)
-    @Size(min = 1, max = MAX_DESCR_LENGTH, message = "Lunghezza della descrizione non valida")
+    @Size(min = 1,
+            max = MAX_DESCR_LENGTH,
+            message = "Lunghezza descrizione errata")
+    @Pattern(regexp="^[A-Z][a-zA-Z0-9.,!?()'\"\\-\\s]*$",
+            message="Formato descrizione errata")
     @NotBlank(message = "La descrizione non può essere vuota")
     private String descrizione;
 

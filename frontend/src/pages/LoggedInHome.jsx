@@ -7,7 +7,7 @@ import { MyHeader } from '../components/Header/Header';
 import { MyFooter } from "../components/Footer/Footer";
 import LogoutButton from "../components/LogoutButton/logoutButton";
 
-export const LoggedIn = () => {
+export const LoggedInHome = () => {
     const nome = localStorage.getItem('nome');
     return (
         <>

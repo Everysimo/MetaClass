@@ -2,14 +2,14 @@ package com.commigo.metaclass.MetaClass.gestionestanza.service;
 
 import com.commigo.metaclass.MetaClass.entity.Stanza;
 import com.commigo.metaclass.MetaClass.entity.Utente;
-import com.commigo.metaclass.MetaClass.gestioneutenza.controller.ResponseBoolMessage;
-import com.commigo.metaclass.MetaClass.utility.response.Response;
+import com.commigo.metaclass.MetaClass.utility.response.types.AccessResponse;
+import com.commigo.metaclass.MetaClass.utility.response.types.Response;
 import org.springframework.http.ResponseEntity;
 
+import java.util.List;
 import java.util.Map;
 
 public interface GestioneStanzaService {
-    ResponseEntity<ResponseBoolMessage> accessoStanza(String codiceStanza, String id_utente);
 
     /**
      * Questo metodo crea una nuova stanza.
@@ -24,7 +24,9 @@ public interface GestioneStanzaService {
      */
     Stanza creaStanza(String nome, String Codice_Stanza, String Descrizione, boolean Tipo_Accesso, int MAX_Posti);
 
-    ResponseEntity<ResponseBoolMessage> richiestaAccessoStanza(String codiceStanza, String id_utente);
+    ResponseEntity<AccessResponse<Boolean>> accessoStanza(String codiceStanza, String id_utente);
+
+    ResponseEntity<AccessResponse<Boolean>> richiestaAccessoStanza(String codiceStanza, String id_utente);
 
     Response<Boolean> upgradeUtente(String id_Uogm, long og, long stanza);
 
@@ -33,4 +35,6 @@ public interface GestioneStanzaService {
     Response<Boolean> deleteRoom(String id_Uogm, Long id_stanza);
 
     Response<Boolean> modificaDatiStanza(String id, Long Id, Map<String, Object> dataMap, Stanza stanza);
+
+    List<Utente> visualizzaStanza(Long Id);
 }

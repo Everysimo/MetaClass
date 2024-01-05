@@ -1,24 +1,15 @@
 package com.commigo.metaclass.MetaClass.entity;
 
-import com.commigo.metaclass.MetaClass.gestioneamministrazione.repository.ScenarioRepository;
-import com.commigo.metaclass.MetaClass.gestionemeeting.controller.CustomExceptionHandler;
-import com.commigo.metaclass.MetaClass.gestionestanza.repository.StanzaRepository;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.http.converter.HttpMessageNotReadableException;
 
-import java.time.DateTimeException;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
 
 @Entity
 @Data
