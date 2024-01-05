@@ -5,6 +5,7 @@ import com.commigo.metaclass.MetaClass.entity.Utente;
 import com.commigo.metaclass.MetaClass.exceptions.RuntimeException403;
 import com.commigo.metaclass.MetaClass.exceptions.ServerRuntimeException;
 import com.commigo.metaclass.MetaClass.gestioneutenza.service.GestioneUtenzaService;
+import com.commigo.metaclass.MetaClass.utility.request.RequestUtils;
 import com.commigo.metaclass.MetaClass.utility.response.types.LoginResponse;
 import com.commigo.metaclass.MetaClass.utility.response.types.Response;
 import com.commigo.metaclass.MetaClass.webconfig.JwtTokenUtil;
@@ -17,6 +18,7 @@ import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -35,13 +37,22 @@ public class GestioneUtenzaController {
     private ValidationToken validationToken;
 
     @PostMapping(value = "/login")
-    public ResponseEntity<LoginResponse<Boolean>> login(@RequestBody Utente u, HttpServletResponse response) {
+    public ResponseEntity<LoginResponse<Boolean>> login(@RequestBody Utente u,
+                                                        HttpServletResponse response,
+                                                        BindingResult result) {
 
         try {
 
             // Generazione del token JWT usando metaId come identificatore
             String token = jwtTokenUtil.generateToken(u.getMetaId());
             u.setTokenAuth(token);
+
+            //controllo errori di validazione
+            if(result.hasErrors())
+            {
+                return ResponseEntity.status(403)
+                        .body(new LoginResponse<>(false, RequestUtils.errorsRequest(result),null));
+            }
 
             // Aggiungi il token al cookie
             Cookie cookie = new Cookie("jwtToken", token);
@@ -106,13 +117,21 @@ public class GestioneUtenzaController {
 
     @PostMapping(value = "/modifyUserData")
     public ResponseEntity<Response<Boolean>> modifyUserData(@RequestBody Utente u,
-                                                            HttpServletRequest request) {
+                                                            HttpServletRequest request,
+                                                            BindingResult result) {
         try{
             Response<Boolean> response;
             ResponseEntity<Response<Boolean>> responseHTTP;
 
             if (!validationToken.isTokenValid(request)) {
                 throw new RuntimeException403("Token non valido");
+            }
+
+            //controllo errori di validazione
+            if(result.hasErrors())
+            {
+                return ResponseEntity.status(403)
+                        .body(new Response<>(false, RequestUtils.errorsRequest(result)));
             }
 
             String metaID = jwtTokenUtil.getMetaIdFromToken(validationToken.getToken());
