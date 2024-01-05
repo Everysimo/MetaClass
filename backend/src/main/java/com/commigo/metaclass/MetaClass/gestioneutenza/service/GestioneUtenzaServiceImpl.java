@@ -8,6 +8,7 @@ import com.commigo.metaclass.MetaClass.gestionestanza.repository.StatoPartecipaz
 import com.commigo.metaclass.MetaClass.exceptions.DataNotFoundException;
 import com.commigo.metaclass.MetaClass.gestioneutenza.repository.UtenteRepository;
 import com.commigo.metaclass.MetaClass.utility.response.types.Response;
+import com.commigo.metaclass.MetaClass.webconfig.ValidationToken;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -34,8 +35,10 @@ public class GestioneUtenzaServiceImpl implements GestioneUtenzaService{
            if (existingUser==null) {
                 // Utente non presente nel database, lo salva
                 utenteRepository.save(u);
+           }else if(utenteRepository.updateAttributes(existingUser.getMetaId(),u)>0){
+               return true;
            }
-            return true;
+            return false;
         } catch (Exception e) {
             return false;
         }
@@ -102,6 +105,23 @@ public class GestioneUtenzaServiceImpl implements GestioneUtenzaService{
             }else{
                 return existingUser;
             }
+    }
+
+/**
+*
+ * @param token
+ * @return
+*/
+    @Override
+    public boolean logoutMeta(String token, ValidationToken validationToken) {
+        System.out.println(token);
+       Utente u = utenteRepository.findUtenteByTokenAuth(token);
+       if(u==null)   return false;
+       u.setTokenAuth(Utente.DEFAULT_TOKEN);
+       if(utenteRepository.updateAttributes(u.getMetaId(), u)>0){
+           return true;
+       }
+       return false;
     }
 }
 

@@ -10,21 +10,26 @@ function useHandleLogout() {
 
     return async () => {
         try {
-            const userMetaID = localStorage.getItem('UserMetaID'); // Fetch the UserMetaID
-
+            const userMetaID = sessionStorage.getItem('UserMetaID'); // Fetch the UserMetaID
+            const requestOptions = {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + sessionStorage.getItem("token")
+                },
+            };
             // Change the method to GET for logout
-            const response = await axios.get('http://localhost:8080/logout', {
-                params: { userMetaID } // Pass the UserMetaID as a query parameter
-            });
-
+            const response = await fetch('http://localhost:8080/Manuallogout', requestOptions);
+            const responseData = await response.json();
+            console.log('Server response:', responseData);
             // Log the message from the backend if the logout was successful
             if (response && response.data && response.data.successo) {
                 console.log('Logout message from backend:', response.data.messaggio);
             }
 
             // Remove authentication-related items from localStorage
-            localStorage.removeItem('UserMetaID'); // Remove the UserMetaID
-            localStorage.setItem('isLoggedIn', 'false');
+            sessionStorage.removeItem('UserMetaID'); // Remove the UserMetaID
+            sessionStorage.setItem('isLoggedIn', 'false');
 
             navigate('/');
         } catch (error) {

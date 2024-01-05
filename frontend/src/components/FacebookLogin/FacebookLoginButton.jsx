@@ -10,7 +10,7 @@ export default class Facebook extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            isLoggedIn: localStorage.getItem('isLoggedIn') === 'true',
+            isLoggedIn: sessionStorage.getItem('isLoggedIn') === 'true',
             nome: "",
             cognome: "",
             email: "",
@@ -26,6 +26,7 @@ export default class Facebook extends Component {
 
     handleUserID = (response) => {
         if (response && response.userID) {
+            console.log(document.cookie);
             this.setState({
                 metaId: response.userID
             });
@@ -74,9 +75,9 @@ export default class Facebook extends Component {
 
 
     saveLoginStatusToLocalStorage = () => {
-        localStorage.setItem('isLoggedIn', JSON.stringify(true));
-        localStorage.setItem('UserMetaID', this.state.metaId);
-        localStorage.setItem('nome', this.state.nome);
+        sessionStorage.setItem('isLoggedIn', JSON.stringify(true));
+        sessionStorage.setItem('UserMetaID', this.state.metaId);
+        sessionStorage.setItem('nome', this.state.nome);
     };
 
     sendDataToServer = async () => {
@@ -95,10 +96,15 @@ export default class Facebook extends Component {
             body: JSON.stringify(dataToSend)
         };
         try {
+            console.log(document.cookie);
             console.log(JSON.stringify(dataToSend));
             const response = await fetch('http://localhost:8080/login', requestOptions);
             const responseData = await response.json();
             console.log('Server response:', responseData);
+            // Estrai l'attributo "token" dalla risposta
+            const token = responseData.token;
+            // Memorizza il token in sessionStorage
+            sessionStorage.setItem('token', token);
         } catch (error) {
             console.error('Error:', error);
         }

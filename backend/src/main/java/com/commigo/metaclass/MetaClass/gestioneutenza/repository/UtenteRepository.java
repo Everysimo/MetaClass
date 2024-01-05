@@ -16,6 +16,7 @@ public interface UtenteRepository extends JpaRepository<Utente, Long> {
     Utente findFirstByMetaId(String idMeta);
     Utente findUtenteById(long id);
     Long findByMetaId(String metaID);
+    Utente findUtenteByTokenAuth(String tokenAuth);
 
     //il valore restituito indica il numero di righe modificate, quindi:
     // 1 se tutto ok
