@@ -10,6 +10,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.hibernate.validator.constraints.URL;
 
 import java.time.LocalDateTime;
 
@@ -17,7 +18,6 @@ import java.time.LocalDateTime;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@JsonIgnoreProperties({"id_categoria"})
 public class Scenario {
 
     public static final int MAX_LENGTH = 254;
@@ -61,10 +61,22 @@ public class Scenario {
     @UpdateTimestamp
     private LocalDateTime data_aggiornamento;
 
+    @URL(message = "L'URL dell'immagine non è valido")
+    @NotNull(message = "L'URL dell'immagine non può essere nullo")
+    @NotBlank(message = "L'URL dell'immagine non può essere vuoto")
+    private String imageUrl;
+
     @JsonCreator
     public Scenario(@JsonProperty("nome") String Nome,
-                  @JsonProperty("descrizione") String Descrizione){
+                    @JsonProperty("descrizione") String Descrizione,
+                    @JsonProperty("imageURL") String imageURL,
+                    @JsonProperty("id_categoria") Long idCategoria){
         this.nome = Nome;
         this.descrizione = Descrizione;
+        this.imageUrl = imageURL;
+
+        this.categoria = new Categoria();
+        this.categoria.setId(idCategoria);
+
     }
 }

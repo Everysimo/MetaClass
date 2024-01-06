@@ -38,9 +38,6 @@ public class GestioneStanzaControl {
     private GestioneStanzaService stanzaService;
 
     @Autowired
-    private JwtTokenUtil jwtTokenUtil;
-
-    @Autowired
     private ValidationToken validationToken;
 
 
