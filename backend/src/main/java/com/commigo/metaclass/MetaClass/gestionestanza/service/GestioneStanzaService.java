@@ -1,5 +1,6 @@
 package com.commigo.metaclass.MetaClass.gestionestanza.service;
 
+import com.commigo.metaclass.MetaClass.entity.Scenario;
 import com.commigo.metaclass.MetaClass.entity.Stanza;
 import com.commigo.metaclass.MetaClass.entity.StatoPartecipazione;
 import com.commigo.metaclass.MetaClass.entity.Utente;
@@ -24,4 +25,6 @@ public interface GestioneStanzaService
     StatoPartecipazione setStatoPartecipazione(Stanza stanza, Utente utente, boolean isInAttesa);
     Response<Boolean> upgradeUtente(String id_Uogm, long og, long stanza);
     List<Utente> visualizzaStanza(Long Id);
+
+    List<Scenario> getAllScenari();
 }

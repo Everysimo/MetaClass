@@ -1,5 +1,6 @@
 package com.commigo.metaclass.MetaClass.gestionestanza.controller;
 
+import com.commigo.metaclass.MetaClass.entity.Scenario;
 import com.commigo.metaclass.MetaClass.entity.Stanza;
 import com.commigo.metaclass.MetaClass.entity.StatoPartecipazione;
 import com.commigo.metaclass.MetaClass.entity.Utente;
@@ -24,10 +25,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
@@ -217,5 +215,32 @@ public class GestioneStanzaControl {
     public List<Utente> richiestaAccessoStanza(@PathVariable Long Id, HttpSession session)
     {
         return stanzaService.visualizzaStanza(Id);
+    }
+
+    @GetMapping(value = "/visualizzaScenari")
+    public ResponseEntity<Response<List<Scenario>>> visualizzaScenari(HttpServletRequest request) {
+        List<Scenario> scenari;
+        try {
+
+            //validazione dl token
+            if (!validationToken.isTokenValid(request)) {
+                throw new RuntimeException403("Token non valido");
+            }
+
+            scenari = stanzaService.getAllScenari();
+            if (scenari == null) {
+                return ResponseEntity.status(500)
+                        .body(new Response<>(null, "Errore la ricerca degli scenari"));
+            } else {
+                return ResponseEntity
+                        .ok(new Response<>(scenari, "operazione effettuata con successo"));
+            }
+        } catch (RuntimeException403 se) {
+            return ResponseEntity.status(403)
+                    .body(new Response<>(null, "Errore durante l'operazione: "+se.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(500)
+                    .body(new Response<>(null, "Errore durante l'operazione"));
+        }
     }
 }

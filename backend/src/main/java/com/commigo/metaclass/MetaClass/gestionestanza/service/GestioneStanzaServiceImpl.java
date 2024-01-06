@@ -272,4 +272,8 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService {
         }
         return ruolo;
     }
+
+    public List<Scenario> getAllScenari(){
+        return scenarioRepository.findAll();
+    }
 }
