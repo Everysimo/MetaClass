@@ -230,7 +230,7 @@ public class GestioneStanzaControl {
             scenari = stanzaService.getAllScenari();
             if (scenari == null) {
                 return ResponseEntity.status(500)
-                        .body(new Response<>(null, "Errore la ricerca degli scenari"));
+                        .body(new Response<>(null, "nessuno scenario creato"));
             } else {
                 return ResponseEntity
                         .ok(new Response<>(scenari, "operazione effettuata con successo"));
