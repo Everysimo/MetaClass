@@ -152,17 +152,20 @@ public class GestioneUtenzaController {
 
     @CrossOrigin
     @GetMapping(value = "/visualizzaStanze")
-    public ResponseEntity<Response<List<Stanza>>> visualizzaStanze(HttpSession session) {
+    public ResponseEntity<Response<List<Stanza>>> visualizzaStanze(HttpServletRequest request) {
         List<Stanza> stanze;
         try {
-            String IdMeta = (String) session.getAttribute("UserMetaID");
 
-            if (IdMeta == null)
-                return ResponseEntity.status(403).body(new Response<>(null, "Utente non loggato"));
-            stanze = utenzaService.getStanzeByUserId(IdMeta);
+            //validazione del token
+            if (!validationToken.isTokenValid(request)) {
+                throw new RuntimeException403("Token non valido");
+            }
+
+            String metaID = jwtTokenUtil.getMetaIdFromToken(validationToken.getToken());
+
+            stanze = utenzaService.getStanzeByUserId(metaID);
             if (stanze == null) {
-                return ResponseEntity.status(500)
-                        .body(new Response<>(null, "Errore la ricerca delle stanze"));
+                throw new ServerRuntimeException("Errore la ricerca delle stanze");
             } else if (stanze.isEmpty()) {
                 return ResponseEntity
                         .ok(new Response<>(stanze, "Non hai accesso a nessuna stanza"));
@@ -170,9 +173,12 @@ public class GestioneUtenzaController {
                 return ResponseEntity
                         .ok(new Response<>(stanze, "operazione effettuata con successo"));
             }
-        } catch (Exception e) {
+        } catch (ServerRuntimeException se) {
             return ResponseEntity.status(500)
-                    .body(new Response<>(null, "Errore durante l'operazione"));
+                    .body(new Response<>(null, "Errore durante l'operazione: "+se.getMessage()));
+        }catch (RuntimeException403 e) {
+            return ResponseEntity.status(403)
+                    .body(new Response<>(null, "Errore durante l'operazione: "+e.getMessage()));
         }
     }
 

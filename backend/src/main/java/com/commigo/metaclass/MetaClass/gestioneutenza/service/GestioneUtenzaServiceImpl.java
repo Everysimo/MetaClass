@@ -3,6 +3,7 @@ package com.commigo.metaclass.MetaClass.gestioneutenza.service;
 import com.commigo.metaclass.MetaClass.entity.Stanza;
 import com.commigo.metaclass.MetaClass.entity.StatoPartecipazione;
 import com.commigo.metaclass.MetaClass.entity.Utente;
+import com.commigo.metaclass.MetaClass.exceptions.ServerRuntimeException;
 import com.commigo.metaclass.MetaClass.gestionestanza.repository.StanzaRepository;
 import com.commigo.metaclass.MetaClass.gestionestanza.repository.StatoPartecipazioneRepository;
 import com.commigo.metaclass.MetaClass.exceptions.DataNotFoundException;
@@ -66,16 +67,15 @@ public class GestioneUtenzaServiceImpl implements GestioneUtenzaService{
      * @return
      */
     @Override
-    public List<Stanza> getStanzeByUserId(String MetaId) {
-        try {
+    public List<Stanza> getStanzeByUserId(String MetaId) throws ServerRuntimeException{
             Utente existingUser = utenteRepository.findFirstByMetaId(MetaId);
             if(existingUser == null) {
-                throw new Exception("Utente non presente nel database");
+                throw new ServerRuntimeException("Utente non presente nel database");
             }else{
                 List<StatoPartecipazione> stati =
                         statoPartecipazioneRepository.findAllByUtente(existingUser);
                 if(stati==null){
-                    throw new Exception("Errore nella ricerca delle stanze");
+                    throw new ServerRuntimeException("Errore nella ricerca delle stanze");
                 }else{
                     // Estrai gli attributi 'stanza' dalla lista 'stati' e messi in una nuova lista
                     return stati.stream()
@@ -83,9 +83,6 @@ public class GestioneUtenzaServiceImpl implements GestioneUtenzaService{
                             .collect(Collectors.toList());
                 }
             }
-        }catch (Exception e) {
-            return null;
-        }
     }
 
 /**

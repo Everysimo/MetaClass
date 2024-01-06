@@ -35,14 +35,6 @@ public class Ruolo {
     @NotBlank
     private String nome;
 
-    @Column(name = "Data_Creazione", updatable = false)
-    @CreationTimestamp
-    private LocalDateTime data_creazione;
-
-    @Column(name = "Data_Aggiornamento")
-    @UpdateTimestamp
-    private LocalDateTime data_aggiornamento;
-
     public Ruolo(String nome) {
         this.nome = nome;
     }
