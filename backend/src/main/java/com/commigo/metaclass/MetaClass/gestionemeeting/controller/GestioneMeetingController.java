@@ -29,9 +29,6 @@ public class GestioneMeetingController {
     private GestioneMeetingService meetingService;
 
     @Autowired
-    private JwtTokenUtil jwtTokenUtil;
-
-    @Autowired
     private ValidationToken validationToken;
 
     @PostMapping(value = "/meetingStatus/{id}")

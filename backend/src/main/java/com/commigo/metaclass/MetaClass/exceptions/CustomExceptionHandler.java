@@ -14,7 +14,7 @@ public class CustomExceptionHandler {
 
         // Restituisci una risposta con uno stato 400 (Bad Request) e il messaggio personalizzato
         return ResponseEntity.badRequest().body(new Response<>(false,
-                "controlla il formato delle date"));
+                "I nomi degli attributi non sono corretti"));
     }
 
     @ExceptionHandler(DataFormatException.class)
