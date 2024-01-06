@@ -40,6 +40,9 @@ public class GestioneStanzaControl {
     @Autowired
     private ValidationToken validationToken;
 
+    @Autowired
+    private JwtTokenUtil jwtTokenUtil;
+
 
     @PostMapping(value = "/creastanza")
     public ResponseEntity<Response<Boolean>> creaStanza(@RequestBody Stanza s,
@@ -74,14 +77,16 @@ public class GestioneStanzaControl {
     }
 
     @PostMapping(value = "/declassaOrganizzatore")
-    public ResponseEntity<Response<Boolean>> declassaOrganizzatore(@RequestBody RichiestaDTO request, HttpSession session) {
+    public ResponseEntity<Response<Boolean>> declassaOrganizzatore(@RequestBody RichiestaDTO richiesta, HttpServletRequest request) {
         try {
-            String IdMeta = (String) session.getAttribute("UserMetaID");
-            if (IdMeta == null) {
-                return ResponseEntity.status(403).body(new Response<>(false, "Utente non loggato"));
-            }else{
-                return ResponseEntity.ok(stanzaService.downgradeUtente(IdMeta, request.getId_og(), request.getId_stanza()));
+            if (!validationToken.isTokenValid(request)) {
+                throw new RuntimeException403("Token non valido");
             }
+
+            String metaID = jwtTokenUtil.getMetaIdFromToken(validationToken.getToken());
+
+            return ResponseEntity.ok(stanzaService.downgradeUtente(metaID, richiesta.getId_og(), richiesta.getId_stanza()));
+
         } catch (Exception e) {
             return ResponseEntity.status(500)
                     .body(new Response<>(false, "Errore durante l'operazione"));
@@ -90,14 +95,16 @@ public class GestioneStanzaControl {
 
     @PostMapping(value = "/eliminaStanza/{Id}")
 
-    public ResponseEntity<Response<Boolean>> eliminaStanza(@PathVariable Long Id, HttpSession session) {
+    public ResponseEntity<Response<Boolean>> eliminaStanza(@PathVariable Long Id, HttpServletRequest request) throws RuntimeException403 {
         try {
-            String IdMeta = (String) session.getAttribute("UserMetaID");
-            if (IdMeta == null) {
-                return ResponseEntity.status(403).body(new Response<>(false, "Utente non loggato"));
-            }else{
-                return ResponseEntity.ok(stanzaService.deleteRoom(IdMeta, Id));
+            if (!validationToken.isTokenValid(request)) {
+                throw new RuntimeException403("Token non valido");
             }
+
+            String metaID = jwtTokenUtil.getMetaIdFromToken(validationToken.getToken());
+
+            return ResponseEntity.ok(stanzaService.deleteRoom(metaID, Id));
+
         } catch (Exception e) {
             return ResponseEntity.status(500)
                     .body(new Response<>(false, "Errore durante l'operazione"));
@@ -173,14 +180,15 @@ public class GestioneStanzaControl {
     }
 
     @PostMapping(value = "/promuoviOrganizzatore")
-    public ResponseEntity<Response<Boolean>> promuoviOrganizzatore(@RequestBody RichiestaDTO request, HttpSession session) {
+    public ResponseEntity<Response<Boolean>> promuoviOrganizzatore(@RequestBody RichiestaDTO richiesta, HttpServletRequest request) {
         try {
-            String IdMeta = (String) session.getAttribute("UserMetaID");
-            if (IdMeta == null) {
-                return ResponseEntity.status(403).body(new Response<>(false, "Utente non loggato"));
-            }else{
-                return ResponseEntity.ok(stanzaService.upgradeUtente(IdMeta, request.getId_og(), request.getId_stanza()));
+            if (!validationToken.isTokenValid(request)) {
+                throw new RuntimeException403("Token non valido");
             }
+
+            String metaID = jwtTokenUtil.getMetaIdFromToken(validationToken.getToken());
+                return ResponseEntity.ok(stanzaService.upgradeUtente(metaID, richiesta.getId_og(), richiesta.getId_stanza()));
+
         } catch (Exception e) {
             return ResponseEntity.status(500)
                     .body(new Response<>(false, "Errore durante l'operazione"));
@@ -188,29 +196,36 @@ public class GestioneStanzaControl {
     }
 
     @PostMapping(value = "/accessoStanza")
-    public ResponseEntity<AccessResponse<Boolean>> richiestaAccessoStanza(@RequestBody String requestBody, HttpSession session)
+    public ResponseEntity<AccessResponse<Boolean>> richiestaAccessoStanza(@RequestBody String requestBody, HttpServletRequest request)
     {
         try {
-            String IdMeta = (String) session.getAttribute("UserMetaID");
-            if (IdMeta == null) {
-                return ResponseEntity.status(403).body(new AccessResponse<>(false, "Utente non loggato", false));
-            }else {
-
-                ObjectMapper objectMapper = new ObjectMapper();
-                JsonNode jsonNode = objectMapper.readTree(requestBody);
-                String codiceStanza = jsonNode.get("codice").asText();
-
-                return ResponseEntity.ok(stanzaService.accessoStanza(codiceStanza, (String) session.getAttribute("UserMetaID")).getBody());
+            if (!validationToken.isTokenValid(request)) {
+                throw new RuntimeException403("Token non valido");
             }
+
+            String metaID = jwtTokenUtil.getMetaIdFromToken(validationToken.getToken());
+
+            ObjectMapper objectMapper = new ObjectMapper();
+            JsonNode jsonNode = objectMapper.readTree(requestBody);
+            String codiceStanza = jsonNode.get("codice").asText();
+
+            return ResponseEntity.ok(stanzaService.accessoStanza(codiceStanza, metaID).getBody());
+
         } catch (RuntimeException | JsonProcessingException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(new AccessResponse<>(false, "Errore durante la richiesta: " + e.getMessage(), false));
+        } catch (RuntimeException403 e) {
+            throw new RuntimeException(e);
         }
     }
 
     @PostMapping(value = "/visualizzaStanza/{Id}")
-    public List<Utente> richiestaAccessoStanza(@PathVariable Long Id, HttpSession session)
-    {
+    public List<Utente> visualizzaStanza(@PathVariable Long Id, HttpServletRequest request) throws RuntimeException403 {
+
+        if (!validationToken.isTokenValid(request)) {
+            throw new RuntimeException403("Token non valido");
+        }
+
         return stanzaService.visualizzaStanza(Id);
     }
 

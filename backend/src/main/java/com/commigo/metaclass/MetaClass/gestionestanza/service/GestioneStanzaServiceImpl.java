@@ -123,9 +123,9 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService {
     }
 
     @Override
-    public Response<Boolean> deleteRoom(String id_Uogm, Long id_stanza){
+    public Response<Boolean> deleteRoom(String metaID, Long id_stanza){
 
-        Utente ogm = utenteRepository.findFirstByMetaId(id_Uogm);
+        Utente ogm = utenteRepository.findFirstByMetaId(metaID);
         Stanza stanza = stanzaRepository.findStanzaById(id_stanza);
         if(stanza == null) {
             return ResponseUtils.getResponseError(HttpStatus.INTERNAL_SERVER_ERROR,"La stanza selezionata non esiste").getBody();
