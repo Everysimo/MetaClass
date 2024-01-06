@@ -8,7 +8,7 @@ import java.util.Optional;
 
 public interface GestioneMeetingService {
     public boolean creaScheduling(Meeting meeting);
-    public Meeting modificaScheduling(Meeting meeting) throws ServerRuntimeException, RuntimeException403;;
+    public boolean modificaScheduling(Meeting meeting) throws ServerRuntimeException, RuntimeException403;;
     Meeting findMeetingById(Long id);
     Meeting saveMeeting(Meeting meeting);
 }

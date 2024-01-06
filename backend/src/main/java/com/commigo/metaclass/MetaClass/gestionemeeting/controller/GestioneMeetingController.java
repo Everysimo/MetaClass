@@ -92,7 +92,7 @@ public class GestioneMeetingController {
     }
 
     @PostMapping(value = "/modificaScheduling")
-    public ResponseEntity<Response<Meeting>> modificaScheduling
+    public ResponseEntity<Response<Boolean>> modificaScheduling
             (@Valid @RequestBody Meeting m, BindingResult result, HttpServletRequest request) {
 
         try {
@@ -105,22 +105,22 @@ public class GestioneMeetingController {
             if(result.hasErrors())
             {
                 return ResponseEntity.status(403)
-                        .body(new Response<>(null, RequestUtils.errorsRequest(result)));
+                        .body(new Response<>(false, RequestUtils.errorsRequest(result)));
             }
 
             Meeting meeting = null;
-            if ((meeting=meetingService.modificaScheduling(m))==null) {
+            if (!meetingService.modificaScheduling(m)) {
                 throw new ServerRuntimeException("modifica non effettuata");
             } else {
-                return ResponseEntity.ok(new Response<>(meeting, "Meeting schedulato con successo"));
+                return ResponseEntity.ok(new Response<>(true, "Meeting schedulato con successo"));
             }
 
         } catch (RuntimeException403 e) {
             return ResponseEntity.status(403)
-                    .body(new Response<>(null, e.getMessage()));
+                    .body(new Response<>(false, e.getMessage()));
         } catch (ServerRuntimeException se) {
             return ResponseEntity.status(500)
-                    .body(new Response<>(null, se.getMessage()));
+                    .body(new Response<>(false, se.getMessage()));
         }
     }
 }

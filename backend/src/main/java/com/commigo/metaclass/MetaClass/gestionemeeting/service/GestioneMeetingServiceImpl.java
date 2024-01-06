@@ -58,7 +58,7 @@ public class GestioneMeetingServiceImpl implements GestioneMeetingService{
  * @return
 */
    @Override
-   public Meeting modificaScheduling(Meeting meeting) throws ServerRuntimeException, RuntimeException403 {
+   public boolean modificaScheduling(Meeting meeting) throws ServerRuntimeException, RuntimeException403 {
     // Cerca il meeting per verificare se è registrato o meno
       Optional<Meeting> m = meetingRepository.findById(meeting.getId());
 
@@ -66,16 +66,15 @@ public class GestioneMeetingServiceImpl implements GestioneMeetingService{
           if (meeting.getStanza().getId() != m.get().getStanza().getId()) {
               throw new RuntimeException403("Messaggio di errore qui...");
           }
-          if(meetingRepository.updateAttributes(m.get().getId(), meeting)>0){
-              return meetingRepository.findMeetingById(m.get().getId());
+          if(meetingRepository.hasOverlappingMeetings(meeting.getInizio(), meeting.getFine())){
+              throw new RuntimeException403("il meeting si accavalla con un altro meeting");
           }
+          return meetingRepository.updateAttributes(m.get().getId(), meeting)>0;
       } else {
           // Gestisci il caso in cui il meeting non è presente (potrebbe essere opportuno lanciare un'eccezione o fare altro)
           throw new ServerRuntimeException("Meeting non trovato con ID: " + meeting.getId());
 
       }
-
-      return null;
    }
 
     @Override
