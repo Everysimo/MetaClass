@@ -40,6 +40,9 @@ public class GestioneStanzaControl {
     @Autowired
     private ValidationToken validationToken;
 
+    @Autowired
+    private JwtTokenUtil jwtTokenUtil;
+
 
     @PostMapping(value = "/creastanza")
     public ResponseEntity<Response<Boolean>> creaStanza(@RequestBody Stanza s,
@@ -90,14 +93,16 @@ public class GestioneStanzaControl {
 
     @PostMapping(value = "/eliminaStanza/{Id}")
 
-    public ResponseEntity<Response<Boolean>> eliminaStanza(@PathVariable Long Id, HttpSession session) {
+    public ResponseEntity<Response<Boolean>> eliminaStanza(@PathVariable Long Id, HttpServletRequest request) throws RuntimeException403 {
         try {
-            String IdMeta = (String) session.getAttribute("UserMetaID");
-            if (IdMeta == null) {
-                return ResponseEntity.status(403).body(new Response<>(false, "Utente non loggato"));
-            }else{
-                return ResponseEntity.ok(stanzaService.deleteRoom(IdMeta, Id));
+            if (!validationToken.isTokenValid(request)) {
+                throw new RuntimeException403("Token non valido");
             }
+
+            String metaID = jwtTokenUtil.getMetaIdFromToken(validationToken.getToken());
+
+            return ResponseEntity.ok(stanzaService.deleteRoom(metaID, Id));
+
         } catch (Exception e) {
             return ResponseEntity.status(500)
                     .body(new Response<>(false, "Errore durante l'operazione"));

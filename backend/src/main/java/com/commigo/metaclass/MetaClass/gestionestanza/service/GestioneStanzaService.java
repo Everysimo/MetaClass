@@ -16,7 +16,7 @@ public interface GestioneStanzaService
 
     ResponseEntity<AccessResponse<Boolean>> accessoStanza(String codiceStanza, String id_utente);
     boolean creaStanza(Stanza s);
-    Response<Boolean> deleteRoom(String id_Uogm, Long id_stanza);
+    Response<Boolean> deleteRoom(String metaID, Long id_stanza);
     Response<Boolean> downgradeUtente(String id_Uogm, long og, long stanza);
     Response<Boolean> modificaDatiStanza(String id, Long Id, Map<String, Object> dataMap, Stanza stanza);
     Stanza findStanza(Long id);
