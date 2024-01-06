@@ -3,6 +3,8 @@ package com.commigo.metaclass.MetaClass.gestionestanza.controller;
 import com.commigo.metaclass.MetaClass.entity.Stanza;
 import com.commigo.metaclass.MetaClass.entity.StatoPartecipazione;
 import com.commigo.metaclass.MetaClass.entity.Utente;
+import com.commigo.metaclass.MetaClass.exceptions.RuntimeException403;
+import com.commigo.metaclass.MetaClass.exceptions.ServerRuntimeException;
 import com.commigo.metaclass.MetaClass.gestionestanza.service.GestioneStanzaService;
 import com.commigo.metaclass.MetaClass.utility.request.GestioneAccessiRequest;
 import com.commigo.metaclass.MetaClass.utility.request.RequestUtils;
@@ -10,9 +12,12 @@ import com.commigo.metaclass.MetaClass.utility.request.RichiestaDTO;
 import com.commigo.metaclass.MetaClass.utility.response.ResponseUtils;
 import com.commigo.metaclass.MetaClass.utility.response.types.AccessResponse;
 import com.commigo.metaclass.MetaClass.utility.response.types.Response;
+import com.commigo.metaclass.MetaClass.webconfig.JwtTokenUtil;
+import com.commigo.metaclass.MetaClass.webconfig.ValidationToken;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -34,29 +39,42 @@ public class GestioneStanzaControl {
     @Qualifier("GestioneStanzaService")
     private GestioneStanzaService stanzaService;
 
+    @Autowired
+    private JwtTokenUtil jwtTokenUtil;
+
+    @Autowired
+    private ValidationToken validationToken;
+
 
     @PostMapping(value = "/creastanza")
-    public ResponseEntity<Response<Boolean>> creaStanza(@RequestBody String requestBody, BindingResult result)
-    {
-        if(result.hasErrors())
-        {
-            return ResponseUtils.getResponseError(HttpStatus.INTERNAL_SERVER_ERROR, RequestUtils.errorsRequest(result));
-        }
+    public ResponseEntity<Response<Boolean>> creaStanza(@RequestBody Stanza s,
+                                                        BindingResult result,
+                                                        HttpServletRequest request){
+
         try
         {
-            JsonNode jsonNode = new ObjectMapper().readTree(requestBody);
+            //validazione dl token
+            if (!validationToken.isTokenValid(request)) {
+                throw new RuntimeException403("Token non valido");
+            }
 
-            String nome = jsonNode.get("nome").asText();
-            String codiceStanza = jsonNode.get("codiceStanza").asText();
-            String descrizione = jsonNode.get("descrizione").asText();
-            boolean tipoAccesso = Boolean.parseBoolean(jsonNode.get("tipoAccesso").asText());
-            int maxPosti = Integer.parseInt(jsonNode.get("maxPosti").asText());
-            stanzaService.creaStanza(nome,codiceStanza,descrizione,tipoAccesso,maxPosti);
+            if(result.hasErrors())
+            {
+                return ResponseUtils.getResponseError(HttpStatus.INTERNAL_SERVER_ERROR, RequestUtils.errorsRequest(result));
+            }
+
+            if(!stanzaService.creaStanza(s)){
+                throw new ServerRuntimeException("errore nel salvataggio dell stanza");
+            }
             return ResponseUtils.getResponseOk("Corretto");
-        }
-        catch (RuntimeException | JsonProcessingException e)
+
+
+        }catch (ServerRuntimeException e)
         {
             return ResponseUtils.getResponseError(HttpStatus.INTERNAL_SERVER_ERROR,"Errore durante la richiesta: " + e.getMessage());
+        }catch(RuntimeException403 se){
+            return ResponseUtils.getResponseError(HttpStatus.valueOf(403),
+                    "Errore durante la richiesta: " + se.getMessage());
         }
     }
 

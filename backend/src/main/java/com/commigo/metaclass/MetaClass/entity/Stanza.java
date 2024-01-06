@@ -88,7 +88,7 @@ public class Stanza {
     @NotNull(message = "Il numero massimo di posti non può essere nullo")
     @Min(value = 1, message = "Il valore del  parametro non deve essere inferiore ad 1")
     @Max(value = 999, message = "Il valore del  parametro non deve superare 999")
-    @NotBlank(message = "Il numero massimo dei posti non può essere vuota")
+   // @NotBlank(message = "Il numero massimo dei posti non può essere vuota")
     private int max_Posti;
 
     /**
@@ -112,7 +112,8 @@ public class Stanza {
                   @JsonProperty("codiceStanza") String codiceStanza,
                   @JsonProperty("descrizione") String descrizione,
                   @JsonProperty("tipoAccesso") boolean tipoAccesso,
-                  @JsonProperty("maxPosti") int maxPosti)
+                  @JsonProperty("maxPosti") Integer maxPosti,
+                  @JsonProperty("id_scenario") Long id_scenario)
 
     {
         this.nome = nome;
@@ -120,5 +121,9 @@ public class Stanza {
         this.descrizione = descrizione;
         this.tipo_Accesso = tipoAccesso;
         this.max_Posti = maxPosti;
+
+        //aggiunta dello scenario
+        this.scenario = new Scenario();
+        this.scenario.setId(id_scenario);
     }
 }

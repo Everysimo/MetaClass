@@ -1,9 +1,7 @@
 package com.commigo.metaclass.MetaClass.gestionestanza.service;
 
-import com.commigo.metaclass.MetaClass.entity.Ruolo;
-import com.commigo.metaclass.MetaClass.entity.Stanza;
-import com.commigo.metaclass.MetaClass.entity.StatoPartecipazione;
-import com.commigo.metaclass.MetaClass.entity.Utente;
+import com.commigo.metaclass.MetaClass.entity.*;
+import com.commigo.metaclass.MetaClass.gestioneamministrazione.repository.ScenarioRepository;
 import com.commigo.metaclass.MetaClass.gestionestanza.repository.RuoloRepository;
 import com.commigo.metaclass.MetaClass.gestionestanza.repository.StanzaRepository;
 import com.commigo.metaclass.MetaClass.gestionestanza.repository.StatoPartecipazioneRepository;
@@ -30,6 +28,7 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService {
     private final RuoloRepository ruoloRepository;
     private final StanzaRepository stanzaRepository;
     private final UtenteRepository utenteRepository;
+    private final ScenarioRepository scenarioRepository;
 
     @Override
     public ResponseEntity<AccessResponse<Boolean>> accessoStanza(String codiceStanza, String id_utente) {
@@ -76,16 +75,21 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService {
     }
 
     @Override
-    public Stanza creaStanza(String nome, String Codice_Stanza, String Descrizione, boolean Tipo_Accesso, int MAX_Posti)
+    public boolean creaStanza(Stanza s)
     {
-        Stanza stanza = null;
-        boolean isValid = Validator.isValid(nome) && Validator.isValid(Codice_Stanza) && Validator.isValid(Descrizione)
-                && Validator.isValid(MAX_Posti);
-        if(!isValid) return stanza;
+        Stanza stanza = stanzaRepository.findStanzaByCodice(s.getCodice());
+        if(stanza == null){
 
-        stanza = new Stanza(nome, Codice_Stanza, Descrizione, Tipo_Accesso, MAX_Posti);
-        stanzaRepository.save(stanza);
-        return stanza;
+             //settaggio scenario
+             Scenario sc = scenarioRepository.findScenarioById(s.getScenario().getId());
+             if(sc != null)
+                  s.setScenario(sc);
+             else return false;
+
+             stanzaRepository.save(s);
+             return true;
+        }
+        return false;
     }
 
 
