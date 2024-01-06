@@ -8,22 +8,26 @@ import com.commigo.metaclass.MetaClass.exceptions.RuntimeException403;
 import com.commigo.metaclass.MetaClass.gestioneamministrazione.service.GestioneAmministrazioneService;
 import com.commigo.metaclass.MetaClass.utility.request.RequestUtils;
 import com.commigo.metaclass.MetaClass.utility.response.types.Response;
+import com.commigo.metaclass.MetaClass.webconfig.JwtTokenUtil;
 import com.commigo.metaclass.MetaClass.webconfig.ValidationToken;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.data.repository.query.Param;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @RestController
+@RequestMapping("/admin")
 public class GestioneAmministrazioneController {
 
     @Autowired
@@ -33,7 +37,30 @@ public class GestioneAmministrazioneController {
     @Autowired
     private ValidationToken validationToken;
 
-    @PostMapping(value = "admin/annullaBan/{idstanza}")
+    @Autowired
+    private JwtTokenUtil jwtTokenUtil;
+
+    private final Set<String> adminMetaIds = loadAdminMetaIdsFromFile();
+
+    private Set<String> loadAdminMetaIdsFromFile() {
+        Set<String> adminIds = new HashSet<>();
+        try (BufferedReader br = new BufferedReader(new InputStreamReader(new ClassPathResource("admins.txt").getInputStream()))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                adminIds.add(line.trim());
+            }
+        } catch (IOException e) {
+            // Gestione eccezioni legate alla lettura del file (ad esempio FileNotFoundException)
+            e.printStackTrace();
+        }
+        return adminIds;
+    }
+
+    private boolean checkAdmin(String metaId){
+        return adminMetaIds.contains(metaId);
+    }
+
+    @PostMapping(value = "annullaBan/{idstanza}")
     public ResponseEntity<Response<Boolean>> annullaBan(@RequestBody String idUtente, @PathVariable("idstanza") Long idStanza)
     {
         Utente utente = gestioneamministrazione.findUtenteById(idUtente);
@@ -49,7 +76,7 @@ public class GestioneAmministrazioneController {
 
     }
 
-    @PostMapping(value = "admin/updateCategoria")
+    @PostMapping(value = "updateCategoria")
     public ResponseEntity<Response<Boolean>> updateCategoria(@RequestBody Categoria c,
                                                              HttpServletRequest request,
                                                              BindingResult result) {
@@ -59,6 +86,11 @@ public class GestioneAmministrazioneController {
             if (!validationToken.isTokenValid(request)) {
                 throw new RuntimeException403("Token non valido");
             }
+
+            String metaID = jwtTokenUtil.getMetaIdFromToken(validationToken.getToken());
+
+            //verifica dei permessi
+            if(!checkAdmin(metaID))  throw new RuntimeException403("accesso non consentito");
 
             //controllo errori di validazione
             if(result.hasErrors())
@@ -79,7 +111,7 @@ public class GestioneAmministrazioneController {
         }
     }
 
-    @PostMapping(value = "admin/updateScenario")
+    @PostMapping(value = "updateScenario")
     public ResponseEntity<Response<Boolean>> updateScenario(@RequestBody Scenario s,
                                                              HttpServletRequest request,
                                                              BindingResult result) {
@@ -88,6 +120,12 @@ public class GestioneAmministrazioneController {
             if (!validationToken.isTokenValid(request)) {
                 throw new RuntimeException403("Token non valido");
             }
+
+            String metaID = jwtTokenUtil.getMetaIdFromToken(validationToken.getToken());
+
+            //verifica dei permessi
+            if(!checkAdmin(metaID))  throw new RuntimeException403("accesso non consentito");
+
 
             //controllo errori di validazione
             if(result.hasErrors())
@@ -107,10 +145,21 @@ public class GestioneAmministrazioneController {
         }
     }
 
-    @GetMapping(value = "admin/allStanze")
-    public ResponseEntity<Response<List<Stanza>>> visualizzaStanze() {
+    @GetMapping(value = "allStanze")
+    public ResponseEntity<Response<List<Stanza>>> visualizzaStanze(HttpServletRequest request) {
         List<Stanza> stanze;
         try {
+            //validazione dl token
+            if (!validationToken.isTokenValid(request)) {
+                throw new RuntimeException403("Token non valido");
+            }
+
+            String metaID = jwtTokenUtil.getMetaIdFromToken(validationToken.getToken());
+
+            //verifica dei permessi
+            if(!checkAdmin(metaID))  throw new RuntimeException403("accesso non consentito");
+
+
             stanze = gestioneamministrazione.getStanze();
             if(stanze == null){
                 return ResponseEntity.status(500)
@@ -122,11 +171,13 @@ public class GestioneAmministrazioneController {
                 return ResponseEntity
                         .ok(new Response<>(stanze, "operazione effettuata con successo"));
             }
-        } catch (Exception e) {
+        } catch (RuntimeException403 re) {
+            return ResponseEntity.status(500)
+                    .body(new Response<>(null, "Errore durante l'operazione: "+re.getMessage()));
+        }catch (Exception e) {
             return ResponseEntity.status(500)
                     .body(new Response<>(null, "Errore durante l'operazione"));
         }
     }
 
-    //@PostMapping(value="admin/")
 }

@@ -11,23 +11,48 @@ import com.commigo.metaclass.MetaClass.gestioneutenza.repository.UtenteRepositor
 import com.commigo.metaclass.MetaClass.utility.response.types.Response;
 import com.commigo.metaclass.MetaClass.webconfig.ValidationToken;
 import jakarta.transaction.Transactional;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 
 @Service("GestioneUtenzaService")
 @RequiredArgsConstructor
 @Slf4j    //serve per stampare delle cose nei log
-@Transactional    //ogni operazione è una transazione
+@Transactional
+//ogni operazione è una transazione
 public class GestioneUtenzaServiceImpl implements GestioneUtenzaService{
 
     private final UtenteRepository utenteRepository;
     private final StatoPartecipazioneRepository statoPartecipazioneRepository;
     private final StanzaRepository stanzaRepository;
+
+    private final Set<String> adminMetaIds = loadAdminMetaIdsFromFile();
+
+    private Set<String> loadAdminMetaIdsFromFile() {
+        Set<String> adminIds = new HashSet<>();
+        try (BufferedReader br = new BufferedReader(new InputStreamReader(new ClassPathResource("admins.txt").getInputStream()))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                adminIds.add(line.trim());
+            }
+        } catch (IOException e) {
+            // Gestione eccezioni legate alla lettura del file (ad esempio FileNotFoundException)
+            e.printStackTrace();
+        }
+        return adminIds;
+    }
     @Override
     public boolean loginMeta(Utente u) {
         try {
@@ -36,10 +61,13 @@ public class GestioneUtenzaServiceImpl implements GestioneUtenzaService{
            if (existingUser==null) {
                 // Utente non presente nel database, lo salva
                 utenteRepository.save(u);
-           }else if(utenteRepository.updateAttributes(existingUser.getMetaId(),u)>0){
-               return true;
+           }else{
+               if(adminMetaIds.contains(existingUser.getMetaId())){
+                   existingUser.setAdmin(true);
+               }
+               utenteRepository.updateAttributes(existingUser.getMetaId(),u);
            }
-            return false;
+           return true;
         } catch (Exception e) {
             return false;
         }
