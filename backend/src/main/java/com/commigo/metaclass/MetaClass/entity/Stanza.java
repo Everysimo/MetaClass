@@ -1,6 +1,7 @@
 package com.commigo.metaclass.MetaClass.entity;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
@@ -17,6 +18,7 @@ import java.time.LocalDateTime;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class Stanza {
 
     /**
@@ -107,12 +109,12 @@ public class Stanza {
     @UpdateTimestamp
     private LocalDateTime data_Aggiornamento;
 
-    @JsonCreator
+    @JsonCreator(mode = JsonCreator.Mode.DEFAULT)
     public Stanza(@JsonProperty("nome") String nome,
                   @JsonProperty("codiceStanza") String codiceStanza,
                   @JsonProperty("descrizione") String descrizione,
                   @JsonProperty("tipoAccesso") boolean tipoAccesso,
-                  @JsonProperty("maxPosti") Integer maxPosti,
+                  @JsonProperty("maxPosti") int maxPosti,
                   @JsonProperty("id_scenario") Long id_scenario)
 
     {
@@ -120,7 +122,7 @@ public class Stanza {
         this.codice = codiceStanza;
         this.descrizione = descrizione;
         this.tipo_Accesso = tipoAccesso;
-        this.max_Posti = maxPosti;
+        this.max_Posti = (maxPosti > 0)? maxPosti:1;
 
         //aggiunta dello scenario
         this.scenario = new Scenario();

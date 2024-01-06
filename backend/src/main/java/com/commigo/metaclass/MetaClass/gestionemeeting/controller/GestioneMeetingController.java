@@ -108,7 +108,6 @@ public class GestioneMeetingController {
                         .body(new Response<>(false, RequestUtils.errorsRequest(result)));
             }
 
-            Meeting meeting = null;
             if (!meetingService.modificaScheduling(m)) {
                 throw new ServerRuntimeException("modifica non effettuata");
             } else {

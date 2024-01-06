@@ -4,6 +4,8 @@ import com.commigo.metaclass.MetaClass.entity.Scenario;
 import com.commigo.metaclass.MetaClass.entity.Stanza;
 import com.commigo.metaclass.MetaClass.entity.StatoPartecipazione;
 import com.commigo.metaclass.MetaClass.entity.Utente;
+import com.commigo.metaclass.MetaClass.exceptions.ClientRuntimeException;
+import com.commigo.metaclass.MetaClass.exceptions.RuntimeException401;
 import com.commigo.metaclass.MetaClass.exceptions.RuntimeException403;
 import com.commigo.metaclass.MetaClass.exceptions.ServerRuntimeException;
 import com.commigo.metaclass.MetaClass.gestionestanza.service.GestioneStanzaService;
@@ -20,6 +22,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
@@ -95,7 +98,7 @@ public class GestioneStanzaControl {
 
     @PostMapping(value = "/eliminaStanza/{Id}")
 
-    public ResponseEntity<Response<Boolean>> eliminaStanza(@PathVariable Long Id, HttpServletRequest request) throws RuntimeException403 {
+    public ResponseEntity<Response<Boolean>> eliminaStanza(@PathVariable Long Id, HttpServletRequest request) {
         try {
             if (!validationToken.isTokenValid(request)) {
                 throw new RuntimeException403("Token non valido");
@@ -105,6 +108,9 @@ public class GestioneStanzaControl {
 
             return ResponseEntity.ok(stanzaService.deleteRoom(metaID, Id));
 
+        } catch (RuntimeException403 re) {
+            return ResponseEntity.status(403)
+                    .body(new Response<>(false, "Errore durante l'operazione: "+re.getMessage()));
         } catch (Exception e) {
             return ResponseEntity.status(500)
                     .body(new Response<>(false, "Errore durante l'operazione"));
@@ -143,36 +149,35 @@ public class GestioneStanzaControl {
     @PostMapping(value = "/modifyRoomData/{Id}")
     public ResponseEntity<Response<Boolean>> modifyRoomData(
             @PathVariable Long Id,
-            @RequestBody Map<String, Object> dataMap,
-            HttpSession session) {
+            @Valid @RequestBody Stanza s,
+            BindingResult result,
+            HttpServletRequest request) {
 
         try {
-            String IdMeta = (String) session.getAttribute("UserMetaID");
-            if (IdMeta == null) {
-                return ResponseEntity.status(403).body(new Response<>(false, "Utente non loggato"));
-            }else {
-
-                Stanza stanza = null;
-                Response<Boolean> response;
-                ResponseEntity<Response<Boolean>> responseHTTP;
-                response = stanzaService.modificaDatiStanza(IdMeta, Id, dataMap, stanza);
-
-                if (response.getValue()) {
-                    /*if (stanza != null) {
-                        // Converti l'oggetto utente in formato JSON
-                        String stanzaJson = new Gson().toJson(stanza);
-                        System.out.println(stanzaJson);
-                        session.setAttribute("RoomModified", stanzaJson);
-                    }*/
-                    responseHTTP = ResponseEntity.ok(response);
-                } else {
-                    responseHTTP = ResponseEntity.status(500).body(response);
+                //controllo del token
+                if (!validationToken.isTokenValid(request)) {
+                    throw new RuntimeException403("Token non valido");
                 }
-                return responseHTTP;
 
-            }
+                //controllo errori di validazione
+                if(result.hasErrors()) {
+                     throw new RuntimeException403(RequestUtils.errorsRequest(result));
+                }
 
-        } catch (Exception e) {
+                if(!stanzaService.modificaDatiStanza(s,Id)){
+                    throw new ServerRuntimeException("modifica non effettuata");
+                } else {
+                    return ResponseEntity.ok(new Response<>(true, "Stanza modificata con successo"));
+                }
+
+        } catch(RuntimeException403 re) {
+            return ResponseEntity.status(403)
+                    .body(new Response<>(false, "Errore durante l'operazione: "+re.getMessage()));
+        }catch(RuntimeException401 ue) {
+            return ResponseEntity.status(401)
+                .body(new Response<>(false, "Errore durante l'operazione: "+ue.getMessage()));
+        }catch(Exception e) {
+            e.printStackTrace();
             return ResponseEntity.status(500)
                     .body(new Response<>(false, "Errore durante l'operazione"));
         }
@@ -219,14 +224,39 @@ public class GestioneStanzaControl {
         }
     }
 
-    @PostMapping(value = "/visualizzaStanza/{Id}")
-    public List<Utente> visualizzaStanza(@PathVariable Long Id, HttpServletRequest request) throws RuntimeException403 {
+    @PostMapping(value = "/visualizzaUtentiInStanza/{Id}")
+    public List<Utente> visualizzaUtentiInStanza(@PathVariable Long Id, HttpServletRequest request) throws RuntimeException403 {
 
         if (!validationToken.isTokenValid(request)) {
             throw new RuntimeException403("Token non valido");
         }
 
-        return stanzaService.visualizzaStanza(Id);
+        return stanzaService.visualizzaUtentiInStanza(Id);
+    }
+
+    @PostMapping(value = "/visualizzaStanza/{Id}")
+    public ResponseEntity<Response<Stanza>> visualizzaStanza(@PathVariable Long Id,
+                                                             HttpServletRequest request) {
+      try{
+           if (!validationToken.isTokenValid(request)) {
+               throw new RuntimeException403("Token non valido");
+           }
+           Stanza s = stanzaService.visualizzaStanza(Id);
+           if(s!=null){
+               return ResponseEntity.ok(new Response<>
+                       (s, "operazione effettuata con successo"));
+           }else{
+               throw new ClientRuntimeException("stanza non trovata, id non valido");
+           }
+      } catch (ClientRuntimeException ce) {
+          return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                  .body(new Response<>(null, "Errore durante la richiesta: " + ce.getMessage()));
+
+      }catch (RuntimeException403 re) {
+          return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                  .body(new Response<>(null, "Errore durante la richiesta: " + re.getMessage()));
+
+      }
     }
 
     @GetMapping(value = "/visualizzaScenari")

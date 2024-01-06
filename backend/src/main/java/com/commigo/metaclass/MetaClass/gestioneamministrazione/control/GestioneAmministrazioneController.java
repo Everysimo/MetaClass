@@ -6,11 +6,13 @@ import com.commigo.metaclass.MetaClass.entity.Stanza;
 import com.commigo.metaclass.MetaClass.entity.Utente;
 import com.commigo.metaclass.MetaClass.exceptions.RuntimeException403;
 import com.commigo.metaclass.MetaClass.gestioneamministrazione.service.GestioneAmministrazioneService;
+import com.commigo.metaclass.MetaClass.gestionestanza.controller.GestioneStanzaControl;
 import com.commigo.metaclass.MetaClass.utility.request.RequestUtils;
 import com.commigo.metaclass.MetaClass.utility.response.types.Response;
 import com.commigo.metaclass.MetaClass.webconfig.JwtTokenUtil;
 import com.commigo.metaclass.MetaClass.webconfig.ValidationToken;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.io.ClassPathResource;
@@ -39,6 +41,9 @@ public class GestioneAmministrazioneController {
 
     @Autowired
     private JwtTokenUtil jwtTokenUtil;
+
+    @Autowired
+    private GestioneStanzaControl stanzaControl;
 
     private final Set<String> adminMetaIds = loadAdminMetaIdsFromFile();
 
@@ -177,6 +182,74 @@ public class GestioneAmministrazioneController {
         }catch (Exception e) {
             return ResponseEntity.status(500)
                     .body(new Response<>(null, "Errore durante l'operazione"));
+        }
+    }
+
+    @PostMapping(value = "modificaStanza/{Id}")
+    public ResponseEntity<Response<Boolean>> modifyRoomDataAdmin(
+            @PathVariable Long Id,
+            @Valid @RequestBody Stanza s,
+            BindingResult result,
+            HttpServletRequest request){
+
+
+       try{ //validazione dl token
+          if (!validationToken.isTokenValid(request)) {
+              throw new RuntimeException403("Token non valido");
+          }
+
+          String metaID = jwtTokenUtil.getMetaIdFromToken(validationToken.getToken());
+
+          //verifica dei permessi
+          if(!checkAdmin(metaID))  throw new RuntimeException403("accesso non consentito");
+
+          return stanzaControl.modifyRoomData(Id,s,result,request);
+        } catch (RuntimeException403 re) {
+           return ResponseEntity.status(403)
+                   .body(new Response<>(null, "Errore durante l'operazione: "+re.getMessage()));
+       }
+    }
+
+    @PostMapping(value = "eliminaStanza/{Id}")
+    public ResponseEntity<Response<Boolean>> eliminaStanza(@PathVariable Long Id,
+                                                           HttpServletRequest request){
+        try{
+            //validazione dl token
+            if (!validationToken.isTokenValid(request)) {
+                throw new RuntimeException403("Token non valido");
+            }
+
+            String metaID = jwtTokenUtil.getMetaIdFromToken(validationToken.getToken());
+
+            //verifica dei permessi
+            if(!checkAdmin(metaID))  throw new RuntimeException403("accesso non consentito");
+
+            return stanzaControl.eliminaStanza(Id,request);
+        } catch (RuntimeException403 re) {
+            return ResponseEntity.status(403)
+                .body(new Response<>(false, "Errore durante l'operazione: "+re.getMessage()));
+        }
+
+   }
+
+    @PostMapping(value = "visualizzaStanza/{Id}")
+    public ResponseEntity<Response<Stanza>> visualizzaStanza(@PathVariable Long Id,
+                                                             HttpServletRequest request) {
+        try{
+            //validazione dl token
+            if (!validationToken.isTokenValid(request)) {
+                throw new RuntimeException403("Token non valido");
+            }
+
+            String metaID = jwtTokenUtil.getMetaIdFromToken(validationToken.getToken());
+
+            //verifica dei permessi
+            if(!checkAdmin(metaID))  throw new RuntimeException403("accesso non consentito");
+
+            return stanzaControl.visualizzaStanza(Id,request);
+        } catch (RuntimeException403 re) {
+            return ResponseEntity.status(403)
+                    .body(new Response<>(null, "Errore durante l'operazione: "+re.getMessage()));
         }
     }
 

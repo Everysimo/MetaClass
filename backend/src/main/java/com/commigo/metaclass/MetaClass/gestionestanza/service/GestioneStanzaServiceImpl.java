@@ -1,6 +1,8 @@
 package com.commigo.metaclass.MetaClass.gestionestanza.service;
 
 import com.commigo.metaclass.MetaClass.entity.*;
+import com.commigo.metaclass.MetaClass.exceptions.RuntimeException401;
+import com.commigo.metaclass.MetaClass.exceptions.RuntimeException403;
 import com.commigo.metaclass.MetaClass.gestioneamministrazione.repository.ScenarioRepository;
 import com.commigo.metaclass.MetaClass.gestionestanza.repository.RuoloRepository;
 import com.commigo.metaclass.MetaClass.gestionestanza.repository.StanzaRepository;
@@ -10,8 +12,11 @@ import com.commigo.metaclass.MetaClass.utility.Validator;
 import com.commigo.metaclass.MetaClass.utility.response.ResponseUtils;
 import com.commigo.metaclass.MetaClass.utility.response.types.AccessResponse;
 import com.commigo.metaclass.MetaClass.utility.response.types.Response;
+import com.commigo.metaclass.MetaClass.webconfig.JwtTokenUtil;
+import com.commigo.metaclass.MetaClass.webconfig.ValidationToken;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -29,6 +34,12 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService {
     private final StanzaRepository stanzaRepository;
     private final UtenteRepository utenteRepository;
     private final ScenarioRepository scenarioRepository;
+
+    @Autowired
+    private ValidationToken validationToken;
+
+    @Autowired
+    private JwtTokenUtil jwtTokenUtil;
 
     @Override
     public ResponseEntity<AccessResponse<Boolean>> accessoStanza(String codiceStanza, String id_utente) {
@@ -132,7 +143,7 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService {
         }
 
         StatoPartecipazione stato_ogm = statoPartecipazioneRepository.findStatoPartecipazioneByUtenteAndStanza(ogm, stanza);
-        if(stato_ogm.getRuolo().getNome().equalsIgnoreCase(Ruolo.ORGANIZZATORE_MASTER)){
+        if(stato_ogm.getRuolo().getNome().equalsIgnoreCase(Ruolo.ORGANIZZATORE_MASTER) || ogm.isAdmin()){
             stanzaRepository.delete(stanza);
             return ResponseEntity.ok(new Response<>(true, "Stanza eliminata con successo")).getBody();
         }else{
@@ -141,34 +152,27 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService {
     }
 
     @Override
-    public Response<Boolean> modificaDatiStanza(String id, Long Id, Map<String, Object> dataMap, Stanza stanza) {
+    public Boolean modificaDatiStanza(Stanza s, Long id) throws RuntimeException403, RuntimeException401 {
 
-        try {
-            Utente ogm = utenteRepository.findFirstByMetaId(id);
-            stanza = stanzaRepository.findStanzaById(Id);
+            //controllo del ruolo di ogm
+            String metaID = jwtTokenUtil.getMetaIdFromToken(validationToken.getToken());
+            Utente ogm = utenteRepository.findFirstByMetaId(metaID);
+            Stanza existingStanza = stanzaRepository.findStanzaById(id);
 
-            StatoPartecipazione statoutente = statoPartecipazioneRepository.findStatoPartecipazioneByUtenteAndStanza(ogm, stanza);
-            if(statoutente.getRuolo().getNome().equalsIgnoreCase(Ruolo.ORGANIZZATORE_MASTER) || statoutente.getRuolo().getNome().equalsIgnoreCase(Ruolo.ORGANIZZATORE)){
-
-                Stanza existingStanza = stanzaRepository.findStanzaById(Id);
-                if(existingStanza == null) {
-                    return ResponseEntity.status(403).body(new Response<>(false, "La stanza non esiste")).getBody();
-                }else{
-                    if(stanzaRepository.updateAttributes(Id, dataMap)>0){
-                        stanza = stanzaRepository.findStanzaById(Id);
-                        return ResponseEntity.ok(new Response<>(true, "modifica effettuata con successo")).getBody();
-                    }else{
-                        stanza = existingStanza;
-                        return ResponseEntity.ok(new Response<>(true, "nessuna modifica effettuata")).getBody();
-                    }
-                }
-            }else{
-                return ResponseEntity.status(403).body(new Response<>(false, "Non puoi effettuare modifiche sulla stanza se non sei almeno un organizzatore")).getBody();
+            if(existingStanza == null) {
+                throw new RuntimeException403("La stanza non esiste");
             }
 
-        }catch (Exception e) {
-            return ResponseEntity.status(403).body(new Response<>(false, "errore nella modifica dei dati")).getBody();
-        }
+            StatoPartecipazione statoutente = statoPartecipazioneRepository.
+                            findStatoPartecipazioneByUtenteAndStanza(ogm, existingStanza);
+
+            if(statoutente==null) throw new RuntimeException403("Non hai acceduto alla stanza");
+
+            if(!statoutente.getRuolo().getNome().equalsIgnoreCase(Ruolo.PARTECIPANTE)){
+                return stanzaRepository.updateAttributes(id, s)>0;
+            }else{
+                throw new RuntimeException401("devi essere almeno un organizzatore");
+            }
     }
 
     @Override
@@ -257,8 +261,18 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService {
 
 
     @Override
-    public List<Utente> visualizzaStanza(Long Id) {
+    public List<Utente> visualizzaUtentiInStanza(Long Id) {
         return statoPartecipazioneRepository.findUtentiInStanza(Id);
+    }
+
+/**
+*
+ * @param Id
+ * @return
+*/
+    @Override
+    public Stanza visualizzaStanza(Long Id) {
+        return stanzaRepository.findStanzaById(Id);
     }
 
     public Ruolo getRuolo(String nome){
