@@ -26,7 +26,9 @@ public interface GestioneStanzaService
     ResponseEntity<AccessResponse<Boolean>> richiestaAccessoStanza(String codiceStanza, String id_utente);
     StatoPartecipazione setStatoPartecipazione(Stanza stanza, Utente utente, boolean isInAttesa);
     Response<Boolean> upgradeUtente(String id_Uogm, long og, long stanza);
-    List<Utente> visualizzaUtentiInStanza(Long Id);
+    ResponseEntity<Response<List<Utente>>> visualizzaUtentiInStanza(Long Id);
     Stanza visualizzaStanza(Long Id);
     List<Scenario> getAllScenari();
+    Scenario visualizzaScenarioStanza(Stanza stanza);
+    ResponseEntity<Response<Boolean>> modificaScenario(String metaID, Long idScenario, Long idStanza);
 }
