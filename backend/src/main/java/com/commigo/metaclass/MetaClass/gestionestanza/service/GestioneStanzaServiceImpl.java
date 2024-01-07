@@ -261,8 +261,57 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService {
 
 
     @Override
-    public List<Utente> visualizzaUtentiInStanza(Long Id) {
-        return statoPartecipazioneRepository.findUtentiInStanza(Id);
+    public ResponseEntity<Response<List<Utente>>> visualizzaUtentiInStanza(Long Id) {
+
+        Stanza stanza = stanzaRepository.findStanzaById(Id);
+
+        if(stanza != null){
+            List<Utente> utenti = statoPartecipazioneRepository.findUtentiInStanza(Id);
+            if(utenti != null){
+                return ResponseEntity.ok(new Response<>
+                        (utenti, "operazione effettuata con successo"));
+            }else{
+                return ResponseEntity.ok(new Response<>(null, "Non sono presenti utenti all'interno della stanza"));
+            }
+        }else{
+            return ResponseEntity.status(403).body(new Response<>(null, "La stanza selezionata non esiste"));
+        }
+
+}
+
+    @Override
+    public Scenario visualizzaScenarioStanza(Stanza stanza) {
+        return stanza.getScenario();
+    }
+
+    @Override
+    public ResponseEntity<Response<Boolean>> modificaScenario(String metaID, Long idScenario, Long idStanza) {
+        Utente u = utenteRepository.findFirstByMetaId(metaID);
+        Stanza stanza = stanzaRepository.findStanzaById(idStanza);
+
+        if(stanza != null){
+            StatoPartecipazione stato = statoPartecipazioneRepository.findStatoPartecipazioneByUtenteAndStanza(u, stanza);
+            if(stato != null){
+                if(stato.getRuolo().getNome().equalsIgnoreCase(Ruolo.ORGANIZZATORE_MASTER) || stato.getRuolo().getNome().equalsIgnoreCase(Ruolo.ORGANIZZATORE) && !stato.isBannato()){
+                    Scenario scenario = scenarioRepository.findScenarioById(idScenario);
+                    if(scenario != null) {
+                        stanza.setScenario(scenario);
+                        stanzaRepository.updateAttributes(idStanza, stanza);
+                        return ResponseEntity.ok(new Response<>(true, "Lo scenario è stato modificato"));
+                    }else{
+                        return ResponseEntity.status(403).body(new Response<>(false, "Lo scenario selezionato non esiste"));
+                    }
+                }else{
+                    return ResponseEntity.status(403).body(new Response<>(false, "Non puoi modificare lo scenario se non sei almeno un organizzatore"));
+                }
+            }else{
+                return ResponseEntity.status(403).body(new Response<>(false, "Non sei all'interno della stanza, non puoi modificare lo scenario"));
+            }
+
+        }else{
+            return ResponseEntity.status(403).body(new Response<>(false, "La stanza selezionata non esiste"));
+        }
+
     }
 
 /**
