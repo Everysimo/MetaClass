@@ -4,11 +4,13 @@ import com.commigo.metaclass.MetaClass.entity.Meeting;
 import com.commigo.metaclass.MetaClass.exceptions.RuntimeException403;
 import com.commigo.metaclass.MetaClass.exceptions.ServerRuntimeException;
 import com.commigo.metaclass.MetaClass.gestionemeeting.service.GestioneMeetingService;
+import com.commigo.metaclass.MetaClass.utility.multipleid.UtenteInMeetingID;
 import com.commigo.metaclass.MetaClass.utility.request.RequestUtils;
 import com.commigo.metaclass.MetaClass.utility.response.ResponseUtils;
 import com.commigo.metaclass.MetaClass.utility.response.types.Response;
 import com.commigo.metaclass.MetaClass.webconfig.JwtTokenUtil;
 import com.commigo.metaclass.MetaClass.webconfig.ValidationToken;
+import io.micrometer.common.util.StringUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +32,9 @@ public class GestioneMeetingController {
 
     @Autowired
     private ValidationToken validationToken;
+
+    @Autowired
+    private JwtTokenUtil jwtTokenUtil;
 
     @PostMapping(value = "/meetingStatus/{id}")
     public ResponseEntity<Response<Boolean>> meetingStatus(@RequestBody String action, @PathVariable("id") Long idMeeting)
@@ -118,6 +123,34 @@ public class GestioneMeetingController {
             return ResponseEntity.status(500)
                     .body(new Response<>(false, se.getMessage()));
         }
+    }
+
+    @PostMapping(value = "/accediMeeting/{id_meeting}")
+    public ResponseEntity<Response<Boolean>> accediMeeting (@PathVariable Long id_meeting,
+                                                            HttpServletRequest request) {
+        try {
+
+            //controllo token
+            if (!validationToken.isTokenValid(request)) {
+                throw new RuntimeException403("Token non valido");
+            }
+
+            String metaID = jwtTokenUtil.getMetaIdFromToken(validationToken.getToken());
+
+            if(meetingService.accediMeeting(metaID, id_meeting)){
+                 return ResponseEntity.ok(new Response<>(true,
+                         "Accesso avvenuto con successo"));
+            }else{
+                throw new ServerRuntimeException("Errore nell'accesso al meeting");
+            }
+        }catch (RuntimeException403 e) {
+            return ResponseEntity.status(403)
+                    .body(new Response<>(false, e.getMessage()));
+        } catch (ServerRuntimeException se) {
+            return ResponseEntity.status(500)
+                    .body(new Response<>(false, se.getMessage()));
+        }
+
     }
 }
 

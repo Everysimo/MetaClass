@@ -2,13 +2,19 @@ package com.commigo.metaclass.MetaClass.gestionemeeting.service;
 
 import com.commigo.metaclass.MetaClass.entity.Meeting;
 import com.commigo.metaclass.MetaClass.entity.Stanza;
+import com.commigo.metaclass.MetaClass.entity.Utente;
+import com.commigo.metaclass.MetaClass.entity.UtenteInMeeting;
 import com.commigo.metaclass.MetaClass.exceptions.RuntimeException403;
 import com.commigo.metaclass.MetaClass.exceptions.ServerRuntimeException;
+import com.commigo.metaclass.MetaClass.gestioneamministrazione.repository.CategoriaRepository;
 import com.commigo.metaclass.MetaClass.gestionemeeting.repository.MeetingRepository;
+import com.commigo.metaclass.MetaClass.gestionemeeting.repository.UtenteInMeetingRepository;
 import com.commigo.metaclass.MetaClass.gestionestanza.repository.StanzaRepository;
+import com.commigo.metaclass.MetaClass.gestioneutenza.repository.UtenteRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -21,6 +27,8 @@ public class GestioneMeetingServiceImpl implements GestioneMeetingService{
 
     private final MeetingRepository meetingRepository;
     private final StanzaRepository stanzaRepository;
+    private final UtenteRepository utenteRepository;
+    private final UtenteInMeetingRepository utenteInMeetingRepository;
 
 /**
 *
@@ -90,5 +98,36 @@ public class GestioneMeetingServiceImpl implements GestioneMeetingService{
     public Meeting saveMeeting(Meeting meeting)
     {
         return meetingRepository.save(meeting);
+    }
+
+/**
+*
+ * @param id_utente
+ * @param id_meeting
+ * @return
+ * @throws ServerRuntimeException
+ * @throws RuntimeException403
+*/
+    @Override
+    public Boolean accediMeeting(String metaID, Long id_meeting) throws ServerRuntimeException, RuntimeException403 {
+
+        Utente u;
+        Meeting m;
+        if((u =  utenteRepository.findFirstByMetaId(metaID))==null){
+            throw new RuntimeException403("utente non trovato");
+        }
+        if((m = meetingRepository.findMeetingById(id_meeting))==null){
+            throw new RuntimeException403("meeting non trovato");
+        }
+
+        //salvataggio dell'accesso al meeting
+        UtenteInMeeting uim = new UtenteInMeeting(u,m,true);
+        try{
+             utenteInMeetingRepository.save(uim);
+             return true;
+        }catch(DataIntegrityViolationException e){
+             throw new ServerRuntimeException("errore nel salvataggio dell'utente nel meeting");
+        }
+
     }
 }
