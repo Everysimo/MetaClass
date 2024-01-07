@@ -1,6 +1,6 @@
 // loginCheck.js
 const isLoggedIn = () => {
-    return localStorage.getItem('isLoggedIn') === 'true';
+    return sessionStorage.getItem('isLoggedIn') === 'true';
 };
 
 export default isLoggedIn;
