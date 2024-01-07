@@ -82,7 +82,8 @@ public class StatoPartecipazione implements Serializable {
     @UpdateTimestamp
     private LocalDateTime Data_Aggiornamento;
 
-    public StatoPartecipazione(Stanza stanza, Utente utente, Ruolo ruolo, boolean isInAttesa, boolean isBannato, String nomeInStanza) {
+    public StatoPartecipazione(Stanza stanza, Utente utente, Ruolo ruolo,
+                               boolean isInAttesa, boolean isBannato, String nomeInStanza) {
         this.stanza = stanza;
         this.utente = utente;
         this.ruolo = ruolo;
