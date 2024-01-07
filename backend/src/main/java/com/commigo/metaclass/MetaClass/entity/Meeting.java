@@ -55,6 +55,9 @@ public class Meeting {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
     private LocalDateTime fine;
 
+    @NotNull(message = "isAvviato non può essere nullo")
+    private boolean isAvviato;
+
     /**
      *Chiave Esterna sullo Scenario
      */
@@ -91,6 +94,8 @@ public class Meeting {
           this.nome = Nome;
           this.inizio = Inizio;
           this.fine = Fine;
+
+          this.isAvviato = false;
 
           this.stanza = new Stanza();
           this.stanza.setId(stanza);
