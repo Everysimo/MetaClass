@@ -23,8 +23,8 @@ export const Rts = () =>{
                 <Route path="/LoggedInHome" element={<LoggedInHome />}/>
                 <Route path="/Account" element={<Account/>} />
                 <Route path="/visualRoomList" element={<VisualRoomList/>} />
-                <Route path="/SingleRoom" element={<SingleRoom/>} />
-                <Route path="/modifyroom" element={<ModifyRoom/>}/>
+                <Route path="/SingleRoom/:id" element={<SingleRoom/>} />
+                <Route path="/modifyroom/:id" element={<ModifyRoom/>}/>
                 <Route path="/createroom" element={<CreateRoom/>}/>
                 <Route path="/accessManagement" element={<GestioneAccessi/>}/>
                 <Route path="/modifyscenario" element={<SelezionaScenario/>}/>

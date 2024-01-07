@@ -1,44 +1,87 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import {useNavigate} from "react-router-dom";
+import React, { Component } from 'react';
+import {Link} from "react-router-dom";
 
-const RoomList = () => {
-    const navigate = useNavigate();
-    const [data, setData] = useState([]);
+class RoomList extends Component {
 
+    constructor(props) {
+        super(props);
+        this.state = {
+            array: [],
+        };
+    }
 
+    componentDidMount() {
+        this.fetchElencoStanze();
+    }
 
-    useEffect(() => {
-        // Effettua la chiamata al backend quando il componente viene montato
-        axios.get('http://localhost:8080/visualizzaStanze')
-            .then(response => {
-                // Ricevi i dati dal backend e aggiorna lo stato
-                setData(response.data);
-            })
-            .catch(error => {
-                console.error('Errore nella chiamata al backend:', error);
+    fetchElencoStanze = async () => {
+
+        const requestOption = {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: 'Bearer ' + sessionStorage.getItem('token'),
+            },
+        };
+
+        try {
+            const response = await fetch('http://localhost:8080/visualizzaStanze', requestOption);
+
+            if (!response.ok) {
+                throw new Error('Errore nel recupero degli scenari.');
+            }
+
+            const data = await response.json();
+            console.log("eccoli i dati delle stanze:", data);
+
+            this.setState({ array: data.value });
+            console.log("nell'array:", this.state.array);
+
+            this.state.array.forEach((param, indice) => {
+                const nome = param.nome;
+                console.log(`nome ${indice + 1}: ${nome}`);
             });
-    }, []); // L'array vuoto come dipendenza assicura che la chiamata avvenga solo una volta all'avvio del componente
-
-    const handleGoToSingleRoom= () => {
-        // Naviga alla pagina di destinazione con il valore 42
-        navigate(`/SingleRoom`);
+        } catch (error) {
+            console.error('Errore durante il recupero degli scenari:', error.message);
+        }
     };
 
-    return (
-        <div>
-            <h1>Elenco Stanze</h1>
-            <ul>
-                {data.map(item => (
-                    <li key={item.id}>
-                        {item.nome} - {item.descrizione}
-                    </li>
-                ))}
-            </ul>
+    render() {
+        return (
+            <>
+                <div>
+                    <h1>Elenco Stanze</h1>
 
-            <button onClick={handleGoToSingleRoom}>vai alla pagina della stanza singola</button>
-        </div>
-    );
-};
+                    <button>
+                        <Link to="/SingleRoom" style={{textDecoration: 'none', color: 'inherit'}}>Vai alla pagina della
+                            stanza singola</Link>
+                    </button>
+
+
+                    <div style={{display: 'flex', flexDirection: 'row', flexWrap: 'wrap'}}>
+                        {this.state.array.map((room, index) => (
+                            <div key={index}
+                                 style={{
+                                     border: '1px solid #ccc',
+                                     padding: '10px',
+                                     margin: '10px',
+                                     width: '100%',
+                                 }}>
+                                <h3>Nome della Stanza: {room.nome}</h3>
+                                <p>ID: {room.id}</p>
+                                <p>Descrizione: {room.descrizione}</p>
+                                {/* inserisci gli altri dati di cui hai bisogno */}
+                                <button>
+                                    <Link to={`/SingleRoom/${room.id}`} style={{textDecoration: 'none', color: 'inherit'}}>Vai alla pagina della stanza</Link>
+                                </button>
+                            </div>
+                            ))}
+                    </div>
+
+                </div>
+            </>
+        );
+    }
+}
 
 export default RoomList;

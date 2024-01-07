@@ -1,9 +1,13 @@
+
 import React, { useState } from 'react';
 import { Divider } from "@chakra-ui/react";
 import "./MyModifyForm.css";
+import {useParams} from "react-router-dom";
 
 const MyModifyForm = () => {
-    const Id = localStorage.getItem('UserMetaID')
+
+    const { id: id_stanza } = useParams();
+    //si usa useParams per farsi passare il parametro
     const [state, setState] = useState({
         nome: "",
         descrizione: "",
@@ -11,14 +15,6 @@ const MyModifyForm = () => {
         maxPosti: '',
     });
 
-    const responseForm = (response) => {
-        setState({
-            nome: response.nome,
-            descrizione: response.descrizione,
-            tipoAccesso: response.tipoAccesso,
-            maxPosti: response.maxPosti,
-        });
-    };
 
     const handleNameChange = (e) => {
         setState({ ...state, nome: e.target.value });
@@ -45,11 +41,14 @@ const MyModifyForm = () => {
     const handleDeleteRoom = async () => {
         const requestOption = {
             method: 'POST',
-            headers: {'Content-Type': 'application/json' }
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + sessionStorage.getItem("token")
+            },
         };
 
         try {
-            const response = await fetch('http://localhost:8080/eliminaStanza', requestOption);
+            const response = await fetch(`http://localhost:8080/eliminaStanza/${id_stanza}`, requestOption);
             const responseData = await response.json();
             console.log("Risposta del server:", responseData);
         } catch (error) {
@@ -84,15 +83,17 @@ const MyModifyForm = () => {
 
         const requestOption = {
             method: 'POST',
-            headers: {'Content-Type': 'application/json'},
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + sessionStorage.getItem("token")
+            },
             body: JSON.stringify(dataToSend)
         };
 
         try {
-            console.log("id: 725841336137765 ->", Id);
             console.log("la stringa json:", JSON.stringify(dataToSend));
 
-            const response = await fetch(`http://localhost:8080/modifyRoomData/${1}`, requestOption);
+            const response = await fetch(`http://localhost:8080/modifyRoomData/${id_stanza}`, requestOption);
 
             const responseData = await response.json();
             console.log("Risposta dal server:", responseData);
@@ -105,7 +106,7 @@ const MyModifyForm = () => {
         <>
             <div className={'primary'}>
                 <div className={'left-label'}>
-                    <h4>Modifica i dati relativi ad una stanza:</h4>
+                    <h4>MODIFICA DATI RELATIVI AD UNA STANZA</h4>
                     <p className={'textp'}>Inserisci Nuovo Nome:</p>
                     <input
                         className={'input-field'}

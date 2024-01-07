@@ -2,9 +2,8 @@
 import React from 'react'
 import {MyHeader} from "../components/Header/Header";
 import {MyFooter} from "../components/Footer/Footer";
-import {RequestSection} from "../components/AccessRequest/RequestSection";
+import RequestSection from "../components/AccessRequest/RequestSection";
 import "../css/accessManagement.css";
-import MyCreateForm from "../components/CreateRoomForm/MyCreateForm";
 const GestioneAccessi = () => {
 
     return(
