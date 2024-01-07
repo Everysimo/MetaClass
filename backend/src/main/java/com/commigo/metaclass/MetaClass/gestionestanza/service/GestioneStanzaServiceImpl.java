@@ -295,9 +295,12 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService {
                 if(stato.getRuolo().getNome().equalsIgnoreCase(Ruolo.ORGANIZZATORE_MASTER) || stato.getRuolo().getNome().equalsIgnoreCase(Ruolo.ORGANIZZATORE) && !stato.isBannato()){
                     Scenario scenario = scenarioRepository.findScenarioById(idScenario);
                     if(scenario != null) {
-                        stanza.setScenario(scenario);
-                        stanzaRepository.updateAttributes(idStanza, stanza);
-                        return ResponseEntity.ok(new Response<>(true, "Lo scenario è stato modificato"));
+                        if(scenario != stanza.getScenario()) {
+                            stanzaRepository.updateAttributes(idScenario, stanza);
+                            return ResponseEntity.ok(new Response<>(true, "Lo scenario è stato modificato"));
+                        }else{
+                            return ResponseEntity.status(403).body(new Response<>(false, "Lo scenario selezionato è già in uso per la stanza"));
+                        }
                     }else{
                         return ResponseEntity.status(403).body(new Response<>(false, "Lo scenario selezionato non esiste"));
                     }
