@@ -2,7 +2,7 @@
 import React from 'react'
 import {MyHeader} from "../components/Header/Header";
 import {MyFooter} from "../components/Footer/Footer";
-import MyModifyForm from "../components/ModifyRoomForm/MyModifyForm";
+import MyModifyForm from "../components/Forms/ModifyRoomForm/MyModifyForm";
 
 export const ModifyRoom = () => {
 
