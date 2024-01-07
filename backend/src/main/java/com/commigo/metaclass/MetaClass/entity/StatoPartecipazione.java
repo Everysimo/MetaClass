@@ -1,5 +1,6 @@
 package com.commigo.metaclass.MetaClass.entity;
 
+import com.commigo.metaclass.MetaClass.utility.multipleid.StatoPartecipazioneId;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
@@ -16,8 +17,7 @@ import java.time.LocalDateTime;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
-@IdClass(value = StatoPartecipazione.class)
+@IdClass(StatoPartecipazioneId.class)
 public class StatoPartecipazione implements Serializable {
 
 

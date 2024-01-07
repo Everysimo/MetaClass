@@ -3,6 +3,7 @@ package com.commigo.metaclass.MetaClass.gestionestanza.service;
 import com.commigo.metaclass.MetaClass.entity.*;
 import com.commigo.metaclass.MetaClass.exceptions.RuntimeException401;
 import com.commigo.metaclass.MetaClass.exceptions.RuntimeException403;
+import com.commigo.metaclass.MetaClass.exceptions.ServerRuntimeException;
 import com.commigo.metaclass.MetaClass.gestioneamministrazione.repository.ScenarioRepository;
 import com.commigo.metaclass.MetaClass.gestionestanza.repository.RuoloRepository;
 import com.commigo.metaclass.MetaClass.gestionestanza.repository.StanzaRepository;
@@ -86,8 +87,11 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService {
     }
 
     @Override
-    public boolean creaStanza(Stanza s)
-    {
+    public boolean creaStanza(Stanza s) throws ServerRuntimeException {
+        String metaID = jwtTokenUtil.getMetaIdFromToken(validationToken.getToken());
+
+        if(metaID==null)      throw new ServerRuntimeException("errore col metaID");
+
         Stanza stanza = stanzaRepository.findStanzaByCodice(s.getCodice());
         if(stanza == null){
 
@@ -98,6 +102,15 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService {
              else return false;
 
              stanzaRepository.save(s);
+             Utente u = utenteRepository.findFirstByMetaId(metaID);
+             if(u==null)  throw new ServerRuntimeException("Utente non trovato");
+
+             StatoPartecipazione sp = new StatoPartecipazione(s,u,
+                     ruoloRepository.findByNome("Organizzatore_Master"),
+                     false, false,u.getNome());
+
+             statoPartecipazioneRepository.save(sp);
+
              return true;
         }
         return false;
