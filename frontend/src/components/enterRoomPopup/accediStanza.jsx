@@ -4,14 +4,14 @@ import {wait} from "@testing-library/user-event/dist/utils";
 export default class AccediStanza extends Component{
     //stato di partenza dei parametri
     state = {
-        codiceStanza: "",
+        codice: "",
         //tipoAccesso: false,
         isVisible: true,
     };
     //funzione similar costruttore per settare i valori
     responseForm = response => {
         this.setState({
-            codiceStanza: response.codiceStanza,
+            codice: response.codice,
             //tipoAccesso: response.tipoAccesso,
             isVisible: response.isVisible,
         });
@@ -19,7 +19,7 @@ export default class AccediStanza extends Component{
 //le varie handle richiamate quando passo i valori nelle input form
 
     handleCodeChange = (e) => {
-        this.setState({codiceStanza: e.target.value})
+        this.setState({codice: e.target.value})
     };
 
     /*handleOptionChange = (e) => {
@@ -27,20 +27,20 @@ export default class AccediStanza extends Component{
     };*/
 
     //simposta invibile il div
-     handleClose = () => {
+    handleClose = () => {
         // Nascondi la card impostando isVisible su false
-         this.setState({isVisible: false});
+        this.setState({isVisible: false});
     };
-     handleClear = () => {
-        this.setState({codiceStanza: ('')});
+    handleClear = () => {
+        this.setState({codice: ('')});
     };
 
     /*funzione per inviare i parametri a crea stanza*/
 
     sendDataToServer = async() =>{
-        const {codiceStanza/*, tipoAccesso*/} = this.state;
+        const {codice/*, tipoAccesso*/} = this.state;
         const dataToSend = {
-            codiceStanza,
+            codice,
             //tipoAccesso,
 
         };
@@ -66,7 +66,7 @@ export default class AccediStanza extends Component{
     }
 
     callFunction = () => {
-        if (this.state.codiceStanza.length !== 6) {
+        if (this.state.codice.length !== 6) {
             this.setState({
                 isErrorPopupVisible: true,
                 errorMessage: "Il codice stanza deve essere di 6 cifre",
@@ -101,19 +101,19 @@ export default class AccediStanza extends Component{
                     <button className="close-button" onClick={this.handleClose}>
                         X
                     </button>
-                <div className="card-content">
-                    <label>
-                        insert room code:
-                        <input
-                            type="number"
-                            placeholder={'Codice di 6 cifre'}
-                            value={this.state.codiceStanza}
-                            onChange={this.handleCodeChange}
-                            maxLength={6}
-                            minLength={6}
-                            min={0}
-                        />
-                    </label>
+                    <div className="card-content">
+                        <label>
+                            insert room code:
+                            <input
+                                type="number"
+                                placeholder={'Codice di 6 cifre'}
+                                value={this.state.codice}
+                                onChange={this.handleCodeChange}
+                                maxLength={6}
+                                minLength={6}
+                                min={0}
+                            />
+                        </label>
                         <div className="button-container">
                             <button onClick={this.handleClear}>Cancella</button>
                             <button onClick={() =>  this.callFunction()}>Invia</button>
