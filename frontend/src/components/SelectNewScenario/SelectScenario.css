@@ -1,0 +1,28 @@
+
+/* ScenarioPage.css */
+
+.card {
+    display: inline-block;
+    margin: 10px;
+    padding: 10px;
+    border: 1px solid #ccc;
+}
+
+.Modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 60%; /* Imposta la larghezza desiderata */
+    max-width: 400px; /* Imposta la larghezza massima se necessario */
+    margin: auto;
+
+
+}
+
+.modal-box{
+
+    background-color: #c70049;
+    border: 2px solid #002f53;
+    border-radius: 15%;
+}

@@ -1,13 +1,17 @@
 package com.commigo.metaclass.MetaClass.entity;
 
+import com.commigo.metaclass.MetaClass.exceptions.DataFormatException;
+import com.commigo.metaclass.MetaClass.gestionemeeting.repository.MeetingRepository;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.LocalDateTime;
 
@@ -15,8 +19,8 @@ import java.time.LocalDateTime;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class Meeting {
-
     /**
      * Costante per valore intero di 254.
      */
@@ -73,23 +77,24 @@ public class Meeting {
         return inizio == null || fine == null || inizio.isBefore(fine);
     }
 
-    @JsonCreator
+    @JsonCreator(mode = JsonCreator.Mode.DEFAULT)
     public Meeting(@JsonProperty("nome") String Nome,
                    @JsonProperty("inizio") LocalDateTime Inizio,
-                   @JsonProperty("fine")  LocalDateTime Fine,
-                   @JsonProperty("id_stanza") Long stanza){
+                   @JsonProperty("fine") LocalDateTime Fine,
+                   @JsonProperty("id_stanza") Long stanza,
+                   @JsonProperty("id_meeting") Long meeting) {
 
-        this.nome = Nome;
 
-        this.inizio = Inizio;
-        this.fine = Fine;
+          if (meeting != null) {
+              this.id = meeting;
+          }
+          this.nome = Nome;
+          this.inizio = Inizio;
+          this.fine = Fine;
 
-        this.stanza = new Stanza();
-        this.stanza.setId(stanza);
+          this.stanza = new Stanza();
+          this.stanza.setId(stanza);
 
-        this.scenario_iniziale = new Scenario();
-
+          this.scenario_iniziale = new Scenario();
     }
-
-
 }

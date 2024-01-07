@@ -7,4 +7,5 @@ import org.springframework.stereotype.Repository;
 @Repository("ScenarioRepository")
 public interface ScenarioRepository extends JpaRepository<Scenario, Long> {
      Scenario findByNome(String nome);
+     Scenario findScenarioById(Long id);
 }

@@ -1,10 +1,15 @@
 package com.commigo.metaclass.MetaClass.gestionemeeting.controller;
 
 import com.commigo.metaclass.MetaClass.entity.Meeting;
+import com.commigo.metaclass.MetaClass.exceptions.RuntimeException403;
+import com.commigo.metaclass.MetaClass.exceptions.ServerRuntimeException;
 import com.commigo.metaclass.MetaClass.gestionemeeting.service.GestioneMeetingService;
 import com.commigo.metaclass.MetaClass.utility.request.RequestUtils;
 import com.commigo.metaclass.MetaClass.utility.response.ResponseUtils;
 import com.commigo.metaclass.MetaClass.utility.response.types.Response;
+import com.commigo.metaclass.MetaClass.webconfig.JwtTokenUtil;
+import com.commigo.metaclass.MetaClass.webconfig.ValidationToken;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -22,6 +27,9 @@ public class GestioneMeetingController {
     @Autowired
     @Qualifier("GestioneMeetingService")
     private GestioneMeetingService meetingService;
+
+    @Autowired
+    private ValidationToken validationToken;
 
     @PostMapping(value = "/meetingStatus/{id}")
     public ResponseEntity<Response<Boolean>> meetingStatus(@RequestBody String action, @PathVariable("id") Long idMeeting)
@@ -65,7 +73,7 @@ public class GestioneMeetingController {
             //controlla se i parametri passati al meeting sono corretti
             if(result.hasErrors())
             {
-                return ResponseUtils.getResponseError(HttpStatus.INTERNAL_SERVER_ERROR, RequestUtils.errorsRequest(result));
+                return ResponseUtils.getResponseError(HttpStatus.INTERNAL_SERVER_ERROR,RequestUtils.errorsRequest(result));
             }
 
             if (!meetingService.creaScheduling(m)) {
@@ -77,6 +85,38 @@ public class GestioneMeetingController {
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(new Response<>(false, "Errore durante la schedulazione del meeting: " + e.getMessage()));
+        }
+    }
+
+    @PostMapping(value = "/modificaScheduling")
+    public ResponseEntity<Response<Boolean>> modificaScheduling
+            (@Valid @RequestBody Meeting m, BindingResult result, HttpServletRequest request) {
+
+        try {
+            //controllo token
+            if (!validationToken.isTokenValid(request)) {
+                throw new RuntimeException403("Token non valido");
+            }
+
+            //controllo errori di validazione
+            if(result.hasErrors())
+            {
+                return ResponseEntity.status(403)
+                        .body(new Response<>(false, RequestUtils.errorsRequest(result)));
+            }
+
+            if (!meetingService.modificaScheduling(m)) {
+                throw new ServerRuntimeException("modifica non effettuata");
+            } else {
+                return ResponseEntity.ok(new Response<>(true, "Meeting schedulato con successo"));
+            }
+
+        } catch (RuntimeException403 e) {
+            return ResponseEntity.status(403)
+                    .body(new Response<>(false, e.getMessage()));
+        } catch (ServerRuntimeException se) {
+            return ResponseEntity.status(500)
+                    .body(new Response<>(false, se.getMessage()));
         }
     }
 }

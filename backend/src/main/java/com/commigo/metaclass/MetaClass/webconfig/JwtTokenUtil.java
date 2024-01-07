@@ -1,4 +1,5 @@
 package com.commigo.metaclass.MetaClass.webconfig;
+import com.commigo.metaclass.MetaClass.gestioneutenza.repository.UtenteRepository;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;

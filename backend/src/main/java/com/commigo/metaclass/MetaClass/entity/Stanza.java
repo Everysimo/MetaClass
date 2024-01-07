@@ -1,7 +1,11 @@
 package com.commigo.metaclass.MetaClass.entity;
 
+import com.commigo.metaclass.MetaClass.exceptions.DataFormatException;
+import com.commigo.metaclass.MetaClass.exceptions.MismatchJsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.exc.MismatchedInputException;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
@@ -44,7 +48,7 @@ public class Stanza {
     @Size(min = 1,
             max = MAX_NAME_LENGTH,
             message = "Lunghezza nome errata")
-    @Pattern(regexp="^[A-Z][a-zA-Z0-9]*$",
+    @Pattern(regexp="^[A-Z][a-zA-Z0-9\\s]*$",
             message="Formato nome errato")
     @NotBlank(message = "Il nome non può essere vuoto")
     private String nome;
@@ -88,7 +92,7 @@ public class Stanza {
     @NotNull(message = "Il numero massimo di posti non può essere nullo")
     @Min(value = 1, message = "Il valore del  parametro non deve essere inferiore ad 1")
     @Max(value = 999, message = "Il valore del  parametro non deve superare 999")
-    @NotBlank(message = "Il numero massimo dei posti non può essere vuota")
+   // @NotBlank(message = "Il numero massimo dei posti non può essere vuota")
     private int max_Posti;
 
     /**
@@ -106,19 +110,26 @@ public class Stanza {
     @Column(name = "Data_Aggiornamento")
     @UpdateTimestamp
     private LocalDateTime data_Aggiornamento;
-
     @JsonCreator
     public Stanza(@JsonProperty("nome") String nome,
                   @JsonProperty("codiceStanza") String codiceStanza,
                   @JsonProperty("descrizione") String descrizione,
                   @JsonProperty("tipoAccesso") boolean tipoAccesso,
-                  @JsonProperty("maxPosti") int maxPosti)
+                  @JsonProperty("maxPosti") int maxPosti,
+                  @JsonProperty("id_scenario") Long id_scenario) throws MismatchJsonProperty {
 
-    {
+        if (nome == null || codiceStanza == null || descrizione == null || id_scenario == null) {
+            throw new MismatchJsonProperty("gli attributi non sono corretti");
+        }
+
         this.nome = nome;
         this.codice = codiceStanza;
         this.descrizione = descrizione;
         this.tipo_Accesso = tipoAccesso;
-        this.max_Posti = maxPosti;
+        this.max_Posti = (maxPosti > 0)? maxPosti:1;
+
+        //aggiunta dello scenario
+        this.scenario = new Scenario();
+        this.scenario.setId(id_scenario);
     }
 }

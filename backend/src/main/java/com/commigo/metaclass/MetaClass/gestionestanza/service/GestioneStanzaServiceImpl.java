@@ -1,9 +1,10 @@
 package com.commigo.metaclass.MetaClass.gestionestanza.service;
 
-import com.commigo.metaclass.MetaClass.entity.Ruolo;
-import com.commigo.metaclass.MetaClass.entity.Stanza;
-import com.commigo.metaclass.MetaClass.entity.StatoPartecipazione;
-import com.commigo.metaclass.MetaClass.entity.Utente;
+import com.commigo.metaclass.MetaClass.entity.*;
+import com.commigo.metaclass.MetaClass.exceptions.RuntimeException401;
+import com.commigo.metaclass.MetaClass.exceptions.RuntimeException403;
+import com.commigo.metaclass.MetaClass.exceptions.ServerRuntimeException;
+import com.commigo.metaclass.MetaClass.gestioneamministrazione.repository.ScenarioRepository;
 import com.commigo.metaclass.MetaClass.gestionestanza.repository.RuoloRepository;
 import com.commigo.metaclass.MetaClass.gestionestanza.repository.StanzaRepository;
 import com.commigo.metaclass.MetaClass.gestionestanza.repository.StatoPartecipazioneRepository;
@@ -12,8 +13,11 @@ import com.commigo.metaclass.MetaClass.utility.Validator;
 import com.commigo.metaclass.MetaClass.utility.response.ResponseUtils;
 import com.commigo.metaclass.MetaClass.utility.response.types.AccessResponse;
 import com.commigo.metaclass.MetaClass.utility.response.types.Response;
+import com.commigo.metaclass.MetaClass.webconfig.JwtTokenUtil;
+import com.commigo.metaclass.MetaClass.webconfig.ValidationToken;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -30,6 +34,13 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService {
     private final RuoloRepository ruoloRepository;
     private final StanzaRepository stanzaRepository;
     private final UtenteRepository utenteRepository;
+    private final ScenarioRepository scenarioRepository;
+
+    @Autowired
+    private ValidationToken validationToken;
+
+    @Autowired
+    private JwtTokenUtil jwtTokenUtil;
 
     @Override
     public ResponseEntity<AccessResponse<Boolean>> accessoStanza(String codiceStanza, String id_utente) {
@@ -76,16 +87,33 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService {
     }
 
     @Override
-    public Stanza creaStanza(String nome, String Codice_Stanza, String Descrizione, boolean Tipo_Accesso, int MAX_Posti)
-    {
-        Stanza stanza = null;
-        boolean isValid = Validator.isValid(nome) && Validator.isValid(Codice_Stanza) && Validator.isValid(Descrizione)
-                && Validator.isValid(MAX_Posti);
-        if(!isValid) return stanza;
+    public boolean creaStanza(Stanza s) throws ServerRuntimeException {
+        String metaID = jwtTokenUtil.getMetaIdFromToken(validationToken.getToken());
 
-        stanza = new Stanza(nome, Codice_Stanza, Descrizione, Tipo_Accesso, MAX_Posti);
-        stanzaRepository.save(stanza);
-        return stanza;
+        if(metaID==null)      throw new ServerRuntimeException("errore col metaID");
+
+        Stanza stanza = stanzaRepository.findStanzaByCodice(s.getCodice());
+        if(stanza == null){
+
+             //settaggio scenario
+             Scenario sc = scenarioRepository.findScenarioById(s.getScenario().getId());
+             if(sc != null)
+                  s.setScenario(sc);
+             else return false;
+
+             stanzaRepository.save(s);
+             Utente u = utenteRepository.findFirstByMetaId(metaID);
+             if(u==null)  throw new ServerRuntimeException("Utente non trovato");
+
+             StatoPartecipazione sp = new StatoPartecipazione(s,u,
+                     ruoloRepository.findByNome("Organizzatore_Master"),
+                     false, false,u.getNome());
+
+             statoPartecipazioneRepository.save(sp);
+
+             return true;
+        }
+        return false;
     }
 
 
@@ -119,16 +147,16 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService {
     }
 
     @Override
-    public Response<Boolean> deleteRoom(String id_Uogm, Long id_stanza){
+    public Response<Boolean> deleteRoom(String metaID, Long id_stanza){
 
-        Utente ogm = utenteRepository.findFirstByMetaId(id_Uogm);
+        Utente ogm = utenteRepository.findFirstByMetaId(metaID);
         Stanza stanza = stanzaRepository.findStanzaById(id_stanza);
         if(stanza == null) {
             return ResponseUtils.getResponseError(HttpStatus.INTERNAL_SERVER_ERROR,"La stanza selezionata non esiste").getBody();
         }
 
         StatoPartecipazione stato_ogm = statoPartecipazioneRepository.findStatoPartecipazioneByUtenteAndStanza(ogm, stanza);
-        if(stato_ogm.getRuolo().getNome().equalsIgnoreCase(Ruolo.ORGANIZZATORE_MASTER)){
+        if(stato_ogm.getRuolo().getNome().equalsIgnoreCase(Ruolo.ORGANIZZATORE_MASTER) || ogm.isAdmin()){
             stanzaRepository.delete(stanza);
             return ResponseEntity.ok(new Response<>(true, "Stanza eliminata con successo")).getBody();
         }else{
@@ -137,34 +165,27 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService {
     }
 
     @Override
-    public Response<Boolean> modificaDatiStanza(String id, Long Id, Map<String, Object> dataMap, Stanza stanza) {
+    public Boolean modificaDatiStanza(Stanza s, Long id) throws RuntimeException403, RuntimeException401 {
 
-        try {
-            Utente ogm = utenteRepository.findFirstByMetaId(id);
-            stanza = stanzaRepository.findStanzaById(Id);
+            //controllo del ruolo di ogm
+            String metaID = jwtTokenUtil.getMetaIdFromToken(validationToken.getToken());
+            Utente ogm = utenteRepository.findFirstByMetaId(metaID);
+            Stanza existingStanza = stanzaRepository.findStanzaById(id);
 
-            StatoPartecipazione statoutente = statoPartecipazioneRepository.findStatoPartecipazioneByUtenteAndStanza(ogm, stanza);
-            if(statoutente.getRuolo().getNome().equalsIgnoreCase(Ruolo.ORGANIZZATORE_MASTER) || statoutente.getRuolo().getNome().equalsIgnoreCase(Ruolo.ORGANIZZATORE)){
-
-                Stanza existingStanza = stanzaRepository.findStanzaById(Id);
-                if(existingStanza == null) {
-                    return ResponseEntity.status(403).body(new Response<>(false, "La stanza non esiste")).getBody();
-                }else{
-                    if(stanzaRepository.updateAttributes(Id, dataMap)>0){
-                        stanza = stanzaRepository.findStanzaById(Id);
-                        return ResponseEntity.ok(new Response<>(true, "modifica effettuata con successo")).getBody();
-                    }else{
-                        stanza = existingStanza;
-                        return ResponseEntity.ok(new Response<>(true, "nessuna modifica effettuata")).getBody();
-                    }
-                }
-            }else{
-                return ResponseEntity.status(403).body(new Response<>(false, "Non puoi effettuare modifiche sulla stanza se non sei almeno un organizzatore")).getBody();
+            if(existingStanza == null) {
+                throw new RuntimeException403("La stanza non esiste");
             }
 
-        }catch (Exception e) {
-            return ResponseEntity.status(403).body(new Response<>(false, "errore nella modifica dei dati")).getBody();
-        }
+            StatoPartecipazione statoutente = statoPartecipazioneRepository.
+                            findStatoPartecipazioneByUtenteAndStanza(ogm, existingStanza);
+
+            if(statoutente==null) throw new RuntimeException403("Non hai acceduto alla stanza");
+
+            if(!statoutente.getRuolo().getNome().equalsIgnoreCase(Ruolo.PARTECIPANTE)){
+                return stanzaRepository.updateAttributes(id, s)>0;
+            }else{
+                throw new RuntimeException401("devi essere almeno un organizzatore");
+            }
     }
 
     @Override
@@ -253,8 +274,67 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService {
 
 
     @Override
-    public List<Utente> visualizzaStanza(Long Id) {
-        return statoPartecipazioneRepository.findUtentiInStanza(Id);
+    public ResponseEntity<Response<List<Utente>>> visualizzaUtentiInStanza(Long Id) {
+
+        Stanza stanza = stanzaRepository.findStanzaById(Id);
+
+        if(stanza != null){
+            List<Utente> utenti = statoPartecipazioneRepository.findUtentiInStanza(Id);
+            if(utenti != null){
+                return ResponseEntity.ok(new Response<>
+                        (utenti, "operazione effettuata con successo"));
+            }else{
+                return ResponseEntity.ok(new Response<>(null, "Non sono presenti utenti all'interno della stanza"));
+            }
+        }else{
+            return ResponseEntity.status(403).body(new Response<>(null, "La stanza selezionata non esiste"));
+        }
+
+}
+
+    @Override
+    public Scenario visualizzaScenarioStanza(Stanza stanza) {
+        return stanza.getScenario();
+    }
+
+    @Override
+    public ResponseEntity<Response<Boolean>> modificaScenario(String metaID, Long idScenario, Long idStanza) {
+        Utente u = utenteRepository.findFirstByMetaId(metaID);
+        Stanza stanza = stanzaRepository.findStanzaById(idStanza);
+
+        if(stanza != null){
+            StatoPartecipazione stato = statoPartecipazioneRepository.findStatoPartecipazioneByUtenteAndStanza(u, stanza);
+            if(stato != null){
+                if(stato.getRuolo().getNome().equalsIgnoreCase(Ruolo.ORGANIZZATORE_MASTER) || stato.getRuolo().getNome().equalsIgnoreCase(Ruolo.ORGANIZZATORE) && !stato.isBannato()){
+                    Scenario scenario = scenarioRepository.findScenarioById(idScenario);
+                    if(scenario != null) {
+                        stanza.setScenario(scenario);
+                        stanzaRepository.updateAttributes(idStanza, stanza);
+                        return ResponseEntity.ok(new Response<>(true, "Lo scenario è stato modificato"));
+                    }else{
+                        return ResponseEntity.status(403).body(new Response<>(false, "Lo scenario selezionato non esiste"));
+                    }
+                }else{
+                    return ResponseEntity.status(403).body(new Response<>(false, "Non puoi modificare lo scenario se non sei almeno un organizzatore"));
+                }
+            }else{
+                return ResponseEntity.status(403).body(new Response<>(false, "Non sei all'interno della stanza, non puoi modificare lo scenario"));
+            }
+
+        }else{
+            return ResponseEntity.status(403).body(new Response<>(false, "La stanza selezionata non esiste"));
+        }
+
+    }
+
+/**
+*
+ * @param Id
+ * @return
+*/
+    @Override
+    public Stanza visualizzaStanza(Long Id) {
+        return stanzaRepository.findStanzaById(Id);
     }
 
     public Ruolo getRuolo(String nome){
@@ -267,5 +347,9 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService {
             ruoloRepository.save(ruolo);
         }
         return ruolo;
+    }
+
+    public List<Scenario> getAllScenari(){
+        return scenarioRepository.findAll();
     }
 }

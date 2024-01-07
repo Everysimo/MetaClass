@@ -45,7 +45,7 @@ const MyModifyForm = () => {
     const handleDeleteRoom = async () => {
         const requestOption = {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' }
+            headers: {'Content-Type': 'application/json' }
         };
 
         try {
@@ -92,7 +92,7 @@ const MyModifyForm = () => {
             console.log("id: 725841336137765 ->", Id);
             console.log("la stringa json:", JSON.stringify(dataToSend));
 
-            const response = await fetch(`http://localhost:8080/modifyRoomData/${Id}`, requestOption);
+            const response = await fetch(`http://localhost:8080/modifyRoomData/${1}`, requestOption);
 
             const responseData = await response.json();
             console.log("Risposta dal server:", responseData);

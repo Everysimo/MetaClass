@@ -30,18 +30,10 @@ public class Ruolo {
 
 
     @NotNull(message = "Il nome non può essere nullo")
-    @Column
+    @Column(unique = true)
     @Size(min = MIN_NAME_LENGTH, max = MAX_NAME_LENGTH, message = "Lunghezza del nome non valida")
-    @NotBlank
+    @NotBlank(message = "il nome non può essere vuoto")
     private String nome;
-
-    @Column(name = "Data_Creazione", updatable = false)
-    @CreationTimestamp
-    private LocalDateTime data_creazione;
-
-    @Column(name = "Data_Aggiornamento")
-    @UpdateTimestamp
-    private LocalDateTime data_aggiornamento;
 
     public Ruolo(String nome) {
         this.nome = nome;

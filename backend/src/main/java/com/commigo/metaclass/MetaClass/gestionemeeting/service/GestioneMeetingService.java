@@ -1,12 +1,14 @@
 package com.commigo.metaclass.MetaClass.gestionemeeting.service;
 
 import com.commigo.metaclass.MetaClass.entity.Meeting;
+import com.commigo.metaclass.MetaClass.exceptions.RuntimeException403;
+import com.commigo.metaclass.MetaClass.exceptions.ServerRuntimeException;
 
 import java.util.Optional;
 
 public interface GestioneMeetingService {
-    boolean creaScheduling(Meeting meeting);
+    public boolean creaScheduling(Meeting meeting);
+    public boolean modificaScheduling(Meeting meeting) throws ServerRuntimeException, RuntimeException403;;
     Meeting findMeetingById(Long id);
-
     Meeting saveMeeting(Meeting meeting);
 }
