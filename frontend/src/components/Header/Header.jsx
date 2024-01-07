@@ -1,7 +1,7 @@
 import './header.css';
 import '../../css/MyApp.css'
 import Comm from '../../img/commigo.png';
-import BurgerButton, {MyMenu} from "../BurgerButton/menu-button";
+import BurgerButton, {MyMenu} from "./BurgerButton/menu-button";
 import React from 'react';
 export function MyHeader(){
     return(

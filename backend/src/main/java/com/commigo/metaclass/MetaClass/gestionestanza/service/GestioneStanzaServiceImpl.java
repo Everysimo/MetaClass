@@ -3,6 +3,7 @@ package com.commigo.metaclass.MetaClass.gestionestanza.service;
 import com.commigo.metaclass.MetaClass.entity.*;
 import com.commigo.metaclass.MetaClass.exceptions.RuntimeException401;
 import com.commigo.metaclass.MetaClass.exceptions.RuntimeException403;
+import com.commigo.metaclass.MetaClass.exceptions.ServerRuntimeException;
 import com.commigo.metaclass.MetaClass.gestioneamministrazione.repository.ScenarioRepository;
 import com.commigo.metaclass.MetaClass.gestionestanza.repository.RuoloRepository;
 import com.commigo.metaclass.MetaClass.gestionestanza.repository.StanzaRepository;
@@ -86,8 +87,11 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService {
     }
 
     @Override
-    public boolean creaStanza(Stanza s)
-    {
+    public boolean creaStanza(Stanza s) throws ServerRuntimeException {
+        String metaID = jwtTokenUtil.getMetaIdFromToken(validationToken.getToken());
+
+        if(metaID==null)      throw new ServerRuntimeException("errore col metaID");
+
         Stanza stanza = stanzaRepository.findStanzaByCodice(s.getCodice());
         if(stanza == null){
 
@@ -98,6 +102,15 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService {
              else return false;
 
              stanzaRepository.save(s);
+             Utente u = utenteRepository.findFirstByMetaId(metaID);
+             if(u==null)  throw new ServerRuntimeException("Utente non trovato");
+
+             StatoPartecipazione sp = new StatoPartecipazione(s,u,
+                     ruoloRepository.findByNome("Organizzatore_Master"),
+                     false, false,u.getNome());
+
+             statoPartecipazioneRepository.save(sp);
+
              return true;
         }
         return false;
@@ -261,8 +274,60 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService {
 
 
     @Override
-    public List<Utente> visualizzaUtentiInStanza(Long Id) {
-        return statoPartecipazioneRepository.findUtentiInStanza(Id);
+    public ResponseEntity<Response<List<Utente>>> visualizzaUtentiInStanza(Long Id) {
+
+        Stanza stanza = stanzaRepository.findStanzaById(Id);
+
+        if(stanza != null){
+            List<Utente> utenti = statoPartecipazioneRepository.findUtentiInStanza(Id);
+            if(utenti != null){
+                return ResponseEntity.ok(new Response<>
+                        (utenti, "operazione effettuata con successo"));
+            }else{
+                return ResponseEntity.ok(new Response<>(null, "Non sono presenti utenti all'interno della stanza"));
+            }
+        }else{
+            return ResponseEntity.status(403).body(new Response<>(null, "La stanza selezionata non esiste"));
+        }
+
+}
+
+    @Override
+    public Scenario visualizzaScenarioStanza(Stanza stanza) {
+        return stanza.getScenario();
+    }
+
+    @Override
+    public ResponseEntity<Response<Boolean>> modificaScenario(String metaID, Long idScenario, Long idStanza) {
+        Utente u = utenteRepository.findFirstByMetaId(metaID);
+        Stanza stanza = stanzaRepository.findStanzaById(idStanza);
+
+        if(stanza != null){
+            StatoPartecipazione stato = statoPartecipazioneRepository.findStatoPartecipazioneByUtenteAndStanza(u, stanza);
+            if(stato != null){
+                if(stato.getRuolo().getNome().equalsIgnoreCase(Ruolo.ORGANIZZATORE_MASTER) || stato.getRuolo().getNome().equalsIgnoreCase(Ruolo.ORGANIZZATORE) && !stato.isBannato()){
+                    Scenario scenario = scenarioRepository.findScenarioById(idScenario);
+                    if(scenario != null) {
+                        if(scenario != stanza.getScenario()) {
+                            stanzaRepository.updateAttributes(idScenario, stanza);
+                            return ResponseEntity.ok(new Response<>(true, "Lo scenario è stato modificato"));
+                        }else{
+                            return ResponseEntity.status(403).body(new Response<>(false, "Lo scenario selezionato è già in uso per la stanza"));
+                        }
+                    }else{
+                        return ResponseEntity.status(403).body(new Response<>(false, "Lo scenario selezionato non esiste"));
+                    }
+                }else{
+                    return ResponseEntity.status(403).body(new Response<>(false, "Non puoi modificare lo scenario se non sei almeno un organizzatore"));
+                }
+            }else{
+                return ResponseEntity.status(403).body(new Response<>(false, "Non sei all'interno della stanza, non puoi modificare lo scenario"));
+            }
+
+        }else{
+            return ResponseEntity.status(403).body(new Response<>(false, "La stanza selezionata non esiste"));
+        }
+
     }
 
 /**

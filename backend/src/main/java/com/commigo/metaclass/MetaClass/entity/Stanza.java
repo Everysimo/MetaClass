@@ -1,8 +1,11 @@
 package com.commigo.metaclass.MetaClass.entity;
 
+import com.commigo.metaclass.MetaClass.exceptions.DataFormatException;
+import com.commigo.metaclass.MetaClass.exceptions.MismatchJsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.exc.MismatchedInputException;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
@@ -18,7 +21,6 @@ import java.time.LocalDateTime;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@JsonInclude(JsonInclude.Include.NON_NULL)
 public class Stanza {
 
     /**
@@ -46,7 +48,7 @@ public class Stanza {
     @Size(min = 1,
             max = MAX_NAME_LENGTH,
             message = "Lunghezza nome errata")
-    @Pattern(regexp="^[A-Z][a-zA-Z0-9]*$",
+    @Pattern(regexp="^[A-Z][a-zA-Z0-9\\s]*$",
             message="Formato nome errato")
     @NotBlank(message = "Il nome non può essere vuoto")
     private String nome;
@@ -108,16 +110,18 @@ public class Stanza {
     @Column(name = "Data_Aggiornamento")
     @UpdateTimestamp
     private LocalDateTime data_Aggiornamento;
-
-    @JsonCreator(mode = JsonCreator.Mode.DEFAULT)
+    @JsonCreator
     public Stanza(@JsonProperty("nome") String nome,
                   @JsonProperty("codiceStanza") String codiceStanza,
                   @JsonProperty("descrizione") String descrizione,
                   @JsonProperty("tipoAccesso") boolean tipoAccesso,
                   @JsonProperty("maxPosti") int maxPosti,
-                  @JsonProperty("id_scenario") Long id_scenario)
+                  @JsonProperty("id_scenario") Long id_scenario) throws MismatchJsonProperty {
 
-    {
+        if (nome == null || codiceStanza == null || descrizione == null || id_scenario == null) {
+            throw new MismatchJsonProperty("gli attributi non sono corretti");
+        }
+
         this.nome = nome;
         this.codice = codiceStanza;
         this.descrizione = descrizione;
