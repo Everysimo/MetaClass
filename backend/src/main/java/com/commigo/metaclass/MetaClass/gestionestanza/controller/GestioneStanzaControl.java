@@ -48,7 +48,7 @@ public class GestioneStanzaControl {
 
 
     @PostMapping(value = "/creastanza")
-    public ResponseEntity<Response<Boolean>> creaStanza(@RequestBody Stanza s,
+    public ResponseEntity<Response<Boolean>> creaStanza(@Valid @RequestBody Stanza s,
                                                         BindingResult result,
                                                         HttpServletRequest request){
 
@@ -59,9 +59,8 @@ public class GestioneStanzaControl {
                 throw new RuntimeException403("Token non valido");
             }
 
-            if(result.hasErrors())
-            {
-                return ResponseUtils.getResponseError(HttpStatus.INTERNAL_SERVER_ERROR, RequestUtils.errorsRequest(result));
+            if(result.hasErrors()) {
+                throw new RuntimeException403(RequestUtils.errorsRequest(result));
             }
 
             if(!stanzaService.creaStanza(s)){
@@ -70,8 +69,7 @@ public class GestioneStanzaControl {
             return ResponseUtils.getResponseOk("Corretto");
 
 
-        }catch (ServerRuntimeException e)
-        {
+        }catch (ServerRuntimeException e) {
             return ResponseUtils.getResponseError(HttpStatus.INTERNAL_SERVER_ERROR,"Errore durante la richiesta: " + e.getMessage());
         }catch(RuntimeException403 se){
             return ResponseUtils.getResponseError(HttpStatus.valueOf(403),
