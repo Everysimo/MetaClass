@@ -26,15 +26,25 @@ export const Account = () => {
     }, []);
 
     return (
-        <div className={"table-container"}>
-            {userDetails && (
-                <div className={"user-details"}>
-                    <p><strong>Name:</strong> {userDetails.name}</p>
-                    <p><strong>Email:</strong> {userDetails.email}</p>
-                    {/* Include other details as needed */}
+        <>
+            <header>
+                <MyHeader />
+            </header>
+            <section className={"sec"}>
+                <div className={"table-container"}>
+                    {userDetails && (
+                        <div className={"user-details"}>
+                            <p><strong>Name:</strong> {userDetails.name}</p>
+                            <p><strong>Email:</strong> {userDetails.email}</p>
+                            {/* Include other details as needed */}
+                        </div>
+                    )}
+                    <LogoutButton/>
                 </div>
-            )}
-            <LogoutButton/>
-        </div>
+                </section>
+            <footer>
+                <MyFooter />
+            </footer>
+        </>
     );
 };

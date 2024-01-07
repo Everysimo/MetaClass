@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import './menu-button.css';
-import MCLogo from "../../img/MetaClassLogo.png";
+import MCLogo from "../../../img/commigo.png";
 import { Link } from "react-router-dom";
 import isLoggedIn from "./loginCheck";
 
@@ -23,11 +23,16 @@ const BurgerButton = () => {
             <div className={menuClass}>
                 <ul>
                     {isLoggedIn()? (
-                        <li><Link to="/Account">ACCOUNT</Link></li>
+                        <>
+                            <li><Link to="/Account">ACCOUNT</Link></li>
+                            <li><Link to="/LoggedInHome">HOME</Link></li>
+                        </>
                     ) : (
-                        <li><Link to="/login">LOGIN</Link></li>
+                        <>
+                            <li><Link to="/login">LOGIN</Link></li>
+                            <li><Link to="/">HOME</Link></li>
+                        </>
                     )}
-                    <li><Link to="/">HOME</Link></li>
                     <li><Link to="/">ABOUT</Link></li>
                     <li><Link to="/">CONTACTS</Link></li>
                 </ul>
@@ -40,12 +45,17 @@ const BurgerButton = () => {
 export function MyMenu() {
     return (
         <div>
-            {isLoggedIn() ? (
-                <Link to="/Account">ACCOUNT</Link>
+            {isLoggedIn()? (
+                <>
+                    <Link to="/Account">ACCOUNT</Link>
+                    <Link to="/LoggedInHome">HOME</Link>
+                </>
             ) : (
-                <Link to="/login">LOGIN</Link>
+                <>
+                    <Link to="/login">LOGIN</Link>
+                    <Link to="/">HOME</Link>
+                </>
             )}
-            <Link to="/">HOME</Link>
             <Link to="/">ABOUT</Link>
             <Link to="/">CONTACTS</Link>
         </div>

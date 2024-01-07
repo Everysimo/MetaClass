@@ -3,14 +3,11 @@ import { faRightFromBracket } from "@fortawesome/free-solid-svg-icons";
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import "./logoutButton.css";
-import axios from 'axios';
-
 function useHandleLogout() {
     const navigate = useNavigate();
 
     return async () => {
         try {
-            const userMetaID = sessionStorage.getItem('UserMetaID'); // Fetch the UserMetaID
             const requestOptions = {
                 method: 'POST',
                 headers: {
