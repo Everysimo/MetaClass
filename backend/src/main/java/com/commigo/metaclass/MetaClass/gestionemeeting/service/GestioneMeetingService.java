@@ -12,4 +12,5 @@ public interface GestioneMeetingService {
     Meeting findMeetingById(Long id);
     Meeting saveMeeting(Meeting meeting);
     Boolean accediMeeting(String metaID, Long id_meeting) throws ServerRuntimeException, RuntimeException403;
+    Boolean avviaMeeting(String metaID, Long id_meeting) throws ServerRuntimeException, RuntimeException403;
 }

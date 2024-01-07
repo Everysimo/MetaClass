@@ -23,7 +23,8 @@ public interface MeetingRepository extends JpaRepository<Meeting, Long> {
     @Query("UPDATE Meeting m SET " +
             "m.nome = COALESCE(:#{#attributes['nome']}, m.nome), " +
             "m.inizio = COALESCE(:#{#attributes['inizio']}, m.inizio), " +
-            "m.fine = COALESCE(:#{#attributes['fine']}, m.fine) " +
+            "m.fine = COALESCE(:#{#attributes['fine']}, m.fine), " +
+            "m.isAvviato= COALESCE(:#{#attributes['isAvviato']}, m.isAvviato) " +
             "WHERE m.id = :MeetingID")
     int updateAttributes(@Param("MeetingID") Long MeetingID, @Param("attributes") Meeting attributes);
 

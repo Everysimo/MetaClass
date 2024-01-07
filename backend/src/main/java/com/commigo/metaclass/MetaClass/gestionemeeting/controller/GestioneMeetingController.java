@@ -36,7 +36,7 @@ public class GestioneMeetingController {
     @Autowired
     private JwtTokenUtil jwtTokenUtil;
 
-    @PostMapping(value = "/meetingStatus/{id}")
+    /*@PostMapping(value = "/meetingStatus/{id}")
     public ResponseEntity<Response<Boolean>> meetingStatus(@RequestBody String action, @PathVariable("id") Long idMeeting)
     {
         boolean value;
@@ -69,7 +69,7 @@ public class GestioneMeetingController {
         if(value) return ResponseUtils.getResponseOk(message);
         return ResponseUtils.getResponseError(HttpStatus.INTERNAL_SERVER_ERROR,message);
 
-    }
+    }*/
 
     @PostMapping(value = "/schedulingMeeting")
     public ResponseEntity<Response<Boolean>> schedulingMeeting(@Valid @RequestBody Meeting m, BindingResult result) {
@@ -124,6 +124,35 @@ public class GestioneMeetingController {
                     .body(new Response<>(false, se.getMessage()));
         }
     }
+
+    @PostMapping(value = "/avviaMeeting/{id_meeting}")
+    public ResponseEntity<Response<Boolean>> avviaMeeting (@PathVariable Long id_meeting,
+                                                            HttpServletRequest request) {
+        try {
+            //controllo token
+            if (!validationToken.isTokenValid(request)) {
+                throw new RuntimeException403("Token non valido");
+            }
+
+            String metaID = jwtTokenUtil.getMetaIdFromToken(validationToken.getToken());
+
+            if(meetingService.avviaMeeting(metaID, id_meeting)){
+                return ResponseEntity.ok(new Response<>(true,
+                        "Avvio meeting avvenuto con successo"));
+            }else{
+                throw new ServerRuntimeException("Errore nell'avvio del meeting");
+            }
+
+
+        }catch (RuntimeException403 e) {
+            return ResponseEntity.status(403)
+                    .body(new Response<>(false, e.getMessage()));
+        } catch (ServerRuntimeException se) {
+            return ResponseEntity.status(500)
+                    .body(new Response<>(false, se.getMessage()));
+        }
+    }
+
 
     @PostMapping(value = "/accediMeeting/{id_meeting}")
     public ResponseEntity<Response<Boolean>> accediMeeting (@PathVariable Long id_meeting,
