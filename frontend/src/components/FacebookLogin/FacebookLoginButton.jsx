@@ -78,6 +78,7 @@ export default class Facebook extends Component {
         sessionStorage.setItem('isLoggedIn', JSON.stringify(true));
         sessionStorage.setItem('UserMetaID', this.state.metaId);
         sessionStorage.setItem('nome', this.state.nome);
+        localStorage.setItem('nome', this.state.nome);
     };
 
     sendDataToServer = async () => {
@@ -111,7 +112,8 @@ export default class Facebook extends Component {
     };
 
     render() {
-        const { isLoggedIn, nome } = this.state;
+        const { isLoggedIn } = this.state;
+        const nome = localStorage.getItem('nome');
         return (
             <div className={"loginForm"}>
                 {isLoggedIn ? (
