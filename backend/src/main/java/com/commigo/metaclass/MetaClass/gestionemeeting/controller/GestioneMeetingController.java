@@ -150,7 +150,7 @@ public class GestioneMeetingController {
         } catch (ServerRuntimeException se) {
             return ResponseEntity.status(500)
                     .body(new Response<>(false, se.getMessage()));
-        }
+        }sss
     }
 
 
