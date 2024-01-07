@@ -36,6 +36,4 @@ public interface UtenteRepository extends JpaRepository<Utente, Long> {
     int updateAttributes(@Param("SessionID") String SessionID, @Param("attributes") Utente attributes);
 
 
-
-
 }

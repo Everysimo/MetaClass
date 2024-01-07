@@ -6,6 +6,7 @@ import com.commigo.metaclass.MetaClass.entity.StatoPartecipazione;
 import com.commigo.metaclass.MetaClass.entity.Utente;
 import com.commigo.metaclass.MetaClass.exceptions.RuntimeException401;
 import com.commigo.metaclass.MetaClass.exceptions.RuntimeException403;
+import com.commigo.metaclass.MetaClass.exceptions.ServerRuntimeException;
 import com.commigo.metaclass.MetaClass.utility.response.types.AccessResponse;
 import com.commigo.metaclass.MetaClass.utility.response.types.Response;
 import org.springframework.http.ResponseEntity;
@@ -17,7 +18,7 @@ public interface GestioneStanzaService
 {
 
     ResponseEntity<AccessResponse<Boolean>> accessoStanza(String codiceStanza, String id_utente);
-    boolean creaStanza(Stanza s);
+    boolean creaStanza(Stanza s) throws ServerRuntimeException;
     Response<Boolean> deleteRoom(String metaID, Long id_stanza);
     Response<Boolean> downgradeUtente(String id_Uogm, long og, long stanza);
     Boolean modificaDatiStanza(Stanza s, Long id) throws RuntimeException403, RuntimeException401;
