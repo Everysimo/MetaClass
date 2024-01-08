@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 @RestController
@@ -188,8 +189,7 @@ public class GestioneAmministrazioneController {
     @PostMapping(value = "modificaStanza/{Id}")
     public ResponseEntity<Response<Boolean>> modifyRoomDataAdmin(
             @PathVariable Long Id,
-            @Valid @RequestBody Stanza s,
-            BindingResult result,
+            @RequestBody Map<String, Object> params,
             HttpServletRequest request){
 
 
@@ -203,7 +203,7 @@ public class GestioneAmministrazioneController {
           //verifica dei permessi
           if(!checkAdmin(metaID))  throw new RuntimeException403("accesso non consentito");
 
-          return stanzaControl.modifyRoomData(Id,s,result,request);
+          return stanzaControl.modifyRoomData(Id,params,request);
         } catch (RuntimeException403 re) {
            return ResponseEntity.status(403)
                    .body(new Response<>(null, "Errore durante l'operazione: "+re.getMessage()));

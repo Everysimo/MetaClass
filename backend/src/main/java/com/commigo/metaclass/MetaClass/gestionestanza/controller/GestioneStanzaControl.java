@@ -9,6 +9,7 @@ import com.commigo.metaclass.MetaClass.exceptions.RuntimeException401;
 import com.commigo.metaclass.MetaClass.exceptions.RuntimeException403;
 import com.commigo.metaclass.MetaClass.exceptions.ServerRuntimeException;
 import com.commigo.metaclass.MetaClass.gestionestanza.service.GestioneStanzaService;
+import com.commigo.metaclass.MetaClass.utility.MapValidator;
 import com.commigo.metaclass.MetaClass.utility.request.GestioneAccessiRequest;
 import com.commigo.metaclass.MetaClass.utility.request.RequestUtils;
 import com.commigo.metaclass.MetaClass.utility.request.RichiestaDTO;
@@ -23,6 +24,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
+import jakarta.validation.Validation;
+import jakarta.validation.Validator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
@@ -150,8 +153,7 @@ public class GestioneStanzaControl {
     @PostMapping(value = "/modifyRoomData/{Id}")
     public ResponseEntity<Response<Boolean>> modifyRoomData(
             @PathVariable Long Id,
-            @Valid @RequestBody Stanza s,
-            BindingResult result,
+            @RequestBody Map<String,Object> params,
             HttpServletRequest request) {
 
         try {
@@ -160,12 +162,10 @@ public class GestioneStanzaControl {
                     throw new RuntimeException403("Token non valido");
                 }
 
-                //controllo errori di validazione
-                if(result.hasErrors()) {
-                     throw new RuntimeException403(RequestUtils.errorsRequest(result));
-                }
+                //validazione della map
+                MapValidator.stanzaValidate(params);
 
-                if(!stanzaService.modificaDatiStanza(s,Id)){
+                if(!stanzaService.modificaDatiStanza(params,Id)){
                     throw new ServerRuntimeException("modifica non effettuata");
                 } else {
                     return ResponseEntity.ok(new Response<>(true, "Stanza modificata con successo"));
@@ -177,6 +177,9 @@ public class GestioneStanzaControl {
         }catch(RuntimeException401 ue) {
             return ResponseEntity.status(401)
                 .body(new Response<>(false, "Errore durante l'operazione: "+ue.getMessage()));
+        }catch(ClientRuntimeException ce) {
+            return ResponseEntity.status(400)
+                    .body(new Response<>(false, ce.getMessage()));
         }catch(Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(500)

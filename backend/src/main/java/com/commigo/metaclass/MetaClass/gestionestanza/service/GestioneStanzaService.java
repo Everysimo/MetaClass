@@ -21,7 +21,7 @@ public interface GestioneStanzaService
     boolean creaStanza(Stanza s) throws ServerRuntimeException;
     Response<Boolean> deleteRoom(String metaID, Long id_stanza);
     Response<Boolean> downgradeUtente(String id_Uogm, long og, long stanza);
-    Boolean modificaDatiStanza(Stanza s, Long id) throws RuntimeException403, RuntimeException401;
+    Boolean modificaDatiStanza(Map<String,Object> params, Long id) throws RuntimeException403, RuntimeException401;
     Stanza findStanza(Long id);
     List<StatoPartecipazione> findStatoPartecipazioniInAttesa(Stanza stanza,boolean isInAttesa);
     ResponseEntity<AccessResponse<Boolean>> richiestaAccessoStanza(String codiceStanza, String id_utente);
