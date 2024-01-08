@@ -33,7 +33,7 @@ public interface UtenteRepository extends JpaRepository<Utente, Long> {
             "u.metaId = COALESCE(:#{#attributes['metaId']}, u.metaId), " +
             "u.tokenAuth = COALESCE(:#{#attributes['tokenAuth']}, u.tokenAuth) " +
             "WHERE u.metaId = :SessionID")
-    int updateAttributes(@Param("SessionID") String SessionID, @Param("attributes") Utente attributes);
+    int updateAttributes(@Param("SessionID") String SessionID, @Param("attributes") Map<String, Object> attributes);
 
 
 }

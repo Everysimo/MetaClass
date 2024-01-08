@@ -2,9 +2,11 @@ package com.commigo.metaclass.MetaClass.gestioneutenza.controller;
 
 import com.commigo.metaclass.MetaClass.entity.Stanza;
 import com.commigo.metaclass.MetaClass.entity.Utente;
+import com.commigo.metaclass.MetaClass.exceptions.ClientRuntimeException;
 import com.commigo.metaclass.MetaClass.exceptions.RuntimeException403;
 import com.commigo.metaclass.MetaClass.exceptions.ServerRuntimeException;
 import com.commigo.metaclass.MetaClass.gestioneutenza.service.GestioneUtenzaService;
+import com.commigo.metaclass.MetaClass.utility.MapValidator;
 import com.commigo.metaclass.MetaClass.utility.request.RequestUtils;
 import com.commigo.metaclass.MetaClass.utility.response.types.LoginResponse;
 import com.commigo.metaclass.MetaClass.utility.response.types.Response;
@@ -22,6 +24,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 public class GestioneUtenzaController {
@@ -51,8 +54,8 @@ public class GestioneUtenzaController {
             //controllo errori di validazione
             if(result.hasErrors())
             {
-                return ResponseEntity.status(403)
-                        .body(new LoginResponse<>(false, RequestUtils.errorsRequest(result),null));
+                throw new RuntimeException403(RequestUtils.errorsRequest(result));
+
             }
 
             // Aggiungi il token al cookie
@@ -61,12 +64,14 @@ public class GestioneUtenzaController {
             response.addCookie(cookie);
 
             if (!utenzaService.loginMeta(u)){
-                throw new RuntimeException("errore nel login");
+                throw new ServerRuntimeException("errore nel login");
             }
 
-            return ResponseEntity.ok(new LoginResponse<>(true, "Login effettuato con successo",token));
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(500).body(new LoginResponse<>(false, e.getMessage(), null));
+            return ResponseEntity.ok(new LoginResponse<>(true, "Login effettuato con successo",token, u.isAdmin()));
+        } catch (ServerRuntimeException e) {
+            return ResponseEntity.status(500).body(new LoginResponse<>(false, e.getMessage(), null, false));
+        } catch (RuntimeException403 e) {
+            return ResponseEntity.status(403).body(new LoginResponse<>(false, e.getMessage(), null, false));
         }
     }
 
@@ -117,36 +122,30 @@ public class GestioneUtenzaController {
     }
 
     @PostMapping(value = "/modifyUserData")
-    public ResponseEntity<Response<Boolean>> modifyUserData(@RequestBody Utente u,
-                                                            HttpServletRequest request,
-                                                            BindingResult result) {
+    public ResponseEntity<Response<Boolean>> modifyUserData(@RequestBody Map<String, Object> params,
+                                                            HttpServletRequest request) {
         try{
-            Response<Boolean> response;
-            ResponseEntity<Response<Boolean>> responseHTTP;
 
             if (!validationToken.isTokenValid(request)) {
                 throw new RuntimeException403("Token non valido");
             }
 
-            //controllo errori di validazione
-            if(result.hasErrors())
-            {
-                return ResponseEntity.status(403)
-                        .body(new Response<>(false, RequestUtils.errorsRequest(result)));
-            }
+            //Validazione dati utente
+            MapValidator.utenteValidate(params);
 
             String metaID = jwtTokenUtil.getMetaIdFromToken(validationToken.getToken());
 
-            response = utenzaService.modificaDatiUtente(metaID,u);
-            if (!response.getValue()) {
-                responseHTTP = ResponseEntity.ok(response);
-            } else {
-                responseHTTP = ResponseEntity.status(403).body(response);
+            if(!utenzaService.modificaDatiUtente(metaID,params)) {
+                throw new ServerRuntimeException("Modifica Utente non effettuata");
+            }else{
+                return ResponseEntity.ok(new Response<>(true, "Utente modificato con successo"));
             }
-            return responseHTTP;
-
         }catch(RuntimeException403 e){
             return ResponseEntity.status(403).body(new Response<>(null, e.getMessage()));
+        } catch (ClientRuntimeException e) {
+            return ResponseEntity.status(400).body(new Response<>(null, e.getMessage()));
+        } catch (ServerRuntimeException e) {
+            return ResponseEntity.status(500).body(new Response<>(null, e.getMessage()));
         }
     }
 
