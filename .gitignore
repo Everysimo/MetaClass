@@ -7,7 +7,7 @@
 backend/.gradle/
 backend/build/
 backend/HELP.md
-backend/gradle.gradle
+backend/gradle.properties
 
 ### INTELLIJ IDEA ###
 !**backend/src/main/**/out/

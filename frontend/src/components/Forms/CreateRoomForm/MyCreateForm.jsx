@@ -13,9 +13,9 @@ export default class MyCreateForm extends Component{
         descrizione: "",
         tipoAccesso: false,
         maxPosti: 0,
-        id_scenario: '',
-        selectedScenario: '',
-        array: []
+        id_scenario: '',            //lo uso per salvare l'id dello scenario e passarlo al backend
+        selectedScenario: '',   //per salvarmi quale opzione sceglie l'utente
+        array: []       //un array in cui mi salvo i dati provenienti dal backend (lista scenari)
     };
 
     //funzione per richiamare la funzione per prelevare gli scenari dal backend
@@ -39,17 +39,20 @@ export default class MyCreateForm extends Component{
             if (!response.ok) {
                 throw new Error('Errore nel recupero degli scenari.');
             }
+            //mi vado a salvare la stringa json in una const
             const data = await response.json();
             console.log('data:', data)
 
+            //IMPORTANTE -> QUESTO E' IL METODO PER CONVERTIRE L'ARRAY
             this.setState({array: data.value})
-
             console.log("array:", this.state.array);
 
+            //questo lo faccio per vedere se riesco a stamparmi un parametro dell'array(uno tra nome, descrizione, id, media...)
             this.state.array.forEach((parametro, indice) => {
                 const descr = parametro.descrizione;
                 console.log(`Descrizione ${indice + 1}: ${descr}`);
             });
+            //esempio di come scorrere l'array per il nome
             /*
                         if (Array.isArray(data.value) && data.value.length > 0) {
                             console.log('Scorrendo array value:');
@@ -60,8 +63,9 @@ export default class MyCreateForm extends Component{
                         } else {
                             console.error('Nessun elemento trovato nell\'array value');
                         }
+             */
 
-                        /*
+                        /* -> altro esempio
                         data.value.map()
                         console.log("nome:", data.value)
                         */
@@ -72,16 +76,7 @@ export default class MyCreateForm extends Component{
     };
 
     //funzione similar costruttore per settare i valori
-    responseForm = response => {
-        this.setState({
-            nome: response.nome,
-            codiceStanza: response.codiceStanza,
-            descrizione: response.descrizione,
-            tipoAccesso: response.tipoAccesso,
-            maxPosti: response.maxPosti,
-            selectedScenario: response.selectedScenario
-        });
-    };
+
 
 //le varie handle richiamate quando passo i valori nelle input form
     handleNameChange = (e) => {
@@ -105,40 +100,43 @@ export default class MyCreateForm extends Component{
     };
 
 
+    //funzione alla scelta del parametro nel form
     handleScenarioChange = (e) => {
+        //mi salvo la variabile scelta in una const
         const selectedScenarioName = e.target.value;
         console.log('Valore selezionato:', selectedScenarioName);
 
+        //setto la mia variabile selectedscenario con il valore scelto
         this.setState({ selectedScenario: selectedScenarioName });
 
+        //richiamo una funzione per prelevare dal nome scelto, l'id corrispondente
         this.findScenarioByName(selectedScenarioName);
     };
 
 
 
+    //funzione trova dal nome
     findScenarioByName = (nome) => {
 
         const { selectedScenario, array } = this.state;
         console.log("in funziione find->", nome)
 
+        //scorre l'array, e cerca quella entry nell'array che ha quel nome
         const foundScenario = array.find((scenario) => scenario.nome === nome);
 
+        //se l'ha trovata sarà true, => allora mi salva sia la posizione in cui l'ha trovata e sia l'id stesso
         if (foundScenario) {
             const positionInArray = array.indexOf(foundScenario);
             const selectedScenarioId = foundScenario.id;
-
             console.log(`Nome dello scenario trovato: ${selectedScenario}, ID: ${selectedScenarioId}, Posizione nell'array: ${positionInArray}`);
 
+            // setto lo stato della mia var id_scenario con l'id che è stato scelto
             this.setState({id_scenario: selectedScenarioId});
 
-            // Salva la posizione e l'id nello stato o fai qualsiasi altra cosa tu voglia
-            // this.setState({ positionInArray, selectedScenarioId });
         } else {
             console.error(`Scenario non trovato per il nome: ${selectedScenario}`);
         }
     };
-
-
 
     /*funzione per inviare i parametri a crea stanza*/
     sendDataToServer = async() =>{
@@ -238,22 +236,6 @@ export default class MyCreateForm extends Component{
                         ))}
                     </select>
 
-
-                    {/*
-
-                <select className={'select-field'} value={this.state.scenarios} onChange={this.handleScenarioChange}>
-                    <option value="" disabled>Seleziona uno scenario</option>
-                    {Object.entries(this.state.scenarios).map(([key, value]) => (
-
-                        <option key={key} value={value}>
-                            {this.state.scenarios}
-
-                        </option>
-
-                    ))}
-
-                </select>
-*/}
                 </div>
 
                 <Divider/>

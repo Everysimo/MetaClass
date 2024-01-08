@@ -1,19 +1,22 @@
 import React from "react";
 import {MyHeader} from "../components/Header/Header";
 import {MyFooter} from "../components/Footer/Footer";
-import {useNavigate} from "react-router-dom";
+import {useNavigate, useParams} from "react-router-dom";
 import CalendarComp from "../components/Calendar/CalendarComp";
 
 
 export const SingleRoom = () =>{
     const navigate = useNavigate();
+    const { id: id_stanza } = useParams();      //si usa useParams per farsi passare il parametro
+
+    sessionStorage.setItem('idStanza', id_stanza)
     const handleGoToModifyDataRoom= () => {
         // Naviga alla pagina di destinazione con il valore 42
-        navigate(`/modifyroom`);
+        navigate(`/modifyroom/ ${id_stanza}`);
     };
-    const handleGoToModifyScenario= () => {
+    const handleGoToChangeScenario= () => {
         // Naviga alla pagina di destinazione con il valore 42
-        navigate(`/modifyscenario`);
+        navigate(`/changescenario/ ${id_stanza}`);
     };
 
     return(
@@ -24,6 +27,7 @@ export const SingleRoom = () =>{
             <div className={"table-container"}>
                 <div className={"table-row"}>
                     <span className={"table-cell"}><h1>Pagina della stanza singola</h1></span>
+                    <h3>ecco la stanza: {id_stanza}</h3>
                 </div>
                 <div className={"table-row"}>
                     <div className={"table-cell"}>
@@ -35,7 +39,7 @@ export const SingleRoom = () =>{
                             {/*ci va tutta la funzione della pagina*/}
 
                             <button onClick={handleGoToModifyDataRoom}>Modifica la stanza</button>
-                            <button onClick={handleGoToModifyScenario}>Modifica lo scenario della stanza</button>
+                            <button onClick={handleGoToChangeScenario}>Modifica lo scenario della stanza</button>
 
                         </div>
                         <div className={"table-row"}>
