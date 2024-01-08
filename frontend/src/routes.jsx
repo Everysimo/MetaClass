@@ -5,12 +5,12 @@ import UnloggedHome from "./pages/UnloggedHome";
 import {CreateRoom} from "./pages/createroom";
 import {ModifyRoom} from "./pages/modifyroom";
 import GestioneAccessi from "./pages/accessManagement";
-import {SelezionaScenario} from "./pages/modifyscenario";
+import {SelezionaScenario} from "./pages/changescenario";
 import {LoggedInHome} from "./pages/LoggedInHome";
 import {BannedUserList} from "./pages/bannedUserList";
 import {Account} from "./pages/Account";
-import {VisualRoomList} from "./pages/visualRoomList";
 import {SingleRoom} from "./pages/SingleRoom";
+import {VisualRoomList} from "./pages/visualRoomList";
 
 
 
@@ -27,7 +27,7 @@ export const Rts = () =>{
                 <Route path="/modifyroom/:id" element={<ModifyRoom/>}/>
                 <Route path="/createroom" element={<CreateRoom/>}/>
                 <Route path="/accessManagement" element={<GestioneAccessi/>}/>
-                <Route path="/modifyscenario" element={<SelezionaScenario/>}/>
+                <Route path="/changescenario/:id" element={<SelezionaScenario/>}/>
 
                 <Route path="/bannedUserList" element={<BannedUserList/>}/>
             </Routes>
