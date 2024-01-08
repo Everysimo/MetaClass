@@ -17,4 +17,6 @@ public interface GestioneMeetingService {
     Boolean accediMeeting(String metaID, Long id_meeting) throws ServerRuntimeException, RuntimeException403;
     Boolean avviaMeeting(String metaID, Long id_meeting) throws ServerRuntimeException, RuntimeException403;
     ResponseEntity<Response<List<Meeting>>> visualizzaSchedulingMeeting(Long idStanza);
+    Boolean terminaMeeting(String metaID, Long id_meeting) throws ServerRuntimeException, RuntimeException403;
+    Boolean uscitaMeeting(String metaID, Long id_meeting) throws ServerRuntimeException, RuntimeException403;
 }

@@ -8,7 +8,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 
 @Entity
@@ -22,24 +24,20 @@ public class FeedbackMeeting {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long Id;
 
-    @Column
+    @Column(updatable = false)
     @CreationTimestamp
     private LocalDateTime Data;
 
     @Column
     @NotNull(message = "Il tempo non può essere nullo")
-    @NotBlank
-    private float Tempo_Totale;
+    private Duration Tempo_Totale;
 
     //da definire la regola inizio<fine
-    @NotNull(message = "La data del primo accesso non può essere nulla")
-    @Past(message = "La data di primo accesso non può essere successiva "+ "o coincidente alla data odierna")
-    @NotBlank(message = "La data del primo accesso non può essere vuota")
-    @Column
+    @Column(updatable = false)
+    @CreationTimestamp
     private LocalDateTime DataPrimoAccesso;
 
     @NotNull(message = "La data dell'ultimo accesso non può essere nulla")
-    @NotBlank(message = "La data dell'ultimo accesso non può essere vuota")
     @Column
     private LocalDateTime DataUltimoAccesso;
 
@@ -60,5 +58,14 @@ public class FeedbackMeeting {
     @ManyToOne()
     @JoinColumn(name = "id_report")
     private Report report;
+
+    //costruttore avviato alla prima istanziazione del feedback
+    public FeedbackMeeting(Utente utente, Meeting meeting, Report report){
+         this.utente = utente;
+         this.meeting = meeting;
+         this.report = report;
+         this.Tempo_Totale = Duration.ZERO;
+         this.DataUltimoAccesso = LocalDateTime.now();
+    }
 
 }
