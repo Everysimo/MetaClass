@@ -5,7 +5,7 @@ export default class RequestSection extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            array: []
+            array: [],
         };
     }
 
@@ -27,7 +27,7 @@ export default class RequestSection extends Component {
             const response = await fetch('http://localhost:8080/gestioneAccessi', this.requestOption);
 
             if (!response.ok) {
-                throw new Error('Errore richeista not ok.');
+                throw new Error('Errore richiesta not ok.');
             }
 
             const data = await response.json();
@@ -37,7 +37,7 @@ export default class RequestSection extends Component {
             console.error('Errore durante il recupero degli accessi:', error.message);
         }
     };
-
+/*
     handleAccept = async (userId) => {
         const requestOption = {
             method: 'POST',
@@ -75,7 +75,7 @@ export default class RequestSection extends Component {
 
         console.log(`Rifiutato l'accesso per l'utente con ID ${userId}`);
     };
-
+*/
     render() {
         return (
             <>

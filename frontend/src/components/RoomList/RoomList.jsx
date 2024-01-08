@@ -10,8 +10,10 @@ class RoomList extends Component {
         };
     }
 
+
     componentDidMount() {
         this.fetchElencoStanze();
+
     }
 
     fetchElencoStanze = async () => {
@@ -51,12 +53,12 @@ class RoomList extends Component {
             <>
                 <div>
                     <h1>Elenco Stanze</h1>
-
+                    {/*
                     <button>
                         <Link to="/SingleRoom" style={{textDecoration: 'none', color: 'inherit'}}>Vai alla pagina della
                             stanza singola</Link>
                     </button>
-
+                    */}
 
                     <div style={{display: 'flex', flexDirection: 'row', flexWrap: 'wrap'}}>
                         {this.state.array.map((room, index) => (
