@@ -165,7 +165,7 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService {
     }
 
     @Override
-    public Boolean modificaDatiStanza(Stanza s, Long id) throws RuntimeException403, RuntimeException401 {
+    public Boolean modificaDatiStanza(Map<String,Object> params, Long id) throws RuntimeException403, RuntimeException401 {
 
             //controllo del ruolo di ogm
             String metaID = jwtTokenUtil.getMetaIdFromToken(validationToken.getToken());
@@ -182,7 +182,7 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService {
             if(statoutente==null) throw new RuntimeException403("Non hai acceduto alla stanza");
 
             if(!statoutente.getRuolo().getNome().equalsIgnoreCase(Ruolo.PARTECIPANTE)){
-                return stanzaRepository.updateAttributes(id, s)>0;
+                return stanzaRepository.updateAttributes(id, params)>0;
             }else{
                 throw new RuntimeException401("devi essere almeno un organizzatore");
             }
@@ -309,7 +309,7 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService {
                     Scenario scenario = scenarioRepository.findScenarioById(idScenario);
                     if(scenario != null) {
                         if(scenario != stanza.getScenario()) {
-                            stanzaRepository.updateAttributes(idScenario, stanza);
+                            //stanzaRepository.updateAttributes(idScenario, stanza);
                             return ResponseEntity.ok(new Response<>(true, "Lo scenario è stato modificato"));
                         }else{
                             return ResponseEntity.status(403).body(new Response<>(false, "Lo scenario selezionato è già in uso per la stanza"));
