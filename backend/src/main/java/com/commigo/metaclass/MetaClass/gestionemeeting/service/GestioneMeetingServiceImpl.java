@@ -275,7 +275,7 @@ public class GestioneMeetingServiceImpl implements GestioneMeetingService{
         //aggiorno il report ai nuovi dati sul meeting terminato
         Report rep = reportRepository.findByMeeting(m);
         rep.setNum_Partecipanti(count);
-        rep.setMAX_Partecipanti(uimList.size());
+        rep.setMax_Partecipanti(uimList.size());
 
         //calcolo tempo trascorso del meeting
         Duration tempoTrascorso = Duration.between
@@ -287,7 +287,7 @@ public class GestioneMeetingServiceImpl implements GestioneMeetingService{
                 .map(uim -> uim.getUtente())
                 .collect(Collectors.toList());
 
-        rep.setLista_Partecipanti(utentiList);
+        rep.setLista_partecipanti(utentiList);
 
         try{
            reportRepository.save(rep);
@@ -331,7 +331,7 @@ public class GestioneMeetingServiceImpl implements GestioneMeetingService{
           // Calcolo la differenza tra DataPrimoAccesso e LocalDateTime.now()
           Duration tempoTrascorso = Duration.between
                   (fm.getDataPrimoAccesso(), LocalDateTime.now());
-          fm.setTempo_Totale(tempoTrascorso);
+          fm.setTempo_totale(tempoTrascorso);
           feedbackMeetingRepository.save(fm);
 
           return true;
