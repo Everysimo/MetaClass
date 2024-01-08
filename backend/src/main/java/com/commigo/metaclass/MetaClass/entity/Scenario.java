@@ -30,14 +30,13 @@ public class Scenario {
     @NotNull(message = "Il nome non può essere nullo")
     @Column(unique = true)
     @Size(min = MIN_LENGTH, max = MAX_LENGTH, message = "Lunghezza del nome non valida")
-    @NotBlank
+    @NotBlank (message = "Il nome non può essere vuoto")
     private String nome;
 
 
     @NotNull(message = "La descrizione non può essere nulla")
-    @Column
     @Size(min = MIN_LENGTH, max = MAX_LENGTH, message = "Lunghezza della descrizione non valida")
-    @NotBlank
+    @NotBlank(message = "La descrizione non può essere vuoto")
     private String descrizione;
 
     @DecimalMin(value = "1", message = "Il valore della media deve essere almeno 1")
@@ -49,7 +48,7 @@ public class Scenario {
      *Chiave Esterna sulla Categoria
      */
     @NotNull(message = "La categoria non può essere nulla")
-    @ManyToOne()
+    @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.REMOVE})
     @JoinColumn(name = "id_categoria")
     private Categoria categoria;
 
@@ -61,20 +60,19 @@ public class Scenario {
     @UpdateTimestamp
     private LocalDateTime data_aggiornamento;
 
-    @URL(message = "L'URL dell'immagine non è valido")
     @NotNull(message = "L'URL dell'immagine non può essere nullo")
-    @NotBlank(message = "L'URL dell'immagine non può essere vuoto")
-    private String imageUrl;
+    @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.DETACH})
+    private Immagine image;
 
     @JsonCreator
     public Scenario(@JsonProperty("nome") String Nome,
                     @JsonProperty("descrizione") String Descrizione,
-                    @JsonProperty("imageURL") String imageURL,
+                    @JsonProperty("id_immagine") Long idImmagine,
                     @JsonProperty("id_categoria") Long idCategoria){
         this.nome = Nome;
         this.descrizione = Descrizione;
-        this.imageUrl = imageURL;
-
+        this.image = new Immagine();
+        this.image.setId(idImmagine);
         this.categoria = new Categoria();
         this.categoria.setId(idCategoria);
 

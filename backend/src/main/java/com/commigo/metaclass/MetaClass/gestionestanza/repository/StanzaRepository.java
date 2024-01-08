@@ -34,7 +34,7 @@ public interface StanzaRepository extends JpaRepository<Stanza, Long> {
     int updateAttributes(@Param("Id") Long Id,
                          @Param("attributes") Stanza attributes);
 
-
+    int deleteStanzaById(long id);
 
 
 
