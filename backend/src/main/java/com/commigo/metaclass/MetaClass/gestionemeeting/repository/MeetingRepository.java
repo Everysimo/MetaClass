@@ -1,6 +1,7 @@
 package com.commigo.metaclass.MetaClass.gestionemeeting.repository;
 
 import com.commigo.metaclass.MetaClass.entity.Meeting;
+import com.commigo.metaclass.MetaClass.entity.Stanza;
 import com.commigo.metaclass.MetaClass.entity.Utente;
 import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -10,6 +11,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Repository("MeetingRespository")
 public interface MeetingRepository extends JpaRepository<Meeting, Long> {
@@ -29,4 +31,6 @@ public interface MeetingRepository extends JpaRepository<Meeting, Long> {
     int updateAttributes(@Param("MeetingID") Long MeetingID, @Param("attributes") Meeting attributes);
 
     Meeting findMeetingById(Long id);
+
+    List<Meeting> findMeetingByStanza(Stanza stanza);
 }

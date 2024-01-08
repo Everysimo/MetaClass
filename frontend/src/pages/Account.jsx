@@ -1,12 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import '../css/MyApp.css';
-import '../css/index.css';
-import '../css/LoggedHome.css';
-import { MyHeader } from "../components/Header/Header"
-import { MyFooter } from '../components/Footer/Footer';
 import LogoutButton from '../components/LogoutButton/logoutButton';
-import GenerateRows from '../components/GenerateRows';
 import { fetchUserDetails } from '../functions/fetchUserDetails';
+import { MyHeader } from "../components/Header/Header";
+import { MyFooter } from "../components/Footer/Footer";
+import EditUserDetails from '../components/Forms/ModifyUsersForm/EditUserDetails';
 
 export const Account = () => {
     const [userDetails, setUserDetails] = useState(null);
@@ -17,7 +14,6 @@ export const Account = () => {
                 const data = await fetchUserDetails();
                 setUserDetails(data);
             } catch (error) {
-                // Handle error scenarios here
                 console.error(error);
             }
         };
@@ -25,26 +21,36 @@ export const Account = () => {
         fetchData();
     }, []);
 
+    useEffect(() => {
+        console.log('Updated User Details:', userDetails);
+    }, [userDetails]);
     return (
         <>
             <header>
                 <MyHeader />
             </header>
             <section className={"sec"}>
-                <div className={"table-container"}>
+                <div className="user-details">
                     {userDetails && (
-                        <div className={"user-details"}>
-                            <p><strong>Name:</strong> {userDetails.name}</p>
+                        <>
+                            {/* Display current user details */}
+                            <p><strong>Name:</strong> {userDetails.nome}</p>
+                            <p><strong>Surname:</strong> {userDetails.cognome}</p>
                             <p><strong>Email:</strong> {userDetails.email}</p>
+                            <p><strong>Birthday:</strong> {userDetails.dataDiNascita}</p>
                             {/* Include other details as needed */}
-                        </div>
+                        </>
                     )}
-                    <LogoutButton/>
                 </div>
-                </section>
+                {/* Pass setUserDetails as prop to EditUserDetails */}
+                <EditUserDetails setUserDetails={setUserDetails} />
+                <LogoutButton />
+            </section>
             <footer>
                 <MyFooter />
             </footer>
         </>
     );
 };
+
+export default Account;

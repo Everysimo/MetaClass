@@ -6,8 +6,8 @@ export default class CreaScenario extends Component {
     state = {
         nome: "",
         descrizione: "",
-        imageUrl: "",
-        categoria: 0,
+        immagine: "",
+        idCategoria: 0,
         isVisible: true,
         isErrorPopupVisible: false,
         errorMessage: "",
@@ -26,10 +26,10 @@ export default class CreaScenario extends Component {
     };
 
     sendDataToServer = async () => {
-        const { nome, descrizione, imageUrl, categoria } = this.state;
+        const { nome, descrizione, immagine, idCategoria } = this.state;
 
         // Validazione: Assicurati che idCategoria sia >= 0
-        if (categoria < 0) {
+        if (idCategoria < 0) {
             this.setState({
                 isErrorPopupVisible: true,
                 errorMessage: "L'id Categoria deve essere maggiore o uguale a 0",
@@ -40,8 +40,8 @@ export default class CreaScenario extends Component {
         const dataToSend = {
             nome,
             descrizione,
-            imageUrl,
-            categoria,
+            immagine,
+            idCategoria,
         };
 
         const requestOption = {
@@ -71,8 +71,8 @@ export default class CreaScenario extends Component {
         this.setState({
             nome: '',
             descrizione: '',
-            imageUrl: '',
-            categoria: 0,
+            immagine: '',
+            idCategoria: 0,
         });
     };
 
@@ -117,7 +117,7 @@ export default class CreaScenario extends Component {
                             <input
                                 type="text"
                                 name="immagine"
-                                value={this.state.imageUrl}
+                                value={this.state.immagine}
                                 onChange={this.handleInputChange}
                             />
                         </label>
@@ -126,7 +126,7 @@ export default class CreaScenario extends Component {
                             <input
                                 type="number"
                                 name="idCategoria"
-                                value={this.state.categoria}
+                                value={this.state.idCategoria}
                                 onChange={this.handleInputChange}
                                 min={0}
                             />

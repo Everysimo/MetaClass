@@ -11,12 +11,15 @@ import com.commigo.metaclass.MetaClass.gestionemeeting.repository.UtenteInMeetin
 import com.commigo.metaclass.MetaClass.gestionestanza.repository.StanzaRepository;
 import com.commigo.metaclass.MetaClass.gestionestanza.repository.StatoPartecipazioneRepository;
 import com.commigo.metaclass.MetaClass.gestioneutenza.repository.UtenteRepository;
+import com.commigo.metaclass.MetaClass.utility.response.types.Response;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -338,5 +341,22 @@ public class GestioneMeetingServiceImpl implements GestioneMeetingService{
         }
 
 
+    }
+
+    @Override
+    public ResponseEntity<Response<List<Meeting>>> visualizzaSchedulingMeeting(Long idStanza) {
+
+
+        Stanza s = stanzaRepository.findStanzaById(idStanza);
+        if(s == null){
+            return ResponseEntity.status(403).body(new Response<>(null,"stanza non trovata"));
+        }else{
+            List<Meeting> meetings = meetingRepository.findMeetingByStanza(s);
+            if(meetings != null) {
+                return ResponseEntity.ok(new Response<>(meetings, "Questi sono tutti i meeting schedulati nella stanza selezionata"));
+            }else{
+                return ResponseEntity.ok(new Response<>(null, "Non ci sono meeting schedulati in questa stanza"));
+            }
+        }
     }
 }

@@ -9,6 +9,7 @@ import GestioneAccessi from "./pages/accessManagement";
 import {SelezionaScenario} from "./pages/modifyscenario";
 import {LoggedInHome} from "./pages/LoggedInHome";
 import {SingleRoom} from "./pages/SingleRoom";
+import {VisualRoomList} from "./pages/visualRoomList";
 
 
 
@@ -22,9 +23,8 @@ export const Rts = () =>{
                 <Route path="/createroom" element={<CreateRoom/>}/>
                 <Route path="/modifyroom" element={<ModifyRoom/>}/>
                 <Route path="/SingleRoom" element={<SingleRoom />}/>
-                {/*nella routes specifico che voglio inviare anche un valore*/}
                 <Route path="/Account" element={<Account/>} />
-                {/*<Route path="/userprofile" element={<UserProfile/>}/>*/}
+                <Route path="/visualRoomList" element={<VisualRoomList />}/>
                 <Route path="/accessManagement" element={<GestioneAccessi/>}/>
                 <Route path="/modifyscenario" element={<SelezionaScenario/>}/>
             </Routes>

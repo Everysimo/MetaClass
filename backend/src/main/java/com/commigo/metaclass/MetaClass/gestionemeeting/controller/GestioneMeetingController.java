@@ -23,6 +23,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 @RestController
 public class GestioneMeetingController {
 
@@ -153,8 +155,22 @@ public class GestioneMeetingController {
         }
     }
 
+    @PostMapping(value = "/visualizzaSchedulingMeeting/{Id}")
+    public ResponseEntity<Response<List<Meeting>>> visualizzaSchedulingMeeting(@PathVariable Long Id,
+                                                                               HttpServletRequest request) {
+        try {
+            if (!validationToken.isTokenValid(request)) {
+                throw new RuntimeException403("Token non valido");
+            }
 
-    @PostMapping(value = "/accediMeeting/{id_meeting}")
+            return meetingService.visualizzaSchedulingMeeting(Id);
+
+        }catch (Exception e) {
+            return ResponseEntity.ok (new Response<>(null, "Errore visualizzazione Scheduling dei meeting per la stanza"));
+        }
+
+    }
+        @PostMapping(value = "/accediMeeting/{id_meeting}")
     public ResponseEntity<Response<Boolean>> accediMeeting (@PathVariable Long id_meeting,
                                                             HttpServletRequest request) {
         try {

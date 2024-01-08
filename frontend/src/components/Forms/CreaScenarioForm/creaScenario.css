@@ -15,12 +15,9 @@
     pointer-events: none; /* Evita che la card sia cliccabile quando è invisibile */
 }
 
-/* Stile per il pulsante di chiusura */
 .close-button {
-    padding: 5px;
-    margin: 5px;
     position: absolute;
-    top: 0px;
+    top: 10px;
     right: 10px;
     cursor: pointer;
     background-color: transparent;
@@ -29,14 +26,12 @@
     color: #000000;
 }
 
-/* Stile per il contenuto della card */
 .card-content {
     display: flex;
     flex-direction: column;
     align-items: center;
 }
 
-/* Stile per l'input numerico */
 input[type="text"] {
     width: 100%;
     padding: 8px;
@@ -45,7 +40,6 @@ input[type="text"] {
     border-radius: 5px;
 }
 
-/* Stile per i pulsanti */
 .button-container {
     display: flex;
     justify-content: space-between;
@@ -65,27 +59,4 @@ button {
 
 button:hover {
     background-color: #c70049;
-}
-
-.error-popup {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background-color: #ffcccc;
-    padding: 10px;
-    border: 1px solid #ff0000;
-    border-radius: 5px;
-    display: inline-block;
-    z-index: 999;
-}
-
-.error-popup.hidden {
-    display: none;
-
-    .error-popup button {
-        margin-top: 10px;
-        cursor: pointer;
-    }
-
 }

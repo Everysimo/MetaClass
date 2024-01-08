@@ -45,26 +45,22 @@ export const LoggedInHome = () => {
         <header>
             <MyHeader />
         </header>
-        <section className={"sec"} id={"sec1"}>
-            <div className={"logoutForm"}>
-                <div className={"table-container"}>
-                    <div className={"table-row"}>
-                        <div className={"table-cell"}>
+        <section className={"sec"}>
+            <div className={"table-container"}>
+                <div className={"table-row"}>
+                    <div className={"table-cell"}>
 
+                        <button onClick={handleGoToProfile}>vai ad Account</button>
+                        <button onClick={handleGoToRoomList}>vai all'elenco delle stanze</button>
+                        <button onClick={handleGoToCreateRoom}>Crea stanza</button>
 
-                            <button onClick={handleGoToProfile}>vai ad Account</button>
-                            <button onClick={handleGoToRoomList}>vai all'elenco delle stanze</button>
-                            <button onClick={handleGoToCreateRoom}>Crea stanza</button>
+                        <h5> IN QUANTO ORGANIZZATORE...</h5>
+                        <button onClick={handleGoToAccessManagement}>Gestione degli accessi</button>
 
-                            <h5> IN QUANTO ORGANIZZATORE...</h5>
-                            <button onClick={handleGoToAccessManagement}>Gestione degli accessi</button>
+                        <h5> IN QUANTO ADMIN...</h5>
+                        <button onClick={handleGoToBannedUserList}>Visualizza Lista Utenti Bannati</button>
 
-
-                            <h5> IN QUANTO ADMIN...</h5>
-                            <button onClick={handleGoToBannedUserList}>Visualizza Lista Utenti Bannati</button>
-
-                            <LogoutButton/>
-                        </div>
+                        <LogoutButton/>
                     </div>
                 </div>
             </div>
