@@ -28,9 +28,9 @@ public class Categoria {
     @Size(min = MIN_NAME_LENGTH,
             max = MAX_NAME_LENGTH,
             message = "Lunghezza nome errata")
-    @Pattern(regexp = "^[A-Z][a-z]*",
+    @Pattern(regexp = "^[A-Z][A-Za-z0-9\\s]*$\n",
             message = "Formato nome errato")
-    @NotBlank
+    @NotBlank (message ="Il nome della categoria non può essere vuoto")
     private String nome;
 
 
@@ -41,6 +41,6 @@ public class Categoria {
             message = "Lunghezza descrizione errata")
     @Pattern(regexp="^[a-zA-Z0-9.,!?()'\"\\-\\s]+$",
             message = "Formato descrizione errato")
-    @NotBlank
+    @NotBlank (message ="La descrizione della categoria non può essere vuoto")
     private String descrizione_categoria;
 }

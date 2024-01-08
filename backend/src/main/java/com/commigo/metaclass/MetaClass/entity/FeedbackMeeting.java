@@ -25,21 +25,20 @@ public class FeedbackMeeting {
     private long Id;
 
     @Column(updatable = false)
-    @CreationTimestamp
-    private LocalDateTime Data;
+    private LocalDateTime data_compilazione;
 
     @Column
     @NotNull(message = "Il tempo non può essere nullo")
-    private Duration Tempo_Totale;
+    private Duration tempo_totale;
 
     //da definire la regola inizio<fine
     @Column(updatable = false)
     @CreationTimestamp
-    private LocalDateTime DataPrimoAccesso;
+    private LocalDateTime dataPrimoAccesso;
 
     @NotNull(message = "La data dell'ultimo accesso non può essere nulla")
     @Column
-    private LocalDateTime DataUltimoAccesso;
+    private LocalDateTime dataUltimoAccesso;
 
     /**
      *Chiave Esterna sull' utente
@@ -64,8 +63,8 @@ public class FeedbackMeeting {
          this.utente = utente;
          this.meeting = meeting;
          this.report = report;
-         this.Tempo_Totale = Duration.ZERO;
-         this.DataUltimoAccesso = LocalDateTime.now();
+         this.tempo_totale = Duration.ZERO;
+         this.dataUltimoAccesso = LocalDateTime.now();
     }
 
 }

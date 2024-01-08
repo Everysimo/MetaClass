@@ -148,7 +148,7 @@ public class Utente {
     @UpdateTimestamp
     private LocalDateTime dataAggiornamento;
 
-    @ManyToOne
+    @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.DETACH})
     @JoinColumn(name = "report_id")
     private Report report;
 

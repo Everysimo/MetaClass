@@ -92,14 +92,13 @@ public class Stanza {
     @NotNull(message = "Il numero massimo di posti non può essere nullo")
     @Min(value = 1, message = "Il valore del  parametro non deve essere inferiore ad 1")
     @Max(value = 999, message = "Il valore del  parametro non deve superare 999")
-   // @NotBlank(message = "Il numero massimo dei posti non può essere vuota")
     private int max_Posti;
 
     /**
      * Chiave Esterna sullo Scenario
      */
     @NotNull(message = "Lo scenario non può essere nullo")
-    @ManyToOne()
+    @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.DETACH})
     @JoinColumn(name = "id_scenario")
     private Scenario scenario;
 

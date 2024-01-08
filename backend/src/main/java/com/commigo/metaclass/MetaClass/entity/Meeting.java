@@ -40,7 +40,7 @@ public class Meeting {
     @Size(min = MIN_NAME_LENGTH, max = MAX_NAME_LENGTH,
             message = "Lunghezza nome non valida")
     @NotBlank(message = "Il nome non può essere vuoto")
-    @Pattern(regexp = "^[A-Z][a-z]*$",
+    @Pattern(regexp = "^[A-Z][A-Za-z0-9\\s]*$\n",
             message = "Il nome deve iniziare con una lettera maiuscola seguita da lettere " +
                       "minuscole senza spazi o caratteri speciali")
     private String nome;
@@ -62,7 +62,7 @@ public class Meeting {
      *Chiave Esterna sullo Scenario
      */
     @NotNull(message = "Lo scenario non può essere nullo")
-    @ManyToOne()
+    @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.DETACH})
     @JoinColumn(name = "id_scenario")
     private Scenario scenario_iniziale;
 
@@ -70,7 +70,7 @@ public class Meeting {
      *Chiave Esterna sulla stanza
      */
     @NotNull(message = "Lo stanza non può essere nulla")
-    @ManyToOne()
+    @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.DETACH})
     @JoinColumn(name = "id_stanza")
     private Stanza stanza;
 
