@@ -13,9 +13,17 @@ export default class CreaScenario extends Component {
         errorMessage: "",
     };
 
-    handleInputChange = (e) => {
-        const { name, value } = e.target;
-        this.setState({ [name]: value });
+    handleNameChange = (e) => {
+        this.setState({nome: e.target.value});
+    };
+    handleDescChange = (e) => {
+        this.setState({ descrizione: e.target.value });
+    };
+    handleImmageChange = (e) => {
+        this.setState({ imageUrl: e.target.value });
+    };
+    handleCateChange = (e) => {
+        this.setState({ categoria: e.target.value });
     };
 
     handleErrorPopupClose = () => {
@@ -75,7 +83,15 @@ export default class CreaScenario extends Component {
             categoria: 0,
         });
     };
+    handleClose = () => {
+        // Nascondi la card impostando isVisible su false
+        this.setState({ isVisible: false });
 
+        // Chiama la funzione di chiusura ricevuta come prop
+        if (this.props.onClose) {
+            this.props.onClose();
+        }
+    };
     renderErrorPopup = () => {
         return (
             <div className={`error-popup ${this.state.isErrorPopupVisible ? '' : 'hidden'}`}>
@@ -100,7 +116,7 @@ export default class CreaScenario extends Component {
                                 type="text"
                                 name="nome"
                                 value={this.state.nome}
-                                onChange={this.handleInputChange}
+                                onChange={this.handleNameChange}
                             />
                         </label>
                         <label>
@@ -109,7 +125,7 @@ export default class CreaScenario extends Component {
                                 type="text"
                                 name="descrizione"
                                 value={this.state.descrizione}
-                                onChange={this.handleInputChange}
+                                onChange={this.handleDescChange}
                             />
                         </label>
                         <label>
@@ -118,7 +134,7 @@ export default class CreaScenario extends Component {
                                 type="text"
                                 name="immagine"
                                 value={this.state.imageUrl}
-                                onChange={this.handleInputChange}
+                                onChange={this.handleImmageChange}
                             />
                         </label>
                         <label>
@@ -127,7 +143,7 @@ export default class CreaScenario extends Component {
                                 type="number"
                                 name="idCategoria"
                                 value={this.state.categoria}
-                                onChange={this.handleInputChange}
+                                onChange={this.handleCateChange}
                                 min={0}
                             />
                         </label>

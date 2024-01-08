@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import '../CreaScenarioForm/creaScenario.css';
 import { wait } from "@testing-library/user-event/dist/utils";
 
-export default class CreaScenario extends Component {
+export default class CreaCategoria extends Component {
     state = {
         nome: "",
         descrizione_categoria: "",
@@ -11,9 +11,11 @@ export default class CreaScenario extends Component {
         errorMessage: "",
     };
 
-    handleInputChange = (e) => {
-        const { name, value } = e.target;
-        this.setState({ [name]: value });
+    handleNameChange = (e) => {
+        this.setState({nome: e.target.value});
+    };
+    handleDescChange = (e) => {
+        this.setState({ descrizione_categoria: e.target.value });
     };
 
     handleErrorPopupClose = () => {
@@ -64,7 +66,12 @@ export default class CreaScenario extends Component {
     };
     handleClose = () => {
         // Nascondi la card impostando isVisible su false
-        this.setState({isVisible: false});
+        this.setState({ isVisible: false });
+
+        // Chiama la funzione di chiusura ricevuta come prop
+        if (this.props.onClose) {
+            this.props.onClose();
+        }
     };
      renderErrorPopup = () => {
         return (
@@ -91,7 +98,7 @@ export default class CreaScenario extends Component {
                                 type="text"
                                 name="nome"
                                 value={this.state.nome}
-                                onChange={this.handleInputChange}
+                                onChange={this.handleNameChange}
                             />
                         </label>
                         <label>
@@ -100,7 +107,7 @@ export default class CreaScenario extends Component {
                                 type="text"
                                 name="descrizione"
                                 value={this.state.descrizione_categoria}
-                                onChange={this.handleInputChange}
+                                onChange={this.handleDescChange}
                             />
                         </label>
                         <div className="button-container">
