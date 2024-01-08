@@ -309,7 +309,9 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService {
                     Scenario scenario = scenarioRepository.findScenarioById(idScenario);
                     if(scenario != null) {
                         if(scenario != stanza.getScenario()) {
-                            stanzaRepository.updateAttributes(idScenario, stanza);
+                           // stanzaRepository.updateAttributes(idScenario, stanza);
+                            stanza.setScenario(scenario);
+                            stanzaRepository.save(stanza);
                             return ResponseEntity.ok(new Response<>(true, "Lo scenario è stato modificato"));
                         }else{
                             return ResponseEntity.status(403).body(new Response<>(false, "Lo scenario selezionato è già in uso per la stanza"));
