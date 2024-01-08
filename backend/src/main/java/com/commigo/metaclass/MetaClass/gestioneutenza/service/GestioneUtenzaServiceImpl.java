@@ -72,7 +72,10 @@ public class GestioneUtenzaServiceImpl implements GestioneUtenzaService{
                 u.setAdmin(true);
             }
 
-            utenteRepository.save(u);
+            if(utenteRepository.findFirstByMetaId(u.getMetaId()) == null){
+                utenteRepository.save(u);
+            }
+
             return true;
         }catch (DataIntegrityViolationException e){
             throw new ServerRuntimeException("errore nella registrazione dell'utente");

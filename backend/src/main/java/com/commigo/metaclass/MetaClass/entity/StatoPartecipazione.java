@@ -70,7 +70,7 @@ public class StatoPartecipazione implements Serializable {
      */
     @NotNull(message = "Il nome nella stanza non può essere nullo")
     @Column(length = MAX_NAME_LENGTH)
-    @Pattern(regexp = "^[A-Z][A-Za-z0-9]*$\n")
+    @Pattern(regexp = "^[A-Z][A-Za-z0-9]*$")
     @Size(min = 1, max = MAX_NAME_LENGTH, message = "Lunghezza del NomeInStanza non valida")
     @NotBlank(message = "Il nome nella stanza non può essere vuota")
     private String nomeInStanza;

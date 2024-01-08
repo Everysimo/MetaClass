@@ -57,14 +57,12 @@ public class Stanza {
      * Codice della Stanza
      */
 
-    @NotNull(message = "Il codice della stanza non può essere nullo")
     @Column(length = MAX_NAME_LENGTH, unique = true)
     @Size(min = 6,
             max = 6,
             message = "Lunghezza codice_stanza errato")
     @Pattern(regexp="^[0-9]{6}$",
             message="Formato codice_stanza errato")
-    @NotBlank(message = "Il codice stanza  non può essere vuoto")
     private String codice;
 
     /**
@@ -111,18 +109,16 @@ public class Stanza {
     private LocalDateTime data_Aggiornamento;
     @JsonCreator
     public Stanza(@JsonProperty("nome") String nome,
-                  @JsonProperty("codiceStanza") String codiceStanza,
                   @JsonProperty("descrizione") String descrizione,
                   @JsonProperty("tipoAccesso") boolean tipoAccesso,
                   @JsonProperty("maxPosti") int maxPosti,
                   @JsonProperty("id_scenario") Long id_scenario) throws MismatchJsonProperty {
 
-        if (nome == null || codiceStanza == null || descrizione == null || id_scenario == null) {
+        if (nome == null || descrizione == null || id_scenario == null) {
             throw new MismatchJsonProperty("gli attributi non sono corretti");
         }
 
         this.nome = nome;
-        this.codice = codiceStanza;
         this.descrizione = descrizione;
         this.tipo_Accesso = tipoAccesso;
         this.max_Posti = (maxPosti > 0)? maxPosti:1;

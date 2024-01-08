@@ -57,12 +57,21 @@ public class Immagine {
     @NotBlank(message = "Il url non può essere vuoto")
     private String url;
 
-    /**
-     *Chiave Esterna sullo Scenario
-     */
-    @NotNull(message = "Lo scenario non può essere nullo")
-    @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.REMOVE})
-    @JoinColumn(name = "id_scenario")
-    private Scenario scenario;
+    public Immagine(String urlString){
+        String fileName = getFileNameFromURL(urlString);
 
+        this.url = urlString;
+        this.nome = fileName;
+    }
+
+
+    private  String getFileNameFromURL(String urlString) {
+        int lastSlashIndex = urlString.lastIndexOf('/');
+        if (lastSlashIndex >= 0 && lastSlashIndex < urlString.length() - 1) {
+            return urlString.substring(lastSlashIndex + 1);
+        } else {
+            // Nel caso in cui l'URL non contenga un nome file valido
+            throw new IllegalArgumentException("L'URL non contiene un nome di file valido.");
+        }
+    }
 }

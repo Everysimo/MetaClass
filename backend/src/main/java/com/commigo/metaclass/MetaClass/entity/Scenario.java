@@ -67,12 +67,12 @@ public class Scenario {
     @JsonCreator
     public Scenario(@JsonProperty("nome") String Nome,
                     @JsonProperty("descrizione") String Descrizione,
-                    @JsonProperty("id_immagine") Long idImmagine,
+                    @JsonProperty("url_immagine") @URL String url ,
                     @JsonProperty("id_categoria") Long idCategoria){
         this.nome = Nome;
         this.descrizione = Descrizione;
         this.image = new Immagine();
-        this.image.setId(idImmagine);
+        this.image.setUrl(url);
         this.categoria = new Categoria();
         this.categoria.setId(idCategoria);
 

@@ -16,6 +16,9 @@ public interface StanzaRepository extends JpaRepository<Stanza, Long> {
     Stanza findStanzaByCodice(String codice);
     Stanza findStanzaById(long id);
 
+    @Query("SELECT s.id FROM Stanza s ORDER BY s.id DESC LIMIT 1")
+    Long findIdUltimaTupla();
+
     //il valore restituito indica il numero di righe modificate, quindi:
     // 1 se tutto ok
     // 0 se non è ok
