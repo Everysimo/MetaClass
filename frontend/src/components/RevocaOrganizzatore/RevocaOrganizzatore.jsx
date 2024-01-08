@@ -1,13 +1,10 @@
 import React, { Component } from 'react';
-import './creaScenario.css';
+import '../CreaScenarioForm/creaScenario.css';
 import { wait } from "@testing-library/user-event/dist/utils";
 
-export default class CreaScenario extends Component {
+export default class RevocaOrganizatore extends Component {
     state = {
         nome: "",
-        descrizione: "",
-        immagine: "",
-        idCategoria: 0,
         isVisible: true,
         isErrorPopupVisible: false,
         errorMessage: "",
@@ -26,22 +23,12 @@ export default class CreaScenario extends Component {
     };
 
     sendDataToServer = async () => {
-        const { nome, descrizione, immagine, idCategoria } = this.state;
+        const { nome} = this.state;
 
         // Validazione: Assicurati che idCategoria sia >= 0
-        if (idCategoria < 0) {
-            this.setState({
-                isErrorPopupVisible: true,
-                errorMessage: "L'id Categoria deve essere maggiore o uguale a 0",
-            });
-            return;
-        }
 
         const dataToSend = {
             nome,
-            descrizione,
-            immagine,
-            idCategoria,
         };
 
         const requestOption = {
@@ -52,7 +39,7 @@ export default class CreaScenario extends Component {
 
         try {
             console.log("la stringa json:", JSON.stringify(dataToSend));
-            const response = await fetch('http://localhost:8080/updateScenario', requestOption);
+            const response = await fetch('http://localhost:8080/updateCategoria', requestOption);
             const responseData = await response.json();
             console.log("Risposta dal server:", responseData);
         } catch (error) {
@@ -67,15 +54,10 @@ export default class CreaScenario extends Component {
         this.handleClear();
     };
 
-    handleClear = () => {
-        this.setState({
-            nome: '',
-            descrizione: '',
-            immagine: '',
-            idCategoria: 0,
-        });
+    handleClose = () => {
+        // Nascondi la card impostando isVisible su false
+        this.setState({isVisible: false});
     };
-
     renderErrorPopup = () => {
         return (
             <div className={`error-popup ${this.state.isErrorPopupVisible ? '' : 'hidden'}`}>
@@ -84,6 +66,7 @@ export default class CreaScenario extends Component {
             </div>
         );
     };
+
 
     render() {
         return (
@@ -103,37 +86,8 @@ export default class CreaScenario extends Component {
                                 onChange={this.handleInputChange}
                             />
                         </label>
-                        <label>
-                            Descrizione:
-                            <input
-                                type="text"
-                                name="descrizione"
-                                value={this.state.descrizione}
-                                onChange={this.handleInputChange}
-                            />
-                        </label>
-                        <label>
-                            Immagine:
-                            <input
-                                type="text"
-                                name="immagine"
-                                value={this.state.immagine}
-                                onChange={this.handleInputChange}
-                            />
-                        </label>
-                        <label>
-                            Id Categoria:
-                            <input
-                                type="number"
-                                name="idCategoria"
-                                value={this.state.idCategoria}
-                                onChange={this.handleInputChange}
-                                min={0}
-                            />
-                        </label>
                         <div className="button-container">
-                            <button onClick={this.handleClear}>Cancella</button>
-                            <button onClick={() => this.callFunction()}>Invia</button>
+                            <button onClick={() => this.callFunction()}>Conferma</button>
                         </div>
                     </div>
                 </div>

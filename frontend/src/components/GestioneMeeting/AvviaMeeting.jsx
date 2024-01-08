@@ -1,30 +1,21 @@
 import React, { Component } from 'react';
-import './creaScenario.css';
-import { wait } from "@testing-library/user-event/dist/utils";
+import '../CreaScenarioForm/creaScenario.css';
 
 export default class AvviaMeeting extends Component {
     state = {
-        stato: false,
+        id_meeting: this.props.id_meeting || "", // Imposta il valore iniziale con quello ricevuto come prop
         isVisible: true,
         isErrorPopupVisible: false,
         errorMessage: "",
     };
 
-    handleErrorPopupClose = () => {
-        this.setState({
-            isErrorPopupVisible: false,
-            errorMessage: "",
-        });
-    };
-
     sendDataToServer = async () => {
-        const { nome, descrizione_categoria} = this.state;
+        const { id_meeting} = this.state;
 
         // Validazione: Assicurati che idCategoria sia >= 0
 
         const dataToSend = {
-            nome,
-            descrizione_categoria,
+            id_meeting,
         };
 
         const requestOption = {
@@ -34,10 +25,7 @@ export default class AvviaMeeting extends Component {
         };
 
         try {
-            console.log("id: 725841336137765 ->", Id);
-            console.log("la stringa json:", JSON.stringify(dataToSend));
-
-            const response = await fetch(`http://localhost:8080/modifyRoomData/${1}`, requestOption);
+            const response = await fetch(`http://localhost:8080/avviaMeeting/${id_meeting}`, requestOption);
 
             const responseData = await response.json();
             console.log("Risposta dal server:", responseData);
@@ -46,43 +34,34 @@ export default class AvviaMeeting extends Component {
         }
     };
 
-
     callFunction = () => {
+        // Invia i dati al server utilizzando this.state.id_meeting
         this.sendDataToServer();
         console.log("dati del form", this.state);
-        wait(100);
-        this.handleClear();
-    };
-    handleStart = () => {
 
     };
 
     handleClose = () => {
         // Nascondi la card impostando isVisible su false
-        this.setState({isVisible: false});
-    };
-    renderErrorPopup = () => {
-        return (
-            <div className={`error-popup ${this.state.isErrorPopupVisible ? '' : 'hidden'}`}>
-                {this.state.errorMessage}
-                <button onClick={this.handleErrorPopupClose}>Chiudi</button>
-            </div>
-        );
+        this.setState({ isVisible: false });
+
+        // Chiama la funzione di chiusura ricevuta come prop
+        if (this.props.onClose) {
+            this.props.onClose();
+        }
     };
 
 
     render() {
         return (
             <div>
-                {this.renderErrorPopup()}
                 <div className={`card ${this.state.isVisible ? '' : 'hidden'}`}>
                     <button className="close-button" onClick={this.handleClose}>
                         X
                     </button>
                     <div className="card-content">
                         <div className="button-container">
-                            <button onClick={this.handleClear}>Cancella</button>
-                            <button onClick={() => this.callFunction()}>Invia</button>
+                            <button onClick={() => this.callFunction()}>Avvia Meeting</button>
                         </div>
                     </div>
                 </div>
