@@ -119,8 +119,11 @@ public class GestioneStanzaControl {
     }
 
     @PostMapping(value = "/gestioneAccessi")
-    public ResponseEntity<Response<List<StatoPartecipazione>>> gestioneAccessi(@RequestBody GestioneAccessiRequest request, HttpSession session, BindingResult result)
-    {
+    public ResponseEntity<Response<List<StatoPartecipazione>>> gestioneAccessi(@RequestBody GestioneAccessiRequest request, HttpServletRequest session, BindingResult result) throws RuntimeException403 {
+
+        if (!validationToken.isTokenValid(session)) {
+            throw new RuntimeException403("Token non valido");
+        }
 
         if(result.hasErrors())
         {
