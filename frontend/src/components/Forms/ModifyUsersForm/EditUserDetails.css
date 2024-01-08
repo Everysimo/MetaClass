@@ -1,0 +1,78 @@
+/* Modal styles */
+.modal {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+.modal-content {
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    width: 300px;
+}
+
+.close {
+    cursor: pointer;
+    float: right;
+    font-size: 20px;
+    font-weight: bold;
+    color: #333;
+}
+
+.close:hover {
+    color: #000;
+}
+
+/* Input styles */
+input[type="text"],
+input[type="date"] {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    /* Additional styles */
+    background-color: white;
+    color: #333;
+    font-size: 16px;
+    /* Adjust appearance for different browsers */
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+}
+
+input[type="text"]:focus,
+input[type="date"]:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+}
+
+/* Style date picker arrow */
+input[type="date"]::-webkit-calendar-picker-indicator {
+    filter: invert(0.3); /* Adjust the color of the calendar icon */
+    cursor: pointer;
+}
+
+/* Placeholder styles for date input */
+input[type="date"]::-webkit-datetime-edit-fields-wrapper::after {
+    content: attr(placeholder);
+    color: #999; /* Placeholder text color */
+    text-align: center;
+}
+
+/* Hide the default placeholder */
+input[type="date"]::-webkit-datetime-edit-fields-wrapper {
+    color: transparent;
+    text-align: center;
+}
+
+

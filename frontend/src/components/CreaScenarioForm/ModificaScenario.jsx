@@ -1,8 +1,9 @@
 import React, { Component } from 'react';
+import { Divider } from "@chakra-ui/react";
 import './creaScenario.css';
 import { wait } from "@testing-library/user-event/dist/utils";
 
-export default class CreaScenario extends Component {
+export default class ModificaScenario extends Component {
     state = {
         nome: "",
         descrizione: "",
@@ -74,6 +75,10 @@ export default class CreaScenario extends Component {
             imageUrl: '',
             categoria: 0,
         });
+    };
+    handleClose = () => {
+        // Nascondi la card impostando isVisible su false
+        this.setState({isVisible: false});
     };
 
     renderErrorPopup = () => {

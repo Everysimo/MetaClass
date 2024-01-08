@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -18,7 +19,6 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Report {
 
 
@@ -26,26 +26,19 @@ public class Report {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-
-    @NotBlank
     @NotNull(message = "Il numero di partecipanti non può essere nullo")
     @Min(value = 1, message = "Il numero di partecipanti non può essere inferiore a 1")
-    private int Num_Partecipante;
-
-
+    private int Num_Partecipanti = 1;
 
     @Column(name = "Durata_Meeting")
-    @NotBlank
     @NotNull(message = "La durata del meeting non può essere nulla")
-    private LocalDateTime Durata_Meeting;
+    private Duration durataMeeting;
 
-    @NotBlank
     @Column(name = "MAX_Partecipanti")
     @NotNull(message = "Il numero massimo di partecipanti non può essere nullo")
     @Min(value = 1, message = "Il numero massimo di partecipanti non può essere inferiore a 1")
-    private int MAX_Partecipanti;
+    private int MAX_Partecipanti = 1;
 
-    @NotBlank
     @NotNull(message = "Il meeting non può essere nullo")
     @ManyToOne()
     @JoinColumn(name = "id_meeting")
@@ -54,14 +47,19 @@ public class Report {
     @OneToMany(mappedBy = "report", cascade = CascadeType.ALL)
     private List<Utente> Lista_Partecipanti;
 
-    @NotBlank
     @Column(name = "Data_Creazione", updatable = false)
     @CreationTimestamp
     private LocalDateTime Data_Creazione;
 
-    @NotBlank
     @Column(name = "Data_Aggiornamento")
     @UpdateTimestamp
     private LocalDateTime Data_Aggiornamento;
+
+    //costruttore richiamato all'avvio del meeting
+    public Report (Meeting meeting, Utente ogm){
+        this.meeting = meeting;
+        this.Lista_Partecipanti = List.of(ogm);
+        this.durataMeeting = Duration.ZERO;
+    }
 
 }

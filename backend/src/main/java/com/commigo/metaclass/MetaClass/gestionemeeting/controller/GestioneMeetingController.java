@@ -23,6 +23,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 @RestController
 public class GestioneMeetingController {
 
@@ -153,8 +155,22 @@ public class GestioneMeetingController {
         }
     }
 
+    @PostMapping(value = "/visualizzaSchedulingMeeting/{Id}")
+    public ResponseEntity<Response<List<Meeting>>> visualizzaSchedulingMeeting(@PathVariable Long Id,
+                                                                               HttpServletRequest request) {
+        try {
+            if (!validationToken.isTokenValid(request)) {
+                throw new RuntimeException403("Token non valido");
+            }
 
-    @PostMapping(value = "/accediMeeting/{id_meeting}")
+            return meetingService.visualizzaSchedulingMeeting(Id);
+
+        }catch (Exception e) {
+            return ResponseEntity.ok (new Response<>(null, "Errore visualizzazione Scheduling dei meeting per la stanza"));
+        }
+
+    }
+        @PostMapping(value = "/accediMeeting/{id_meeting}")
     public ResponseEntity<Response<Boolean>> accediMeeting (@PathVariable Long id_meeting,
                                                             HttpServletRequest request) {
         try {
@@ -180,6 +196,60 @@ public class GestioneMeetingController {
                     .body(new Response<>(false, se.getMessage()));
         }
 
+    }
+
+    @PostMapping(value = "/terminaMeeting/{id_meeting}")
+    public ResponseEntity<Response<Boolean>> terminaMeeting (@PathVariable Long id_meeting,
+                                                           HttpServletRequest request) {
+        try {
+            //controllo token
+            if (!validationToken.isTokenValid(request)) {
+                throw new RuntimeException403("Token non valido");
+            }
+
+            String metaID = jwtTokenUtil.getMetaIdFromToken(validationToken.getToken());
+
+            if(meetingService.terminaMeeting(metaID, id_meeting)){
+                return ResponseEntity.ok(new Response<>(true,
+                        "Meeting terminato con successo"));
+            }else{
+                throw new ServerRuntimeException("Errore nella terminazione del meeting");
+            }
+
+        }catch (RuntimeException403 e) {
+            return ResponseEntity.status(403)
+                    .body(new Response<>(false, e.getMessage()));
+        }catch (ServerRuntimeException se) {
+            return ResponseEntity.status(500)
+                    .body(new Response<>(false, se.getMessage()));
+        }
+    }
+
+    @PostMapping(value = "/uscitaMeeting/{id_meeting}")
+    public ResponseEntity<Response<Boolean>> uscitaMeeting (@PathVariable Long id_meeting,
+                                                             HttpServletRequest request) {
+        try {
+            //controllo token
+            if (!validationToken.isTokenValid(request)) {
+                throw new RuntimeException403("Token non valido");
+            }
+
+            String metaID = jwtTokenUtil.getMetaIdFromToken(validationToken.getToken());
+
+            if(meetingService.uscitaMeeting(metaID, id_meeting)){
+                return ResponseEntity.ok(new Response<>(true,
+                        "Uscita avvenuta con successo"));
+            }else{
+                throw new ServerRuntimeException("Errore nell'uscita dell'utente del meeting");
+            }
+
+        }catch (RuntimeException403 e) {
+            return ResponseEntity.status(403)
+                    .body(new Response<>(false, e.getMessage()));
+        }catch (ServerRuntimeException se) {
+            return ResponseEntity.status(500)
+                    .body(new Response<>(false, se.getMessage()));
+        }
     }
 }
 
