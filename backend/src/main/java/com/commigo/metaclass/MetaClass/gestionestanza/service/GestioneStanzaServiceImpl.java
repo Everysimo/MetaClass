@@ -317,7 +317,7 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService {
             StatoPartecipazione stato = statoPartecipazioneRepository.findStatoPartecipazioneByUtenteAndStanza(u, stanza);
             if (stato != null) {
                 if (stato.getRuolo().getNome().equalsIgnoreCase(Ruolo.ORGANIZZATORE_MASTER) || stato.getRuolo().getNome().equalsIgnoreCase(Ruolo.ORGANIZZATORE) && !stato.isBannato()) {
-                    List<Utente> utenti = statoPartecipazioneRepository.findUtentiBannatiInStanza(Id);
+                    List<Utente> utenti = statoPartecipazioneRepository.findUtentiInAttesaInStanza(Id);
 
                     if (utenti != null) {
                         return ResponseEntity.ok(new Response<>
@@ -405,7 +405,36 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService {
         }
     }
 
-            /**
+    @Override
+    public ResponseEntity<Response<Boolean>> kickPartecipante(String metaID, Long idStanza, Long idUtente){
+        Utente og = utenteRepository.findFirstByMetaId(metaID);
+        Stanza stanza = stanzaRepository.findStanzaById(idStanza);
+
+        Utente kick = utenteRepository.findUtenteById(idUtente);
+            if (stanza != null) {
+            StatoPartecipazione statoOg = statoPartecipazioneRepository.findStatoPartecipazioneByUtenteAndStanza(og, stanza);
+            if (statoOg != null) {
+                if (statoOg.getRuolo().getNome().equalsIgnoreCase(Ruolo.ORGANIZZATORE_MASTER) || statoOg.getRuolo().getNome().equalsIgnoreCase(Ruolo.ORGANIZZATORE) && !statoOg.isBannato()) {
+
+                    StatoPartecipazione statoKick = statoPartecipazioneRepository.findStatoPartecipazioneByUtenteAndStanza(kick, stanza);
+                    if (statoKick != null) {
+                        statoPartecipazioneRepository.delete(statoKick);
+                        return ResponseEntity.ok(new Response<>(true, "L'utente è stato kickato con successo"));
+                    } else {
+                        return ResponseEntity.status(403).body(new Response<>(false, "Il partecipante selezionato non è presente nella stanza"));
+                    }
+                } else {
+                    return ResponseEntity.status(403).body(new Response<>(false, "Non puoi kickare un utente se non sei almeno un'organizzatore"));
+                }
+            } else {
+                return ResponseEntity.status(403).body(new Response<>(false, "Il partecipante selezionato non è presente nella stanza"));
+            }
+        }else{
+            return ResponseEntity.status(403).body(new Response<>(false, "La stanza selezionata non esiste"));
+        }
+    }
+
+    /**
              * @param Id
              * @return
              */

@@ -385,10 +385,6 @@ public class GestioneStanzaControl {
                 throw new RuntimeException403("Token non valido");
             }
 
-            System.out.println("Id_stanza" + IdStanza);
-            System.out.println("Id_utente" + IdUtente);
-            System.out.println("nome" + nome);
-
             String metaID = jwtTokenUtil.getMetaIdFromToken(validationToken.getToken());
 
             ObjectMapper objectMapper = new ObjectMapper();
@@ -396,6 +392,29 @@ public class GestioneStanzaControl {
             String NuovoNome = jsonNode.get("nome").asText();
 
             return stanzaService.modificaNomePartecipante(metaID, IdStanza, IdUtente, NuovoNome);
+
+        } catch (RuntimeException403 e) {
+            e.printStackTrace();
+            return ResponseEntity.status(403).body(new Response<>(null, "Errore nell'operazione"));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(500).body(new Response<>(null, "Errore durante l'operazione"));
+        }
+    }
+
+    @PostMapping(value = "/kickarePartecipante/{IdStanza}/{IdUtente}")
+    public ResponseEntity<Response<Boolean>> kickPartecipante(@PathVariable Long IdStanza,
+                                                                      @PathVariable Long IdUtente,
+                                                                      HttpServletRequest request) {
+
+        try {
+            if (!validationToken.isTokenValid(request)) {
+                throw new RuntimeException403("Token non valido");
+            }
+
+            String metaID = jwtTokenUtil.getMetaIdFromToken(validationToken.getToken());
+
+            return stanzaService.kickPartecipante(metaID, IdStanza, IdUtente);
 
         } catch (RuntimeException403 e) {
             e.printStackTrace();
