@@ -43,7 +43,7 @@ export const Account = () => {
                     )}
                 </div>
                 {/* Pass setUserDetails as prop to EditUserDetails */}
-                <EditUserDetails setUserDetails={setUserDetails} />
+                <EditUserDetails userDetails={userDetails} setUserDetails={setUserDetails} />
                 <LogoutButton />
             </section>
             <footer>
