@@ -6,9 +6,9 @@ import com.commigo.metaclass.MetaClass.gestioneamministrazione.repository.Scenar
 import com.commigo.metaclass.MetaClass.gestionestanza.repository.RuoloRepository;
 import com.commigo.metaclass.MetaClass.gestionestanza.repository.StanzaRepository;
 import com.commigo.metaclass.MetaClass.gestionestanza.repository.StatoPartecipazioneRepository;
-import com.commigo.metaclass.MetaClass.gestionestanza.service.GestioneStanzaService;
 import com.commigo.metaclass.MetaClass.gestionestanza.service.GestioneStanzaServiceImpl;
 import com.commigo.metaclass.MetaClass.gestioneutenza.repository.UtenteRepository;
+import com.commigo.metaclass.MetaClass.utility.multipleid.StatoPartecipazioneId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
@@ -47,66 +47,51 @@ public class DataInitializer implements CommandLineRunner {
     public void run(String... args) throws Exception {
 
         //Aggiunta Utente - Michele è amministratore - Francesco utente semplice
-            utenteRepository.save(new Utente("Michele", "Pesce", "pescemichele@live.com", "05/30/1993","M","7184488154978627", Utente.DEFAULT_TOKEN, true));
-            utenteRepository.save(new Utente("Francesco", "Gatto", "francescogatto2001@gmail.com", "11/01/2001","M","7179258205463811", Utente.DEFAULT_TOKEN, false));
-            utenteRepository.save(new Utente("Giorgio", "Castelluccio", "giorgio_castelluccio@outlook.it", "10/10/2010","M","7168367147841000", Utente.DEFAULT_TOKEN, false));
+            Utente u1 = utenteRepository.save(new Utente(1L, "Michele", "Pesce", "pescemichele@live.com", "05/30/1993","M","7184488154978627", Utente.DEFAULT_TOKEN, true));
+            Utente u2 = utenteRepository.save(new Utente(2L, "Francesco", "Gatto", "francescogatto2001@gmail.com", "11/01/2001","M","7179258205463811", Utente.DEFAULT_TOKEN, false));
+            Utente u3 = utenteRepository.save(new Utente(3L, "Giorgio", "Castelluccio", "giorgio_castelluccio@outlook.it", "10/10/2010","M","7168367147841000", Utente.DEFAULT_TOKEN, false));
 
         //Aggiunta ruolo
-            ruoloRepository.save(new Ruolo("Partecipante"));
-            ruoloRepository.save(new Ruolo("Organizzatore"));
-            ruoloRepository.save(new Ruolo("Organizzatore_Master"));
+            Ruolo r1 = ruoloRepository.save(new Ruolo(1L, "Partecipante"));
+            Ruolo r2 = ruoloRepository.save(new Ruolo(2L, "Organizzatore"));
+            Ruolo r3 = ruoloRepository.save(new Ruolo(3L, "Organizzatore_Master"));
 
         //Aggiunta della Categoria
-            categoriaRepository.save(new Categoria("Lavoro", "Categoria per il lavoro"));
-            categoriaRepository.save(new Categoria("Scuola", "Categoria per la scuola"));
-            categoriaRepository.save(new Categoria("Divertimento", "Categoria per il divertimento"));
+            Categoria c1 = categoriaRepository.save(new Categoria(1L, "Lavoro", "Categoria per il lavoro"));
+            Categoria c2 = categoriaRepository.save(new Categoria(2L,"Scuola", "Categoria per la scuola"));
+            Categoria c3 = categoriaRepository.save(new Categoria(3L, "Divertimento", "Categoria per il divertimento"));
 
         //Aggiunta Immagine
-        Immagine lavoro1 = new Immagine("https://www.lavoro1.com/path/to/lavoro1.txt");
-            immagineRepository.save(lavoro1);
-
-        Immagine scuola1 = new Immagine("https://www.scuola1.com/path/to/scuola1.txt");
-            immagineRepository.save(scuola1);
-
-        Immagine divertimento1 = new Immagine("https://www.divertimento1.com/path/to/divertimento1.txt");
-           immagineRepository.save(divertimento1);
+            Immagine i1 = immagineRepository.save(new Immagine(1L, "lavoro1.txt","https://www.lavoro1.com/path/to/lavoro1.txt"));
+            Immagine i2 = immagineRepository.save(new Immagine(2L, "scuola1.txt","https://www.scuola1.com/path/to/scuola1.txt"));
+            Immagine i3 = immagineRepository.save(new Immagine(3L, "divertimento1.txt","https://www.divertimento1.com/path/to/divertimento1.txt"));
 
         //Aggiunta dello Scenario
 
-            scenarioRepository.save(new Scenario("Lavoro1", "Scenario 1 per il lavoro", immagineRepository.findImmagineById((long)1), (long)1));
-            scenarioRepository.save(new Scenario("Scuola1", "Scenario 1 per la scuola", immagineRepository.findImmagineById((long)2), (long)2));
-            scenarioRepository.save(new Scenario("Divertimento1", "Divertimento 1 per la scuola", immagineRepository.findImmagineById((long)3), (long)3));
+            Scenario sc1 = scenarioRepository.save(new Scenario(1L, "Lavoro1", "Scenario 1 per il lavoro", i1, c1));
+            Scenario sc2 = scenarioRepository.save(new Scenario(2L, "Scuola1", "Scenario 1 per la scuola", i2, c2));
+            Scenario sc3 = scenarioRepository.save(new Scenario(3L, "Divertimento1", "Divertimento 1 per la scuola", i3, c3));
 
 
         //Aggiunta della Stanza
-            stanzaRepository.save(new Stanza("StanzaLavoro1", "Stanza 1 per il lavoro", true, 500, scenarioRepository.findScenarioById((long)1), "000001"));
-            stanzaRepository.save(new Stanza("StanzaScuola1", "Stanza 1 per la scuola", false, 200, scenarioRepository.findScenarioById((long)2), "000002"));
-           stanzaRepository.save(new Stanza("StanzaDivertimento1", "Stanza 1 per il divertimento", true, 50, scenarioRepository.findScenarioById((long)3), "000003"));
+            Stanza s1 = stanzaRepository.save(new Stanza(1L, "StanzaLavoro1", "Stanza 1 per il lavoro", true, 500, sc1, "000001"));
+            Stanza s2 = stanzaRepository.save(new Stanza(2L, "StanzaScuola1", "Stanza 1 per la scuola", false, 200, sc2, "000002"));
+            Stanza s3 = stanzaRepository.save(new Stanza(3L, "StanzaDivertimento1", "Stanza 1 per il divertimento", true, 50, sc3, "000003"));
 
+      System.out.println(s1);
         //Aggiunta dello StatoPartecipazione
-        //Stanza lavoro
-        Stanza lavoro = stanzaRepository.findStanzaById((long)1);
-        Utente michele = utenteRepository.findFirstByMetaId("7184488154978627");
-        Utente francesco = utenteRepository.findFirstByMetaId("7179258205463811");
-        Utente giorgio = utenteRepository.findFirstByMetaId("7168367147841000");
 
-            statoPartecipazioneRepository.save(new StatoPartecipazione(lavoro, michele, stanzaService.getRuolo(ORGANIZZATORE_MASTER), false, false, "Michele"));
-            statoPartecipazioneRepository.save(new StatoPartecipazione(lavoro, francesco, stanzaService.getRuolo(Ruolo.ORGANIZZATORE), false, false, "Francesco"));
-            statoPartecipazioneRepository.save(new StatoPartecipazione(lavoro, giorgio, stanzaService.getRuolo(Ruolo.PARTECIPANTE), true, false, "Giorgio"));
+            StatoPartecipazione sp1 = statoPartecipazioneRepository.save(new StatoPartecipazione(s1, u1, stanzaService.getRuolo(ORGANIZZATORE_MASTER), false, false, "Michele"));
+            StatoPartecipazione sp2 = statoPartecipazioneRepository.save(new StatoPartecipazione(s1, u2, stanzaService.getRuolo(Ruolo.ORGANIZZATORE), false, false, "Francesco"));
+            StatoPartecipazione sp3 = statoPartecipazioneRepository.save(new StatoPartecipazione(s1, u3, stanzaService.getRuolo(Ruolo.PARTECIPANTE), true, false, "Giorgio"));
 
-        //Stanza scuola
-        Stanza scuola = stanzaRepository.findStanzaById((long)2);
+            StatoPartecipazione sp4 = statoPartecipazioneRepository.save(new StatoPartecipazione(s2, u1, stanzaService.getRuolo(Ruolo.PARTECIPANTE), false, true, "Michele"));
+            StatoPartecipazione sp5 = statoPartecipazioneRepository.save(new StatoPartecipazione(s2, u2, stanzaService.getRuolo(Ruolo.PARTECIPANTE), false, false, "Francesco"));
+            StatoPartecipazione sp6 = statoPartecipazioneRepository.save(new StatoPartecipazione(s3, u3, stanzaService.getRuolo(ORGANIZZATORE_MASTER), false, false, "Giorgio"));
 
-            statoPartecipazioneRepository.save(new StatoPartecipazione(scuola, michele, stanzaService.getRuolo(Ruolo.PARTECIPANTE), false, true, "Michele"));
-            statoPartecipazioneRepository.save(new StatoPartecipazione(scuola, francesco, stanzaService.getRuolo(Ruolo.PARTECIPANTE), false, false, "Francesco"));
-            statoPartecipazioneRepository.save(new StatoPartecipazione(scuola, giorgio, stanzaService.getRuolo(ORGANIZZATORE_MASTER), false, false, "Giorgio"));
-
-        //Stanza divertimento
-        Stanza divertimento = stanzaRepository.findStanzaById((long)3);
-
-            statoPartecipazioneRepository.save(new StatoPartecipazione(divertimento, michele, stanzaService.getRuolo(Ruolo.PARTECIPANTE), true, false, "Michele"));
-            statoPartecipazioneRepository.save(new StatoPartecipazione(divertimento, francesco, stanzaService.getRuolo(Ruolo.PARTECIPANTE), false, false, "Francesco"));
-            statoPartecipazioneRepository.save(new StatoPartecipazione(divertimento, giorgio, stanzaService.getRuolo(ORGANIZZATORE_MASTER), false, false, "Giorgio"));
+            StatoPartecipazione sp7 = statoPartecipazioneRepository.save(new StatoPartecipazione(s3, u1, stanzaService.getRuolo(Ruolo.PARTECIPANTE), true, false, "Michele"));
+            StatoPartecipazione sp8 = statoPartecipazioneRepository.save(new StatoPartecipazione(s3, u2, stanzaService.getRuolo(Ruolo.PARTECIPANTE), false, false, "Francesco"));
+            StatoPartecipazione sp9 = statoPartecipazioneRepository.save(new StatoPartecipazione(s3, u3, stanzaService.getRuolo(ORGANIZZATORE_MASTER), false, false, "Giorgio"));
 
     }
 

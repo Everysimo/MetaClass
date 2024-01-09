@@ -64,7 +64,7 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService {
 
                 if (statoPartecipazione == null) {
 
-                    statoPartecipazione = new StatoPartecipazione(stanza, u, getRuolo(Ruolo.PARTECIPANTE), false, false, u.getNome());
+                   // statoPartecipazione = new StatoPartecipazione(stanza, u, getRuolo(Ruolo.PARTECIPANTE), false, false, u.getNome());
                     return ResponseEntity.ok(new AccessResponse<>(1, "Stai per effettuare l'accesso alla stanza", false));
 
                 } else if (statoPartecipazione.isBannato()) {
@@ -112,10 +112,10 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService {
         s.setCodice(codice);
         stanzaRepository.save(s);
 
-        StatoPartecipazione sp = new StatoPartecipazione(s, u,
-                getRuolo(Ruolo.ORGANIZZATORE_MASTER), false, false, u.getNome());
+       // StatoPartecipazione sp = new StatoPartecipazione(s, u,
+              //  getRuolo(Ruolo.ORGANIZZATORE_MASTER), false, false, u.getNome());
 
-        statoPartecipazioneRepository.save(sp);
+       // statoPartecipazioneRepository.save(sp);
 
         return true;
     }
@@ -211,7 +211,7 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService {
 
             if (statoPartecipazione == null) {
 
-                statoPartecipazione = new StatoPartecipazione(stanza, u, getRuolo(Ruolo.PARTECIPANTE), true, false, u.getNome());
+               // statoPartecipazione = new StatoPartecipazione(stanza, u, getRuolo(Ruolo.PARTECIPANTE), true, false, u.getNome());
                 return ResponseEntity.ok(new AccessResponse<>(5, "La stanza è privata, sei in attesa di entrare", true));
 
             } else if (statoPartecipazione.isBannato()) {
