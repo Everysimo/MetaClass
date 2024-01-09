@@ -40,7 +40,7 @@ public class Meeting {
     @Size(min = MIN_NAME_LENGTH, max = MAX_NAME_LENGTH,
             message = "Lunghezza nome non valida")
     @NotBlank(message = "Il nome non può essere vuoto")
-    @Pattern(regexp = "^[A-Z][A-Za-z0-9\\s]*$\n",
+    @Pattern(regexp = "^[A-Z][A-Za-z0-9\\s]*$",
             message = "Il nome deve iniziare con una lettera maiuscola seguita da lettere " +
                       "minuscole senza spazi o caratteri speciali")
     private String nome;

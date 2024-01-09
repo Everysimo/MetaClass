@@ -1,13 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import './RequestAccess.css';
-import {useNavigate, useParams} from "react-router-dom";
+import { useParams } from 'react-router-dom';
 
 const RequestSection = () => {
     const [array, setArray] = useState([]);
 
-    const { id: id_stanza } = useParams();      //si usa useParams per farsi passare il parametro
+    const { id: id_stanza } = useParams(); //si usa useParams per farsi passare il parametro
+    console.log('idStanza', id_stanza);
 
-    console.log("idstanza", id_stanza)
+    useEffect(() => {
+        fetchGestioneAccessi();
+    }, []);
+
     const requestOption = {
         method: 'POST',
         headers: {
@@ -16,13 +20,9 @@ const RequestSection = () => {
         },
     };
 
-    useEffect(() => {
-        fetchGestioneAccessi();
-    }, []);
-
     const fetchGestioneAccessi = async () => {
         try {
-            const response = await fetch(`http://localhost:8080/visualizzaUtentiInAttesaInStanza/${1}`, requestOption);
+            const response = await fetch(`http://localhost:8080/visualizzaUtentiInAttesaInStanza/${id_stanza}`, requestOption);
 
             if (!response.ok) {
                 throw new Error('Errore richiesta not ok.');
@@ -31,11 +31,13 @@ const RequestSection = () => {
             const data = await response.json();
             console.log("eccoli i dati degli utenti in attesa:", data);
 
+            setArray(data.value);
+            console.log('lista utenti:', array);
+
         } catch (error) {
             console.error('Errore durante il recupero degli accessi:', error.message);
         }
     };
-
     /*
     const handleAccept = async (userId) => {
         const requestOption = {
@@ -75,13 +77,17 @@ const RequestSection = () => {
         console.log(`Rifiutato l'accesso per l'utente con ID ${userId}`);
     };
     */
-
     return (
-        <>
-            <div className="access-management-container">
-                <h2>Richieste di accesso</h2>
-            </div>
-        </>
+        <div className="access-management-container">
+            <h2>Richieste di accesso:</h2>
+            {array.map((user) => (
+                <div key={user.id} className="user-card">
+                    <span>{`${user.nome} ${user.cognome}`}</span>
+                    <button onClick={() => {/*handleAccept(user.id)*/}}>Accetta</button>
+                    <button onClick={() => {/*handleReject(user.id)*/}}>Rifiuta</button>
+                </div>
+            ))}
+        </div>
     );
 };
 

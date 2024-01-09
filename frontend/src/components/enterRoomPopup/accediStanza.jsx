@@ -29,7 +29,12 @@ export default class AccediStanza extends Component{
     //simposta invibile il div
     handleClose = () => {
         // Nascondi la card impostando isVisible su false
-        this.setState({isVisible: false});
+        this.setState({ isVisible: false });
+
+        // Chiama la funzione di chiusura ricevuta come prop
+        if (this.props.onClose) {
+            this.props.onClose();
+        }
     };
     handleClear = () => {
         this.setState({codice: ('')});

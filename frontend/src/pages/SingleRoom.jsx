@@ -9,7 +9,7 @@ export const SingleRoom = () =>{
     const navigate = useNavigate();
     const { id: id_stanza } = useParams();      //si usa useParams per farsi passare il parametro
 
-    sessionStorage.setItem('idStanza', id_stanza)
+    sessionStorage.setItem('idStanza', id_stanza);
     const handleGoToModifyDataRoom= () => {
         // Naviga alla pagina di destinazione con il valore 42
         navigate(`/modifyroom/ ${id_stanza}`);
@@ -33,17 +33,19 @@ export const SingleRoom = () =>{
             <header>
                 <MyHeader />
             </header>
-            <section>
+            <section className={"contentSec"}>
                 <h1>Stanza {id_stanza}</h1>
-                <div>
-                    <h2>Schedula un nuovo meeting</h2>
-                    <CalendarComp />
-                </div>
-                <div>
-                    <button onClick={handleGoToModifyDataRoom}>Modifica la stanza</button>
-                    <button onClick={handleGoToChangeScenario}>Modifica lo scenario della stanza</button>
-                    <button onClick={handleGoToAccessManagement}>Gestione degli accessi</button>
-                    <button onClick={handleGoToBannedUserList}>Visualizza Lista Utenti Bannati</button>
+                <div className={"masterDiv"}>
+                    <div className={"childDiv"}>
+                        <h2>Schedula un nuovo meeting</h2>
+                        <CalendarComp/>
+                    </div>
+                    <div className={"childDiv"}>
+                        <button onClick={handleGoToModifyDataRoom}>Modifica la stanza</button>
+                        <button onClick={handleGoToChangeScenario}>Modifica lo scenario della stanza</button>
+                        <button onClick={handleGoToAccessManagement}>Gestione degli accessi</button>
+                        <button onClick={handleGoToBannedUserList}>Visualizza Lista Utenti Bannati</button>
+                    </div>
                 </div>
             </section>
             <footer>
