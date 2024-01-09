@@ -17,7 +17,8 @@ export default class Facebook extends Component {
             email: "",
             eta: "",
             sesso: "",
-            metaId: ""
+            metaId: "",
+            isAdmin: ""
         };
     }
 
@@ -106,6 +107,7 @@ export default class Facebook extends Component {
             const token = responseData.token;
             // Memorizza il token in sessionStorage
             sessionStorage.setItem('token', token);
+            sessionStorage.setItem('isAdmin', responseData.isAdmin);
         } catch (error) {
             console.error('Error:', error);
         }
