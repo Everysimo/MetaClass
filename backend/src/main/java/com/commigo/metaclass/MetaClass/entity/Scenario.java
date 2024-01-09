@@ -1,5 +1,6 @@
 package com.commigo.metaclass.MetaClass.entity;
 
+import com.commigo.metaclass.MetaClass.exceptions.MismatchJsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -30,12 +31,16 @@ public class Scenario {
     @NotNull(message = "Il nome non può essere nullo")
     @Column(unique = true)
     @Size(min = MIN_LENGTH, max = MAX_LENGTH, message = "Lunghezza del nome non valida")
+    @Pattern(regexp = "^[A-Z][A-Za-z0-9\\s]*$",
+            message = "Formato nome errato")
     @NotBlank (message = "Il nome non può essere vuoto")
     private String nome;
 
 
     @NotNull(message = "La descrizione non può essere nulla")
     @Size(min = MIN_LENGTH, max = MAX_LENGTH, message = "Lunghezza della descrizione non valida")
+    @Pattern(regexp="^[a-zA-Z0-9.,!?()'\"\\-\\s]+$",
+            message = "Formato descrizione errato")
     @NotBlank(message = "La descrizione non può essere vuoto")
     private String descrizione;
 
@@ -68,11 +73,30 @@ public class Scenario {
     public Scenario(@JsonProperty("nome") String Nome,
                     @JsonProperty("descrizione") String Descrizione,
                     @JsonProperty("url_immagine") @URL String url ,
-                    @JsonProperty("id_categoria") Long idCategoria){
+                    @JsonProperty("id_categoria") Long idCategoria) throws MismatchJsonProperty {
+
+        if (Nome == null || Descrizione == null || url == null || idCategoria == null) {
+            throw new MismatchJsonProperty("gli attributi non sono corretti");
+        }
+
         this.nome = Nome;
         this.descrizione = Descrizione;
         this.image = new Immagine();
         this.image.setUrl(url);
+        this.categoria = new Categoria();
+        this.categoria.setId(idCategoria);
+
+    }
+
+    public Scenario(String Nome, String Descrizione, Immagine immagine ,Long idCategoria) throws MismatchJsonProperty {
+
+        if (Nome == null || Descrizione == null || idCategoria == null) {
+            throw new MismatchJsonProperty("gli attributi non sono corretti");
+        }
+
+        this.nome = Nome;
+        this.descrizione = Descrizione;
+        this.image = immagine;
         this.categoria = new Categoria();
         this.categoria.setId(idCategoria);
 

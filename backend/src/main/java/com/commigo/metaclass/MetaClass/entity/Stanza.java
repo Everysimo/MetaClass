@@ -127,4 +127,19 @@ public class Stanza {
         this.scenario = new Scenario();
         this.scenario.setId(id_scenario);
     }
+
+    public Stanza(String nome, String descrizione, boolean tipoAccesso, int maxPosti, Scenario scenario, String codice) throws MismatchJsonProperty {
+
+        if (nome == null || descrizione == null) {
+            throw new MismatchJsonProperty("gli attributi non sono corretti");
+        }
+
+        this.nome = nome;
+        this.descrizione = descrizione;
+        this.tipo_Accesso = tipoAccesso;
+        this.max_Posti = (maxPosti > 0)? maxPosti:1;
+        this.codice = codice;
+        //aggiunta dello scenario
+        this.scenario = scenario;
+    }
 }

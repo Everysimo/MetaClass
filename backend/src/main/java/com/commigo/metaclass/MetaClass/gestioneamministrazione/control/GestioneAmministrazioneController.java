@@ -85,8 +85,8 @@ public class GestioneAmministrazioneController {
 
     @PostMapping(value = "updateCategoria")
     public ResponseEntity<Response<Boolean>> updateCategoria(@Valid @RequestBody Categoria c,
-                                                             HttpServletRequest request,
-                                                             BindingResult result) {
+                                                             BindingResult result,
+                                                             HttpServletRequest request) {
         try {
 
             //validazione dl token
@@ -119,9 +119,9 @@ public class GestioneAmministrazioneController {
     }
 
     @PostMapping(value = "updateScenario")
-    public ResponseEntity<Response<Boolean>> updateScenario(@RequestBody Scenario s,
-                                                             HttpServletRequest request,
-                                                             BindingResult result) {
+    public ResponseEntity<Response<Boolean>> updateScenario(@Valid @RequestBody Scenario s,
+                                                            BindingResult result,
+                                                            HttpServletRequest request){
         try {
             //validazione dl token
             if (!validationToken.isTokenValid(request)) {
@@ -141,7 +141,7 @@ public class GestioneAmministrazioneController {
             }
 
             if (!gestioneamministrazione.updateScenario(s, s.getCategoria().getId())) {
-                throw new Exception("Errore durante l'inserimento dello scenario");
+                throw new ServerRuntimeException("Errore durante l'inserimento dello scenario");
             } else {
                 return ResponseEntity.ok(new Response<>(true, "scenario creato con successo"));
             }
