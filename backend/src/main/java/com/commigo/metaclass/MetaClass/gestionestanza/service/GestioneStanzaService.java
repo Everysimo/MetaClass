@@ -39,4 +39,6 @@ public interface GestioneStanzaService
     ResponseEntity<Response<Boolean>> modificaScenario(String metaID, Long idScenario, Long idStanza);
     ResponseEntity<Response<Boolean>> modificaNomePartecipante(String metaID, Long idStanza, Long idUtente, String nome);
 
+    ResponseEntity<Response<Boolean>> kickPartecipante(String metaID, Long idStanza, Long idUtente);
+
 }
