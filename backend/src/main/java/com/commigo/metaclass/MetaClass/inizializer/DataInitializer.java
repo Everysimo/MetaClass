@@ -78,7 +78,6 @@ public class DataInitializer implements CommandLineRunner {
             Stanza s2 = stanzaRepository.save(new Stanza(2L, "StanzaScuola1", "Stanza 1 per la scuola", false, 200, sc2, "000002"));
             Stanza s3 = stanzaRepository.save(new Stanza(3L, "StanzaDivertimento1", "Stanza 1 per il divertimento", true, 50, sc3, "000003"));
 
-      System.out.println(s1);
         //Aggiunta dello StatoPartecipazione
 
             StatoPartecipazione sp1 = statoPartecipazioneRepository.save(new StatoPartecipazione(s1, u1, stanzaService.getRuolo(ORGANIZZATORE_MASTER), false, false, "Michele"));

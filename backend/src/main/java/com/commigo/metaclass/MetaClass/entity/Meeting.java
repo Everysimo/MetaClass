@@ -11,6 +11,8 @@ import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.LocalDateTime;
@@ -62,8 +64,8 @@ public class Meeting {
      *Chiave Esterna sullo Scenario
      */
     @NotNull(message = "Lo scenario non può essere nullo")
-    @ManyToOne(cascade = CascadeType.MERGE)
-    @JoinColumn(name = "id_scenario")
+    @ManyToOne(fetch = FetchType.LAZY, optional = true)
+    @JoinColumn(name = "id_scenario",  nullable = true)
     private Scenario scenario_iniziale;
 
     /**
@@ -72,6 +74,7 @@ public class Meeting {
     @NotNull(message = "Lo stanza non può essere nulla")
     @ManyToOne(cascade = CascadeType.REMOVE)
     @JoinColumn(name = "id_stanza")
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Stanza stanza;
 
     @AssertTrue(message = "L'inizio deve essere precedente alla fine")

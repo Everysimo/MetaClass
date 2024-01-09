@@ -19,14 +19,14 @@ public class UtenteInMeeting {
 
     @Id
     @NotNull(message = "L'utente non può essere nullo")
-    @ManyToOne(cascade = CascadeType.MERGE)
+    @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.REFRESH})
     @JoinColumn(name = "id_utente")
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Utente utente;
 
     @Id
     @NotNull(message = "il meeting non può essere nullo")
-    @ManyToOne(cascade = CascadeType.MERGE)
+    @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.REFRESH})
     @JoinColumn(name = "id_meeting")
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Meeting meeting;
