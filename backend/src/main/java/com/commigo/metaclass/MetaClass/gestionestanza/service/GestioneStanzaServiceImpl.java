@@ -160,7 +160,7 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService {
 
         StatoPartecipazione stato_ogm = statoPartecipazioneRepository.findStatoPartecipazioneByUtenteAndStanza(ogm, stanza);
         if (stato_ogm.getRuolo().getNome().equalsIgnoreCase(Ruolo.ORGANIZZATORE_MASTER) || ogm.isAdmin()) {
-            stanzaRepository.deleteStanzaById(id_stanza);
+            stanzaRepository.delete(stanza);
             return ResponseEntity.ok(new Response<>(true, "Stanza eliminata con successo")).getBody();
         } else {
             return ResponseEntity.status(403).body(new Response<>(false, "Non puoi eliminare una stanza se non sei un'organizzatore master")).getBody();

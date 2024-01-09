@@ -31,8 +31,8 @@ public class StatoPartecipazione implements Serializable {
      *Chiave Esterna sulla stanza
      */
     @Id
-    @NotNull(message = "La stanza non può essere nulla")
-    @ManyToOne(cascade = CascadeType.MERGE)
+    //@NotNull(message = "La stanza non può essere nulla")
+    @ManyToOne(cascade = CascadeType.REMOVE)
     @JoinColumn(name = "id_stanza")
     private Stanza stanza;
 

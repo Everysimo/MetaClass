@@ -15,6 +15,8 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 
 @Entity
@@ -99,6 +101,9 @@ public class Stanza {
     @ManyToOne(cascade = CascadeType.MERGE)
     @JoinColumn(name = "id_scenario")
     private Scenario scenario;
+
+      @OneToMany(mappedBy = "stanza", cascade = CascadeType.ALL, orphanRemoval = true)
+      private List<StatoPartecipazione> statiPartecipazione = new ArrayList<>();
 
     @Column(name = "Data_Creazione", updatable = false)
     @CreationTimestamp
