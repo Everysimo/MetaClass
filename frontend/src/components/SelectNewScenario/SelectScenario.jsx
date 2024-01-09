@@ -88,7 +88,7 @@ const ScenarioPage = () => {
 
         try {
             console.log("la stringa json:", JSON.stringify(dataTosend));
-            const response = await fetch(`http://localhost:8080/modificaScenario/${encodeURIComponent(dataTosend.idStanza)}/${encodeURIComponent(dataTosend.id_scenario)}`, requestOption);
+            const response = await fetch(`http://localhost:8080/admin/updateScenario/${encodeURIComponent(dataTosend.idStanza)}/${encodeURIComponent(dataTosend.id_scenario)}`, requestOption);
             const responseData = await response.json();
             console.log("Risposta dal server:", responseData);
         } catch (error) {

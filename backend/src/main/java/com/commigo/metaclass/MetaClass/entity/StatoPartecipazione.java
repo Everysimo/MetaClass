@@ -7,6 +7,7 @@ import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -31,7 +32,7 @@ public class StatoPartecipazione implements Serializable {
      */
     @Id
     @NotNull(message = "La stanza non può essere nulla")
-    @ManyToOne()
+    @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.REMOVE})
     @JoinColumn(name = "id_stanza")
     private Stanza stanza;
 
@@ -40,7 +41,7 @@ public class StatoPartecipazione implements Serializable {
      */
     @Id
     @NotNull(message = "L'utente non può essere nullo")
-    @ManyToOne()
+    @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.REMOVE})
     @JoinColumn(name = "id_utente")
     private Utente utente;
 
@@ -48,7 +49,7 @@ public class StatoPartecipazione implements Serializable {
      *Chiave Esterna sulla ruolo dell'utente
      */
     @NotNull(message = "Il ruolo  non può essere nullo")
-    @ManyToOne()
+    @ManyToOne(cascade = {CascadeType.MERGE})
     @JoinColumn(name = "id_ruolo")
     private Ruolo ruolo;
 
@@ -69,18 +70,19 @@ public class StatoPartecipazione implements Serializable {
      */
     @NotNull(message = "Il nome nella stanza non può essere nullo")
     @Column(length = MAX_NAME_LENGTH)
+    @Pattern(regexp = "^[A-Z][A-Za-z0-9]*$")
     @Size(min = 1, max = MAX_NAME_LENGTH, message = "Lunghezza del NomeInStanza non valida")
-    @NotBlank(message = "il nome nella stanza non può essere vuota")
-    private String NomeInStanza;
+    @NotBlank(message = "Il nome nella stanza non può essere vuota")
+    private String nomeInStanza;
 
     //data creazione e aggiornamento dei dati
     @Column(name = "Data_Creazione", updatable = false)
     @CreationTimestamp
-    private LocalDateTime Data_Creazione;
+    private LocalDateTime data_Creazione;
 
     @Column(name = "Data_Aggiornamento")
     @UpdateTimestamp
-    private LocalDateTime Data_Aggiornamento;
+    private LocalDateTime data_Aggiornamento;
 
     public StatoPartecipazione(Stanza stanza, Utente utente, Ruolo ruolo,
                                boolean isInAttesa, boolean isBannato, String nomeInStanza) {
@@ -89,6 +91,6 @@ public class StatoPartecipazione implements Serializable {
         this.ruolo = ruolo;
         this.isInAttesa = isInAttesa;
         this.isBannato = isBannato;
-        NomeInStanza = nomeInStanza;
+        this.nomeInStanza = nomeInStanza;
     }
 }

@@ -148,7 +148,7 @@ public class Utente {
     @UpdateTimestamp
     private LocalDateTime dataAggiornamento;
 
-    @ManyToOne
+    @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.DETACH})
     @JoinColumn(name = "report_id")
     private Report report;
 
@@ -164,6 +164,26 @@ public class Utente {
         this.email = Email;
         this.metaId = IdMeta;
         this.sesso = Sesso;
+
+        if (Data != null && !Data.isEmpty()) {
+            try {
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/dd/yyyy");
+                this.dataDiNascita = LocalDate.parse(Data, formatter);
+            } catch (DateTimeParseException e) {
+                throw new DataFormatException("Formato della data di nascita non valido. Formato richiesto: MM/dd/yyyy");
+            }
+        }
+
+    }
+
+    public Utente(String Nome, String Cognome, String Email, String Data, String Sesso, String IdMeta, String token, boolean Is_Admin) throws DataFormatException {
+        this.nome = Nome;
+        this.cognome = Cognome;
+        this.email = Email;
+        this.metaId = IdMeta;
+        this.sesso = Sesso;
+        this.tokenAuth = token;
+        this.isAdmin = Is_Admin;
 
         if (Data != null && !Data.isEmpty()) {
             try {

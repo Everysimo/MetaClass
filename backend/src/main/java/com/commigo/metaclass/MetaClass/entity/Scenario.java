@@ -1,5 +1,6 @@
 package com.commigo.metaclass.MetaClass.entity;
 
+import com.commigo.metaclass.MetaClass.exceptions.MismatchJsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -30,14 +31,17 @@ public class Scenario {
     @NotNull(message = "Il nome non può essere nullo")
     @Column(unique = true)
     @Size(min = MIN_LENGTH, max = MAX_LENGTH, message = "Lunghezza del nome non valida")
-    @NotBlank
+    @Pattern(regexp = "^[A-Z][A-Za-z0-9\\s]*$",
+            message = "Formato nome errato")
+    @NotBlank (message = "Il nome non può essere vuoto")
     private String nome;
 
 
     @NotNull(message = "La descrizione non può essere nulla")
-    @Column
     @Size(min = MIN_LENGTH, max = MAX_LENGTH, message = "Lunghezza della descrizione non valida")
-    @NotBlank
+    @Pattern(regexp="^[a-zA-Z0-9.,!?()'\"\\-\\s]+$",
+            message = "Formato descrizione errato")
+    @NotBlank(message = "La descrizione non può essere vuoto")
     private String descrizione;
 
     @DecimalMin(value = "1", message = "Il valore della media deve essere almeno 1")
@@ -49,7 +53,7 @@ public class Scenario {
      *Chiave Esterna sulla Categoria
      */
     @NotNull(message = "La categoria non può essere nulla")
-    @ManyToOne()
+    @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.REMOVE})
     @JoinColumn(name = "id_categoria")
     private Categoria categoria;
 
@@ -61,20 +65,38 @@ public class Scenario {
     @UpdateTimestamp
     private LocalDateTime data_aggiornamento;
 
-    @URL(message = "L'URL dell'immagine non è valido")
     @NotNull(message = "L'URL dell'immagine non può essere nullo")
-    @NotBlank(message = "L'URL dell'immagine non può essere vuoto")
-    private String imageUrl;
+    @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.DETACH})
+    private Immagine image;
 
     @JsonCreator
     public Scenario(@JsonProperty("nome") String Nome,
                     @JsonProperty("descrizione") String Descrizione,
-                    @JsonProperty("imageURL") String imageURL,
-                    @JsonProperty("id_categoria") Long idCategoria){
+                    @JsonProperty("url_immagine") @URL String url ,
+                    @JsonProperty("id_categoria") Long idCategoria) throws MismatchJsonProperty {
+
+        if (Nome == null || Descrizione == null || url == null || idCategoria == null) {
+            throw new MismatchJsonProperty("gli attributi non sono corretti");
+        }
+
         this.nome = Nome;
         this.descrizione = Descrizione;
-        this.imageUrl = imageURL;
+        this.image = new Immagine();
+        this.image.setUrl(url);
+        this.categoria = new Categoria();
+        this.categoria.setId(idCategoria);
 
+    }
+
+    public Scenario(String Nome, String Descrizione, Immagine immagine ,Long idCategoria) throws MismatchJsonProperty {
+
+        if (Nome == null || Descrizione == null || idCategoria == null) {
+            throw new MismatchJsonProperty("gli attributi non sono corretti");
+        }
+
+        this.nome = Nome;
+        this.descrizione = Descrizione;
+        this.image = immagine;
         this.categoria = new Categoria();
         this.categoria.setId(idCategoria);
 

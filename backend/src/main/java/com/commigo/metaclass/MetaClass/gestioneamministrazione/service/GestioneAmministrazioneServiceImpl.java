@@ -1,10 +1,8 @@
 package com.commigo.metaclass.MetaClass.gestioneamministrazione.service;
 
-import com.commigo.metaclass.MetaClass.entity.Categoria;
-import com.commigo.metaclass.MetaClass.entity.Scenario;
-import com.commigo.metaclass.MetaClass.entity.Stanza;
-import com.commigo.metaclass.MetaClass.entity.Utente;
+import com.commigo.metaclass.MetaClass.entity.*;
 import com.commigo.metaclass.MetaClass.gestioneamministrazione.repository.CategoriaRepository;
+import com.commigo.metaclass.MetaClass.gestioneamministrazione.repository.ImmagineRepository;
 import com.commigo.metaclass.MetaClass.gestioneamministrazione.repository.ScenarioRepository;
 import com.commigo.metaclass.MetaClass.gestionestanza.repository.StanzaRepository;
 import com.commigo.metaclass.MetaClass.gestionestanza.repository.StatoPartecipazioneRepository;
@@ -25,6 +23,10 @@ public class GestioneAmministrazioneServiceImpl implements GestioneAmministrazio
     @Autowired
     @Qualifier("ScenarioRepository")
     private ScenarioRepository scenarioRepository;
+
+    @Autowired
+    @Qualifier("ImmagineRepository")
+    private ImmagineRepository immagineRepository;
 
     @Autowired
     @Qualifier("StanzaRepository")
@@ -67,6 +69,7 @@ public class GestioneAmministrazioneServiceImpl implements GestioneAmministrazio
          return false;
     }
 
+
     /**
      * @param s
      * @return
@@ -78,6 +81,9 @@ public class GestioneAmministrazioneServiceImpl implements GestioneAmministrazio
         Categoria cat;
         if((cat = categoriaRepository.findById(IdCategoria))==null)   return false;
         s.setCategoria(cat);
+
+        Immagine image = immagineRepository.save(new Immagine(s.getImage().getUrl()));
+        s.setImage(image);
 
         //getsione dello scenario
         if((scenarioRepository.findByNome(s.getNome()))==null){

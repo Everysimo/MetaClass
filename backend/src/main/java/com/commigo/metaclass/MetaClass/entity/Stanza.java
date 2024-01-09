@@ -57,14 +57,12 @@ public class Stanza {
      * Codice della Stanza
      */
 
-    @NotNull(message = "Il codice della stanza non può essere nullo")
     @Column(length = MAX_NAME_LENGTH, unique = true)
     @Size(min = 6,
             max = 6,
             message = "Lunghezza codice_stanza errato")
     @Pattern(regexp="^[0-9]{6}$",
             message="Formato codice_stanza errato")
-    @NotBlank(message = "Il codice stanza  non può essere vuoto")
     private String codice;
 
     /**
@@ -92,14 +90,13 @@ public class Stanza {
     @NotNull(message = "Il numero massimo di posti non può essere nullo")
     @Min(value = 1, message = "Il valore del  parametro non deve essere inferiore ad 1")
     @Max(value = 999, message = "Il valore del  parametro non deve superare 999")
-   // @NotBlank(message = "Il numero massimo dei posti non può essere vuota")
     private int max_Posti;
 
     /**
      * Chiave Esterna sullo Scenario
      */
     @NotNull(message = "Lo scenario non può essere nullo")
-    @ManyToOne()
+    @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.DETACH})
     @JoinColumn(name = "id_scenario")
     private Scenario scenario;
 
@@ -112,18 +109,16 @@ public class Stanza {
     private LocalDateTime data_Aggiornamento;
     @JsonCreator
     public Stanza(@JsonProperty("nome") String nome,
-                  @JsonProperty("codiceStanza") String codiceStanza,
                   @JsonProperty("descrizione") String descrizione,
                   @JsonProperty("tipoAccesso") boolean tipoAccesso,
                   @JsonProperty("maxPosti") int maxPosti,
                   @JsonProperty("id_scenario") Long id_scenario) throws MismatchJsonProperty {
 
-        if (nome == null || codiceStanza == null || descrizione == null || id_scenario == null) {
+        if (nome == null || descrizione == null || id_scenario == null) {
             throw new MismatchJsonProperty("gli attributi non sono corretti");
         }
 
         this.nome = nome;
-        this.codice = codiceStanza;
         this.descrizione = descrizione;
         this.tipo_Accesso = tipoAccesso;
         this.max_Posti = (maxPosti > 0)? maxPosti:1;
@@ -131,5 +126,20 @@ public class Stanza {
         //aggiunta dello scenario
         this.scenario = new Scenario();
         this.scenario.setId(id_scenario);
+    }
+
+    public Stanza(String nome, String descrizione, boolean tipoAccesso, int maxPosti, Scenario scenario, String codice) throws MismatchJsonProperty {
+
+        if (nome == null || descrizione == null) {
+            throw new MismatchJsonProperty("gli attributi non sono corretti");
+        }
+
+        this.nome = nome;
+        this.descrizione = descrizione;
+        this.tipo_Accesso = tipoAccesso;
+        this.max_Posti = (maxPosti > 0)? maxPosti:1;
+        this.codice = codice;
+        //aggiunta dello scenario
+        this.scenario = scenario;
     }
 }

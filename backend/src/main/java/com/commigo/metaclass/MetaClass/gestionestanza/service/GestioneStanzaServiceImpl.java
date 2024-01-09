@@ -87,33 +87,38 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService {
     }
 
     @Override
-    public boolean creaStanza(Stanza s) throws ServerRuntimeException {
+    public boolean creaStanza(Stanza s) throws ServerRuntimeException, RuntimeException403 {
         String metaID = jwtTokenUtil.getMetaIdFromToken(validationToken.getToken());
 
-        if(metaID==null)      throw new ServerRuntimeException("errore col metaID");
+        if(metaID==null)
+            throw new ServerRuntimeException("Errore col metaID");
 
-        Stanza stanza = stanzaRepository.findStanzaByCodice(s.getCodice());
-        if(stanza == null){
+        Utente u = utenteRepository.findFirstByMetaId(metaID);
+        if(u==null)
+            throw new ServerRuntimeException("Utente non trovato");
 
-             //settaggio scenario
-             Scenario sc = scenarioRepository.findScenarioById(s.getScenario().getId());
-             if(sc != null)
-                  s.setScenario(sc);
-             else return false;
+        //settaggio scenario
+         Scenario sc = scenarioRepository.findScenarioById(s.getScenario().getId());
+         if(sc != null)
+              s.setScenario(sc);
+         else
+             throw new RuntimeException403("Scenario non trovato");
 
-             stanzaRepository.save(s);
-             Utente u = utenteRepository.findFirstByMetaId(metaID);
-             if(u==null)  throw new ServerRuntimeException("Utente non trovato");
+        stanzaRepository.save(s);
 
-             StatoPartecipazione sp = new StatoPartecipazione(s,u,
-                     ruoloRepository.findByNome("Organizzatore_Master"),
-                     false, false,u.getNome());
+         //Prelevo l'id della stanza a cui si deve generare il codice
+         Long id_stanza = stanzaRepository.findIdUltimaTupla();
+         //Converto l'id in una stringa di 6 caratteri
+         String codice = String.format("%06d", id_stanza);
+         s.setCodice(codice);
+         stanzaRepository.save(s);
 
-             statoPartecipazioneRepository.save(sp);
+         StatoPartecipazione sp = new StatoPartecipazione(s,u,
+                 getRuolo(Ruolo.ORGANIZZATORE_MASTER), false, false, u.getNome());
 
-             return true;
-        }
-        return false;
+         statoPartecipazioneRepository.save(sp);
+
+         return true;
     }
 
 
@@ -157,7 +162,7 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService {
 
         StatoPartecipazione stato_ogm = statoPartecipazioneRepository.findStatoPartecipazioneByUtenteAndStanza(ogm, stanza);
         if(stato_ogm.getRuolo().getNome().equalsIgnoreCase(Ruolo.ORGANIZZATORE_MASTER) || ogm.isAdmin()){
-            stanzaRepository.delete(stanza);
+            stanzaRepository.deleteStanzaById(id_stanza);
             return ResponseEntity.ok(new Response<>(true, "Stanza eliminata con successo")).getBody();
         }else{
             return ResponseEntity.status(403).body(new Response<>(false, "Non puoi eliminare una stanza se non sei un'organizzatore master")).getBody();

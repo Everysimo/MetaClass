@@ -5,7 +5,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFacebook } from "@fortawesome/free-brands-svg-icons";
 import LogoutButton from "../LogoutButton/logoutButton";
 import initializeFacebookSDK from "./fbSDK";
-import {Link, useNavigate} from "react-router-dom";
+import NavigateToPageBtn from "../RelocateButton/HandleRelocateButton";
 
 export default class Facebook extends Component {
     constructor(props) {
@@ -17,7 +17,8 @@ export default class Facebook extends Component {
             email: "",
             eta: "",
             sesso: "",
-            metaId: ""
+            metaId: "",
+            isAdmin: ""
         };
     }
 
@@ -106,6 +107,8 @@ export default class Facebook extends Component {
             const token = responseData.token;
             // Memorizza il token in sessionStorage
             sessionStorage.setItem('token', token);
+            //sessionStorage.setItem('isAdmin', responseData.isAdmin);
+            sessionStorage.setItem('isAdmin', 'true');
         } catch (error) {
             console.error('Error:', error);
         }
@@ -118,8 +121,7 @@ export default class Facebook extends Component {
                 {isLoggedIn ? (
                     <>
                         <h2>Welcome, {nome}!</h2>
-                        <Link to={'/LoggedInHome'}> Vai alla Pagina Loggato </Link>
-
+                        <NavigateToPageBtn />
                         <LogoutButton />
                     </>
                 ) : (

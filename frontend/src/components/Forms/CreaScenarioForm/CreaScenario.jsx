@@ -6,16 +6,24 @@ export default class CreaScenario extends Component {
     state = {
         nome: "",
         descrizione: "",
-        immagine: "",
-        idCategoria: 0,
+        imageUrl: "",
+        categoria: 0,
         isVisible: true,
         isErrorPopupVisible: false,
         errorMessage: "",
     };
 
-    handleInputChange = (e) => {
-        const { name, value } = e.target;
-        this.setState({ [name]: value });
+    handleNameChange = (e) => {
+        this.setState({nome: e.target.value});
+    };
+    handleDescChange = (e) => {
+        this.setState({ descrizione: e.target.value });
+    };
+    handleImmageChange = (e) => {
+        this.setState({ imageUrl: e.target.value });
+    };
+    handleCateChange = (e) => {
+        this.setState({ categoria: e.target.value });
     };
 
     handleErrorPopupClose = () => {
@@ -26,10 +34,10 @@ export default class CreaScenario extends Component {
     };
 
     sendDataToServer = async () => {
-        const { nome, descrizione, immagine, idCategoria } = this.state;
+        const { nome, descrizione, imageUrl, categoria } = this.state;
 
         // Validazione: Assicurati che idCategoria sia >= 0
-        if (idCategoria < 0) {
+        if (categoria < 0) {
             this.setState({
                 isErrorPopupVisible: true,
                 errorMessage: "L'id Categoria deve essere maggiore o uguale a 0",
@@ -40,8 +48,8 @@ export default class CreaScenario extends Component {
         const dataToSend = {
             nome,
             descrizione,
-            immagine,
-            idCategoria,
+            imageUrl,
+            categoria,
         };
 
         const requestOption = {
@@ -71,11 +79,19 @@ export default class CreaScenario extends Component {
         this.setState({
             nome: '',
             descrizione: '',
-            immagine: '',
-            idCategoria: 0,
+            imageUrl: '',
+            categoria: 0,
         });
     };
+    handleClose = () => {
+        // Nascondi la card impostando isVisible su false
+        this.setState({ isVisible: false });
 
+        // Chiama la funzione di chiusura ricevuta come prop
+        if (this.props.onClose) {
+            this.props.onClose();
+        }
+    };
     renderErrorPopup = () => {
         return (
             <div className={`error-popup ${this.state.isErrorPopupVisible ? '' : 'hidden'}`}>
@@ -100,7 +116,7 @@ export default class CreaScenario extends Component {
                                 type="text"
                                 name="nome"
                                 value={this.state.nome}
-                                onChange={this.handleInputChange}
+                                onChange={this.handleNameChange}
                             />
                         </label>
                         <label>
@@ -109,7 +125,7 @@ export default class CreaScenario extends Component {
                                 type="text"
                                 name="descrizione"
                                 value={this.state.descrizione}
-                                onChange={this.handleInputChange}
+                                onChange={this.handleDescChange}
                             />
                         </label>
                         <label>
@@ -117,8 +133,8 @@ export default class CreaScenario extends Component {
                             <input
                                 type="text"
                                 name="immagine"
-                                value={this.state.immagine}
-                                onChange={this.handleInputChange}
+                                value={this.state.imageUrl}
+                                onChange={this.handleImmageChange}
                             />
                         </label>
                         <label>
@@ -126,8 +142,8 @@ export default class CreaScenario extends Component {
                             <input
                                 type="number"
                                 name="idCategoria"
-                                value={this.state.idCategoria}
-                                onChange={this.handleInputChange}
+                                value={this.state.categoria}
+                                onChange={this.handleCateChange}
                                 min={0}
                             />
                         </label>

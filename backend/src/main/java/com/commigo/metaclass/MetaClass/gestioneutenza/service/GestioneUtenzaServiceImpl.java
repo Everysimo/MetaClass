@@ -1,21 +1,27 @@
 package com.commigo.metaclass.MetaClass.gestioneutenza.service;
 
+import com.commigo.metaclass.MetaClass.entity.Ruolo;
 import com.commigo.metaclass.MetaClass.entity.Stanza;
 import com.commigo.metaclass.MetaClass.entity.StatoPartecipazione;
 import com.commigo.metaclass.MetaClass.entity.Utente;
+import com.commigo.metaclass.MetaClass.exceptions.RuntimeException401;
+import com.commigo.metaclass.MetaClass.exceptions.RuntimeException403;
 import com.commigo.metaclass.MetaClass.exceptions.ServerRuntimeException;
 import com.commigo.metaclass.MetaClass.gestionestanza.repository.StanzaRepository;
 import com.commigo.metaclass.MetaClass.gestionestanza.repository.StatoPartecipazioneRepository;
 import com.commigo.metaclass.MetaClass.exceptions.DataNotFoundException;
 import com.commigo.metaclass.MetaClass.gestioneutenza.repository.UtenteRepository;
 import com.commigo.metaclass.MetaClass.utility.response.types.Response;
+import com.commigo.metaclass.MetaClass.webconfig.JwtTokenUtil;
 import com.commigo.metaclass.MetaClass.webconfig.ValidationToken;
 import jakarta.transaction.Transactional;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import java.io.BufferedReader;
@@ -23,6 +29,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -37,7 +44,11 @@ public class GestioneUtenzaServiceImpl implements GestioneUtenzaService{
     private final UtenteRepository utenteRepository;
     private final StatoPartecipazioneRepository statoPartecipazioneRepository;
     private final StanzaRepository stanzaRepository;
+    @Autowired
+    private ValidationToken validationToken;
 
+    @Autowired
+    private JwtTokenUtil jwtTokenUtil;
     private final Set<String> adminMetaIds = loadAdminMetaIdsFromFile();
 
     private Set<String> loadAdminMetaIdsFromFile() {
@@ -54,40 +65,35 @@ public class GestioneUtenzaServiceImpl implements GestioneUtenzaService{
         return adminIds;
     }
     @Override
-    public boolean loginMeta(Utente u) {
+    public boolean loginMeta(Utente u) throws ServerRuntimeException {
         try {
-            //cerca l'utente per verificare se registrato o meno
-            Utente existingUser = utenteRepository.findFirstByMetaId(u.getMetaId());
-           if (existingUser==null) {
-                // Utente non presente nel database, lo salva
+
+            if(adminMetaIds.contains(u.getMetaId())){
+                u.setAdmin(true);
+            }
+
+            if(utenteRepository.findFirstByMetaId(u.getMetaId()) == null){
                 utenteRepository.save(u);
-           }else{
-               if(adminMetaIds.contains(existingUser.getMetaId())){
-                   existingUser.setAdmin(true);
-               }
-               utenteRepository.updateAttributes(existingUser.getMetaId(),u);
-           }
-           return true;
-        } catch (Exception e) {
-            return false;
+            }
+
+            return true;
+        }catch (DataIntegrityViolationException e){
+            throw new ServerRuntimeException("errore nella registrazione dell'utente");
         }
     }
 
     @Override
-    public Response<Boolean> modificaDatiUtente(String MetaID, Utente u) {
+    public boolean modificaDatiUtente(String MetaID, Map<String, Object> params) throws RuntimeException403{
 
-            Utente existingUser = utenteRepository.findFirstByMetaId(MetaID);
-            if(existingUser == null) {
-                return new Response<>(false, "l'utente non esiste");
-            }else{
-                if(utenteRepository.updateAttributes(MetaID, u)>0){
-                    u = utenteRepository.findFirstByMetaId(MetaID);
-                    return new Response<>(true, "modifica effettuata con successo");
-                }else{
-                    u = existingUser;
-                    return new Response<>(false, "nessuna modifica effettuata");
-                }
-            }
+        String metaID = jwtTokenUtil.getMetaIdFromToken(validationToken.getToken());
+
+        Utente u = utenteRepository.findFirstByMetaId(metaID);
+
+        if(u == null) {
+            throw new RuntimeException403("Utente non registrato nei sistemi");
+        }
+
+        return utenteRepository.updateAttributes(u.getMetaId(), params)>0;
     }
 
     /**
@@ -130,19 +136,24 @@ public class GestioneUtenzaServiceImpl implements GestioneUtenzaService{
 
 /**
 *
- * @param token
+ * @param metaID
  * @return
 */
     @Override
-    public boolean logoutMeta(String token, ValidationToken validationToken) {
-        System.out.println(token);
-       Utente u = utenteRepository.findUtenteByTokenAuth(token);
-       if(u==null)   return false;
+    public boolean logoutMeta(String metaID, ValidationToken validationToken) throws ServerRuntimeException {
+
+       Utente u = utenteRepository.findFirstByMetaId(metaID);
+       if(u==null)
+           return false;
+
        u.setTokenAuth(Utente.DEFAULT_TOKEN);
-       if(utenteRepository.updateAttributes(u.getMetaId(), u)>0){
-           return true;
+       try {
+           utenteRepository.save(u);
+            return true;
+       }catch (DataIntegrityViolationException e){
+           throw new ServerRuntimeException("errore nel salvataggio del utente");
        }
-       return false;
+
     }
 }
 

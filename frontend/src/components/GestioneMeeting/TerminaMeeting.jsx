@@ -1,36 +1,19 @@
 import React, { Component } from 'react';
-import './creaScenario.css';
-import { wait } from "@testing-library/user-event/dist/utils";
+import '../Forms/CreaScenarioForm/creaScenario.css';
 
-export default class TerminaMeeting extends Component {
+export default class AvviaMeeting extends Component {
     state = {
-        nome: "",
-        descrizione_categoria: "",
+        id_meeting: this.props.id_meeting || "",
         isVisible: true,
         isErrorPopupVisible: false,
         errorMessage: "",
     };
 
-    handleInputChange = (e) => {
-        const { name, value } = e.target;
-        this.setState({ [name]: value });
-    };
-
-    handleErrorPopupClose = () => {
-        this.setState({
-            isErrorPopupVisible: false,
-            errorMessage: "",
-        });
-    };
-
     sendDataToServer = async () => {
-        const { nome, descrizione_categoria} = this.state;
-
-        // Validazione: Assicurati che idCategoria sia >= 0
+        const { id_meeting } = this.state;
 
         const dataToSend = {
-            nome,
-            descrizione_categoria,
+            id_meeting,
         };
 
         const requestOption = {
@@ -40,8 +23,9 @@ export default class TerminaMeeting extends Component {
         };
 
         try {
-            console.log("la stringa json:", JSON.stringify(dataToSend));
-            const response = await fetch('http://localhost:8080/updateCategoria', requestOption);
+            // Utilizza il valore dinamico di id_meeting
+            const response = await fetch(`http://localhost:8080/avviaMeeting/${id_meeting}`, requestOption);
+
             const responseData = await response.json();
             console.log("Risposta dal server:", responseData);
         } catch (error) {
@@ -52,60 +36,28 @@ export default class TerminaMeeting extends Component {
     callFunction = () => {
         this.sendDataToServer();
         console.log("dati del form", this.state);
-        wait(100);
-        this.handleClear();
     };
 
-    handleClear = () => {
-        this.setState({
-            nome: '',
-            descrizione_categoria: '',
-        });
-    };
     handleClose = () => {
         // Nascondi la card impostando isVisible su false
-        this.setState({isVisible: false});
-    };
-    renderErrorPopup = () => {
-        return (
-            <div className={`error-popup ${this.state.isErrorPopupVisible ? '' : 'hidden'}`}>
-                {this.state.errorMessage}
-                <button onClick={this.handleErrorPopupClose}>Chiudi</button>
-            </div>
-        );
-    };
+        this.setState({ isVisible: false });
 
+        // Chiama la funzione di chiusura ricevuta come prop
+        if (this.props.onClose) {
+            this.props.onClose();
+        }
+    };
 
     render() {
         return (
             <div>
-                {this.renderErrorPopup()}
                 <div className={`card ${this.state.isVisible ? '' : 'hidden'}`}>
                     <button className="close-button" onClick={this.handleClose}>
                         X
                     </button>
                     <div className="card-content">
-                        <label>
-                            Nome:
-                            <input
-                                type="text"
-                                name="nome"
-                                value={this.state.nome}
-                                onChange={this.handleInputChange}
-                            />
-                        </label>
-                        <label>
-                            Descrizione:
-                            <input
-                                type="text"
-                                name="descrizione"
-                                value={this.state.descrizione_categoria}
-                                onChange={this.handleInputChange}
-                            />
-                        </label>
                         <div className="button-container">
-                            <button onClick={this.handleClear}>Cancella</button>
-                            <button onClick={() => this.callFunction()}>Invia</button>
+                            <button onClick={() => this.callFunction()}>Termina Meeting</button>
                         </div>
                     </div>
                 </div>

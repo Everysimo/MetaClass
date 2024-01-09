@@ -47,6 +47,7 @@ input[type="date"] {
     appearance: none;
     -webkit-appearance: none;
     -moz-appearance: none;
+    text-align: left;
 }
 
 input[type="text"]:focus,
@@ -66,13 +67,11 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 input[type="date"]::-webkit-datetime-edit-fields-wrapper::after {
     content: attr(placeholder);
     color: #999; /* Placeholder text color */
-    text-align: center;
+    text-align: left;
 }
 
 /* Hide the default placeholder */
 input[type="date"]::-webkit-datetime-edit-fields-wrapper {
-    color: transparent;
-    text-align: center;
+    color: #999;
+    text-align: left;
 }
-
-
