@@ -45,7 +45,7 @@ section {
     justify-content: center;
     margin: 0;
     padding: 5%;
-    display: block;
+    display: inline-block;
     background-color: white;
     min-height: 0;
     z-index: 2;
@@ -60,6 +60,9 @@ section h1{
 section p{
     font-size: x-large;
     text-align: left;
+}
+section div{
+    display: flex;
 }
 
 .sec {
