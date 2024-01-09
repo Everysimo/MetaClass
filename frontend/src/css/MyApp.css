@@ -49,7 +49,6 @@ section {
     background-color: white;
     min-height: 0;
     z-index: 2;
-    box-shadow: 12px 2px 20px 12px rgba(0, 0, 0, 0.5); /* Increase the shadow effect */
 }
 
 section h1{
@@ -68,8 +67,6 @@ section p{
     min-height: 500px;
     box-shadow: none;
 }
-
-.noShadow{ box-shadow: 0 -5px 16px -4px #000000; }
 
 #sec1, #sec2, #sec3{
     background-position: center;

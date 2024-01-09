@@ -9,8 +9,8 @@ import LogoutButton from "../components/LogoutButton/logoutButton";
 import { useNavigate } from 'react-router-dom';
 import AvviaMeeting from "../components/GestioneMeeting/AvviaMeeting";
 import CreaCategoria from "../components/CreaCategoria/CreaCategoria";
-import CreaScenario from "../components/CreaScenarioForm/CreaScenario";
-import ModificaScenario from "../components/CreaScenarioForm/ModificaScenario";
+import CreaScenario from "../components/Forms/CreaScenarioForm/CreaScenario";
+import ModificaScenario from "../components/Forms/CreaScenarioForm/ModificaScenario";
 
 export const LoggedInHome = () => {
     const nome = localStorage.getItem('nome');

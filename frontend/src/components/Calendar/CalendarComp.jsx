@@ -1,26 +1,46 @@
-import { useState } from 'react';
-import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
+import React, { useState } from 'react';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
+import { LocalizationProvider, StaticDateTimePicker } from '@mui/x-date-pickers';
 import dayjs from 'dayjs';
+import axios from 'axios';
 
-export default function CalendarComp() {
-    const [value, setValue] = useState(dayjs()); // Initial state with today's date
+const CalendarComp = () => {
+    const [selectedDateTime, setSelectedDateTime] = useState(dayjs('2022-04-17T15:30'));
+
+    const handleDateTimeChange = (newDateTime) => {
+        setSelectedDateTime(newDateTime);
+    };
+
+    const handleSubmit = async () => {
+        try {
+            // Format selectedDateTime to match your API's expected format
+            const formattedDateTime = selectedDateTime.format(); // Customize this according to your API's format
+
+            // Make an Axios POST request to your API endpoint
+            const response = await axios.post('YOUR_API_ENDPOINT', {
+                dateTime: formattedDateTime, // Pass the formatted date/time to your API
+                // Add other parameters as needed
+            });
+
+            // Handle response or any further logic based on API call
+            console.log('API Response:', response.data);
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    };
 
     return (
         <LocalizationProvider dateAdapter={AdapterDayjs}>
-            <DemoContainer components={['DateTimePicker']}>
-                <DateTimePicker
-                    label="Uncontrolled picker"
-                    defaultValue={dayjs('2022-04-17T15:30')}
-                />
-                <DateTimePicker
-                    label="Controlled picker"
-                    value={value}
-                    onChange={(newValue) => setValue(newValue)}
-                />
-            </DemoContainer>
+            <StaticDateTimePicker
+                value={selectedDateTime}
+                onChange={handleDateTimeChange}
+                renderInput={(params) => <input {...params} />}
+                // Customize the component according to your preferences
+            />
+            <button onClick={handleSubmit}>Submit</button>
         </LocalizationProvider>
     );
-}
+};
+
+export default CalendarComp;
+

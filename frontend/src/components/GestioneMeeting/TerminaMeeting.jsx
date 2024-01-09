@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import '../CreaScenarioForm/creaScenario.css';
+import '../Forms/CreaScenarioForm/creaScenario.css';
 
 export default class AvviaMeeting extends Component {
     state = {
