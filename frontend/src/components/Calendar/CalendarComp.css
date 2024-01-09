@@ -1,0 +1,23 @@
+/* Add these styles to your existing stylesheet */
+/* Styles for the DateTimePicker component */
+.dateTimePickerContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+.inputField {
+    margin-bottom: 1px; /* Adjust margin as needed */
+}
+
+.dateTimePicker {
+    max-width: 100%;
+}
+
+#submitBtn {
+    margin-top: 5px;
+    margin-bottom: 5px;
+    margin-inline: 0;
+}
