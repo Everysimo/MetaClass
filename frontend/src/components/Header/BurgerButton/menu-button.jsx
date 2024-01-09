@@ -21,6 +21,8 @@ const BurgerButton = () => {
                 <div className="line"></div>
             </div>
             <div className={menuClass}>
+                <nav>
+
                 <ul>
                     {isLoggedIn()? (
                         <>
@@ -37,6 +39,7 @@ const BurgerButton = () => {
                     <li><Link to="/">CONTACTS</Link></li>
                 </ul>
                 <img src={MCLogo} className='App-logo' alt='no image' id={"menu2-image"} />
+                </nav>
             </div>
         </div>
     );
@@ -44,7 +47,7 @@ const BurgerButton = () => {
 
 export function MyMenu() {
     return (
-        <div>
+        <nav>
             {isLoggedIn()? (
                 <>
                     <Link to="/Account">ACCOUNT</Link>
@@ -58,7 +61,7 @@ export function MyMenu() {
             )}
             <Link to="/">ABOUT</Link>
             <Link to="/">CONTACTS</Link>
-        </div>
+        </nav>
     );
 }
 
