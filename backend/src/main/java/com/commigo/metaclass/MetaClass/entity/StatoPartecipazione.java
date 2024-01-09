@@ -32,7 +32,7 @@ public class StatoPartecipazione implements Serializable {
      */
     @Id
     @NotNull(message = "La stanza non può essere nulla")
-    @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.REMOVE})
+    @ManyToOne(cascade = CascadeType.MERGE)
     @JoinColumn(name = "id_stanza")
     private Stanza stanza;
 
@@ -41,7 +41,7 @@ public class StatoPartecipazione implements Serializable {
      */
     @Id
     @NotNull(message = "L'utente non può essere nullo")
-    @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.REMOVE})
+    @ManyToOne(cascade = CascadeType.MERGE)
     @JoinColumn(name = "id_utente")
     private Utente utente;
 

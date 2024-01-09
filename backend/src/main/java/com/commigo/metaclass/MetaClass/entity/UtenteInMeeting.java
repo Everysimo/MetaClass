@@ -17,13 +17,13 @@ public class UtenteInMeeting {
 
     @Id
     @NotNull(message = "L'utente non può essere nullo")
-    @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.REMOVE})
+    @ManyToOne(cascade = CascadeType.MERGE)
     @JoinColumn(name = "id_utente")
     private Utente utente;
 
     @Id
     @NotNull(message = "il meeting non può essere nullo")
-    @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.REMOVE})
+    @ManyToOne(cascade = CascadeType.MERGE)
     @JoinColumn(name = "id_meeting")
     private Meeting meeting;
 

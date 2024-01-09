@@ -53,7 +53,7 @@ public class Scenario {
      *Chiave Esterna sulla Categoria
      */
     @NotNull(message = "La categoria non può essere nulla")
-    @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.REMOVE})
+    @ManyToOne(cascade = CascadeType.MERGE)
     @JoinColumn(name = "id_categoria")
     private Categoria categoria;
 
@@ -66,7 +66,7 @@ public class Scenario {
     private LocalDateTime data_aggiornamento;
 
     @NotNull(message = "L'URL dell'immagine non può essere nullo")
-    @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.DETACH})
+    @ManyToOne(cascade = CascadeType.MERGE)
     private Immagine image;
 
     @JsonCreator

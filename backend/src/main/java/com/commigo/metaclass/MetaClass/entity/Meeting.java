@@ -62,7 +62,7 @@ public class Meeting {
      *Chiave Esterna sullo Scenario
      */
     @NotNull(message = "Lo scenario non può essere nullo")
-    @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.DETACH})
+    @ManyToOne(cascade = CascadeType.MERGE)
     @JoinColumn(name = "id_scenario")
     private Scenario scenario_iniziale;
 
@@ -70,7 +70,7 @@ public class Meeting {
      *Chiave Esterna sulla stanza
      */
     @NotNull(message = "Lo stanza non può essere nulla")
-    @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.DETACH})
+    @ManyToOne(cascade = CascadeType.REMOVE)
     @JoinColumn(name = "id_stanza")
     private Stanza stanza;
 
