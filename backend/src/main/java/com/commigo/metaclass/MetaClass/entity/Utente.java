@@ -23,7 +23,7 @@ import java.time.format.DateTimeParseException;
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class Utente implements Serializable {
+public class Utente {
 
     /**
      * Costante per valore intero di 254.

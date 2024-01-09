@@ -24,7 +24,7 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Stanza implements Serializable {
+public class Stanza {
 
     /**
      * Costante per valore intero di 50.
@@ -102,9 +102,6 @@ public class Stanza implements Serializable {
     @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.REFRESH})
     @JoinColumn(name = "id_scenario")
     private Scenario scenario;
-
-    @OneToMany(mappedBy = "stanza", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    private List<StatoPartecipazione> statiPartecipazione = new ArrayList<>();
 
     @Column(name = "Data_Creazione", updatable = false)
     @CreationTimestamp
