@@ -374,4 +374,35 @@ public class GestioneStanzaControl {
         }
     }
 
+    @PostMapping(value = "/modificaNomePartecipante/{IdStanza}/{IdUtente}")
+    public ResponseEntity<Response<Boolean>> modificaNomePartecipante(@PathVariable Long IdStanza,
+                                                                      @PathVariable Long IdUtente,
+                                                                      @RequestBody String nome,
+                                                                      HttpServletRequest request) {
+
+        try {
+            if (!validationToken.isTokenValid(request)) {
+                throw new RuntimeException403("Token non valido");
+            }
+
+            System.out.println("Id_stanza" + IdStanza);
+            System.out.println("Id_utente" + IdUtente);
+            System.out.println("nome" + nome);
+
+            String metaID = jwtTokenUtil.getMetaIdFromToken(validationToken.getToken());
+
+            ObjectMapper objectMapper = new ObjectMapper();
+            JsonNode jsonNode = objectMapper.readTree(nome);
+            String NuovoNome = jsonNode.get("nome").asText();
+
+            return stanzaService.modificaNomePartecipante(metaID, IdStanza, IdUtente, NuovoNome);
+
+        } catch (RuntimeException403 e) {
+            e.printStackTrace();
+            return ResponseEntity.status(403).body(new Response<>(null, "Errore nell'operazione"));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(500).body(new Response<>(null, "Errore durante l'operazione"));
+        }
+    }
 }

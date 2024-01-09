@@ -37,4 +37,6 @@ public interface GestioneStanzaService
     ResponseEntity<Response<List<Utente>>> visualizzaUtentiBannatiInStanza(Long Id);
 
     ResponseEntity<Response<Boolean>> modificaScenario(String metaID, Long idScenario, Long idStanza);
+    ResponseEntity<Response<Boolean>> modificaNomePartecipante(String metaID, Long idStanza, Long idUtente, String nome);
+
 }

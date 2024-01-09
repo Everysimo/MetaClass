@@ -316,7 +316,7 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService {
         if (stanza != null) {
             StatoPartecipazione stato = statoPartecipazioneRepository.findStatoPartecipazioneByUtenteAndStanza(u, stanza);
             if (stato != null) {
-                if (stato.getRuolo().getNome().equalsIgnoreCase(Ruolo.ORGANIZZATORE_MASTER) || stato.getRuolo().getNome().equalsIgnoreCase(Ruolo.ORGANIZZATORE)) {
+                if (stato.getRuolo().getNome().equalsIgnoreCase(Ruolo.ORGANIZZATORE_MASTER) || stato.getRuolo().getNome().equalsIgnoreCase(Ruolo.ORGANIZZATORE) && !stato.isBannato()) {
                     List<Utente> utenti = statoPartecipazioneRepository.findUtentiBannatiInStanza(Id);
 
                     if (utenti != null) {
@@ -375,10 +375,40 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService {
 
     }
 
-    /**
-     * @param Id
-     * @return
-     */
+    public ResponseEntity<Response<Boolean>> modificaNomePartecipante(String metaID, Long idStanza, Long idUtente, String nome){
+        Utente og = utenteRepository.findFirstByMetaId(metaID);
+        Stanza stanza = stanzaRepository.findStanzaById(idStanza);
+
+        Utente modifica = utenteRepository.findUtenteById(idUtente);
+        if (stanza != null) {
+            StatoPartecipazione statoOg = statoPartecipazioneRepository.findStatoPartecipazioneByUtenteAndStanza(og, stanza);
+            if (statoOg != null) {
+                if (statoOg.getRuolo().getNome().equalsIgnoreCase(Ruolo.ORGANIZZATORE_MASTER) || statoOg.getRuolo().getNome().equalsIgnoreCase(Ruolo.ORGANIZZATORE) && !statoOg.isBannato()) {
+
+                    StatoPartecipazione statoModifica = statoPartecipazioneRepository.findStatoPartecipazioneByUtenteAndStanza(modifica, stanza);
+                    if (statoModifica != null) {
+                        statoModifica.setNomeInStanza(nome);
+                        statoPartecipazioneRepository.save(statoModifica);
+
+                        return ResponseEntity.ok(new Response<>(true, "Il nome in stanza è stato modificato"));
+                    } else {
+                        return ResponseEntity.status(403).body(new Response<>(false, "Il partecipante selezionato non è presente nella stanza"));
+                    }
+                } else {
+                    return ResponseEntity.status(403).body(new Response<>(false, "Non puoi modificare il nome in stanza di un utente se non sei almeno un'organizzatore"));
+                }
+            } else {
+                return ResponseEntity.status(403).body(new Response<>(false, "Non puoi modificare il nome in stanza dell'utente selezionato perché non è presente in stanza"));
+            }
+        }else{
+            return ResponseEntity.status(403).body(new Response<>(false, "La stanza selezionata non esiste"));
+        }
+    }
+
+            /**
+             * @param Id
+             * @return
+             */
     @Override
     public Stanza visualizzaStanza(Long Id) {
         return stanzaRepository.findStanzaById(Id);
