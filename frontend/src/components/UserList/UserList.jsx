@@ -1,33 +1,58 @@
-// UserList.jsx
-import React, {useEffect, useState} from 'react';
-import UserCard from './UserCard';
-import axios from "axios";
+import React, { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
 
 const UserList = () => {
+    const [userList, setUserList] = useState([]);
 
-    const [userList, setUserList] = useState();
+    const { id: id_stanza } = useParams();
+    console.log('idStanza', id_stanza);
 
     useEffect(() => {
-        // Funzione per prelevare la lista di utenti dal backend
-        const fetchUserList = async () => {
-            try {
-                const response = await axios.get('http://localhost:8080/annullaBan/'); // Sostituisci 'URL_DEL_BACKEND' con il vero URL del tuo backend
-                setUserList(response.data);
-            } catch (error) {
-                console.error('Errore durante il recupero della lista di utenti:', error);
-            }
-        };
-
-        // Chiamata alla funzione per ottenere i dati dal backend
         fetchUserList();
-    }, []); // L'array vuoto come secondo argomento assicura che useEffect venga eseguito solo una volta al montaggio del componente
+    }, []);
+
+    const requestOption = {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + sessionStorage.getItem("token")
+        },
+    };
+
+    const fetchUserList = async () => {
+        try {
+            const response = await fetch(`http://localhost:8080/admin/visualizzaUtentiBannatiInStanza/${id_stanza}`, requestOption);
+
+            if (!response.ok) {
+                throw new Error('Errore nella richiesta');
+            }
+
+            const data = await response.json();
+            console.log('data:', data);
+
+            setUserList(data.value);
+            console.log('lista utenti:', userList);
+
+
+        } catch (error) {
+            console.error('Errore durante il recupero della lista di utenti:', error);
+        }
+    }
+
+    const handleRevocaBan = (userId) => {
+        // Implementa la logica per revocare il ban per l'utente con l'ID fornito
+        console.log(`Revoca ban per l'utente con ID ${userId}`);
+    };
 
     return (
         <div>
-            <h2>User List</h2>
-            {/* {userList.map((user) => (
-                <UserCard key={user.id} user={user} />
-            ))}*/}
+            <h2>Utenti Bannati:</h2>
+            {userList && userList.map((user) => (
+                <div key={user.id} className="user-card">
+                    <span>{`${user.nome} ${user.cognome}`}</span>
+                    <button onClick={() => handleRevocaBan(user.id)}>Revoca Ban Utente</button>
+                </div>
+            ))}
         </div>
     );
 };

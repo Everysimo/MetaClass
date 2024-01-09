@@ -18,6 +18,15 @@ export const SingleRoom = () =>{
         // Naviga alla pagina di destinazione con il valore 42
         navigate(`/changescenario/ ${id_stanza}`);
     };
+    const handleGoToAccessManagement= () => {
+        // Naviga alla pagina di destinazione con il valore 42
+        navigate(`/accessManagement/ ${id_stanza}`);
+    };
+
+    const handleGoToBannedUserList= () => {
+        // Naviga alla pagina di destinazione con il valore 42
+        navigate(`/bannedUserList/ ${id_stanza}`);
+    };
 
     return(
         <>
@@ -40,6 +49,11 @@ export const SingleRoom = () =>{
 
                             <button onClick={handleGoToModifyDataRoom}>Modifica la stanza</button>
                             <button onClick={handleGoToChangeScenario}>Modifica lo scenario della stanza</button>
+                            <button onClick={handleGoToAccessManagement}>Gestione degli accessi</button>
+
+                            <br/>
+
+                            <button onClick={handleGoToBannedUserList}>Visualizza Lista Utenti Bannati</button>
 
                         </div>
                         <div className={"table-row"}>

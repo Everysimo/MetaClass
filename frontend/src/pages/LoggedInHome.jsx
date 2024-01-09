@@ -37,15 +37,8 @@ export const LoggedInHome = () => {
         navigate(`/createroom`);
     };
 
-    const handleGoToAccessManagement= () => {
-        // Naviga alla pagina di destinazione con il valore 42
-        navigate(`/accessManagement`);
-    };
 
-    const handleGoToBannedUserList= () => {
-        // Naviga alla pagina di destinazione con il valore 42
-        navigate(`/bannedUserList`);
-    };
+
 
 
 
@@ -66,11 +59,10 @@ export const LoggedInHome = () => {
                         <button onClick={handleGoToCreateRoom}>Crea stanza</button>
 
                         <h5> IN QUANTO ORGANIZZATORE...</h5>
-                        <button onClick={handleGoToAccessManagement}>Gestione degli accessi</button>
                         <button onClick={() => setIsAvviaMeetingVisible(prevVisibility => !prevVisibility)}>AvviaMeeting </button>
                         {isAvviaMeetingVisible && <AvviaMeeting id_meeting={1} onClose={() => setIsAvviaMeetingVisible(false)} />}
+
                         <h5> IN QUANTO ADMIN...</h5>
-                        <button onClick={handleGoToBannedUserList}>Visualizza Lista Utenti Bannati</button>
 
                         <button onClick={() => setIsVisibleCat(prevVisibility => !prevVisibility)}>Crea Categoria</button>
                         {isVisibleCat && <CreaCategoria onClose={() => setIsVisibleCat(false)} />}
