@@ -28,8 +28,13 @@ public interface GestioneStanzaService
     StatoPartecipazione setStatoPartecipazione(Stanza stanza, Utente utente, boolean isInAttesa);
     Response<Boolean> upgradeUtente(String id_Uogm, long og, long stanza);
     ResponseEntity<Response<List<Utente>>> visualizzaUtentiInStanza(Long Id);
+    ResponseEntity<Response<List<Utente>>> visualizzaUtentiInAttesaInStanza(Long Id, String metaID);
+
     Stanza visualizzaStanza(Long Id);
     List<Scenario> getAllScenari();
     Scenario visualizzaScenarioStanza(Stanza stanza);
+
+    ResponseEntity<Response<List<Utente>>> visualizzaUtentiBannatiInStanza(Long Id);
+
     ResponseEntity<Response<Boolean>> modificaScenario(String metaID, Long idScenario, Long idStanza);
 }

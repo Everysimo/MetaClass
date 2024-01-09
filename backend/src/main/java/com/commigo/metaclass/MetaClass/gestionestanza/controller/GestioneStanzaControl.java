@@ -227,6 +227,19 @@ public class GestioneStanzaControl {
             throw new RuntimeException(e);
         }
     }
+    public ResponseEntity<Response<List<Utente>>> visualizzaUtentiBannatiInStanza(@PathVariable Long Id, HttpServletRequest request) throws RuntimeException403 {
+        try{
+            if (!validationToken.isTokenValid(request)) {
+                throw new RuntimeException403("Token non valido");
+            }
+
+            return stanzaService.visualizzaUtentiBannatiInStanza(Id);
+
+        }catch (RuntimeException403 re) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(new Response<>(null, "Errore durante la richiesta: " + re.getMessage()));
+        }
+    }
 
     @PostMapping(value = "/visualizzaUtentiInStanza/{Id}")
     public ResponseEntity<Response<List<Utente>>> visualizzaUtentiInStanza(@PathVariable Long Id, HttpServletRequest request) throws RuntimeException403 {
@@ -243,6 +256,22 @@ public class GestioneStanzaControl {
         }
     }
 
+
+    @PostMapping(value = "/visualizzaUtentiInAttesaInStanza/{Id}")
+    ResponseEntity<Response<List<Utente>>> visualizzaUtentiInAttesaInStanza(@PathVariable Long Id, HttpServletRequest request) throws RuntimeException403 {
+        try{
+            if (!validationToken.isTokenValid(request)) {
+                throw new RuntimeException403("Token non valido");
+            }
+
+            String metaID = jwtTokenUtil.getMetaIdFromToken(validationToken.getToken());
+            return stanzaService.visualizzaUtentiInAttesaInStanza(Id, metaID);
+
+        }catch (RuntimeException403 re) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(new Response<>(null, "Errore durante la richiesta: " + re.getMessage()));
+        }
+    }
     @PostMapping(value = "/visualizzaStanza/{Id}")
     public ResponseEntity<Response<Stanza>> visualizzaStanza(@PathVariable Long Id,
                                                              HttpServletRequest request) {

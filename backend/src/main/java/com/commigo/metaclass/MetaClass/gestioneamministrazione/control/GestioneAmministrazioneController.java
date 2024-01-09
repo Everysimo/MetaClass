@@ -67,6 +67,21 @@ public class GestioneAmministrazioneController {
         return adminMetaIds.contains(metaId);
     }
 
+    @PostMapping(value = "/visualizzaUtentiBannatiInStanza/{Id}")
+    public ResponseEntity<Response<List<Utente>>> visualizzaUtentiBannatiInStanza(@PathVariable Long Id, HttpServletRequest request) throws RuntimeException403 {
+        try{
+            if (!validationToken.isTokenValid(request)) {
+                throw new RuntimeException403("Token non valido");
+            }
+
+            return stanzaControl.visualizzaUtentiBannatiInStanza(Id, request);
+
+        }catch (RuntimeException403 re) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(new Response<>(null, "Errore durante la richiesta: " + re.getMessage()));
+        }
+    }
+
     @PostMapping(value = "annullaBan/{idstanza}")
     public ResponseEntity<Response<Boolean>> annullaBan(@RequestBody String idUtente, @PathVariable("idstanza") Long idStanza)
     {
@@ -82,6 +97,7 @@ public class GestioneAmministrazioneController {
         return ResponseEntity.ok(new Response<>(true,"Ban annullato correttamente"));
 
     }
+
 
     @PostMapping(value = "updateCategoria")
     public ResponseEntity<Response<Boolean>> updateCategoria(@Valid @RequestBody Categoria c,

@@ -51,9 +51,9 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService {
         } else if (!stanza.isTipo_Accesso()) {
 
             AccessResponse<Boolean> richiesta = richiestaAccessoStanza(codiceStanza, id_utente).getBody();
-            if(richiesta.getValue()){
+            if (richiesta.getValue()) {
                 return ResponseEntity.ok(new AccessResponse<>(richiesta.getValue(), richiesta.getMessage(), richiesta.isInAttesa()));
-            }else{
+            } else {
                 return ResponseEntity.status(403).body(new AccessResponse<>(richiesta.getValue(), richiesta.getMessage(), richiesta.isInAttesa()));
             }
 
@@ -90,41 +90,40 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService {
     public boolean creaStanza(Stanza s) throws ServerRuntimeException, RuntimeException403 {
         String metaID = jwtTokenUtil.getMetaIdFromToken(validationToken.getToken());
 
-        if(metaID==null)
+        if (metaID == null)
             throw new ServerRuntimeException("Errore col metaID");
 
         Utente u = utenteRepository.findFirstByMetaId(metaID);
-        if(u==null)
+        if (u == null)
             throw new ServerRuntimeException("Utente non trovato");
 
         //settaggio scenario
-         Scenario sc = scenarioRepository.findScenarioById(s.getScenario().getId());
-         if(sc != null)
-              s.setScenario(sc);
-         else
-             throw new RuntimeException403("Scenario non trovato");
+        Scenario sc = scenarioRepository.findScenarioById(s.getScenario().getId());
+        if (sc != null)
+            s.setScenario(sc);
+        else
+            throw new RuntimeException403("Scenario non trovato");
 
         stanzaRepository.save(s);
 
-         //Prelevo l'id della stanza a cui si deve generare il codice
-         Long id_stanza = stanzaRepository.findIdUltimaTupla();
-         //Converto l'id in una stringa di 6 caratteri
-         String codice = String.format("%06d", id_stanza);
-         s.setCodice(codice);
-         stanzaRepository.save(s);
+        //Prelevo l'id della stanza a cui si deve generare il codice
+        Long id_stanza = stanzaRepository.findIdUltimaTupla();
+        //Converto l'id in una stringa di 6 caratteri
+        String codice = String.format("%06d", id_stanza);
+        s.setCodice(codice);
+        stanzaRepository.save(s);
 
-         StatoPartecipazione sp = new StatoPartecipazione(s,u,
-                 getRuolo(Ruolo.ORGANIZZATORE_MASTER), false, false, u.getNome());
+        StatoPartecipazione sp = new StatoPartecipazione(s, u,
+                getRuolo(Ruolo.ORGANIZZATORE_MASTER), false, false, u.getNome());
 
-         statoPartecipazioneRepository.save(sp);
+        statoPartecipazioneRepository.save(sp);
 
-         return true;
+        return true;
     }
 
 
-
     @Override
-    public Response<Boolean> downgradeUtente(String id_Uogm, long id_og, long id_stanza){
+    public Response<Boolean> downgradeUtente(String id_Uogm, long id_og, long id_stanza) {
 
         Utente ogm = utenteRepository.findFirstByMetaId(id_Uogm);
         Utente og = utenteRepository.findUtenteById(id_og);
@@ -132,77 +131,75 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService {
 
 
         StatoPartecipazione stato_ogm = statoPartecipazioneRepository.findStatoPartecipazioneByUtenteAndStanza(ogm, stanza);
-        if(stato_ogm.getRuolo().getNome().equalsIgnoreCase(Ruolo.ORGANIZZATORE_MASTER)){
+        if (stato_ogm.getRuolo().getNome().equalsIgnoreCase(Ruolo.ORGANIZZATORE_MASTER)) {
             StatoPartecipazione stato_og = statoPartecipazioneRepository.findStatoPartecipazioneByUtenteAndStanza(og, stanza);
-            if(stato_og.getRuolo().getNome().equalsIgnoreCase(Ruolo.ORGANIZZATORE)){
+            if (stato_og.getRuolo().getNome().equalsIgnoreCase(Ruolo.ORGANIZZATORE)) {
                 stato_og.getRuolo().setNome(Ruolo.PARTECIPANTE);
 
                 return ResponseEntity.ok(new Response<>(true, "L'utente selezionato ora è un partecipante")).getBody();
 
-            }else if (stato_og.getRuolo().getNome().equalsIgnoreCase(Ruolo.PARTECIPANTE)){
+            } else if (stato_og.getRuolo().getNome().equalsIgnoreCase(Ruolo.PARTECIPANTE)) {
 
                 return ResponseEntity.status(403).body(new Response<>(false, "L'utente selezionato è già un partecipante")).getBody();
 
-            }else{
+            } else {
                 return ResponseEntity.status(403).body(new Response<>(false, "L'utente selezionato non può essere declassato")).getBody();
             }
-        }else{
+        } else {
             return ResponseEntity.status(403).body(new Response<>(false, "Non puoi declassare un'utente perché non sei un'organizzatore master")).getBody();
         }
     }
 
     @Override
-    public Response<Boolean> deleteRoom(String metaID, Long id_stanza){
+    public Response<Boolean> deleteRoom(String metaID, Long id_stanza) {
 
         Utente ogm = utenteRepository.findFirstByMetaId(metaID);
         Stanza stanza = stanzaRepository.findStanzaById(id_stanza);
-        if(stanza == null) {
-            return ResponseUtils.getResponseError(HttpStatus.INTERNAL_SERVER_ERROR,"La stanza selezionata non esiste").getBody();
+        if (stanza == null) {
+            return ResponseUtils.getResponseError(HttpStatus.INTERNAL_SERVER_ERROR, "La stanza selezionata non esiste").getBody();
         }
 
         StatoPartecipazione stato_ogm = statoPartecipazioneRepository.findStatoPartecipazioneByUtenteAndStanza(ogm, stanza);
-        if(stato_ogm.getRuolo().getNome().equalsIgnoreCase(Ruolo.ORGANIZZATORE_MASTER) || ogm.isAdmin()){
+        if (stato_ogm.getRuolo().getNome().equalsIgnoreCase(Ruolo.ORGANIZZATORE_MASTER) || ogm.isAdmin()) {
             stanzaRepository.deleteStanzaById(id_stanza);
             return ResponseEntity.ok(new Response<>(true, "Stanza eliminata con successo")).getBody();
-        }else{
+        } else {
             return ResponseEntity.status(403).body(new Response<>(false, "Non puoi eliminare una stanza se non sei un'organizzatore master")).getBody();
         }
     }
 
     @Override
-    public Boolean modificaDatiStanza(Map<String,Object> params, Long id) throws RuntimeException403, RuntimeException401 {
+    public Boolean modificaDatiStanza(Map<String, Object> params, Long id) throws RuntimeException403, RuntimeException401 {
 
-            //controllo del ruolo di ogm
-            String metaID = jwtTokenUtil.getMetaIdFromToken(validationToken.getToken());
-            Utente ogm = utenteRepository.findFirstByMetaId(metaID);
-            Stanza existingStanza = stanzaRepository.findStanzaById(id);
+        //controllo del ruolo di ogm
+        String metaID = jwtTokenUtil.getMetaIdFromToken(validationToken.getToken());
+        Utente ogm = utenteRepository.findFirstByMetaId(metaID);
+        Stanza existingStanza = stanzaRepository.findStanzaById(id);
 
-            if(existingStanza == null) {
-                throw new RuntimeException403("La stanza non esiste");
-            }
+        if (existingStanza == null) {
+            throw new RuntimeException403("La stanza non esiste");
+        }
 
-            StatoPartecipazione statoutente = statoPartecipazioneRepository.
-                            findStatoPartecipazioneByUtenteAndStanza(ogm, existingStanza);
+        StatoPartecipazione statoutente = statoPartecipazioneRepository.
+                findStatoPartecipazioneByUtenteAndStanza(ogm, existingStanza);
 
-            if(statoutente==null) throw new RuntimeException403("Non hai acceduto alla stanza");
+        if (statoutente == null) throw new RuntimeException403("Non hai acceduto alla stanza");
 
-            if(!statoutente.getRuolo().getNome().equalsIgnoreCase(Ruolo.PARTECIPANTE)){
-                return stanzaRepository.updateAttributes(id, params)>0;
-            }else{
-                throw new RuntimeException401("devi essere almeno un organizzatore");
-            }
+        if (!statoutente.getRuolo().getNome().equalsIgnoreCase(Ruolo.PARTECIPANTE)) {
+            return stanzaRepository.updateAttributes(id, params) > 0;
+        } else {
+            throw new RuntimeException401("devi essere almeno un organizzatore");
+        }
     }
 
     @Override
-    public Stanza findStanza(Long id)
-    {
+    public Stanza findStanza(Long id) {
         return stanzaRepository.findStanzaById(id);
     }
 
     @Override
-    public List<StatoPartecipazione> findStatoPartecipazioniInAttesa(Stanza stanza,boolean isInAttesa)
-    {
-        return statoPartecipazioneRepository.finsAllByStanzaAndisInAttesa(stanza.getId(),isInAttesa);
+    public List<StatoPartecipazione> findStatoPartecipazioniInAttesa(Stanza stanza, boolean isInAttesa) {
+        return statoPartecipazioneRepository.finsAllByStanzaAndisInAttesa(stanza.getId(), isInAttesa);
     }
 
     @Override
@@ -241,16 +238,15 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService {
     }
 
     @Override
-    public StatoPartecipazione setStatoPartecipazione(Stanza stanza, Utente utente, boolean isInAttesa)
-    {
-        StatoPartecipazione sp = statoPartecipazioneRepository.findStatoPartecipazioneByUtenteAndStanza(utente,stanza);
+    public StatoPartecipazione setStatoPartecipazione(Stanza stanza, Utente utente, boolean isInAttesa) {
+        StatoPartecipazione sp = statoPartecipazioneRepository.findStatoPartecipazioneByUtenteAndStanza(utente, stanza);
         sp.setInAttesa(isInAttesa);
         statoPartecipazioneRepository.save(sp);
         return sp;
     }
 
     @Override
-    public Response<Boolean> upgradeUtente(String id_Uogm, long id_og, long id_stanza){
+    public Response<Boolean> upgradeUtente(String id_Uogm, long id_og, long id_stanza) {
 
         Utente ogm = utenteRepository.findFirstByMetaId(id_Uogm);
         Utente og = utenteRepository.findUtenteById(id_og);
@@ -258,21 +254,21 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService {
 
 
         StatoPartecipazione stato_ogm = statoPartecipazioneRepository.findStatoPartecipazioneByUtenteAndStanza(ogm, stanza);
-        if(stato_ogm.getRuolo().getNome().equalsIgnoreCase(Ruolo.ORGANIZZATORE_MASTER)){
+        if (stato_ogm.getRuolo().getNome().equalsIgnoreCase(Ruolo.ORGANIZZATORE_MASTER)) {
             StatoPartecipazione stato_og = statoPartecipazioneRepository.findStatoPartecipazioneByUtenteAndStanza(og, stanza);
-            if(stato_og.getRuolo().getNome().equalsIgnoreCase(Ruolo.PARTECIPANTE)){
+            if (stato_og.getRuolo().getNome().equalsIgnoreCase(Ruolo.PARTECIPANTE)) {
                 stato_og.getRuolo().setNome(Ruolo.ORGANIZZATORE);
 
                 return ResponseEntity.ok(new Response<>(true, "L'utente selezionato ora è un organizzatore")).getBody();
 
-            }else if (stato_og.getRuolo().getNome().equalsIgnoreCase(Ruolo.ORGANIZZATORE)){
+            } else if (stato_og.getRuolo().getNome().equalsIgnoreCase(Ruolo.ORGANIZZATORE)) {
 
                 return ResponseEntity.status(403).body(new Response<>(false, "L'utente selezionato è già un'organizzatore")).getBody();
 
-            }else{
+            } else {
                 return ResponseEntity.status(403).body(new Response<>(false, "L'utente selezionato non può essere declassato ad organizzatore")).getBody();
             }
-        }else{
+        } else {
             return ResponseEntity.status(403).body(new Response<>(false, "Non puoi promuovere un'utente perché non sei un'organizzatore master")).getBody();
         }
     }
@@ -283,19 +279,63 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService {
 
         Stanza stanza = stanzaRepository.findStanzaById(Id);
 
-        if(stanza != null){
+        if (stanza != null) {
             List<Utente> utenti = statoPartecipazioneRepository.findUtentiInStanza(Id);
-            if(utenti != null){
+            if (utenti != null) {
                 return ResponseEntity.ok(new Response<>
                         (utenti, "operazione effettuata con successo"));
-            }else{
+            } else {
                 return ResponseEntity.ok(new Response<>(null, "Non sono presenti utenti all'interno della stanza"));
             }
-        }else{
+        } else {
             return ResponseEntity.status(403).body(new Response<>(null, "La stanza selezionata non esiste"));
         }
+    }
 
-}
+    @Override
+    public ResponseEntity<Response<List<Utente>>> visualizzaUtentiBannatiInStanza(Long Id) {
+
+        Stanza stanza = stanzaRepository.findStanzaById(Id);
+
+        if (stanza != null) {
+            List<Utente> utenti = statoPartecipazioneRepository.findUtentiBannatiInStanza(Id);
+            if (utenti != null) {
+                return ResponseEntity.ok(new Response<>
+                        (utenti, "operazione effettuata con successo"));
+            } else {
+                return ResponseEntity.ok(new Response<>(null, "Non sono presenti utenti bannati all'interno della stanza"));
+            }
+        } else {
+            return ResponseEntity.status(403).body(new Response<>(null, "La stanza selezionata non esiste"));
+        }
+    }
+
+    @Override
+    public ResponseEntity<Response<List<Utente>>> visualizzaUtentiInAttesaInStanza(Long Id, String metaID) {
+        Stanza stanza = stanzaRepository.findStanzaById(Id);
+        Utente u = utenteRepository.findFirstByMetaId(metaID);
+        if (stanza != null) {
+            StatoPartecipazione stato = statoPartecipazioneRepository.findStatoPartecipazioneByUtenteAndStanza(u, stanza);
+            if (stato != null) {
+                if (stato.getRuolo().getNome().equalsIgnoreCase(Ruolo.ORGANIZZATORE_MASTER) || stato.getRuolo().getNome().equalsIgnoreCase(Ruolo.ORGANIZZATORE)) {
+                    List<Utente> utenti = statoPartecipazioneRepository.findUtentiBannatiInStanza(Id);
+
+                    if (utenti != null) {
+                        return ResponseEntity.ok(new Response<>
+                                (utenti, "operazione effettuata con successo"));
+                    } else {
+                        return ResponseEntity.ok(new Response<>(null, "Non sono presenti utenti in attesa all'interno della stanza"));
+                    }
+                } else {
+                    return ResponseEntity.status(403).body(new Response<>(null, "Non puoi visualizzare gli utenti in attesa se non sei almeno un organizzatore"));
+                }
+            } else {
+                return ResponseEntity.status(403).body(new Response<>(null, "Non puoi visualizzare gli utenti in attesa della stanza se non sei almeno un'organizzatore di essa"));
+            }
+        } else {
+            return ResponseEntity.status(403).body(new Response<>(null, "La stanza selezionata non esiste"));
+        }
+    }
 
     @Override
     public Scenario visualizzaScenarioStanza(Stanza stanza) {
@@ -307,50 +347,49 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService {
         Utente u = utenteRepository.findFirstByMetaId(metaID);
         Stanza stanza = stanzaRepository.findStanzaById(idStanza);
 
-        if(stanza != null){
+        if (stanza != null) {
             StatoPartecipazione stato = statoPartecipazioneRepository.findStatoPartecipazioneByUtenteAndStanza(u, stanza);
-            if(stato != null){
-                if(stato.getRuolo().getNome().equalsIgnoreCase(Ruolo.ORGANIZZATORE_MASTER) || stato.getRuolo().getNome().equalsIgnoreCase(Ruolo.ORGANIZZATORE) && !stato.isBannato()){
+            if (stato != null) {
+                if (stato.getRuolo().getNome().equalsIgnoreCase(Ruolo.ORGANIZZATORE_MASTER) || stato.getRuolo().getNome().equalsIgnoreCase(Ruolo.ORGANIZZATORE) && !stato.isBannato()) {
                     Scenario scenario = scenarioRepository.findScenarioById(idScenario);
-                    if(scenario != null) {
-                        if(scenario != stanza.getScenario()) {
+                    if (scenario != null) {
+                        if (scenario != stanza.getScenario()) {
                             stanza.setScenario(scenario);
                             stanzaRepository.save(stanza);
                             return ResponseEntity.ok(new Response<>(true, "Lo scenario è stato modificato"));
-                        }else{
+                        } else {
                             return ResponseEntity.status(403).body(new Response<>(false, "Lo scenario selezionato è già in uso per la stanza"));
                         }
-                    }else{
+                    } else {
                         return ResponseEntity.status(403).body(new Response<>(false, "Lo scenario selezionato non esiste"));
                     }
-                }else{
+                } else {
                     return ResponseEntity.status(403).body(new Response<>(false, "Non puoi modificare lo scenario se non sei almeno un organizzatore"));
                 }
-            }else{
+            } else {
                 return ResponseEntity.status(403).body(new Response<>(false, "Non sei all'interno della stanza, non puoi modificare lo scenario"));
             }
 
-        }else{
+        } else {
             return ResponseEntity.status(403).body(new Response<>(false, "La stanza selezionata non esiste"));
         }
 
     }
 
-/**
-*
- * @param Id
- * @return
-*/
+    /**
+     * @param Id
+     * @return
+     */
     @Override
     public Stanza visualizzaStanza(Long Id) {
         return stanzaRepository.findStanzaById(Id);
     }
 
-    public Ruolo getRuolo(String nome){
+    public Ruolo getRuolo(String nome) {
 
         Ruolo ruolo = ruoloRepository.findByNome(nome);
 
-        if(ruolo == null){
+        if (ruolo == null) {
             ruolo = new Ruolo(nome);
             System.out.println(ruolo);
             ruoloRepository.save(ruolo);
@@ -358,7 +397,7 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService {
         return ruolo;
     }
 
-    public List<Scenario> getAllScenari(){
+    public List<Scenario> getAllScenari() {
         return scenarioRepository.findAll();
     }
 }

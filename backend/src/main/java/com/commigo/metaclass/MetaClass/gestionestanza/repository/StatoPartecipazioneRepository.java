@@ -22,6 +22,12 @@ public interface StatoPartecipazioneRepository extends JpaRepository<StatoPartec
     @Query("SELECT sp.utente FROM StatoPartecipazione sp WHERE sp.isInAttesa=false AND  sp.isBannato=false and sp.stanza.id = :id")
     List<Utente> findUtentiInStanza(@Param("id") Long id);
 
+    @Query("SELECT sp.utente FROM StatoPartecipazione sp WHERE sp.isInAttesa=false AND  sp.isBannato=true and sp.stanza.id = :id")
+    List<Utente> findUtentiBannatiInStanza(@Param("id") Long id);
+
+    @Query("SELECT sp.utente FROM StatoPartecipazione sp WHERE sp.isInAttesa=true AND  sp.isBannato=false and sp.stanza.id = :id")
+    List<Utente> findUtentiInAttesaInStanza(@Param("id") Long id);
+
     @Query("SELECT sp.isBannato FROM StatoPartecipazione sp WHERE sp.stanza.id = :idstanza AND sp.utente.id = :idutente")
     boolean isBannedUser(@Param("idstanza") Long idstanza, @Param("idutente") Long idutente);
 }
