@@ -205,7 +205,7 @@ public class GestioneStanzaControl {
     }
 
     @PostMapping(value = "/accessoStanza")
-    public ResponseEntity<AccessResponse<Boolean>> richiestaAccessoStanza(@RequestBody String requestBody, HttpServletRequest request)
+    public ResponseEntity<AccessResponse<Integer>> richiestaAccessoStanza(@RequestBody String requestBody, HttpServletRequest request)
     {
         try {
             if (!validationToken.isTokenValid(request)) {
@@ -222,7 +222,7 @@ public class GestioneStanzaControl {
 
         } catch (RuntimeException | JsonProcessingException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new AccessResponse<>(false, "Errore durante la richiesta: " + e.getMessage(), false));
+                    .body(new AccessResponse<>(0, "Errore durante la richiesta: " + e.getMessage(), false));
         } catch (RuntimeException403 e) {
             throw new RuntimeException(e);
         }

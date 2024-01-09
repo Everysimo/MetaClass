@@ -17,14 +17,14 @@ import java.util.Map;
 public interface GestioneStanzaService
 {
 
-    ResponseEntity<AccessResponse<Boolean>> accessoStanza(String codiceStanza, String id_utente);
+    ResponseEntity<AccessResponse<Integer>> accessoStanza(String codiceStanza, String id_utente);
     boolean creaStanza(Stanza s) throws ServerRuntimeException, RuntimeException403;
     Response<Boolean> deleteRoom(String metaID, Long id_stanza);
     Response<Boolean> downgradeUtente(String id_Uogm, long og, long stanza);
     Boolean modificaDatiStanza(Map<String,Object> params, Long id) throws RuntimeException403, RuntimeException401;
     Stanza findStanza(Long id);
     List<StatoPartecipazione> findStatoPartecipazioniInAttesa(Stanza stanza,boolean isInAttesa);
-    ResponseEntity<AccessResponse<Boolean>> richiestaAccessoStanza(String codiceStanza, String id_utente);
+    ResponseEntity<AccessResponse<Integer>> richiestaAccessoStanza(String codiceStanza, String id_utente);
     StatoPartecipazione setStatoPartecipazione(Stanza stanza, Utente utente, boolean isInAttesa);
     Response<Boolean> upgradeUtente(String id_Uogm, long og, long stanza);
     ResponseEntity<Response<List<Utente>>> visualizzaUtentiInStanza(Long Id);

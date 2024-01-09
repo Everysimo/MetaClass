@@ -9,7 +9,6 @@ import com.commigo.metaclass.MetaClass.gestionestanza.repository.RuoloRepository
 import com.commigo.metaclass.MetaClass.gestionestanza.repository.StanzaRepository;
 import com.commigo.metaclass.MetaClass.gestionestanza.repository.StatoPartecipazioneRepository;
 import com.commigo.metaclass.MetaClass.gestioneutenza.repository.UtenteRepository;
-import com.commigo.metaclass.MetaClass.utility.Validator;
 import com.commigo.metaclass.MetaClass.utility.response.ResponseUtils;
 import com.commigo.metaclass.MetaClass.utility.response.types.AccessResponse;
 import com.commigo.metaclass.MetaClass.utility.response.types.Response;
@@ -43,15 +42,15 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService {
     private JwtTokenUtil jwtTokenUtil;
 
     @Override
-    public ResponseEntity<AccessResponse<Boolean>> accessoStanza(String codiceStanza, String id_utente) {
+    public ResponseEntity<AccessResponse<Integer>> accessoStanza(String codiceStanza, String id_utente) {
 
         Stanza stanza = stanzaRepository.findStanzaByCodice(codiceStanza);
         if (stanza == null) {
-            return ResponseEntity.status(403).body(new AccessResponse<>(false, "La stanza non esiste", false));
+            return ResponseEntity.status(403).body(new AccessResponse<>(404, "La stanza non esiste", false));
         } else if (!stanza.isTipo_Accesso()) {
 
-            AccessResponse<Boolean> richiesta = richiestaAccessoStanza(codiceStanza, id_utente).getBody();
-            if (richiesta.getValue()) {
+            AccessResponse<Integer> richiesta = richiestaAccessoStanza(codiceStanza, id_utente).getBody();
+            if (richiesta.getValue() == 1 || richiesta.getValue() == 5) {
                 return ResponseEntity.ok(new AccessResponse<>(richiesta.getValue(), richiesta.getMessage(), richiesta.isInAttesa()));
             } else {
                 return ResponseEntity.status(403).body(new AccessResponse<>(richiesta.getValue(), richiesta.getMessage(), richiesta.isInAttesa()));
@@ -66,21 +65,21 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService {
                 if (statoPartecipazione == null) {
 
                     statoPartecipazione = new StatoPartecipazione(stanza, u, getRuolo(Ruolo.PARTECIPANTE), false, false, u.getNome());
-                    return ResponseEntity.ok(new AccessResponse<>(true, "Stai per effettuare l'accesso alla stanza", false));
+                    return ResponseEntity.ok(new AccessResponse<>(1, "Stai per effettuare l'accesso alla stanza", false));
 
                 } else if (statoPartecipazione.isBannato()) {
 
-                    return ResponseEntity.status(403).body(new AccessResponse<>(false, "Sei stato bannato da questa stanza, non puoi entrare", false));
+                    return ResponseEntity.status(403).body(new AccessResponse<>(2, "Sei stato bannato da questa stanza, non puoi entrare", false));
 
                 } else {
 
-                    return ResponseEntity.status(403).body(new AccessResponse<>(false, "Sei già all'interno di questa stanza", false));
+                    return ResponseEntity.status(403).body(new AccessResponse<>(3, "Sei già all'interno di questa stanza", false));
 
                 }
 
             } catch (RuntimeException e) {
 
-                return ResponseEntity.status(403).body(new AccessResponse<>(false, "Errore durante la richiesta: " + e.getMessage(), false));
+                return ResponseEntity.status(403).body(new AccessResponse<>(4, "Errore durante la richiesta: " + e.getMessage(), false));
 
             }
         }
@@ -203,7 +202,7 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService {
     }
 
     @Override
-    public ResponseEntity<AccessResponse<Boolean>> richiestaAccessoStanza(String codiceStanza, String id_utente) {
+    public ResponseEntity<AccessResponse<Integer>> richiestaAccessoStanza(String codiceStanza, String id_utente) {
         try {
             Stanza stanza = stanzaRepository.findStanzaByCodice(codiceStanza);
 
@@ -213,25 +212,25 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService {
             if (statoPartecipazione == null) {
 
                 statoPartecipazione = new StatoPartecipazione(stanza, u, getRuolo(Ruolo.PARTECIPANTE), true, false, u.getNome());
-                return ResponseEntity.ok(new AccessResponse<>(true, "La stanza è privata, sei in attesa di entrare", true));
+                return ResponseEntity.ok(new AccessResponse<>(5, "La stanza è privata, sei in attesa di entrare", true));
 
             } else if (statoPartecipazione.isBannato()) {
 
-                return ResponseEntity.status(403).body(new AccessResponse<>(false, "Sei stato bannato da questa stanza, non richiedere di entrare", false));
+                return ResponseEntity.status(403).body(new AccessResponse<>(6, "Sei stato bannato da questa stanza, non richiedere di entrare", false));
 
             } else if (statoPartecipazione.isInAttesa()) {
 
-                return ResponseEntity.status(403).body(new AccessResponse<>(false, "Sei già in attesa di entrare in questa stanza", true));
+                return ResponseEntity.status(403).body(new AccessResponse<>(7, "Sei già in attesa di entrare in questa stanza", true));
 
             } else {
 
-                return ResponseEntity.status(403).body(new AccessResponse<>(false, "Sei già all'interno di questa stanza", false));
+                return ResponseEntity.status(403).body(new AccessResponse<>(8, "Sei già all'interno di questa stanza", false));
 
             }
 
 
         } catch (RuntimeException e) {
-            return ResponseEntity.status(403).body(new AccessResponse<>(false,
+            return ResponseEntity.status(403).body(new AccessResponse<>(0,
                     "Errore durante la richiesta: " + e.getMessage(), false));
         }
 
