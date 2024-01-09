@@ -5,7 +5,7 @@ import { wait } from "@testing-library/user-event/dist/utils";
 export default class CreaCategoria extends Component {
     state = {
         nome: "",
-        descrizione_categoria: "",
+        descrizione: "",
         isVisible: true,
         isErrorPopupVisible: false,
         errorMessage: "",
@@ -15,7 +15,7 @@ export default class CreaCategoria extends Component {
         this.setState({nome: e.target.value});
     };
     handleDescChange = (e) => {
-        this.setState({ descrizione_categoria: e.target.value });
+        this.setState({ descrizione: e.target.value });
     };
 
     handleErrorPopupClose = () => {
@@ -26,13 +26,13 @@ export default class CreaCategoria extends Component {
     };
 
     sendDataToServer = async () => {
-        const { nome, descrizione_categoria} = this.state;
+        const { nome, descrizione} = this.state;
 
         // Validazione: Assicurati che idCategoria sia >= 0
 
         const dataToSend = {
             nome,
-            descrizione_categoria,
+            descrizione
         };
 
         const requestOption = {
@@ -43,7 +43,7 @@ export default class CreaCategoria extends Component {
 
         try {
             console.log("la stringa json:", JSON.stringify(dataToSend));
-            const response = await fetch('http://localhost:8080/updateCategoria', requestOption);
+            const response = await fetch('http://localhost:8080/admin/updateCategoria', requestOption);
             const responseData = await response.json();
             console.log("Risposta dal server:", responseData);
         } catch (error) {
@@ -61,7 +61,7 @@ export default class CreaCategoria extends Component {
     handleClear = () => {
         this.setState({
             nome: '',
-            descrizione_categoria: '',
+            descrizione: '',
         });
     };
     handleClose = () => {
@@ -106,7 +106,7 @@ export default class CreaCategoria extends Component {
                             <input
                                 type="text"
                                 name="descrizione"
-                                value={this.state.descrizione_categoria}
+                                value={this.state.descrizione}
                                 onChange={this.handleDescChange}
                             />
                         </label>

@@ -107,7 +107,8 @@ export default class Facebook extends Component {
             const token = responseData.token;
             // Memorizza il token in sessionStorage
             sessionStorage.setItem('token', token);
-            sessionStorage.setItem('isAdmin', responseData.isAdmin);
+            //sessionStorage.setItem('isAdmin', responseData.isAdmin);
+            sessionStorage.setItem('isAdmin', 'true');
         } catch (error) {
             console.error('Error:', error);
         }
