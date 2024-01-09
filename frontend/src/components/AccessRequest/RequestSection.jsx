@@ -1,30 +1,28 @@
-import React, { Component } from 'react';
-import "./RequestAccess.css";
+import React, { useState, useEffect } from 'react';
+import './RequestAccess.css';
+import {useNavigate, useParams} from "react-router-dom";
 
-export default class RequestSection extends Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            array: [],
-        };
-    }
+const RequestSection = () => {
+    const [array, setArray] = useState([]);
 
-    componentDidMount() {
-        this.fetchGestioneAccessi();
-    }
+    const { id: id_stanza } = useParams();      //si usa useParams per farsi passare il parametro
 
-    requestOption = {
+    console.log("idstanza", id_stanza)
+    const requestOption = {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
             Authorization: 'Bearer ' + sessionStorage.getItem('token'),
         },
     };
-    fetchGestioneAccessi = async () => {
 
+    useEffect(() => {
+        fetchGestioneAccessi();
+    }, []);
 
+    const fetchGestioneAccessi = async () => {
         try {
-            const response = await fetch('http://localhost:8080/gestioneAccessi', this.requestOption);
+            const response = await fetch(`http://localhost:8080/visualizzaUtentiInAttesaInStanza/${1}`, requestOption);
 
             if (!response.ok) {
                 throw new Error('Errore richiesta not ok.');
@@ -37,8 +35,9 @@ export default class RequestSection extends Component {
             console.error('Errore durante il recupero degli accessi:', error.message);
         }
     };
-/*
-    handleAccept = async (userId) => {
+
+    /*
+    const handleAccept = async (userId) => {
         const requestOption = {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -57,7 +56,7 @@ export default class RequestSection extends Component {
         console.log(`Accettato l'accesso per l'utente con ID ${userId}`);
     };
 
-    handleReject = async (userId) => {
+    const handleReject = async (userId) => {
         const requestOption = {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -75,27 +74,15 @@ export default class RequestSection extends Component {
 
         console.log(`Rifiutato l'accesso per l'utente con ID ${userId}`);
     };
-*/
-    render() {
-        return (
-            <>
-                <div className="access-management-container">
-                    <h2>Richieste di accesso</h2>
-                    {/*
-                    {this.state.accessRequests.map((request) => (
-                        <div key={request.userId} className="card-container">
-                            <div className="user-info">
-                                <h3>{request.userName}</h3>
-                            </div>
-                            <div className="button-container">
-                                <button className={'button-field'} onClick={() => this.handleAccept(request.userId)}>Accetta</button>
-                                <button className={'button-field'} onClick={() => this.handleReject(request.userId)}>Rifiuta</button>
-                            </div>
-                        </div>
-                    ))} */}
-                </div>
+    */
 
-            </>
-        );
-    }
-}
+    return (
+        <>
+            <div className="access-management-container">
+                <h2>Richieste di accesso</h2>
+            </div>
+        </>
+    );
+};
+
+export default RequestSection;

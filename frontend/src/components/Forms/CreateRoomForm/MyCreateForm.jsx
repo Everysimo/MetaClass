@@ -9,7 +9,6 @@ export default class MyCreateForm extends Component{
     //stato di partenza dei parametri
     state = {
         nome: "",
-        codiceStanza: "",
         descrizione: "",
         tipoAccesso: false,
         maxPosti: 0,
@@ -83,10 +82,6 @@ export default class MyCreateForm extends Component{
         this.setState({nome: e.target.value});
     };
 
-    handleCodeChange = (e) => {
-        this.setState({codiceStanza: e.target.value})
-    };
-
     handleDescriptionChange = (e) => {
         this.setState({descrizione: e.target.value})
     };
@@ -140,10 +135,9 @@ export default class MyCreateForm extends Component{
 
     /*funzione per inviare i parametri a crea stanza*/
     sendDataToServer = async() =>{
-        const {nome, codiceStanza, descrizione, tipoAccesso, maxPosti, id_scenario} = this.state;
+        const {nome, descrizione, tipoAccesso, maxPosti, id_scenario} = this.state;
         const dataToSend = {
             nome,
-            codiceStanza,
             descrizione,
             tipoAccesso,
             maxPosti,
@@ -241,22 +235,6 @@ export default class MyCreateForm extends Component{
                 <Divider/>
 
                 <div className={'right-label'}>
-                    <div className={'text-box'}>
-                        <p className={'textp'}>Inserisci Codice della Stanza:</p>
-                    </div>
-                    <div className={'pin-box'}>
-                        <input
-                            className={'pin-field'}
-                            required
-                            placeholder={'Codice di 6 cifre'}
-                            type="text"
-                            maxLength={6}
-                            style={{width: '150px'}}
-                            value={this.state.codiceStanza}
-                            onChange={this.handleCodeChange}
-                        />
-                    </div>
-                    <br/>
                     <button className={'button-create'} type="button" onClick={() =>  this.callFunction() }> Create</button>
                 </div>
             </div>

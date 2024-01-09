@@ -24,10 +24,10 @@ export const Rts = () =>{
                 <Route path="/SingleRoom/:id" element={<SingleRoom/>} />
                 <Route path="/modifyroom/:id" element={<ModifyRoom/>}/>
                 <Route path="/createroom" element={<CreateRoom/>}/>
-                <Route path="/accessManagement" element={<GestioneAccessi/>}/>
+                <Route path="/accessManagement/:id" element={<GestioneAccessi/>}/>
                 <Route path="/changescenario/:id" element={<SelezionaScenario/>}/>
 
-                <Route path="/bannedUserList" element={<BannedUserList/>}/>
+                <Route path="/bannedUserList/:id" element={<BannedUserList/>}/>
             </Routes>
         </Router>
     )

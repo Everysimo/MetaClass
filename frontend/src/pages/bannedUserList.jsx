@@ -6,6 +6,7 @@ import UserList from "../components/UserList/UserList";
 
 export const BannedUserList = ({List}) => {
 
+
     return(
         <>
             <header>
