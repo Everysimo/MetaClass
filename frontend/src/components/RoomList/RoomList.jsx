@@ -79,7 +79,6 @@ class RoomList extends Component {
                             </div>
                             ))}
                     </div>
-
                 </div>
             </>
         );

@@ -1,28 +1,50 @@
 import React, { useState } from 'react';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { LocalizationProvider, StaticDateTimePicker } from '@mui/x-date-pickers';
 import dayjs from 'dayjs';
-import axios from 'axios';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { MultiInputDateTimeRangeField } from '@mui/x-date-pickers-pro/MultiInputDateTimeRangeField';
+import axios from "axios";
 
 const CalendarComp = () => {
-    const [selectedDateTime, setSelectedDateTime] = useState(dayjs('2022-04-17T15:30'));
+    const [selectedDateTimeRange, setSelectedDateTimeRange] = useState([
+        dayjs('2022-04-17T15:30'),
+        dayjs('2022-04-21T18:30'),
+    ]);
+    const [name, setName] = useState(''); // State for the 'name' input
 
-    const handleDateTimeChange = (newDateTime) => {
-        setSelectedDateTime(newDateTime);
+    const handleDateTimeRangeChange = (newDateTimeRange) => {
+        setSelectedDateTimeRange(newDateTimeRange);
     };
 
     const handleSubmit = async () => {
         try {
-            // Format selectedDateTime to match your API's expected format
-            const formattedDateTime = selectedDateTime.format(); // Customize this according to your API's format
+            const [startDate, endDate] = selectedDateTimeRange.map((date) =>
+                date.format('YYYY-MM-DD HH:mm')
+            );
 
+            const token = sessionStorage.getItem('token');
+
+            const meetingData = {
+                nome: name,
+                inizio: startDate,
+                fine: endDate,
+                id_stanza: sessionStorage.getItem('idStanza')
+                // Other properties of the Meeting object if needed
+            };
+
+            // Convert the object to a JSON string using JSON.stringify()
+            const meetingDataJSON = JSON.stringify(meetingData);
+
+            console.log(meetingDataJSON);
             // Make an Axios POST request to your API endpoint
-            const response = await axios.post('YOUR_API_ENDPOINT', {
-                dateTime: formattedDateTime, // Pass the formatted date/time to your API
-                // Add other parameters as needed
+            const response = await axios.post('http://localhost:8080/schedulingMeeting',
+                meetingDataJSON, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                }
             });
 
-            // Handle response or any further logic based on API call
             console.log('API Response:', response.data);
         } catch (error) {
             console.error('Error:', error);
@@ -31,11 +53,15 @@ const CalendarComp = () => {
 
     return (
         <LocalizationProvider dateAdapter={AdapterDayjs}>
-            <StaticDateTimePicker
-                value={selectedDateTime}
-                onChange={handleDateTimeChange}
-                renderInput={(params) => <input {...params} />}
-                // Customize the component according to your preferences
+            <input
+                type="text"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="Enter name"
+            />
+            <MultiInputDateTimeRangeField
+                value={selectedDateTimeRange}
+                onChange={handleDateTimeRangeChange}
             />
             <button onClick={handleSubmit}>Submit</button>
         </LocalizationProvider>
@@ -43,4 +69,5 @@ const CalendarComp = () => {
 };
 
 export default CalendarComp;
+
 

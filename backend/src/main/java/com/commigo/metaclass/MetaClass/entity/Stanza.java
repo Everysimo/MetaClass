@@ -96,7 +96,7 @@ public class Stanza {
      * Chiave Esterna sullo Scenario
      */
     @NotNull(message = "Lo scenario non può essere nullo")
-    @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.DETACH})
+    @ManyToOne(cascade = CascadeType.MERGE)
     @JoinColumn(name = "id_scenario")
     private Scenario scenario;
 

@@ -40,7 +40,7 @@ public class Report {
     private int max_Partecipanti = 1;
 
     @NotNull(message = "Il meeting non può essere nullo")
-    @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.REMOVE})
+    @ManyToOne(cascade = CascadeType.MERGE)
     @JoinColumn(name = "id_meeting")
     private Meeting meeting;
 

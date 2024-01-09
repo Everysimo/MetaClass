@@ -57,6 +57,5 @@ public class Categoria {
         this.nome = nome;
         this.descrizione_categoria = descrizione_categoria;
 
-
     }
 }
