@@ -7,6 +7,7 @@ import {useParams} from "react-router-dom";
 const MyModifyForm = () => {
 
     const { id: id_stanza } = useParams();
+
     //si usa useParams per farsi passare il parametro
     const [state, setState] = useState({
         nome: "",

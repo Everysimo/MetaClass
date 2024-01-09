@@ -12,8 +12,6 @@ import {SingleRoom} from "./pages/SingleRoom";
 import {VisualRoomList} from "./pages/visualRoomList";
 import {SelezionaScenario} from "./pages/changescenario";
 
-
-
 export const Rts = () =>{
     return(
         <Router>
