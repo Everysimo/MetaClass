@@ -45,7 +45,7 @@ section {
     justify-content: center;
     margin: 0;
     padding: 5%;
-    display: inline-block;
+    display: block;
     background-color: white;
     min-height: 0;
     z-index: 2;
@@ -61,15 +61,27 @@ section p{
     font-size: x-large;
     text-align: left;
 }
-section div{
-    display: flex;
-}
 
 .sec {
     z-index: 1;
     min-height: 500px;
     box-shadow: none;
 }
+
+.contentSec{
+    display: inline-block;
+}
+.masterDiv {
+    display: flex; /* Display children horizontally */
+    padding: 5%;
+}
+
+.childDiv {
+    display: flex; /* Children of .master will be displayed horizontally */
+    flex-direction: column; /* Children inside .child will be displayed vertically */
+    margin: 5%; /* Optional: Add margin between .child elements */
+}
+
 
 #sec1, #sec2, #sec3{
     background-position: center;

@@ -13,7 +13,7 @@ import CreaScenario from "../components/Forms/CreaScenarioForm/CreaScenario";
 import ModificaScenario from "../components/Forms/CreaScenarioForm/ModificaScenario";
 
 export const LoggedInHome = () => {
-    const nome = localStorage.getItem('nome');
+    const nome = sessionStorage.getItem('nome');
     const [isAvviaMeetingVisible, setIsAvviaMeetingVisible] = useState(false);
     const [isVisibleScen, setIsVisibleScen] = useState(false);
     const [isVisibleModScen, setIsVisibleModScen] = useState(false);
@@ -37,45 +37,39 @@ export const LoggedInHome = () => {
         navigate(`/createroom`);
     };
 
-
-
-
-
-
-
+    function isAdmin() {
+        if (sessionStorage.getItem('isAdmin') === 'true') {
+            return (
+                <>
+                    <h5> IN QUANTO ADMIN...</h5>
+                    <button onClick={() => setIsVisibleCat(prevVisibility => !prevVisibility)}>Crea Categoria</button>
+                    {isVisibleCat && <CreaCategoria onClose={() => setIsVisibleCat(false)} />}
+                    <button onClick={() => setIsVisibleScen(prevVisibility => !prevVisibility)}>Crea Scenario</button>
+                    {isVisibleScen && <CreaScenario onClose={() => setIsVisibleScen(false)} />}
+                    <button onClick={() => setIsVisibleModScen(prevVisibility => !prevVisibility)}>Modifica Scenario</button>
+                    {isVisibleModScen && <ModificaScenario onClose={() => setIsVisibleModScen(false)} />}
+                </>
+            );
+        }
+        return null;
+    }
 
     return (
         <>
         <header>
             <MyHeader />
         </header>
-        <section className={"sec"}>
-            <div className={"table-container"}>
-                <div className={"table-row"}>
-                    <div className={"table-cell"}>
-
-                        <button onClick={handleGoToProfile}>vai ad Account</button>
-                        <button onClick={handleGoToRoomList}>vai all'elenco delle stanze</button>
-                        <button onClick={handleGoToCreateRoom}>Crea stanza</button>
-
-                        <h5> IN QUANTO ORGANIZZATORE...</h5>
-                        <button onClick={() => setIsAvviaMeetingVisible(prevVisibility => !prevVisibility)}>AvviaMeeting </button>
-                        {isAvviaMeetingVisible && <AvviaMeeting id_meeting={1} onClose={() => setIsAvviaMeetingVisible(false)} />}
-
-                        <h5> IN QUANTO ADMIN...</h5>
-
-                        <button onClick={() => setIsVisibleCat(prevVisibility => !prevVisibility)}>Crea Categoria</button>
-                        {isVisibleCat && <CreaCategoria onClose={() => setIsVisibleCat(false)} />}
-
-                        <button onClick={() => setIsVisibleScen(prevVisibility => !prevVisibility)}>Crea Scenario</button>
-                        {isVisibleScen && <CreaScenario onClose={() => setIsVisibleScen(false)} />}
-
-                        <button onClick={() => setIsVisibleModScen(prevVisibility => !prevVisibility)}>Modifica Scenario</button>
-                        {isVisibleModScen && <ModificaScenario onClose={() => setIsVisibleModScen(false)} />}
-
-                        <LogoutButton/>
-                    </div>
-                </div>
+        <section>
+            <div>
+                <h1>BENTORNATO, {nome}</h1>
+                <button onClick={handleGoToProfile}>vai ad Account</button>
+                <button onClick={handleGoToRoomList}>vai all'elenco delle stanze</button>
+                <button onClick={handleGoToCreateRoom}>Crea stanza</button>
+                <h5> IN QUANTO ORGANIZZATORE...</h5>
+                <button onClick={() => setIsAvviaMeetingVisible(prevVisibility => !prevVisibility)}>AvviaMeeting </button>
+                {isAvviaMeetingVisible && <AvviaMeeting id_meeting={1} onClose={() => setIsAvviaMeetingVisible(false)} />}
+                {isAdmin()}
+                <LogoutButton/>
             </div>
         </section>
             <footer>
