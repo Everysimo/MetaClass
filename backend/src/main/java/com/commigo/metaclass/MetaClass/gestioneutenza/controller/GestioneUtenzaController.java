@@ -106,8 +106,9 @@ public class GestioneUtenzaController {
                 throw new RuntimeException403("Token non valido");
             }
 
+            String metaID = jwtTokenUtil.getMetaIdFromToken(validationToken.getToken());
             // Rimuovi il token nel sistema
-            if (utenzaService.logoutMeta(token, validationToken)) {
+            if (utenzaService.logoutMeta(metaID, validationToken)) {
                 return ResponseEntity.ok(new Response<Boolean>(true, "Utente disconnesso con successo"));
             } else {
                 throw new ServerRuntimeException("Errore nella rimozione del token dell'utente");

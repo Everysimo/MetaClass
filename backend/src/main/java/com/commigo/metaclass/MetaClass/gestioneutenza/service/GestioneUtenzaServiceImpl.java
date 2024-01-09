@@ -136,21 +136,22 @@ public class GestioneUtenzaServiceImpl implements GestioneUtenzaService{
 
 /**
 *
- * @param token
+ * @param metaID
  * @return
 */
     @Override
-    public boolean logoutMeta(String token, ValidationToken validationToken) throws ServerRuntimeException {
+    public boolean logoutMeta(String metaID, ValidationToken validationToken) throws ServerRuntimeException {
 
-        System.out.println(token);
-       Utente u = utenteRepository.findUtenteByTokenAuth(token);
-       if(u==null)   return false;
+       Utente u = utenteRepository.findFirstByMetaId(metaID);
+       if(u==null)
+           return false;
+
        u.setTokenAuth(Utente.DEFAULT_TOKEN);
        try {
            utenteRepository.save(u);
             return true;
        }catch (DataIntegrityViolationException e){
-           throw new ServerRuntimeException("errore nel salvataggio del report");
+           throw new ServerRuntimeException("errore nel salvataggio del utente");
        }
 
     }

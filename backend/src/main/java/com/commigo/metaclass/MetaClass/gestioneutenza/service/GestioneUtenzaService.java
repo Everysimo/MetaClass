@@ -18,6 +18,6 @@ public interface GestioneUtenzaService{
     boolean modificaDatiUtente(String MetaID, Map<String, Object> params)throws RuntimeException403;
     List<Stanza> getStanzeByUserId(String MetaId) throws ServerRuntimeException;
     Utente getUtenteByUserId(String sessionID) throws DataNotFoundException;
-    boolean logoutMeta(String token, ValidationToken validationToken) throws ServerRuntimeException;
+    boolean logoutMeta(String metaID, ValidationToken validationToken) throws ServerRuntimeException;
 
 }

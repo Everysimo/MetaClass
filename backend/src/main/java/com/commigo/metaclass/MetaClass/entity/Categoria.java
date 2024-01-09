@@ -1,5 +1,8 @@
 package com.commigo.metaclass.MetaClass.entity;
 
+import com.commigo.metaclass.MetaClass.exceptions.MismatchJsonProperty;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -12,7 +15,6 @@ import lombok.NoArgsConstructor;
 @Entity
 @Data
 @NoArgsConstructor
-@AllArgsConstructor
 public class Categoria {
 
     
@@ -43,4 +45,18 @@ public class Categoria {
             message = "Formato descrizione errato")
     @NotBlank (message ="La descrizione della categoria non può essere vuoto")
     private String descrizione_categoria;
+
+
+    @JsonCreator
+    public Categoria(@JsonProperty("nome") String nome,
+                     @JsonProperty("descrizione") String descrizione_categoria) throws MismatchJsonProperty {
+
+        if (nome == null || descrizione_categoria == null) {
+            throw new MismatchJsonProperty("gli attributi non sono corretti");
+        }
+        this.nome = nome;
+        this.descrizione_categoria = descrizione_categoria;
+
+
+    }
 }
