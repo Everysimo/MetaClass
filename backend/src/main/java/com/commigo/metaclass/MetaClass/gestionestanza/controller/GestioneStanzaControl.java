@@ -1,9 +1,6 @@
 package com.commigo.metaclass.MetaClass.gestionestanza.controller;
 
-import com.commigo.metaclass.MetaClass.entity.Scenario;
-import com.commigo.metaclass.MetaClass.entity.Stanza;
-import com.commigo.metaclass.MetaClass.entity.StatoPartecipazione;
-import com.commigo.metaclass.MetaClass.entity.Utente;
+import com.commigo.metaclass.MetaClass.entity.*;
 import com.commigo.metaclass.MetaClass.exceptions.ClientRuntimeException;
 import com.commigo.metaclass.MetaClass.exceptions.RuntimeException401;
 import com.commigo.metaclass.MetaClass.exceptions.RuntimeException403;
@@ -423,5 +420,29 @@ public class GestioneStanzaControl {
             e.printStackTrace();
             return ResponseEntity.status(500).body(new Response<>(null, "Errore durante l'operazione"));
         }
+    }
+
+    @PostMapping(value = "/getRuolo/{id_stanza}")
+    public ResponseEntity<Response<Ruolo>> modificaScenario(@PathVariable Long id_stanza,
+                                                              HttpServletRequest request){
+        try{
+
+            if (!validationToken.isTokenValid(request)) {
+                throw new RuntimeException403("Token non valido");
+            }
+
+            String metaID = jwtTokenUtil.getMetaIdFromToken(validationToken.getToken());
+
+            Ruolo r = stanzaService.getRuoloByUserAndStanzaID(metaID,id_stanza);
+            if(r == null)  throw new ServerRuntimeException("errore nel recapito del ruolo");
+            else  return ResponseEntity.ok(new Response<>(r,"ruolo recapitato con successo"));
+
+        } catch (ServerRuntimeException | RuntimeException403 e) {
+
+        // Gestisci le eccezioni e restituisci una risposta appropriata
+        int statusCode = (e instanceof ServerRuntimeException) ? 500 : 403;
+        return ResponseEntity.status(statusCode)
+                .body(new Response<>(null, "Errore durante l'operazione: " + e.getMessage()));
+       }
     }
 }

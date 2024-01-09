@@ -434,6 +434,35 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService {
         }
     }
 
+/**
+*
+ * @param metaID
+ * @param idStanza
+ * @return
+*/
+    @Override
+    public Ruolo getRuoloByUserAndStanzaID(String metaID, Long idStanza) throws ServerRuntimeException, RuntimeException403 {
+
+        Utente u;
+        Stanza stanza;
+        if((u= utenteRepository.findFirstByMetaId(metaID))==null)
+            throw new ServerRuntimeException(("Utente non torvato"));
+        if((stanza = stanzaRepository.findStanzaById(idStanza))==null)
+            throw new RuntimeException403("Stanza non trovata");
+
+        StatoPartecipazione sp;
+        if((sp=statoPartecipazioneRepository
+                .findStatoPartecipazioneByUtenteAndStanza(u,stanza))==null)
+            throw new RuntimeException403("L'utente non ha acceduto alla stanza");
+
+        if(sp.getRuolo().getNome().equalsIgnoreCase(Ruolo.PARTECIPANTE)){
+           if(sp.isBannato())   throw new RuntimeException403("Utente bannato dalla stanza");
+           if(sp.isInAttesa())   throw new RuntimeException403("Utente in attesa di entrare in stanza");
+        }
+
+        return sp.getRuolo();
+    }
+
     /**
              * @param Id
              * @return

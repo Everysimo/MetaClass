@@ -9,6 +9,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.*;
+import org.springframework.transaction.TransactionSystemException;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -85,14 +86,36 @@ public class StatoPartecipazione implements Serializable {
     @UpdateTimestamp
     private LocalDateTime data_Aggiornamento;
 
+    public void checkRule(){
+        try{
+          if(!this.ruolo.getNome().equalsIgnoreCase(Ruolo.PARTECIPANTE)){
+             if(this.isInAttesa){
+
+                 throw new TransactionSystemException("non puoi inserire un ruolo " +
+                         "diverso da partecipante che sia in attesa");
+
+             }else if(this.ruolo.getNome().equalsIgnoreCase(Ruolo.ORGANIZZATORE_MASTER) &&
+                      this.isBannato){
+
+                 throw new TransactionSystemException("L'organizzatore master non può " +
+                         "essere inserito come bannato");
+
+             }
+          }
+        }catch(TransactionSystemException e){
+            System.err.println(e.getMessage());
+        }
+    }
+
     public StatoPartecipazione(Stanza stanza, Utente utente, Ruolo ruolo,
-                               boolean isInAttesa, boolean isBannato, String nomeInStanza) {
+                               boolean isInAttesa, boolean isBannato, String nomeInStanza) throws Exception {
         this.stanza = stanza;
         this.utente = utente;
         this.ruolo = ruolo;
         this.isInAttesa = isInAttesa;
         this.isBannato = isBannato;
         this.nomeInStanza = nomeInStanza;
+        checkRule();
     }
 
 }

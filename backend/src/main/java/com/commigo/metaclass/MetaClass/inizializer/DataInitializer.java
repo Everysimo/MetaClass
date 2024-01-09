@@ -78,14 +78,16 @@ public class DataInitializer implements CommandLineRunner {
             Stanza s2 = stanzaRepository.save(new Stanza(2L, "StanzaScuola1", "Stanza 1 per la scuola", false, 200, sc2, "000002"));
             Stanza s3 = stanzaRepository.save(new Stanza(3L, "StanzaDivertimento1", "Stanza 1 per il divertimento", true, 50, sc3, "000003"));
 
-        //Aggiunta dello StatoPartecipazione
+           //Aggiunta dello StatoPartecipazione
+           //SE VIENE INSERITO UN ORGANIZZATORE_MASTER BANNATO ALLORA DA ERRORE
+           //STESSA COSA VALE PER isInAttesa SIA PER ORGANIZZATORI CHE ORGANIZZATORI MASTER
 
             StatoPartecipazione sp1 = statoPartecipazioneRepository.save(new StatoPartecipazione(s1, u1, stanzaService.getRuolo(ORGANIZZATORE_MASTER), false, false, "Michele"));
             StatoPartecipazione sp2 = statoPartecipazioneRepository.save(new StatoPartecipazione(s1, u2, stanzaService.getRuolo(Ruolo.ORGANIZZATORE), false, false, "Francesco"));
             StatoPartecipazione sp3 = statoPartecipazioneRepository.save(new StatoPartecipazione(s1, u3, stanzaService.getRuolo(Ruolo.PARTECIPANTE), true, false, "Giorgio"));
 
             StatoPartecipazione sp4 = statoPartecipazioneRepository.save(new StatoPartecipazione(s2, u1, stanzaService.getRuolo(Ruolo.PARTECIPANTE), false, true, "Michele"));
-            StatoPartecipazione sp5 = statoPartecipazioneRepository.save(new StatoPartecipazione(s2, u2, stanzaService.getRuolo(Ruolo.PARTECIPANTE), false, false, "Francesco"));
+            StatoPartecipazione sp5 = statoPartecipazioneRepository.save(new StatoPartecipazione(s2, u2, stanzaService.getRuolo(Ruolo.PARTECIPANTE), false, true, "Francesco"));
             StatoPartecipazione sp6 = statoPartecipazioneRepository.save(new StatoPartecipazione(s3, u3, stanzaService.getRuolo(ORGANIZZATORE_MASTER), false, false, "Giorgio"));
 
             StatoPartecipazione sp7 = statoPartecipazioneRepository.save(new StatoPartecipazione(s3, u1, stanzaService.getRuolo(Ruolo.PARTECIPANTE), true, false, "Michele"));
