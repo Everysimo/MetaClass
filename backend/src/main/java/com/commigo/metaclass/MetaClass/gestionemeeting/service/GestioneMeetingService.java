@@ -23,4 +23,6 @@ public interface GestioneMeetingService {
     List<Meeting> visualizzaQuestionari(String metaId) throws ServerRuntimeException, RuntimeException403;
 
     List<Meeting> getMeetingPrecedenti(String metaId) throws ServerRuntimeException, RuntimeException403;
+
+    boolean compilaQuestionario(Integer value, String metaId, Long id_meeting) throws ServerRuntimeException, RuntimeException403;
 }

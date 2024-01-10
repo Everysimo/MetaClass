@@ -3,6 +3,7 @@ package com.commigo.metaclass.MetaClass.gestionemeeting.service;
 import com.commigo.metaclass.MetaClass.entity.*;
 import com.commigo.metaclass.MetaClass.exceptions.RuntimeException403;
 import com.commigo.metaclass.MetaClass.exceptions.ServerRuntimeException;
+import com.commigo.metaclass.MetaClass.gestioneamministrazione.repository.ScenarioRepository;
 import com.commigo.metaclass.MetaClass.gestionemeeting.repository.FeedbackMeetingRepository;
 import com.commigo.metaclass.MetaClass.gestionemeeting.repository.MeetingRepository;
 import com.commigo.metaclass.MetaClass.gestionemeeting.repository.ReportRepository;
@@ -33,6 +34,7 @@ public class GestioneMeetingServiceImpl implements GestioneMeetingService{
     private final MeetingRepository meetingRepository;
     private final StanzaRepository stanzaRepository;
     private final UtenteRepository utenteRepository;
+    private final ScenarioRepository scenarioRepository;
     private final UtenteInMeetingRepository utenteInMeetingRepository;
     private final StatoPartecipazioneRepository statoPartecipazioneRepository;
     private final FeedbackMeetingRepository feedbackMeetingRepository;
@@ -414,5 +416,49 @@ public class GestioneMeetingServiceImpl implements GestioneMeetingService{
                 .map(UtenteInMeeting::getMeeting)
                 .filter(meeting -> !meeting.isAvviato())
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public boolean compilaQuestionario(Integer value, String metaId, Long id_meeting) throws ServerRuntimeException, RuntimeException403 {
+
+        Utente u;
+        if((u=utenteRepository.findFirstByMetaId(metaId))==null)
+            throw new ServerRuntimeException("errore nella ricerca dell'utente");
+
+        //controllo della valutazione
+        if(value == null || (value<1 || value>5))
+            throw new RuntimeException403("valore non valido");
+
+        Meeting m;
+        if((m = meetingRepository.findMeetingById(id_meeting))==null){
+            throw new RuntimeException403("meeting non trovato");
+        }
+
+        //controllo se esiste il feedbackmeeting
+        FeedbackMeeting fm = feedbackMeetingRepository
+                .findFeedbackMeetingByUtenteAndMeeting(u,m);
+        if(fm==null)   throw new ServerRuntimeException("errore nella ricerca del feedback meeting");
+
+        //controllo se il questionario già è stato compilato
+        if(fm.isCompiledQuestionario())
+            throw new RuntimeException403("questionario già compilato");
+
+        //se non è compilato allora procedo con la compilazione
+        Scenario sc = m.getScenario_iniziale();
+        if(sc == null)  throw new ServerRuntimeException("errore nella ricerca dello scenario");
+
+        //prelevo media e numero dei voti
+        float media = sc.getMedia_valutazione();
+        int num_voti = sc.getNum_voti();
+
+        //calcolo media
+        float newMedia = ((media * num_voti)+value)/(num_voti + 1);
+
+        //inserimento della media nello scenario
+        sc.setMedia_valutazione(newMedia);
+        sc.setNum_voti(num_voti+1);
+        scenarioRepository.save(sc);
+
+        return true;
     }
 }

@@ -35,7 +35,7 @@ public class CustomExceptionHandler {
     @ExceptionHandler(NumberFormatException.class)
     public ResponseEntity<Response<Object>> handleNumberFormatException(NumberFormatException ex) {
         return ResponseEntity.badRequest().body(new Response<>(null,
-                "Formato parametri URL errato"));
+                "Formato parametri errato"));
     }
 
     @ExceptionHandler(NoHandlerFoundException.class)
