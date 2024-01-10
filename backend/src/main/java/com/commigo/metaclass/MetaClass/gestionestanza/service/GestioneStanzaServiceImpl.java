@@ -64,7 +64,7 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService {
 
                 if (statoPartecipazione == null) {
 
-                    statoPartecipazione = new StatoPartecipazione(stanza, u, getRuolo(Ruolo.PARTECIPANTE), false, false, u.getNome());
+                   // statoPartecipazione = new StatoPartecipazione(stanza, u, getRuolo(Ruolo.PARTECIPANTE), false, false, u.getNome());
                     return ResponseEntity.ok(new AccessResponse<>(1, "Stai per effettuare l'accesso alla stanza", false));
 
                 } else if (statoPartecipazione.isBannato()) {
@@ -112,10 +112,10 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService {
         s.setCodice(codice);
         stanzaRepository.save(s);
 
-        StatoPartecipazione sp = new StatoPartecipazione(s, u,
-                getRuolo(Ruolo.ORGANIZZATORE_MASTER), false, false, u.getNome());
+       // StatoPartecipazione sp = new StatoPartecipazione(s, u,
+              //  getRuolo(Ruolo.ORGANIZZATORE_MASTER), false, false, u.getNome());
 
-        statoPartecipazioneRepository.save(sp);
+       // statoPartecipazioneRepository.save(sp);
 
         return true;
     }
@@ -160,7 +160,7 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService {
 
         StatoPartecipazione stato_ogm = statoPartecipazioneRepository.findStatoPartecipazioneByUtenteAndStanza(ogm, stanza);
         if (stato_ogm.getRuolo().getNome().equalsIgnoreCase(Ruolo.ORGANIZZATORE_MASTER) || ogm.isAdmin()) {
-            stanzaRepository.deleteStanzaById(id_stanza);
+            stanzaRepository.delete(stanza);
             return ResponseEntity.ok(new Response<>(true, "Stanza eliminata con successo")).getBody();
         } else {
             return ResponseEntity.status(403).body(new Response<>(false, "Non puoi eliminare una stanza se non sei un'organizzatore master")).getBody();
@@ -211,7 +211,7 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService {
 
             if (statoPartecipazione == null) {
 
-                statoPartecipazione = new StatoPartecipazione(stanza, u, getRuolo(Ruolo.PARTECIPANTE), true, false, u.getNome());
+               // statoPartecipazione = new StatoPartecipazione(stanza, u, getRuolo(Ruolo.PARTECIPANTE), true, false, u.getNome());
                 return ResponseEntity.ok(new AccessResponse<>(5, "La stanza è privata, sei in attesa di entrare", true));
 
             } else if (statoPartecipazione.isBannato()) {
@@ -432,6 +432,35 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService {
         }else{
             return ResponseEntity.status(403).body(new Response<>(false, "La stanza selezionata non esiste"));
         }
+    }
+
+/**
+*
+ * @param metaID
+ * @param idStanza
+ * @return
+*/
+    @Override
+    public Ruolo getRuoloByUserAndStanzaID(String metaID, Long idStanza) throws ServerRuntimeException, RuntimeException403 {
+
+        Utente u;
+        Stanza stanza;
+        if((u= utenteRepository.findFirstByMetaId(metaID))==null)
+            throw new ServerRuntimeException(("Utente non torvato"));
+        if((stanza = stanzaRepository.findStanzaById(idStanza))==null)
+            throw new RuntimeException403("Stanza non trovata");
+
+        StatoPartecipazione sp;
+        if((sp=statoPartecipazioneRepository
+                .findStatoPartecipazioneByUtenteAndStanza(u,stanza))==null)
+            throw new RuntimeException403("L'utente non ha acceduto alla stanza");
+
+        if(sp.getRuolo().getNome().equalsIgnoreCase(Ruolo.PARTECIPANTE)){
+           if(sp.isBannato())   throw new RuntimeException403("Utente bannato dalla stanza");
+           if(sp.isInAttesa())   throw new RuntimeException403("Utente in attesa di entrare in stanza");
+        }
+
+        return sp.getRuolo();
     }
 
     /**
