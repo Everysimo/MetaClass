@@ -1,4 +1,7 @@
-#stanze{ grid-template-columns: repeat(3, 1fr); }
+#stanze{
+    grid-template-columns: repeat(3, 1fr);
+    padding: 2%;
+}
 #stanze div{
     min-height: 300px;
 }

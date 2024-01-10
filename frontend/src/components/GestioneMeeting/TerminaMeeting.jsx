@@ -1,16 +1,12 @@
 import React, { useState } from 'react';
-import "./MyModifyForm.css";
+import "../Forms/ModifyRoomForm/MyModifyForm.css";
 import {useParams} from "react-router-dom";
 
 const TerminaMeeting = () => {
     const { id_meeting: id_meeting } = useParams();
     //si usa useParams per farsi passare il parametro
-    const terminaMeeting = () => {
-        console.log("sono nel button Invia");
-        handleAvviaMeting();
-    };
 
-    const handleAvviaMeting = async () => {
+    const terminaMeeting = async () => {
         const requestOption = {
             method: 'POST',
             headers: {

@@ -99,18 +99,10 @@ export const SingleRoom = () => {
                     {role &&
                         <div className={"masterDiv"}>
                             <div className={"childDiv"}>
-                                <button onClick={() => {
-                                    setIsAvviaMeetingVisible(prevVisibility => !prevVisibility)
-                                }}
-                                >
-                                    Avvia Meeting <FontAwesomeIcon icon={faPlay} size="xl" style={{color: "#ffffff",}} />
-                                </button>
-                                {isAvviaMeetingVisible &&
                                     <AvviaMeeting
-                                        id_meeting={1}
-                                        onClose={() => setIsAvviaMeetingVisible(false)}
+                                        id_meeting={id_stanza}
                                     />
-                                }
+
                             </div>
                         </div>
                     }

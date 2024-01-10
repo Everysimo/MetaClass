@@ -1,5 +1,8 @@
 import React, { Component } from 'react';
 import '../Forms/CreaScenarioForm/creaScenario.css';
+import {faChalkboardUser, faPlay} from "@fortawesome/free-solid-svg-icons";
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {wait} from "@testing-library/user-event/dist/utils";
 
 export default class AvviaMeeting extends Component {
     state = {
@@ -7,6 +10,7 @@ export default class AvviaMeeting extends Component {
         isVisible: true,
         isErrorPopupVisible: false,
         errorMessage: "",
+
     };
 
     sendDataToServer = async () => {
@@ -20,16 +24,23 @@ export default class AvviaMeeting extends Component {
 
         const requestOption = {
             method: 'POST',
-            headers: {'Content-Type': 'application/json'},
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + sessionStorage.getItem("token")
+            },
             body: JSON.stringify(dataToSend)
         };
 
-        try {
+        try{
+            console.log("la stringa json:", JSON.stringify(dataToSend));
             const response = await fetch(`http://localhost:8080/avviaMeeting/${id_meeting}`, requestOption);
-
             const responseData = await response.json();
             console.log("Risposta dal server:", responseData);
-        } catch (error) {
+            if (responseData && responseData.value) {
+                console.log(responseData.message);
+            }
+        }
+        catch (error) {
             console.error('ERRORE:', error);
         }
     };
@@ -40,31 +51,10 @@ export default class AvviaMeeting extends Component {
         console.log("dati del form", this.state);
 
     };
-
-    handleClose = () => {
-        // Nascondi la card impostando isVisible su false
-        this.setState({ isVisible: false });
-
-        // Chiama la funzione di chiusura ricevuta come prop
-        if (this.props.onClose) {
-            this.props.onClose();
-        }
-    };
-
-
     render() {
         return (
-            <div>
-                <div className={`card ${this.state.isVisible ? '' : 'hidden'}`}>
-                    <button className="close-button" onClick={this.handleClose}>
-                        X
-                    </button>
-                    <div className="card-content">
-                        <div className="button-container">
-                            <button onClick={() => this.callFunction()}>Avvia Meeting</button>
-                        </div>
-                    </div>
-                </div>
+            <div className="button-container">
+                <button onClick={() => this.callFunction()}> Avvia Meeting <FontAwesomeIcon icon={faPlay} size="xl" style={{color: "#ffffff",}}/> </button>
             </div>
         );
     };
