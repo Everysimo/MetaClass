@@ -11,7 +11,6 @@ import {Account} from "./pages/Account";
 import {SingleRoom} from "./pages/SingleRoom";
 import {VisualRoomList} from "./pages/visualRoomList";
 import {SelezionaScenario} from "./pages/changescenario";
-import {UserListRoom} from "./pages/userListRoom";
 
 export const Rts = () =>{
     return(
@@ -28,7 +27,6 @@ export const Rts = () =>{
                 <Route path="/accessManagement/:id" element={<GestioneAccessi/>}/>
                 <Route path="/changescenario/:id" element={<SelezionaScenario/>}/>
                 <Route path="/bannedUserList/:id" element={<BannedList/>}/>
-                <Route path="/userListRoom/:id" element={<UserListRoom/>}/>
             </Routes>
         </Router>
     )
