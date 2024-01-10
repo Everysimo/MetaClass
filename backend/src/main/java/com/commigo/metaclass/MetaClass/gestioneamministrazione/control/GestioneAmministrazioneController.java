@@ -108,10 +108,7 @@ public class GestioneAmministrazioneController {
         }catch (RuntimeException403 re) {
            return ResponseEntity.status(HttpStatus.FORBIDDEN)
                 .body(new Response<>(false, "Errore durante la richiesta: " + re.getMessage()));
-       }catch(ServerRuntimeException se) {
-            return ResponseEntity.status(500)
-                    .body(new Response<>(false, "Errore durante la richiesta: " + se.getMessage()));
-        }
+       }
     }
 
 
