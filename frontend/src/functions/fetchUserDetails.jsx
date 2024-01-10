@@ -16,7 +16,7 @@ export const fetchUserDetails = async () => {
         console.log('Response data:', response.data); // Log the received data
 
         if (response.status === 200) {
-            const value = response.data;
+            const value = response.data.value;
 
             if (value) {
                 return value; // Return the user details from the 'value' field

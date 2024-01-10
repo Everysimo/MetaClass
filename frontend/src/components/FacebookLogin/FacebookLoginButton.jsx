@@ -28,7 +28,6 @@ export default class Facebook extends Component {
 
     handleUserID = (response) => {
         if (response && response.userID) {
-            console.log(document.cookie);
             this.setState({
                 metaId: response.userID
             });
@@ -48,18 +47,13 @@ export default class Facebook extends Component {
         }
     }
 
-    handleAdmin = (response) =>{
-        let admin;
-        response.isAdmin ? admin = 'true' : admin =  'false';
-        return admin;
-    }
+    handleAdmin = (response) => { return !!response.isAdmin; } // This will return a boolean value
 
     responseFacebook = (response) => {
         if (response && response.name) {
             const nameParts = response.name.split(' ');
             const nome = nameParts.slice(0, -1).join(' ');
             const cognome = nameParts.slice(-1).join(' ');
-
             const gender = this.handleGender(response); // Call handleGender with response
             const admin = this.handleAdmin(response);
             this.setState(
@@ -68,9 +62,9 @@ export default class Facebook extends Component {
                     cognome,
                     email: response.email,
                     eta: response.birthday,
-                    sesso: gender, // Set the gender obtained from handleGender
+                    sesso: gender,
                     isLoggedIn: true,
-                    isAdmin: admin
+                    isAdmin: admin // No need for JSON.stringify here
                 },
                 () => {
                     this.saveLoginStatusToLocalStorage();
@@ -87,7 +81,7 @@ export default class Facebook extends Component {
         sessionStorage.setItem('isLoggedIn', JSON.stringify(true));
         sessionStorage.setItem('UserMetaID', this.state.metaId);
         sessionStorage.setItem('nome', this.state.nome);
-        sessionStorage.setItem('isAdmin', this.state.isAdmin);
+        sessionStorage.setItem('isAdmin', this.state.isAdmin); // Directly save the boolean value
     };
 
     sendDataToServer = async () => {
@@ -106,8 +100,6 @@ export default class Facebook extends Component {
             body: JSON.stringify(dataToSend)
         };
         try {
-            console.log(document.cookie);
-            console.log(JSON.stringify(dataToSend));
             const response = await fetch('http://localhost:8080/login', requestOptions);
             const responseData = await response.json();
             console.log('Server response:', responseData);
