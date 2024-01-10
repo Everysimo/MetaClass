@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 
-const UserList = () => {
+const BannedUserList = () => {
     const [userList, setUserList] = useState([]);
 
     const { id: id_stanza } = useParams();
     console.log('idStanza', id_stanza);
 
     useEffect(() => {
-        fetchUserList();
+        fetchBannedUserList();
     }, []);
 
     const requestOption = {
@@ -19,7 +19,7 @@ const UserList = () => {
         },
     };
 
-    const fetchUserList = async () => {
+    const fetchBannedUserList = async () => {
         try {
             const response = await fetch(`http://localhost:8080/admin/visualizzaUtentiBannatiInStanza/${id_stanza}`, requestOption);
 
@@ -57,4 +57,4 @@ const UserList = () => {
     );
 };
 
-export default UserList;
+export default BannedUserList;
