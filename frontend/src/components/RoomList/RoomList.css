@@ -1,5 +1,8 @@
+#stanze{ grid-template-columns: repeat(3, 1fr); }
+#stanze div{
+    min-height: 300px;
+}
 
-.totality{
-    display: flex;
-        flex-wrap: wrap;    /*importantissimo perché appena vede lo spazio va a capo*/
+@media only screen and (max-width: 1000px) {
+    #stanze{ grid-template-columns: repeat(1, 1fr); }
 }

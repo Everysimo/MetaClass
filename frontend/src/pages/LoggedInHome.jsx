@@ -10,7 +10,7 @@ import { useNavigate } from 'react-router-dom';
 import CreaCategoria from "../components/CreaCategoria/CreaCategoria";
 import CreaScenario from "../components/Forms/CreaScenarioForm/CreaScenario";
 import ModificaScenario from "../components/Forms/CreaScenarioForm/ModificaScenario";
-import AccediStanza from "../components/enterRoomPopup/accediStanza";
+import AccediStanza from "../components/Forms/enterRoomPopup/accediStanza";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faChalkboardUser, faCirclePlus, faDoorOpen, faUser} from "@fortawesome/free-solid-svg-icons";
 

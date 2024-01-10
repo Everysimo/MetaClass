@@ -38,7 +38,7 @@
     gap: 0;
 }
 
-.button-container.open {
+.options-container.open {
     max-height: 250px; /* Adjust the max height as needed */
     opacity: 1;
     animation: none; /* Remove the animation */

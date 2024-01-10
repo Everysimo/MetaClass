@@ -11,13 +11,7 @@ export const VisualRoomList = () => {
         <header>
             <MyHeader/>
         </header>
-
-        <section>
-            <div>
-                <RoomList/>
-            </div>
-        </section>
-
+            <RoomList/>
         <footer>
             <MyFooter/>
         </footer>

@@ -121,8 +121,12 @@ export default class Facebook extends Component {
                 {isLoggedIn ? (
                     <>
                         <h2>Welcome, {nome}!</h2>
-                        <NavigateToPageBtn />
-                        <LogoutButton />
+                        <div className={"masterDiv"}>
+                            <span className={"childDiv"}>
+                                <NavigateToPageBtn />
+                                <LogoutButton/>
+                            </span>
+                        </div>
                     </>
                 ) : (
                     <>

@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import './accediStanza.css';
+import '../PopUpStyles.css';
 
 const AccediStanza = () => {
     const [showModal, setShowModal] = useState(false);
     const [codice, setCodice] = useState('');
-    const [isErrorPopupVisible, setIsErrorPopupVisible] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
     const [formReset, setFormReset] = useState(false);
+    const [displayOKButton, setDisplayOKButton] = useState(false);
 
     const handleShowModal = () => {
         setShowModal(true);
@@ -15,17 +15,26 @@ const AccediStanza = () => {
 
     const handleCloseModal = () => {
         setShowModal(false);
-        setFormReset(true);
+        resetForm();
     };
 
     const handleCodeChange = (e) => {
         setCodice(e.target.value);
+        setErrorMessage('');
+        setDisplayOKButton(false);
+    };
+
+    const resetForm = () => {
+        setCodice('');
+        setErrorMessage('');
+        setFormReset(true);
+        setDisplayOKButton(false);
     };
 
     const sendDataToServer = async () => {
         if (codice.length !== 6) {
-            setIsErrorPopupVisible(true);
             setErrorMessage('Il codice stanza deve essere di 6 cifre');
+            setDisplayOKButton(true);
             return;
         }
 
@@ -36,18 +45,18 @@ const AccediStanza = () => {
         try {
             const response = await axios.post('http://localhost:8080/accessoStanza', dataToSend);
             console.log('Risposta dal server:', response.data);
+            setShowModal(false);
+            resetForm();
         } catch (error) {
             console.error('ERRORE:', error);
+            setErrorMessage('Errore durante l\'invio dei dati');
+            setDisplayOKButton(true);
         }
-        setFormReset(false);
-        setCodice('');
-        setIsErrorPopupVisible(false);
     };
 
     useEffect(() => {
         if (formReset) {
             setCodice('');
-            setIsErrorPopupVisible(false);
             setErrorMessage('');
             setFormReset(false);
         }
@@ -72,8 +81,10 @@ const AccediStanza = () => {
                                 min={0}
                             />
                         </label>
-                        <button onClick={() => setCodice('')}>Cancella</button>
-                        <button onClick={sendDataToServer}>Invia</button>
+                        {errorMessage && <p>{errorMessage}</p>}
+                        {displayOKButton && <button onClick={resetForm}>OK</button>}
+                        {!displayOKButton && <button onClick={() => setCodice('')}>Cancella</button>}
+                        {!displayOKButton && <button onClick={sendDataToServer}>Invia</button>}
                     </div>
                 </div>
             )}
@@ -82,4 +93,3 @@ const AccediStanza = () => {
 };
 
 export default AccediStanza;
-
