@@ -74,7 +74,12 @@ class RoomList extends Component {
                                 <p>Descrizione: {room.descrizione}</p>
                                 {/* inserisci gli altri dati di cui hai bisogno */}
                                 <button>
-                                    <Link to={`/SingleRoom/${room.id}`} style={{textDecoration: 'none', color: 'inherit'}}>Vai alla pagina della stanza</Link>
+                                    <Link
+                                        to={`/SingleRoom/${room.id}`}
+                                        style={{textDecoration: 'none', color: 'inherit'}}
+                                    >
+                                        Vai alla pagina della stanza
+                                    </Link>
                                 </button>
                             </div>
                             ))}
