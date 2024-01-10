@@ -15,9 +15,15 @@ import java.util.List;
 
 @Repository("MeetingRespository")
 public interface MeetingRepository extends JpaRepository<Meeting, Long> {
-    @Query("SELECT CASE WHEN COUNT(m) > 0 THEN true ELSE false END FROM Meeting m " +
+    /*@Query("SELECT CASE WHEN COUNT(m) > 0 THEN true ELSE false END FROM Meeting m " +
             "WHERE (:newInizio BETWEEN m.inizio AND m.fine OR :newFine BETWEEN m.inizio AND m.fine) " +
             "      OR (m.inizio BETWEEN :newInizio AND :newFine OR m.fine BETWEEN :newInizio AND :newFine)")
+    boolean hasOverlappingMeetings(@Param("newInizio") LocalDateTime newInizio, @Param("newFine") LocalDateTime newFine);
+*/
+    @Query("SELECT CASE WHEN COUNT(m) > 0 THEN true ELSE false END FROM Meeting m " +
+            "WHERE (:newInizio BETWEEN m.inizio AND m.fine OR :newFine BETWEEN m.inizio AND m.fine " +
+            "       OR m.inizio BETWEEN :newInizio AND :newFine OR m.fine BETWEEN :newInizio AND :newFine " +
+            "       OR m.inizio <= :newInizio AND m.fine >= :newFine)")
     boolean hasOverlappingMeetings(@Param("newInizio") LocalDateTime newInizio, @Param("newFine") LocalDateTime newFine);
 
     @Modifying
@@ -33,4 +39,5 @@ public interface MeetingRepository extends JpaRepository<Meeting, Long> {
     Meeting findMeetingById(Long id);
 
     List<Meeting> findMeetingByStanza(Stanza stanza);
+
 }
