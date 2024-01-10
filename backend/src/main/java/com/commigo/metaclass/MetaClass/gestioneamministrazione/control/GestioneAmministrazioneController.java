@@ -77,7 +77,7 @@ public class GestioneAmministrazioneController {
             String metaID = jwtTokenUtil.getMetaIdFromToken(validationToken.getToken());
 
             //verifica dei permessi
-            if(!checkAdmin(metaID))  throw new RuntimeException403("non sei amministratore");
+            if(!checkAdmin(metaID))  throw new RuntimeException403("Non sei amministratore");
 
             return stanzaControl.visualizzaUtentiBannatiInStanza(Id, request);
 
@@ -273,7 +273,7 @@ public class GestioneAmministrazioneController {
             String metaID = jwtTokenUtil.getMetaIdFromToken(validationToken.getToken());
 
             //verifica dei permessi
-            if(!checkAdmin(metaID))  throw new RuntimeException403("accesso non consentito");
+            if(!checkAdmin(metaID))  throw new RuntimeException403("Non sei un amministratore");
 
             return stanzaControl.visualizzaStanza(Id,request);
         } catch (RuntimeException403 re) {
