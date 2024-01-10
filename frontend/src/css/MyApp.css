@@ -82,7 +82,6 @@ section p{
     margin: 5%; /* Optional: Add margin between .child elements */
 }
 
-
 #sec1, #sec2, #sec3{
     background-position: center;
     background-repeat: no-repeat;

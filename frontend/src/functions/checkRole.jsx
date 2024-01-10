@@ -1,13 +1,13 @@
 import axios from "axios";
 
-export const fetchUserDetails = async () => {
+export const checkRole = async (id_stanza) => {
     try {
         const token = sessionStorage.getItem('token');
         if (!token) {
             throw new Error('Token not found');
         }
 
-        const response = await axios.get('http://localhost:8080/userDetails', {
+        const response = await axios.get(`http://localhost:8080/getRuolo/${id_stanza}`, {
             headers: {
                 'Authorization': 'Bearer ' + token
             }
@@ -16,10 +16,10 @@ export const fetchUserDetails = async () => {
         console.log('Response data:', response.data); // Log the received data
 
         if (response.status === 200) {
-            const value = response.data;
+            const role = response.data;
 
-            if (value) {
-                return value; // Return the user details from the 'value' field
+            if (role) {
+                return role; // Return the user details from the 'value' field
             } else {
                 throw new Error('No user details found');
             }
@@ -31,3 +31,4 @@ export const fetchUserDetails = async () => {
         throw new Error('Failed to fetch user details');
     }
 };
+
