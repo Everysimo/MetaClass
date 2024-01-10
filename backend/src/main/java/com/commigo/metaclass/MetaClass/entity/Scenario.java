@@ -10,8 +10,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.validator.constraints.URL;
 
@@ -57,7 +55,6 @@ public class Scenario {
     @NotNull(message = "La categoria non può essere nulla")
     @ManyToOne(cascade = CascadeType.MERGE)
     @JoinColumn(name = "id_categoria")
-    @OnDelete(action = OnDeleteAction.CASCADE)
     private Categoria categoria;
 
     @Column(name = "Data_Creazione", updatable = false)
@@ -69,7 +66,7 @@ public class Scenario {
     private LocalDateTime data_aggiornamento;
 
     @NotNull(message = "L'URL dell'immagine non può essere nullo")
-    @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.REFRESH})
+    @ManyToOne(cascade = CascadeType.MERGE)
     private Immagine image;
 
     @JsonCreator
@@ -91,14 +88,17 @@ public class Scenario {
 
     }
 
-    //costruttore creato a fini di testing
-    public Scenario(Long Id, String Nome, String Descrizione, Immagine immagine ,Categoria cat)  {
+    public Scenario(String Nome, String Descrizione, Immagine immagine ,Long idCategoria) throws MismatchJsonProperty {
 
-        this.id = Id;
+        if (Nome == null || Descrizione == null || idCategoria == null) {
+            throw new MismatchJsonProperty("gli attributi non sono corretti");
+        }
+
         this.nome = Nome;
         this.descrizione = Descrizione;
         this.image = immagine;
-        this.categoria = cat;
+        this.categoria = new Categoria();
+        this.categoria.setId(idCategoria);
 
     }
 }

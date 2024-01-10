@@ -9,5 +9,4 @@ import org.springframework.stereotype.Repository;
 public interface ImmagineRepository extends JpaRepository<Immagine, Long> {
 
     Immagine findImmagineById(long id);
-    Immagine findByNome(String nome);
 }

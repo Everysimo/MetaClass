@@ -10,6 +10,13 @@ export const SingleRoom = () =>{
     const { id: id_stanza } = useParams();      //si usa useParams per farsi passare il parametro
 
     sessionStorage.setItem('idStanza', id_stanza);
+
+
+    const handleGoToUserList= () => {
+        // Naviga alla pagina di destinazione con il valore 42
+        navigate(`/userListRoom/ ${id_stanza}`);
+    };
+
     const handleGoToModifyDataRoom= () => {
         // Naviga alla pagina di destinazione con il valore 42
         navigate(`/modifyroom/ ${id_stanza}`);
@@ -41,6 +48,7 @@ export const SingleRoom = () =>{
                         <CalendarComp/>
                     </div>
                     <div className={"childDiv"}>
+                        <button onClick={handleGoToUserList}>Visualizza Lista Utenti in Stanza</button>
                         <button onClick={handleGoToModifyDataRoom}>Modifica la stanza</button>
                         <button onClick={handleGoToChangeScenario}>Modifica lo scenario della stanza</button>
                         <button onClick={handleGoToAccessManagement}>Gestione degli accessi</button>

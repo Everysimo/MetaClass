@@ -1,12 +1,9 @@
-
-import React from 'react'
 import {MyHeader} from "../components/Header/Header";
 import {MyFooter} from "../components/Footer/Footer";
-import BannedUserList from "../components/UserList/BannedUserList";
+import React from "react";
+import UserListInRoom from "../components/UserList/UserListInRoom";
 
-export const BannedList = ({List}) => {
-
-
+export const UserListRoom = () => {
     return(
         <>
             <header>
@@ -15,7 +12,7 @@ export const BannedList = ({List}) => {
             <section>
                 <div className={'total-body'}>
                     <div>
-                        <BannedUserList userList={List} />
+                        <UserListInRoom/>
                     </div>
                 </div>
             </section>
