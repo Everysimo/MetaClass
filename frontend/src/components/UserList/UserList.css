@@ -1,4 +1,20 @@
-.user-card{
+/* Define the animation */
+@keyframes slideUpDown {
+    0% {
+        max-height: 0;
+        opacity: 0;
+    }
+    50% {
+        max-height: 250px; /* Adjust the max height as needed */
+        opacity: 1;
+    }
+    100% {
+        max-height: 0;
+        opacity: 0;
+    }
+}
+
+.user-card {
     display: flex;
     flex-direction: column;
     border-radius: 10px;
@@ -8,4 +24,23 @@
     margin: 5px;
 }
 
-.user-card button{ font-size: small; }
+.user-card button {
+    font-size: small;
+}
+
+.button-container {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    transition: max-height 1s, opacity 1s;
+    max-height: 0;
+    opacity: 0;
+    gap: 0;
+}
+
+.button-container.open {
+    max-height: 250px; /* Adjust the max height as needed */
+    opacity: 1;
+    animation: none; /* Remove the animation */
+}
+

@@ -83,7 +83,6 @@ export const SingleRoom = () => {
                             </div>
                         }
                         <div className={"childDiv"}>
-                            <button onClick={handleGoToUserList}>Visualizza Lista Utenti in Stanza</button>
                             <button onClick={handleGoToModifyDataRoom}>Modifica la stanza</button>
                             <button onClick={handleGoToChangeScenario}>Modifica lo scenario della stanza</button>
                             <button onClick={handleGoToAccessManagement}>Gestione degli accessi</button>
