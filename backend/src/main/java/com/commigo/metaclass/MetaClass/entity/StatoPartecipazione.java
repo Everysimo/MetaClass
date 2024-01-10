@@ -3,13 +3,13 @@ package com.commigo.metaclass.MetaClass.entity;
 import com.commigo.metaclass.MetaClass.utility.multipleid.StatoPartecipazioneId;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
+import jakarta.persistence.CascadeType;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.Cascade;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
+import org.hibernate.annotations.*;
+import org.springframework.transaction.TransactionSystemException;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -31,9 +31,10 @@ public class StatoPartecipazione implements Serializable {
      *Chiave Esterna sulla stanza
      */
     @Id
-    @NotNull(message = "La stanza non può essere nulla")
-    @ManyToOne(cascade = CascadeType.MERGE)
+    //@NotNull(message = "La stanza non può essere nulla")
+    @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
     @JoinColumn(name = "id_stanza")
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Stanza stanza;
 
     /**
@@ -41,15 +42,16 @@ public class StatoPartecipazione implements Serializable {
      */
     @Id
     @NotNull(message = "L'utente non può essere nullo")
-    @ManyToOne(cascade = CascadeType.MERGE)
+    @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
     @JoinColumn(name = "id_utente")
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Utente utente;
 
     /**
      *Chiave Esterna sulla ruolo dell'utente
      */
     @NotNull(message = "Il ruolo  non può essere nullo")
-    @ManyToOne(cascade = {CascadeType.MERGE})
+    @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.REFRESH})
     @JoinColumn(name = "id_ruolo")
     private Ruolo ruolo;
 
@@ -84,13 +86,41 @@ public class StatoPartecipazione implements Serializable {
     @UpdateTimestamp
     private LocalDateTime data_Aggiornamento;
 
+    public void checkRule(){
+        try{
+
+          if(this.utente.isAdmin() && this.isBannato)
+                  throw new TransactionSystemException("un'amministratore se viene bannato "+
+                          "se lo può recovare!");
+
+          if(!this.ruolo.getNome().equalsIgnoreCase(Ruolo.PARTECIPANTE)){
+             if(this.isInAttesa){
+
+                 throw new TransactionSystemException("non puoi inserire un ruolo " +
+                         "diverso da partecipante che sia in attesa");
+
+             }else if(this.ruolo.getNome().equalsIgnoreCase(Ruolo.ORGANIZZATORE_MASTER) &&
+                      this.isBannato){
+
+                 throw new TransactionSystemException("L'organizzatore master non può " +
+                         "essere inserito come bannato");
+
+             }
+          }
+        }catch(TransactionSystemException e){
+            System.err.println(e.getMessage());
+        }
+    }
+
     public StatoPartecipazione(Stanza stanza, Utente utente, Ruolo ruolo,
-                               boolean isInAttesa, boolean isBannato, String nomeInStanza) {
+                               boolean isInAttesa, boolean isBannato, String nomeInStanza) throws Exception {
         this.stanza = stanza;
         this.utente = utente;
         this.ruolo = ruolo;
         this.isInAttesa = isInAttesa;
         this.isBannato = isBannato;
         this.nomeInStanza = nomeInStanza;
+        checkRule();
     }
+
 }

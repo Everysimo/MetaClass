@@ -9,6 +9,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.Duration;
@@ -40,8 +42,9 @@ public class Report {
     private int max_Partecipanti = 1;
 
     @NotNull(message = "Il meeting non può essere nullo")
-    @ManyToOne(cascade = CascadeType.MERGE)
+    @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.REFRESH})
     @JoinColumn(name = "id_meeting")
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Meeting meeting;
 
     @OneToMany(mappedBy = "report", cascade = CascadeType.ALL)

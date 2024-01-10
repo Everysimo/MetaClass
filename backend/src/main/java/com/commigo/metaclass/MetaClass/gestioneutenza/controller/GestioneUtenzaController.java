@@ -150,37 +150,33 @@ public class GestioneUtenzaController {
         }
     }
 
-    @CrossOrigin
     @GetMapping(value = "/visualizzaStanze")
     public ResponseEntity<Response<List<Stanza>>> visualizzaStanze(HttpServletRequest request) {
-        List<Stanza> stanze;
         try {
-
-            //validazione del token
+            // Validazione del token
             if (!validationToken.isTokenValid(request)) {
                 throw new RuntimeException403("Token non valido");
             }
 
             String metaID = jwtTokenUtil.getMetaIdFromToken(validationToken.getToken());
+            List<Stanza> stanze = utenzaService.getStanzeByUserId(metaID);
 
-            stanze = utenzaService.getStanzeByUserId(metaID);
-            if (stanze == null) {
-                throw new ServerRuntimeException("Errore la ricerca delle stanze");
-            } else if (stanze.isEmpty()) {
-                return ResponseEntity
-                        .ok(new Response<>(stanze, "Non hai accesso a nessuna stanza"));
-            } else {
-                return ResponseEntity
-                        .ok(new Response<>(stanze, "operazione effettuata con successo"));
+            if (stanze.isEmpty()) {
+                // Se non ci sono stanze, restituisci una risposta con un messaggio appropriato
+                return ResponseEntity.ok(new Response<>(stanze, "Non hai accesso a nessuna stanza"));
             }
-        } catch (ServerRuntimeException se) {
-            return ResponseEntity.status(500)
-                    .body(new Response<>(null, "Errore durante l'operazione: "+se.getMessage()));
-        }catch (RuntimeException403 e) {
-            return ResponseEntity.status(403)
-                    .body(new Response<>(null, "Errore durante l'operazione: "+e.getMessage()));
+
+            // Se ci sono stanze, restituisci una risposta con le stanze e un messaggio di successo
+            return ResponseEntity.ok(new Response<>(stanze, "Operazione effettuata con successo"));
+        } catch (ServerRuntimeException | RuntimeException403 e) {
+
+            // Gestisci le eccezioni e restituisci una risposta appropriata
+            int statusCode = (e instanceof ServerRuntimeException) ? 500 : 403;
+            return ResponseEntity.status(statusCode)
+                    .body(new Response<>(null, "Errore durante l'operazione: " + e.getMessage()));
         }
     }
+
 
 
     @GetMapping(value = "/userDetails")

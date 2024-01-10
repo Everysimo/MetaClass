@@ -8,6 +8,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.Duration;
@@ -49,13 +51,15 @@ public class FeedbackMeeting {
     private Utente utente;
 
     @NotNull(message = "Il meeting non può essere nullo")
-    @ManyToOne()
+    @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.REFRESH})
     @JoinColumn(name = "id_meeting")
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Meeting meeting;
 
     @NotNull(message = "Il report non può essere nullo")
-    @ManyToOne()
+    @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.REFRESH})
     @JoinColumn(name = "id_report")
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Report report;
 
     //costruttore avviato alla prima istanziazione del feedback
