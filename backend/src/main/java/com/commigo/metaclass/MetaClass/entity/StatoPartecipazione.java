@@ -1,7 +1,6 @@
 package com.commigo.metaclass.MetaClass.entity;
 
 import com.commigo.metaclass.MetaClass.utility.multipleid.StatoPartecipazioneId;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import jakarta.persistence.CascadeType;
 import jakarta.validation.constraints.*;
