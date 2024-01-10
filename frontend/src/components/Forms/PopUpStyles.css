@@ -33,10 +33,11 @@
 
 /* Input styles */
 input[type="text"],
-input[type="date"] {
+input[type="date"],
+input[type="number"]{
     width: 100%;
     padding: 10px;
-    margin: 0;
+    margin: 5px;
     border: 1px solid #ccc;
     border-radius: 4px;
     /* Additional styles */
@@ -51,7 +52,8 @@ input[type="date"] {
 }
 
 input[type="text"]:focus,
-input[type="date"]:focus {
+input[type="date"]:focus,
+input[type="number"]:focus{
     outline: none;
     border-color: #007bff;
     box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);

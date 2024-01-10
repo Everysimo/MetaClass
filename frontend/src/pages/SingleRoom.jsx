@@ -5,7 +5,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import CalendarComp from "../components/Calendar/CalendarComp";
 import { checkRole } from "../functions/checkRole";
 import UserListInRoom from "../components/UserList/UserListInRoom";
-import {faChalkboardUser} from "@fortawesome/free-solid-svg-icons";
+import {faChalkboardUser, faPlay} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import AvviaMeeting from "../components/GestioneMeeting/AvviaMeeting";
 
@@ -83,35 +83,37 @@ export const SingleRoom = () => {
                     <h1>Stanza {id_stanza}</h1>
                     <div className={"masterDiv"}>
                         {role &&
-                            <>
-                                <div className={"childDiv"}>
-                                    <h2>Schedula un nuovo meeting</h2>
-                                    <CalendarComp/>
-                                </div>
-                                <div className={"childDiv"}>
-                                    <h5> IN QUANTO ORGANIZZATORE...</h5>
-                                    <button onClick={() => {
-                                        setIsAvviaMeetingVisible(prevVisibility => !prevVisibility)
-                                    }}
-                                    >
-                                        AvviaMeeting
-                                    </button>
-                                    {isAvviaMeetingVisible &&
-                                        <AvviaMeeting
-                                            id_meeting={1}
-                                            onClose={() => setIsAvviaMeetingVisible(false)}
-                                        />
-                                    }
-                                </div>
-                            </>
+                            <div className={"childDiv"}>
+                                <h2>Schedula un
+                                    nuovo meeting</h2>
+                                <CalendarComp/>
+                            </div>
                         }
-                    <div className={"childDiv"}>
+                        <div className={"childDiv"}>
                             <button onClick={handleGoToModifyDataRoom}>Modifica la stanza</button>
                             <button onClick={handleGoToChangeScenario}>Modifica lo scenario della stanza</button>
                             <button onClick={handleGoToAccessManagement}>Gestione degli accessi</button>
                             <button onClick={handleGoToBannedUserList}>Visualizza Lista Utenti Bannati</button>
                         </div>
                     </div>
+                    {role &&
+                        <div className={"masterDiv"}>
+                            <div className={"childDiv"}>
+                                <button onClick={() => {
+                                    setIsAvviaMeetingVisible(prevVisibility => !prevVisibility)
+                                }}
+                                >
+                                    Avvia Meeting <FontAwesomeIcon icon={faPlay} size="xl" style={{color: "#ffffff",}} />
+                                </button>
+                                {isAvviaMeetingVisible &&
+                                    <AvviaMeeting
+                                        id_meeting={1}
+                                        onClose={() => setIsAvviaMeetingVisible(false)}
+                                    />
+                                }
+                            </div>
+                        </div>
+                    }
                 </section>
                 <aside className="side-nav">
                     <div className={"childDiv"}>

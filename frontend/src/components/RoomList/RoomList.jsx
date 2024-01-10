@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import {Link} from "react-router-dom";
+import "./RoomList.css";
 
 class RoomList extends Component {
 
@@ -51,26 +52,13 @@ class RoomList extends Component {
     render() {
         return (
             <>
-                <div>
+                <section>
                     <h1>Elenco Stanze</h1>
-                    {/*
-                    <button>
-                        <Link to="/SingleRoom" style={{textDecoration: 'none', color: 'inherit'}}>Vai alla pagina della
-                            stanza singola</Link>
-                    </button>
-                    */}
-
-                    <div style={{display: 'flex', flexDirection: 'row', flexWrap: 'wrap'}}>
-                        {this.state.array.map((room, index) => (
-                            <div key={index}
-                                 style={{
-                                     border: '1px solid #ccc',
-                                     borderRadius: '10px',
-                                     padding: '5px',
-                                     margin: '5px',
-                                     width: '100%',
-                                 }}>
-                                <h3>Nome della Stanza: {room.nome}</h3>
+                </section>
+                <section className={"layout"} id={"stanze"}>
+                    {this.state.array.map((room, index) => (
+                        <div key={index}>
+                            <h4>Nome della Stanza: {room.nome}</h4>
                                 <p>ID: {room.id}</p>
                                 <p>Descrizione: {room.descrizione}</p>
                                 {/* inserisci gli altri dati di cui hai bisogno */}
@@ -84,8 +72,7 @@ class RoomList extends Component {
                                 </button>
                             </div>
                             ))}
-                    </div>
-                </div>
+                </section>
             </>
         );
     }

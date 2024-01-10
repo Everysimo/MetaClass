@@ -99,7 +99,7 @@ main {
 
 .masterDiv {
     display: flex; /* Display children horizontally */
-    justify-content: center;
+    justify-content: space-around;
     padding: 0;
 }
 
@@ -152,7 +152,21 @@ main {
     border: 2px solid #cccccc;
     padding: 20px;
     border-radius: 10px;
-    box-shadow: 0 8px 12px rgba(0, 0, 0, 0.15); /* Increase the shadow effect */
+    box-shadow: 0 8px 12px rgba(0, 0, 0, 0.15);
+}
+.startButton{
+    border-radius: 50%;
+}
+.user-details{
+    margin: 0 20% 0 20%;
+    border-radius: 10px;
+    background: #f4f4f4;
+    border: 1px solid #002f53;
+    padding: 20px;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}
+.user-details p{
+    border-bottom: 1px solid #002f53;;
 }
 
 @media only screen and (max-width: 1000px) {
@@ -164,5 +178,5 @@ main {
         display: flex;
         flex-direction: column;
     }
-    .layout{ grid-template-columns: repeat(1, 1fr); }
+    .layout, #stanze{ grid-template-columns: repeat(1, 1fr); }
 }

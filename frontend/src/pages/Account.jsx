@@ -32,21 +32,26 @@ export const Account = () => {
                 <MyHeader />
             </header>
             <section className={"sec"}>
-                <div className="user-details">
-                    {userDetails && (
-                        <>
-                            {/* Display current user details */}
-                            <p><strong>Name:</strong> {userDetails.nome}</p>
-                            <p><strong>Surname:</strong> {userDetails.cognome}</p>
-                            <p><strong>Email:</strong> {userDetails.email}</p>
-                            <p><strong>Birthday:</strong> {userDetails.dataDiNascita}</p>
-                            {/* Include other details as needed */}
-                        </>
-                    )}
-                </div>
-                {/* Pass setUserDetails as prop to EditUserDetails */}
-                <EditUserDetails userDetails={userDetails} setUserDetails={setUserDetails} />
-                <LogoutButton />
+                <h1>Dettagli account</h1>
+                    <div className={"user-details"}>
+                        {userDetails && (
+                            <>
+                                {/* Display current user details */}
+                                <p><strong>Name:</strong> {userDetails.nome}</p>
+                                <p><strong>Surname:</strong> {userDetails.cognome}</p>
+                                <p><strong>Email:</strong> {userDetails.email}</p>
+                                <p><strong>Birthday:</strong> {userDetails.dataDiNascita}</p>
+                            </>
+                        )}
+                        <div className={"masterDiv"}>
+                            <div className={"childDiv"}>
+                                <EditUserDetails userDetails={userDetails} setUserDetails={setUserDetails} />
+                            </div>
+                            <div className={"childDiv"}>
+                                <LogoutButton />
+                            </div>
+                        </div>
+                    </div>
             </section>
             <footer>
                 <MyFooter />
