@@ -99,6 +99,7 @@ main {
 
 .masterDiv {
     display: flex; /* Display children horizontally */
+    justify-content: center;
     padding: 0;
 }
 

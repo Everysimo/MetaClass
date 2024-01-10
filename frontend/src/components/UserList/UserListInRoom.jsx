@@ -1,15 +1,25 @@
 import { useParams } from "react-router-dom";
 import React, { useEffect, useState } from "react";
 import './UserList.css';
+
 const UserListInRoom = () => {
     const [userList, setUserList] = useState([]);
     const [isPopupOpen, setPopupOpen] = useState(false);
     const [newName, setNewName] = useState("");
     const [selectedUserId, setSelectedUserId] = useState(null);
+    const [showButtonsMap, setShowButtonsMap] = useState({});
 
     const { id: id_stanza } = useParams();
 
     useEffect(() => { fetchUserList(); }, []);
+
+    // Function to toggle button visibility for a specific user card
+    const toggleButtons = (userId) => {
+        setShowButtonsMap(prevState => ({
+            ...prevState,
+            [userId]: !prevState[userId] || false,
+        }));
+    };
 
     const requestOption = {
         method: 'POST',
@@ -29,9 +39,7 @@ const UserListInRoom = () => {
                 throw new Error('Errore nella richiesta');
             }
             const data = await response.json();
-            console.log('data:', data);
             setUserList(data.value);
-            console.log('lista utenti:', userList);
         } catch (error) {
             console.error('Errore durante il recupero della lista di utenti:', error);
         }
@@ -126,13 +134,20 @@ const UserListInRoom = () => {
         }
     }
 
-    const handlePromotionButton = (idutente) =>{
+    const handlePromotionButton = (idutente) => {
         console.log(idutente);
         setSelectedUserId(idutente);
         handlePromotion();
-    }
-    const handlePromotion = async () =>{
-        console.log(id_stanza);
+    };
+
+    const handlePromotion = async () => {
+        console.log('Before fetch call:', id_stanza, selectedUserId);
+
+        if (!id_stanza || !selectedUserId) {
+            console.error('Invalid id_stanza or selectedUserId');
+            return;
+        }
+
         const requestOption = {
             method: 'POST',
             headers: {
@@ -140,32 +155,43 @@ const UserListInRoom = () => {
                 'Authorization': 'Bearer ' + sessionStorage.getItem("token")
             },
         };
+
         try {
+            console.log('About to make fetch call');
             const response = await fetch(
                 `http://localhost:8080/promuoviOrganizzatore/${id_stanza}/${selectedUserId}`,
                 requestOption
             );
+            console.log('Fetch call completed');
+            console.log(response);
             if (!response.ok) {
-                throw new Error('Errore nella richiesta di silenziare partecipante');
+                throw new Error('Error in promoting the user');
             }
+
             const data = await response.json();
             console.log('data:', data);
         } catch (error) {
-            console.error('Errore durante la richiesta di silenziare il partecipante:', error);
+            console.error('Error during user promotion:', error);
         }
-    }
+    };
+
+
     return (
         <div>
             <h2>Utenti In Stanza:</h2>
             {userList && userList.map((user) => (
                 <div key={user.id} className="user-card">
-                    <span>Nome: {`${user.nome} ${user.cognome}`}</span><br/>
+                    <span>Nome: {`${user.nome} ${user.cognome}`}</span><br />
                     <span>Email: {`${user.email}`}</span>
-
-                    <button onClick={() => handleChangeNameButton(user.id)}>Cambia Nome</button>
-                    <button onClick={() => handleKickUserButton(user.id)}>Kicka Partecipante</button>
-                    <button onClick={() => handleSilenziaUserButton(user.id)}>Silenzia Partecipante</button>
-                    <button onClick={() => handlePromotionButton(user.id)}>Promuovi</button>
+                    <button onClick={() => toggleButtons(user.id)}>
+                        Options
+                    </button>
+                    <div className={`button-container${showButtonsMap[user.id] ? ' open' : ''}`}>
+                        <button onClick={() => handleChangeNameButton(user.id)}>Cambia Nome</button>
+                        <button onClick={() => handleKickUserButton(user.id)}>Kicka Partecipante</button>
+                        <button onClick={() => handleSilenziaUserButton(user.id)}>Silenzia Partecipante</button>
+                        <button onClick={() => handlePromotionButton(user.id)}>Promuovi</button>
+                    </div>
                 </div>
             ))}
 
