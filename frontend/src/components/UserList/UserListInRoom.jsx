@@ -1,6 +1,6 @@
 import { useParams } from "react-router-dom";
 import React, { useEffect, useState } from "react";
-
+import './UserList.css';
 const UserListInRoom = () => {
     const [userList, setUserList] = useState([]);
     const [isPopupOpen, setPopupOpen] = useState(false);
@@ -8,11 +8,8 @@ const UserListInRoom = () => {
     const [selectedUserId, setSelectedUserId] = useState(null);
 
     const { id: id_stanza } = useParams();
-    console.log('idStanza', id_stanza);
 
-    useEffect(() => {
-        fetchUserList();
-    }, []);
+    useEffect(() => { fetchUserList(); }, []);
 
     const requestOption = {
         method: 'POST',
@@ -24,18 +21,17 @@ const UserListInRoom = () => {
 
     const fetchUserList = async () => {
         try {
-            const response = await fetch(`http://localhost:8080/visualizzaUtentiInStanza/${id_stanza}`, requestOption);
-
+            const response = await fetch(
+                `http://localhost:8080/visualizzaUtentiInStanza/${id_stanza}`,
+                requestOption
+            );
             if (!response.ok) {
                 throw new Error('Errore nella richiesta');
             }
-
             const data = await response.json();
             console.log('data:', data);
-
             setUserList(data.value);
             console.log('lista utenti:', userList);
-
         } catch (error) {
             console.error('Errore durante il recupero della lista di utenti:', error);
         }
@@ -49,9 +45,7 @@ const UserListInRoom = () => {
 
     const handleChangeName = async () => {
         setPopupOpen(false); // Chiudi il popup quando si conferma il cambio nome
-
         console.log("newname", newName)
-
         const requestOption = {
             method: 'POST',
             headers: {
@@ -60,21 +54,17 @@ const UserListInRoom = () => {
             },
             body: JSON.stringify({ newName })
         };
-
         try {
             console.log("stringa json:",requestOption )
-
-            const response = await fetch(`http://localhost:8080/modificaNomePartecipante/${id_stanza}/${selectedUserId}`, requestOption);
-
+            const response = await fetch(
+                `http://localhost:8080/modificaNomePartecipante/${id_stanza}/${selectedUserId}`,
+                requestOption
+            );
             if (!response.ok) {
                 throw new Error('Errore nella richiesta di cambio nome');
             }
-
             const data = await response.json();
             console.log('data:', data);
-
-
-
         } catch (error) {
             console.error('Errore durante la modifica del nome:', error);
         }
@@ -86,7 +76,6 @@ const UserListInRoom = () => {
         handleKickUser();
     }
     const handleKickUser = async () => {
-
         const requestOption = {
             method: 'POST',
             headers: {
@@ -94,18 +83,16 @@ const UserListInRoom = () => {
                 'Authorization': 'Bearer ' + sessionStorage.getItem("token")
             },
         };
-
         try {
-            const response = await fetch(`http://localhost:8080/kickarePartecipante/${id_stanza}/${selectedUserId}`, requestOption);
-
+            const response = await fetch(
+                `http://localhost:8080/kickarePartecipante/${id_stanza}/${selectedUserId}`,
+                requestOption
+            );
             if (!response.ok) {
                 throw new Error('Errore nella richiesta di kickare partecipante');
             }
-
             const data = await response.json();
             console.log('data:', data);
-
-
         } catch (error) {
             console.error('Errore durante il kick dell\'utente:', error);
         }
@@ -117,7 +104,6 @@ const UserListInRoom = () => {
         handleSilenziaUser();
     }
     const handleSilenziaUser = async () => {
-
         const requestOption = {
             method: 'POST',
             headers: {
@@ -125,24 +111,49 @@ const UserListInRoom = () => {
                 'Authorization': 'Bearer ' + sessionStorage.getItem("token")
             },
         };
-
         try {
-            const response = await fetch(`http://localhost:8080/.../${id_stanza}/${selectedUserId}`, requestOption);
-
+            const response = await fetch(
+                `http://localhost:8080/.../${id_stanza}/${selectedUserId}`,
+                requestOption
+            );
             if (!response.ok) {
                 throw new Error('Errore nella richiesta di silenziare partecipante');
             }
-
             const data = await response.json();
             console.log('data:', data);
-
-
-
         } catch (error) {
             console.error('Errore durante la richiesta di silenziare il partecipante:', error);
         }
     }
 
+    const handlePromotionButton = (idutente) =>{
+        console.log(idutente);
+        setSelectedUserId(idutente);
+        handlePromotion();
+    }
+    const handlePromotion = async () =>{
+        console.log(id_stanza);
+        const requestOption = {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + sessionStorage.getItem("token")
+            },
+        };
+        try {
+            const response = await fetch(
+                `http://localhost:8080/promuoviOrganizzatore/${id_stanza}/${selectedUserId}`,
+                requestOption
+            );
+            if (!response.ok) {
+                throw new Error('Errore nella richiesta di silenziare partecipante');
+            }
+            const data = await response.json();
+            console.log('data:', data);
+        } catch (error) {
+            console.error('Errore durante la richiesta di silenziare il partecipante:', error);
+        }
+    }
     return (
         <div>
             <h2>Utenti In Stanza:</h2>
@@ -150,11 +161,11 @@ const UserListInRoom = () => {
                 <div key={user.id} className="user-card">
                     <span>Nome: {`${user.nome} ${user.cognome}`}</span><br/>
                     <span>Email: {`${user.email}`}</span>
-                    {/* Aggiungi il pulsante e passa l'idutente a handleChangeNameButton */}
+
                     <button onClick={() => handleChangeNameButton(user.id)}>Cambia Nome</button>
                     <button onClick={() => handleKickUserButton(user.id)}>Kicka Partecipante</button>
                     <button onClick={() => handleSilenziaUserButton(user.id)}>Silenzia Partecipante</button>
-
+                    <button onClick={() => handlePromotionButton(user.id)}>Promuovi</button>
                 </div>
             ))}
 

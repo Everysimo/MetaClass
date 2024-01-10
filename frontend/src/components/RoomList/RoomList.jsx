@@ -65,8 +65,9 @@ class RoomList extends Component {
                             <div key={index}
                                  style={{
                                      border: '1px solid #ccc',
-                                     padding: '10px',
-                                     margin: '10px',
+                                     borderRadius: '10px',
+                                     padding: '5px',
+                                     margin: '5px',
                                      width: '100%',
                                  }}>
                                 <h3>Nome della Stanza: {room.nome}</h3>
