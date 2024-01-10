@@ -1,6 +1,6 @@
 import { useParams } from "react-router-dom";
 import React, { useEffect, useState } from "react";
-
+import './UserList.css';
 const UserListInRoom = () => {
     const [userList, setUserList] = useState([]);
     const [isPopupOpen, setPopupOpen] = useState(false);
@@ -150,11 +150,10 @@ const UserListInRoom = () => {
                 <div key={user.id} className="user-card">
                     <span>Nome: {`${user.nome} ${user.cognome}`}</span><br/>
                     <span>Email: {`${user.email}`}</span>
-                    {/* Aggiungi il pulsante e passa l'idutente a handleChangeNameButton */}
+
                     <button onClick={() => handleChangeNameButton(user.id)}>Cambia Nome</button>
                     <button onClick={() => handleKickUserButton(user.id)}>Kicka Partecipante</button>
                     <button onClick={() => handleSilenziaUserButton(user.id)}>Silenzia Partecipante</button>
-
                 </div>
             ))}
 

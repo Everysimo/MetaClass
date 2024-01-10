@@ -4,6 +4,7 @@ import {MyFooter} from "../components/Footer/Footer";
 import {useNavigate, useParams} from "react-router-dom";
 import CalendarComp from "../components/Calendar/CalendarComp";
 import {checkRole} from "../functions/checkRole";
+import UserListInRoom from "../components/UserList/UserListInRoom";
 
 export const SingleRoom = () =>{
     const navigate = useNavigate();
@@ -51,26 +52,33 @@ export const SingleRoom = () =>{
     return(
         <>
             <header>
-                <MyHeader />
+                <MyHeader/>
             </header>
-            <section className={"contentSec"}>
-                <h1>Stanza {id_stanza}</h1>
-                <div className={"masterDiv"}>
-                    {role &&
+            <main>
+                <section className={"roomSec"}>
+                    <h1>Stanza {id_stanza}</h1>
+                    <div className={"masterDiv"}>
+                        {role &&
+                            <div className={"childDiv"}>
+                                <h2>Schedula un nuovo meeting</h2>
+                                <CalendarComp/>
+                            </div>
+                        }
                         <div className={"childDiv"}>
-                            <h2>Schedula un nuovo meeting</h2>
-                            <CalendarComp/>
+                            <button onClick={handleGoToUserList}>Visualizza Lista Utenti in Stanza</button>
+                            <button onClick={handleGoToModifyDataRoom}>Modifica la stanza</button>
+                            <button onClick={handleGoToChangeScenario}>Modifica lo scenario della stanza</button>
+                            <button onClick={handleGoToAccessManagement}>Gestione degli accessi</button>
+                            <button onClick={handleGoToBannedUserList}>Visualizza Lista Utenti Bannati</button>
                         </div>
-                    }
-                    <div className={"childDiv"}>
-                        <button onClick={handleGoToUserList}>Visualizza Lista Utenti in Stanza</button>
-                        <button onClick={handleGoToModifyDataRoom}>Modifica la stanza</button>
-                        <button onClick={handleGoToChangeScenario}>Modifica lo scenario della stanza</button>
-                        <button onClick={handleGoToAccessManagement}>Gestione degli accessi</button>
-                        <button onClick={handleGoToBannedUserList}>Visualizza Lista Utenti Bannati</button>
                     </div>
-                </div>
-            </section>
+                </section>
+                <aside className="side-nav">
+                    <div className={"childDiv"}>
+                        <UserListInRoom/>
+                    </div>
+                </aside>
+            </main>
             <footer>
                 <MyFooter/>
             </footer>

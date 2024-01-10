@@ -73,6 +73,23 @@ section p{
     padding: 20px;
     margin: 2px;
 }
+
+main {
+    display: flex;
+}
+
+.roomSec {
+    flex: 3;
+    padding: 20px;
+    min-height: 600px;
+}
+
+.side-nav {
+    flex: 1;
+    background-color: #f4f4f4;
+    padding: 20px;
+}
+
 .masterDiv {
     display: flex; /* Display children horizontally */
     padding: 0;
@@ -127,6 +144,7 @@ section p{
     border: 2px solid #cccccc;
     padding: 20px;
     border-radius: 10px;
+    box-shadow: 0 8px 12px rgba(0, 0, 0, 0.15); /* Increase the shadow effect */
 }
 
 @media only screen and (max-width: 1000px) {
