@@ -74,6 +74,9 @@ public class GestioneStanzaControl {
         }catch(RuntimeException403 se){
             return ResponseUtils.getResponseError(HttpStatus.valueOf(403),
                     "Errore durante la richiesta: " + se.getMessage());
+        }catch(Exception ge){
+            return ResponseUtils.getResponseError(HttpStatus.valueOf(500),
+                    "Errore durante la richiesta: " + ge.getMessage());
         }
     }
 

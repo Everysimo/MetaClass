@@ -86,7 +86,7 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService {
     }
 
     @Override
-    public boolean creaStanza(Stanza s) throws ServerRuntimeException, RuntimeException403 {
+    public boolean creaStanza(Stanza s) throws Exception {
         String metaID = jwtTokenUtil.getMetaIdFromToken(validationToken.getToken());
 
         if (metaID == null)
@@ -112,10 +112,10 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService {
         s.setCodice(codice);
         stanzaRepository.save(s);
 
-       // StatoPartecipazione sp = new StatoPartecipazione(s, u,
-              //  getRuolo(Ruolo.ORGANIZZATORE_MASTER), false, false, u.getNome());
+       StatoPartecipazione sp = new StatoPartecipazione(s, u,
+              getRuolo(Ruolo.ORGANIZZATORE_MASTER), false, false, u.getNome());
 
-       // statoPartecipazioneRepository.save(sp);
+       statoPartecipazioneRepository.save(sp);
 
         return true;
     }

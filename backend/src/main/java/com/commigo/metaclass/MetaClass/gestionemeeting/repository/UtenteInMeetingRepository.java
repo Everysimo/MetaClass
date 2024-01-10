@@ -25,4 +25,6 @@ public interface UtenteInMeetingRepository extends JpaRepository<UtenteInMeeting
             "AND uim.utente.id = :UtenteID")
     int updateAttributes(@Param("MeetingID") Long MeetingID, @Param("UtenteID")Long UtenteID,
                          @Param("attributes") UtenteInMeeting attributes);
+
+    List<UtenteInMeeting> findUtenteInMeetingsByUtente(Utente u);
 }

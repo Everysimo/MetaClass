@@ -13,15 +13,13 @@ import com.commigo.metaclass.MetaClass.webconfig.ValidationToken;
 import io.micrometer.common.util.StringUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
+import org.apache.catalina.Server;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -74,24 +72,36 @@ public class GestioneMeetingController {
     }*/
 
     @PostMapping(value = "/schedulingMeeting")
-    public ResponseEntity<Response<Boolean>> schedulingMeeting(@Valid @RequestBody Meeting m, BindingResult result) {
+    public ResponseEntity<Response<Boolean>> schedulingMeeting(@Valid @RequestBody Meeting m,
+                                                               BindingResult result,
+                                                               HttpServletRequest request) {
         try {
 
-            //controlla se i parametri passati al meeting sono corretti
-            if(result.hasErrors())
-            {
-                return ResponseUtils.getResponseError(HttpStatus.INTERNAL_SERVER_ERROR,RequestUtils.errorsRequest(result));
+            //controllo token
+            if (!validationToken.isTokenValid(request)) {
+                throw new RuntimeException403("Token non valido");
             }
 
-            if (!meetingService.creaScheduling(m)) {
+            //controlla se i parametri passati al meeting sono corretti
+            if(result.hasErrors()) {
+                throw new ServerRuntimeException(RequestUtils.errorsRequest(result));
+            }
+
+            String metaID = jwtTokenUtil.getMetaIdFromToken(validationToken.getToken());
+
+            if (!meetingService.creaScheduling(m,metaID)) {
                 throw new RuntimeException("Meeting non effettuato");
             } else {
                 return ResponseEntity.ok(new Response<>(true, "Meeting schedulato con successo"));
             }
 
-        } catch (RuntimeException e) {
+        } catch (RuntimeException403 e) {
+            return ResponseEntity.status(403)
+                    .body(new Response<>(false, "Errore durante la schedulazione del meeting: " + e.getMessage()));
+        } catch (ServerRuntimeException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(new Response<>(false, "Errore durante la schedulazione del meeting: " + e.getMessage()));
+
         }
     }
 
@@ -251,6 +261,57 @@ public class GestioneMeetingController {
                     .body(new Response<>(false, se.getMessage()));
         }
     }
+
+    @GetMapping("/visualizzaQuestionari")
+    public ResponseEntity<Response<List<Meeting>>> visualizzaQuestionario (
+            HttpServletRequest request) {
+
+        try {
+            //controllo token
+            if (!validationToken.isTokenValid(request)) {
+                throw new RuntimeException403("Token non valido");
+            }
+
+            String metaID = jwtTokenUtil.getMetaIdFromToken(validationToken.getToken());
+            List<Meeting> meetingToQuest = meetingService.visualizzaQuestionari(metaID);
+                return ResponseEntity.ok(new Response<>(meetingToQuest,
+                        "La stampa dei meeting su cui bisogna compilare il questionario è" +
+                                " avvenuto con successo"));
+
+        }catch (RuntimeException403 e) {
+            return ResponseEntity.status(403)
+                    .body(new Response<>(null, e.getMessage()));
+        }catch (ServerRuntimeException se) {
+            return ResponseEntity.status(500)
+                    .body(new Response<>(null, se.getMessage()));
+        }
+    }
+
+    @GetMapping("/visualizzaMeetingPrecedenti")
+    public ResponseEntity<Response<List<Meeting>>> visualizzaMeetingPrecedeni (
+            HttpServletRequest request) {
+
+        try {
+            //controllo token
+            if (!validationToken.isTokenValid(request)) {
+                throw new RuntimeException403("Token non valido");
+            }
+
+            String metaID = jwtTokenUtil.getMetaIdFromToken(validationToken.getToken());
+
+            List<Meeting> meetingToQuest = meetingService.getMeetingPrecedenti(metaID);
+            return ResponseEntity.ok(new Response<>(meetingToQuest,
+                    "Operazione avvenuta con successo"));
+
+        }catch (RuntimeException403 e) {
+            return ResponseEntity.status(403)
+                    .body(new Response<>(null, e.getMessage()));
+        }catch (ServerRuntimeException se) {
+            return ResponseEntity.status(500)
+                    .body(new Response<>(null, se.getMessage()));
+        }
+    }
+
 
 }
 
