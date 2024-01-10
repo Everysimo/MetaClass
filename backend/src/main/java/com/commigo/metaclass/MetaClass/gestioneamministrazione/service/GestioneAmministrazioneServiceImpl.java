@@ -83,22 +83,27 @@ public class GestioneAmministrazioneServiceImpl implements GestioneAmministrazio
      * @return
      */
     @Override
-    public boolean updateScenario(Scenario s, long IdCategoria) {
+    public boolean updateScenario(Scenario s, long IdCategoria) throws RuntimeException403 {
 
         //gestione della categoria
         Categoria cat;
-        if((cat = categoriaRepository.findById(IdCategoria))==null)   return false;
+        if((cat = categoriaRepository.findById(IdCategoria))==null)
+            throw new RuntimeException403("categoria non trovata");
         s.setCategoria(cat);
 
-        Immagine image = immagineRepository.save(new Immagine(s.getImage().getUrl()));
-        s.setImage(image);
+        //gestione immagini
+        Immagine image = new Immagine(s.getImage().getUrl());
+        if(immagineRepository.findByNome(image.getNome())!=null)
+            throw new RuntimeException403("devi inserire un'immagine con nome diverso");
+
+        s.setImage(immagineRepository.save(image));
 
         //getsione dello scenario
         if((scenarioRepository.findByNome(s.getNome()))==null){
             scenarioRepository.save(s);
             return true;
-        }
-        return false;
+        }else
+           throw new RuntimeException403("esiste già uno scenario chiamato "+s.getNome());
     }
 
     /**
@@ -106,11 +111,7 @@ public class GestioneAmministrazioneServiceImpl implements GestioneAmministrazio
      */
     @Override
     public List<Stanza> getStanze() {
-        try{
             return stanzaRepository.findAll();
-        }catch(Exception e){
-            return null;
-        }
     }
 
 }

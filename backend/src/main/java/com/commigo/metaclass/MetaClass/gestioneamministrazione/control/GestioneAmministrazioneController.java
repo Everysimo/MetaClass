@@ -201,8 +201,7 @@ public class GestioneAmministrazioneController {
 
             stanze = gestioneamministrazione.getStanze();
             if(stanze == null){
-                return ResponseEntity.status(500)
-                        .body(new Response<>(null, "Errore la ricerca delle stanze"));
+                throw new ServerRuntimeException("Errore nella ricerca delle stanze");
             }else if(stanze.isEmpty()){
                 return ResponseEntity
                         .ok(new Response<>(stanze, "nessuna stanza creata"));
@@ -211,9 +210,9 @@ public class GestioneAmministrazioneController {
                         .ok(new Response<>(stanze, "operazione effettuata con successo"));
             }
         } catch (RuntimeException403 re) {
-            return ResponseEntity.status(500)
+            return ResponseEntity.status(403)
                     .body(new Response<>(null, "Errore durante l'operazione: "+re.getMessage()));
-        }catch (Exception e) {
+        }catch (ServerRuntimeException e) {
             return ResponseEntity.status(500)
                     .body(new Response<>(null, "Errore durante l'operazione"));
         }

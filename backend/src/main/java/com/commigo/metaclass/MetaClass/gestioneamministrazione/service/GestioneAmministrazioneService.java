@@ -14,7 +14,7 @@ public interface GestioneAmministrazioneService {
     boolean deleteBanToUser(Long idUtente, Long idStanza) throws RuntimeException403, ServerRuntimeException;
 
     boolean updateCategoria(Categoria c);
-    boolean updateScenario(Scenario s, long IdCategoria);
+    boolean updateScenario(Scenario s, long IdCategoria) throws RuntimeException403;
     List<Stanza> getStanze();
 
 
