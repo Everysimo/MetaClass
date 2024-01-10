@@ -12,7 +12,6 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.format.annotation.DateTimeFormat;
 
-import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -177,8 +176,7 @@ public class Utente {
 
     }
 
-    public Utente(Long id, String Nome, String Cognome, String Email, String Data, String Sesso, String IdMeta, String token, boolean Is_Admin) throws DataFormatException {
-        this.id = id;
+    public Utente(String Nome, String Cognome, String Email, String Data, String Sesso, String IdMeta, String token, boolean Is_Admin) throws DataFormatException {
         this.nome = Nome;
         this.cognome = Cognome;
         this.email = Email;

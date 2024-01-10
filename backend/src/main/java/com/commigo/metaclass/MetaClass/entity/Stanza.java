@@ -14,10 +14,7 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
-import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 
 @Entity
@@ -99,7 +96,7 @@ public class Stanza {
      * Chiave Esterna sullo Scenario
      */
     @NotNull(message = "Lo scenario non può essere nullo")
-    @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.REFRESH})
+    @ManyToOne(cascade = CascadeType.MERGE)
     @JoinColumn(name = "id_scenario")
     private Scenario scenario;
 
@@ -131,7 +128,7 @@ public class Stanza {
         this.scenario.setId(id_scenario);
     }
 
-    public Stanza(Long id, String nome, String descrizione, boolean tipoAccesso, int maxPosti, Scenario scenario, String codice) throws MismatchJsonProperty {
+    public Stanza(String nome, String descrizione, boolean tipoAccesso, int maxPosti, Scenario scenario, String codice) throws MismatchJsonProperty {
 
         if (nome == null || descrizione == null) {
             throw new MismatchJsonProperty("gli attributi non sono corretti");

@@ -1,8 +1,6 @@
 package com.commigo.metaclass.MetaClass.gestioneamministrazione.service;
 
 import com.commigo.metaclass.MetaClass.entity.*;
-import com.commigo.metaclass.MetaClass.exceptions.RuntimeException403;
-import com.commigo.metaclass.MetaClass.exceptions.ServerRuntimeException;
 import com.commigo.metaclass.MetaClass.gestioneamministrazione.repository.CategoriaRepository;
 import com.commigo.metaclass.MetaClass.gestioneamministrazione.repository.ImmagineRepository;
 import com.commigo.metaclass.MetaClass.gestioneamministrazione.repository.ScenarioRepository;
@@ -43,25 +41,19 @@ public class GestioneAmministrazioneServiceImpl implements GestioneAmministrazio
     private StatoPartecipazioneRepository statoPartecipazioneRepository;
 
     @Override
-    public boolean deleteBanToUser(Long idUtente, Long idStanza) throws RuntimeException403, ServerRuntimeException {
+    public Utente findUtenteById(String id) {
+        return utenteRepository.findUtenteById(utenteRepository.findByMetaId(id));
+    }
 
-        Utente utente = utenteRepository.findUtenteById(idUtente);
-        if(utente == null) throw new RuntimeException403("Utente non trovato");
+    @Override
+    public Stanza findStanzaById(Long id)
+    {
+        return stanzaRepository.findStanzaById(id);
+    }
 
-        Stanza stanza = stanzaRepository.findStanzaById(idStanza);
-        if(stanza == null) throw new RuntimeException403("Stanza non trovata");
-
-        StatoPartecipazione sp = statoPartecipazioneRepository
-                .findStatoPartecipazioneByUtenteAndStanza(utente, stanza);
-        if(sp==null) throw new ServerRuntimeException("Stanza non trovata");
-
-        if(!sp.isBannato())   throw new RuntimeException403("L'utente non e' bannato");
-
-        sp.setBannato(false);
-        statoPartecipazioneRepository.save(sp);
-
-        return true;
-
+    @Override
+    public boolean isBannedUser(Utente utente, Stanza stanza) {
+        return statoPartecipazioneRepository.isBannedUser(stanza.getId(),utente.getId());
     }
 
     /**
@@ -83,27 +75,22 @@ public class GestioneAmministrazioneServiceImpl implements GestioneAmministrazio
      * @return
      */
     @Override
-    public boolean updateScenario(Scenario s, long IdCategoria) throws RuntimeException403 {
+    public boolean updateScenario(Scenario s, long IdCategoria) {
 
         //gestione della categoria
         Categoria cat;
-        if((cat = categoriaRepository.findById(IdCategoria))==null)
-            throw new RuntimeException403("categoria non trovata");
+        if((cat = categoriaRepository.findById(IdCategoria))==null)   return false;
         s.setCategoria(cat);
 
-        //gestione immagini
-        Immagine image = new Immagine(s.getImage().getUrl());
-        if(immagineRepository.findByNome(image.getNome())!=null)
-            throw new RuntimeException403("devi inserire un'immagine con nome diverso");
-
-        s.setImage(immagineRepository.save(image));
+        Immagine image = immagineRepository.save(new Immagine(s.getImage().getUrl()));
+        s.setImage(image);
 
         //getsione dello scenario
         if((scenarioRepository.findByNome(s.getNome()))==null){
             scenarioRepository.save(s);
             return true;
-        }else
-           throw new RuntimeException403("esiste già uno scenario chiamato "+s.getNome());
+        }
+        return false;
     }
 
     /**
@@ -111,8 +98,11 @@ public class GestioneAmministrazioneServiceImpl implements GestioneAmministrazio
      */
     @Override
     public List<Stanza> getStanze() {
+        try{
             return stanzaRepository.findAll();
+        }catch(Exception e){
+            return null;
+        }
     }
-
 }
 
