@@ -1,37 +1,61 @@
-import React, { useState } from 'react';
-import "../Forms/ModifyRoomForm/MyModifyForm.css";
-import {useParams} from "react-router-dom";
+import React, { Component } from 'react';
+import '../Forms/CreaScenarioForm/creaScenario.css';
+import {faChalkboardUser, faPlay} from "@fortawesome/free-solid-svg-icons";
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {wait} from "@testing-library/user-event/dist/utils";
 
-const TerminaMeeting = () => {
-    const { id_meeting: id_meeting } = useParams();
-    //si usa useParams per farsi passare il parametro
+export default class AvviaMeeting extends Component {
+    state = {
+        id_meeting: this.props.id_meeting || "", // Imposta il valore iniziale con quello ricevuto come prop
+        isVisible: true,
+        isErrorPopupVisible: false,
+        errorMessage: "",
 
-    const terminaMeeting = async () => {
+    };
+
+    sendDataToServer = async () => {
+        const { id_meeting} = this.state;
+
+        // Validazione: Assicurati che idCategoria sia >= 0
+
+        const dataToSend = {
+            id_meeting,
+        };
+
         const requestOption = {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': 'Bearer ' + sessionStorage.getItem("token")
             },
+            body: JSON.stringify(dataToSend)
         };
 
-        try {
+        try{
+            console.log("la stringa json:", JSON.stringify(dataToSend));
             const response = await fetch(`http://localhost:8080/terminaMeeting/${id_meeting}`, requestOption);
             const responseData = await response.json();
-            console.log("Risposta del server:", responseData);
-        } catch (error) {
-            console.error('Errore:', error);
+            console.log("Risposta dal server:", responseData);
+            if (responseData && responseData.value) {
+                console.log(responseData.message);
+            }
+        }
+        catch (error) {
+            console.error('ERRORE:', error);
         }
     };
 
-    return (
-        <>
-            <div className="card-content">
-                <div className="button-container">
-                    <button type="button" onClick={terminaMeeting}> TerminaMeeting </button>
-                </div>
+    callFunction = () => {
+        // Invia i dati al server utilizzando this.state.id_meeting
+        this.sendDataToServer();
+        console.log("dati del form", this.state);
+
+    };
+    render() {
+        return (
+            <div className="button-container">
+                <button onClick={() => this.callFunction()}> Termina Meeting <FontAwesomeIcon icon={faPlay} size="xl" style={{color: "#ffffff",}}/> </button>
             </div>
-        </>
-    );
-};
-export default TerminaMeeting;
+        );
+    };
+}

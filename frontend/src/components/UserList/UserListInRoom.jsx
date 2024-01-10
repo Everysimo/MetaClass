@@ -177,6 +177,47 @@ const UserListInRoom = () => {
         }
     };
 
+    const handleDeclassifyButton = (idutente) => {
+        console.log(idutente);
+        setSelectedUserId(idutente);
+        handleDeclassify();
+    };
+
+    const handleDeclassify = async () => {
+        console.log('Before fetch call:', id_stanza, selectedUserId);
+
+        if (!id_stanza || !selectedUserId) {
+            console.error('Invalid id_stanza or selectedUserId');
+            return;
+        }
+
+        const requestOption = {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + sessionStorage.getItem("token")
+            },
+        };
+
+        try {
+            console.log('About to make fetch call');
+            const response = await fetch(
+                `http://localhost:8080/declassaOrganizzatore/${id_stanza}/${selectedUserId}`,
+                requestOption
+            );
+            console.log('Fetch call completed');
+            console.log(response);
+            if (!response.ok) {
+                throw new Error('Error in promoting the user');
+            }
+
+            const data = await response.json();
+            console.log('data:', data);
+        } catch (error) {
+            console.error('Error during user promotion:', error);
+        }
+    };
+
 
     return (
         <div>
@@ -193,6 +234,9 @@ const UserListInRoom = () => {
                         <button onClick={() => handleKickUserButton(user.id)}>Kicka Partecipante</button>
                         <button onClick={() => handleSilenziaUserButton(user.id)}>Silenzia Partecipante</button>
                         <button onClick={() => handlePromotionButton(user.id)}>Promuovi</button>
+                        {/*<button onClick={() => handleBanUserButton(user.id)}>Banna Partecipante</button>*/}
+                        {/*<button onClick={handleBanOrganaiser() => }>Banna Organizzatore</button>*/}
+                        <button onClick={() => handleDeclassifyButton(user.id)}>Declassa</button>
                     </div>
                 </div>
             ))}
