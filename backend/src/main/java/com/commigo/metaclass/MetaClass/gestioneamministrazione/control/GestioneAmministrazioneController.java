@@ -105,13 +105,10 @@ public class GestioneAmministrazioneController {
             gestioneamministrazione.deleteBanToUser(idUtente,idStanza);
             return ResponseEntity.ok(new Response<>(true,"Ban annullato correttamente"));
 
-        }catch (RuntimeException403 re) {
+        }catch (RuntimeException403 | ServerRuntimeException re) {
            return ResponseEntity.status(HttpStatus.FORBIDDEN)
                 .body(new Response<>(false, "Errore durante la richiesta: " + re.getMessage()));
-       }catch(ServerRuntimeException se) {
-            return ResponseEntity.status(500)
-                    .body(new Response<>(false, "Errore durante la richiesta: " + se.getMessage()));
-        }
+       }
     }
 
 
