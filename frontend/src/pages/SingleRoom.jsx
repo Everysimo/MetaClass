@@ -23,6 +23,13 @@ export const SingleRoom = () =>{
 
         fetchRole(); // Fetch the role when the component mounts
     }, [id_stanza]); // Run effect whenever id_stanza changes
+
+
+    const handleGoToUserList= () => {
+        // Naviga alla pagina di destinazione con il valore 42
+        navigate(`/userListRoom/ ${id_stanza}`);
+    };
+
     const handleGoToModifyDataRoom= () => {
         // Naviga alla pagina di destinazione con il valore 42
         navigate(`/modifyroom/ ${id_stanza}`);
@@ -56,6 +63,7 @@ export const SingleRoom = () =>{
                         </div>
                     }
                     <div className={"childDiv"}>
+                        <button onClick={handleGoToUserList}>Visualizza Lista Utenti in Stanza</button>
                         <button onClick={handleGoToModifyDataRoom}>Modifica la stanza</button>
                         <button onClick={handleGoToChangeScenario}>Modifica lo scenario della stanza</button>
                         <button onClick={handleGoToAccessManagement}>Gestione degli accessi</button>

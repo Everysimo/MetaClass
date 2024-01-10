@@ -74,6 +74,11 @@ public class GestioneAmministrazioneController {
                 throw new RuntimeException403("Token non valido");
             }
 
+            String metaID = jwtTokenUtil.getMetaIdFromToken(validationToken.getToken());
+
+            //verifica dei permessi
+            if(!checkAdmin(metaID))  throw new RuntimeException403("Non sei amministratore");
+
             return stanzaControl.visualizzaUtentiBannatiInStanza(Id, request);
 
         }catch (RuntimeException403 re) {
@@ -82,20 +87,31 @@ public class GestioneAmministrazioneController {
         }
     }
 
-    @PostMapping(value = "annullaBan/{idstanza}")
-    public ResponseEntity<Response<Boolean>> annullaBan(@RequestBody String idUtente, @PathVariable("idstanza") Long idStanza)
+    @PostMapping(value = "annullaBan/{idstanza}/{idUtente}")
+    public ResponseEntity<Response<Boolean>> annullaBan(@PathVariable Long idUtente,
+                                                        @PathVariable("idstanza") Long idStanza,
+                                                        HttpServletRequest request)
     {
-        Utente utente = gestioneamministrazione.findUtenteById(idUtente);
-        Stanza stanza = gestioneamministrazione.findStanzaById(idStanza);
+        try{
+            if (!validationToken.isTokenValid(request)) {
+                throw new RuntimeException403("Token non valido");
+            }
 
-        if(!gestioneamministrazione.isBannedUser(utente,stanza))
-        {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new Response<>(false,"Utente non bannato"));
+            String metaID = jwtTokenUtil.getMetaIdFromToken(validationToken.getToken());
+
+            //verifica dei permessi
+            if(!checkAdmin(metaID))  throw new RuntimeException403("non sei amministratore");
+
+            gestioneamministrazione.deleteBanToUser(idUtente,idStanza);
+            return ResponseEntity.ok(new Response<>(true,"Ban annullato correttamente"));
+
+        }catch (RuntimeException403 re) {
+           return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .body(new Response<>(false, "Errore durante la richiesta: " + re.getMessage()));
+       }catch(ServerRuntimeException se) {
+            return ResponseEntity.status(500)
+                    .body(new Response<>(false, "Errore durante la richiesta: " + se.getMessage()));
         }
-
-        return ResponseEntity.ok(new Response<>(true,"Ban annullato correttamente"));
-
     }
 
 
@@ -113,7 +129,7 @@ public class GestioneAmministrazioneController {
             String metaID = jwtTokenUtil.getMetaIdFromToken(validationToken.getToken());
 
             //verifica dei permessi
-            if(!checkAdmin(metaID))  throw new RuntimeException403("accesso non consentito");
+            if(!checkAdmin(metaID))  throw new RuntimeException403("non sei amministratore");
 
             //controllo errori di validazione
             if(result.hasErrors())
@@ -129,7 +145,7 @@ public class GestioneAmministrazioneController {
             }
         }catch(RuntimeException403 e){
             return ResponseEntity.status(403).body(new Response<>(false, e.getMessage()));
-        } catch (Exception e) {
+        } catch (ServerRuntimeException e) {
             return ResponseEntity.status(500).body(new Response<>(false, e.getMessage()));
         }
     }
@@ -163,7 +179,7 @@ public class GestioneAmministrazioneController {
             }
         }catch(RuntimeException403 e){
             return ResponseEntity.status(403).body(new Response<>(false, e.getMessage()));
-        }  catch (Exception e) {
+        }  catch (ServerRuntimeException e) {
             return ResponseEntity.status(500).body(new Response<>(false, e.getMessage()));
         }
     }
@@ -185,8 +201,7 @@ public class GestioneAmministrazioneController {
 
             stanze = gestioneamministrazione.getStanze();
             if(stanze == null){
-                return ResponseEntity.status(500)
-                        .body(new Response<>(null, "Errore la ricerca delle stanze"));
+                throw new ServerRuntimeException("Errore nella ricerca delle stanze");
             }else if(stanze.isEmpty()){
                 return ResponseEntity
                         .ok(new Response<>(stanze, "nessuna stanza creata"));
@@ -195,9 +210,9 @@ public class GestioneAmministrazioneController {
                         .ok(new Response<>(stanze, "operazione effettuata con successo"));
             }
         } catch (RuntimeException403 re) {
-            return ResponseEntity.status(500)
+            return ResponseEntity.status(403)
                     .body(new Response<>(null, "Errore durante l'operazione: "+re.getMessage()));
-        }catch (Exception e) {
+        }catch (ServerRuntimeException e) {
             return ResponseEntity.status(500)
                     .body(new Response<>(null, "Errore durante l'operazione"));
         }
@@ -261,7 +276,7 @@ public class GestioneAmministrazioneController {
             String metaID = jwtTokenUtil.getMetaIdFromToken(validationToken.getToken());
 
             //verifica dei permessi
-            if(!checkAdmin(metaID))  throw new RuntimeException403("accesso non consentito");
+            if(!checkAdmin(metaID))  throw new RuntimeException403("Non sei un amministratore");
 
             return stanzaControl.visualizzaStanza(Id,request);
         } catch (RuntimeException403 re) {
