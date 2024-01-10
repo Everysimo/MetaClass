@@ -12,6 +12,8 @@ import CreaCategoria from "../components/CreaCategoria/CreaCategoria";
 import CreaScenario from "../components/Forms/CreaScenarioForm/CreaScenario";
 import ModificaScenario from "../components/Forms/CreaScenarioForm/ModificaScenario";
 import AccediStanza from "../components/enterRoomPopup/accediStanza";
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {faChalkboardUser, faCirclePlus, faDoorOpen, faUser} from "@fortawesome/free-solid-svg-icons";
 
 export const LoggedInHome = () => {
     const nome = sessionStorage.getItem('nome');
@@ -54,22 +56,41 @@ export const LoggedInHome = () => {
             </header>
             <section className={"contentSec"}>
                 <h1>BENTORNATO, {nome}</h1>
-                <div className={"masterDiv"}>
-                    <div className={"childDiv"}>
-                        <button onClick={handleGoToProfile}>vai ad Account</button>
-                        <button onClick={handleGoToRoomList}>vai all'elenco delle stanze</button>
-                        <button onClick={handleGoToCreateRoom}>Crea stanza</button>
-                        <button onClick={() => {
-                            closeAllComponents();
-                            setIsVisibleAcc(prevVisibility => !prevVisibility)
-                        }}
-                        >
-                            Accedi Stanza
-                        </button>
-                        {isVisibleAcc &&
-                            <AccediStanza onClose={() => setIsVisibleAcc(false)}/>
-                        }
+            </section>
+            <section className={"layout"}>
+                <div>
+                    <FontAwesomeIcon icon={faUser} size="2xl" style={{color: "#c70049",}} />
+                    <h2>Account</h2>
+                    <button onClick={handleGoToProfile}>vai ad Account</button>
+                </div>
+                <div>
+                    <FontAwesomeIcon icon={faChalkboardUser} size="2xl" style={{color: "#c70049",}} />
+                    <h2>Le mie Stanze</h2>
+                    <button onClick={handleGoToRoomList}>vai all'elenco delle stanze</button>
+                </div>
+                <div>
+                    <FontAwesomeIcon icon={faCirclePlus} size="2xl" style={{color: "#c70049",}} />
+                    <h2>Creazione stanza</h2>
+                    <button onClick={handleGoToCreateRoom}>Crea stanza</button>
+                </div>
+                <div>
+                    <FontAwesomeIcon icon={faDoorOpen} size="2xl" style={{color: "#c70049",}} />
+                    <h2>Ingresso stanza</h2>
+                    <button onClick={() => {
+                        closeAllComponents();
+                        setIsVisibleAcc(prevVisibility => !prevVisibility)
+                    }}
+                    >
+                        Accedi Stanza
+                    </button>
+                </div>
+                {isVisibleAcc &&
+                    <div>
+                        <AccediStanza onClose={() => setIsVisibleAcc(false)}/>
                     </div>
+                }
+            </section>
+            <section className={"contentSec"}>
                     <div className={"childDiv"}>
                         <h5> IN QUANTO ORGANIZZATORE...</h5>
                         <button onClick={() => {
@@ -111,7 +132,6 @@ export const LoggedInHome = () => {
                             <LogoutButton/>
                         </div>
                     }
-                </div>
             </section>
             <footer>
             <MyFooter/>
