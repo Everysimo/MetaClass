@@ -22,13 +22,15 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.http.converter.HttpMessageNotWritableException;
 import org.springframework.stereotype.Service;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 
@@ -71,12 +73,11 @@ public class GestioneUtenzaServiceImpl implements GestioneUtenzaService{
             }
 
             Utente ut;
-            if((ut = utenteRepository.findFirstByMetaId(u.getMetaId())) == null){
-                utenteRepository.save(u);
-            }else{
+            if((ut=utenteRepository.findFirstByMetaId(u.getMetaId())) != null){
                 ut.setTokenAuth(u.getTokenAuth());
                 utenteRepository.save(ut);
-            }
+            }else
+                utenteRepository.save(u);
 
             return true;
         }catch (DataIntegrityViolationException e){
@@ -99,25 +100,29 @@ public class GestioneUtenzaServiceImpl implements GestioneUtenzaService{
     }
 
     /**
-     * @param metaId
+     * @param MetaId
      * @return
      */
     @Override
-    public List<Stanza> getStanzeByUserId(String metaId) throws ServerRuntimeException {
-        Utente existingUser = utenteRepository.findFirstByMetaId(metaId);
-        if (existingUser == null) {
-            throw new ServerRuntimeException("Utente non presente nel database");
-        } else {
-            List<StatoPartecipazione> stati = statoPartecipazioneRepository.findAllByUtente(existingUser);
-            // Se non ci sono stati, restituisci una lista vuota
-            return stati != null
-                    ? stati.stream().map(StatoPartecipazione::getStanza).collect(Collectors.toList())
-                    : Collections.emptyList();
-        }
+    public List<Stanza> getStanzeByUserId(String MetaId) throws ServerRuntimeException{
+            Utente existingUser = utenteRepository.findFirstByMetaId(MetaId);
+            if(existingUser == null) {
+                throw new ServerRuntimeException("Utente non presente nel database");
+            }else{
+                List<StatoPartecipazione> stati =
+                        statoPartecipazioneRepository.findAllByUtente(existingUser);
+                if(stati==null){
+                    throw new ServerRuntimeException("Errore nella ricerca delle stanze");
+                }else{
+                    // Estrai gli attributi 'stanza' dalla lista 'stati' e messi in una nuova lista
+                    return stati.stream()
+                            .map(StatoPartecipazione::getStanza)
+                            .collect(Collectors.toList());
+                }
+            }
     }
 
-
-    /**
+/**
 *
  * @param sessionID
  * @return

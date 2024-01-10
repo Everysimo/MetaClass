@@ -48,6 +48,7 @@ public class FeedbackMeeting {
     @NotNull(message = "L'utente non può essere nullo")
     @ManyToOne()
     @JoinColumn(name = "id_utente")
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Utente utente;
 
     @NotNull(message = "Il meeting non può essere nullo")
