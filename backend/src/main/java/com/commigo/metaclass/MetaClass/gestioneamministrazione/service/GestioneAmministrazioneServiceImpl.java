@@ -131,6 +131,7 @@ public class GestioneAmministrazioneServiceImpl implements GestioneAmministrazio
             throw new RuntimeException403("L'utente non è bannato nella stanza "+s.getNome());
 
         sp.setBannato(false);
+        statoPartecipazioneRepository.save(sp);
         return true;
 
     }

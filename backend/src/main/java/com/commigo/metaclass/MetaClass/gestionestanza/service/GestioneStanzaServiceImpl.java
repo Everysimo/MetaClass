@@ -64,7 +64,7 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService {
 
                 if (statoPartecipazione == null) {
 
-                   // statoPartecipazione = new StatoPartecipazione(stanza, u, getRuolo(Ruolo.PARTECIPANTE), false, false, u.getNome());
+                    statoPartecipazione = new StatoPartecipazione(stanza, u, getRuolo(Ruolo.PARTECIPANTE), false, false, u.getNome());
                     return ResponseEntity.ok(new AccessResponse<>(1, "Stai per effettuare l'accesso alla stanza", false));
 
                 } else if (statoPartecipazione.isBannato()) {
@@ -81,6 +81,8 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService {
 
                 return ResponseEntity.status(403).body(new AccessResponse<>(4, "Errore durante la richiesta: " + e.getMessage(), false));
 
+            } catch (Exception e) {
+                throw new RuntimeException(e);
             }
         }
     }
@@ -257,6 +259,7 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService {
             StatoPartecipazione stato_og = statoPartecipazioneRepository.findStatoPartecipazioneByUtenteAndStanza(og, stanza);
             if (stato_og.getRuolo().getNome().equalsIgnoreCase(Ruolo.PARTECIPANTE)) {
                 stato_og.getRuolo().setNome(Ruolo.ORGANIZZATORE);
+                statoPartecipazioneRepository.save(stato_og);
 
                 return ResponseEntity.ok(new Response<>(true, "L'utente selezionato ora è un organizzatore")).getBody();
 
