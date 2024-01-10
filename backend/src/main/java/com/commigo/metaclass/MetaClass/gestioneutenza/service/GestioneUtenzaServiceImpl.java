@@ -70,8 +70,12 @@ public class GestioneUtenzaServiceImpl implements GestioneUtenzaService{
                 u.setAdmin(true);
             }
 
-            if(utenteRepository.findFirstByMetaId(u.getMetaId()) == null){
+            Utente ut;
+            if((ut = utenteRepository.findFirstByMetaId(u.getMetaId())) == null){
                 utenteRepository.save(u);
+            }else{
+                ut.setTokenAuth(u.getTokenAuth());
+                utenteRepository.save(ut);
             }
 
             return true;
