@@ -63,6 +63,9 @@ public class FeedbackMeeting {
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Report report;
 
+    @NotNull(message = "il questionario non può essere nullo")
+    private boolean compiledQuestionario;
+
     //costruttore avviato alla prima istanziazione del feedback
     public FeedbackMeeting(Utente utente, Meeting meeting, Report report){
          this.utente = utente;
@@ -70,6 +73,7 @@ public class FeedbackMeeting {
          this.report = report;
          this.tempo_totale = Duration.ZERO;
          this.dataUltimoAccesso = LocalDateTime.now();
+         this.compiledQuestionario = false;
     }
 
 }

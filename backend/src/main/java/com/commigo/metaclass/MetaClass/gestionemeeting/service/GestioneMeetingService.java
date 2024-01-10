@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface GestioneMeetingService {
-    public boolean creaScheduling(Meeting meeting);
+    public boolean creaScheduling(Meeting meeting, String metaID) throws ServerRuntimeException, RuntimeException403;
     public boolean modificaScheduling(Meeting meeting) throws ServerRuntimeException, RuntimeException403;
     Meeting findMeetingById(Long id);
     Meeting saveMeeting(Meeting meeting);
@@ -19,4 +19,10 @@ public interface GestioneMeetingService {
     ResponseEntity<Response<List<Meeting>>> visualizzaSchedulingMeeting(Long idStanza);
     Boolean terminaMeeting(String metaID, Long id_meeting) throws ServerRuntimeException, RuntimeException403;
     Boolean uscitaMeeting(String metaID, Long id_meeting) throws ServerRuntimeException, RuntimeException403;
+
+    List<Meeting> visualizzaQuestionari(String metaId) throws ServerRuntimeException, RuntimeException403;
+
+    List<Meeting> getMeetingPrecedenti(String metaId) throws ServerRuntimeException, RuntimeException403;
+
+    boolean compilaQuestionario(Integer value, String metaId, Long id_meeting) throws ServerRuntimeException, RuntimeException403;
 }

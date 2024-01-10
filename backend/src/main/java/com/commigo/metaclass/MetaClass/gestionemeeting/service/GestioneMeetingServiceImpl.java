@@ -3,7 +3,7 @@ package com.commigo.metaclass.MetaClass.gestionemeeting.service;
 import com.commigo.metaclass.MetaClass.entity.*;
 import com.commigo.metaclass.MetaClass.exceptions.RuntimeException403;
 import com.commigo.metaclass.MetaClass.exceptions.ServerRuntimeException;
-import com.commigo.metaclass.MetaClass.gestioneamministrazione.repository.CategoriaRepository;
+import com.commigo.metaclass.MetaClass.gestioneamministrazione.repository.ScenarioRepository;
 import com.commigo.metaclass.MetaClass.gestionemeeting.repository.FeedbackMeetingRepository;
 import com.commigo.metaclass.MetaClass.gestionemeeting.repository.MeetingRepository;
 import com.commigo.metaclass.MetaClass.gestionemeeting.repository.ReportRepository;
@@ -22,7 +22,6 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -35,6 +34,7 @@ public class GestioneMeetingServiceImpl implements GestioneMeetingService{
     private final MeetingRepository meetingRepository;
     private final StanzaRepository stanzaRepository;
     private final UtenteRepository utenteRepository;
+    private final ScenarioRepository scenarioRepository;
     private final UtenteInMeetingRepository utenteInMeetingRepository;
     private final StatoPartecipazioneRepository statoPartecipazioneRepository;
     private final FeedbackMeetingRepository feedbackMeetingRepository;
@@ -46,18 +46,36 @@ public class GestioneMeetingServiceImpl implements GestioneMeetingService{
  * @return
 */
     @Override
-    public boolean creaScheduling(Meeting meeting) throws RuntimeException{
+    public boolean creaScheduling(Meeting meeting, String metaID) throws ServerRuntimeException, RuntimeException403 {
             //cerca il meeting per verificare se registrato o meno
             Optional<Meeting> m = meetingRepository.findById(meeting.getId());
-            if (!m.isPresent()) {
+            if (m.isEmpty()) {
 
                 //ricerca della stanza da associare a meeting
                 Stanza s = stanzaRepository.findStanzaById(meeting.getStanza().getId());
                 if(s==null){
-                    throw new RuntimeException("nessuna stanza ha quell'id");
+                    throw new ServerRuntimeException("errore nella ricerca della stanza");
                 }
+
+                //controllo esistenza dell'utente
+                Utente u;
+                if((u =  utenteRepository.findFirstByMetaId(metaID))==null){
+                    throw new RuntimeException403("utente non trovato");
+                }
+
+                //controllo del ruolo di organizzatore o organizzatore master
+                StatoPartecipazione sp;
+                if((sp=statoPartecipazioneRepository
+                        .findStatoPartecipazioneByUtenteAndStanza(u,s))==null){
+                    throw new ServerRuntimeException("errore nella ricerca del ruolo");
+                }
+                if(sp.getRuolo().getNome().equalsIgnoreCase(Ruolo.PARTECIPANTE)){
+                    throw new RuntimeException403("non hai i permessi per schedulare un meeting");
+                }
+
+                //controllo dei meeting sovrapponibili
                 if(meetingRepository.hasOverlappingMeetings(meeting.getInizio(), meeting.getFine())){
-                    throw new RuntimeException("il meeting si accavalla con un altro meeting");
+                    throw new RuntimeException403("il meeting si accavalla con un altro meeting");
                 }
                 meeting.setStanza(s);
 
@@ -66,7 +84,10 @@ public class GestioneMeetingServiceImpl implements GestioneMeetingService{
 
                 // Meeting non presente nel database, lo salva
                 meetingRepository.save(meeting);
+            }else{
+                throw new ServerRuntimeException("meeting già schedulato in precedenza");
             }
+
             return true;
     }
 
@@ -249,7 +270,7 @@ public class GestioneMeetingServiceImpl implements GestioneMeetingService{
         }
         //verifica ruolo
         if(sp.getRuolo().getNome().equalsIgnoreCase("Partecipante")){
-            throw new ServerRuntimeException("non puoi avviare il metting. Sei un partecipante");
+            throw new ServerRuntimeException("non puoi terminare il metting. Sei un partecipante");
         }
 
         //TERMINAZIONE MEETING
@@ -358,5 +379,86 @@ public class GestioneMeetingServiceImpl implements GestioneMeetingService{
                 return ResponseEntity.ok(new Response<>(null, "Non ci sono meeting schedulati in questa stanza"));
             }
         }
+    }
+
+    @Override
+    public List<Meeting> visualizzaQuestionari(String metaId) throws ServerRuntimeException, RuntimeException403 {
+
+        Utente u;
+        if((u=utenteRepository.findFirstByMetaId(metaId))==null)
+            throw new ServerRuntimeException("errore nella ricerca dell'utente");
+
+        List<FeedbackMeeting>feedbacks =
+                feedbackMeetingRepository.findFeedbackMeetingByUtente(u);
+        if(feedbacks == null)
+            throw  new RuntimeException403("non hai partecipato ancora a nessun meeting");
+
+        return feedbacks.stream()
+                        .map(FeedbackMeeting::getMeeting)
+                        .filter(meeting -> !meeting.isAvviato())
+                        .collect(Collectors.toList());
+
+    }
+
+    @Override
+    public List<Meeting> getMeetingPrecedenti(String metaId) throws ServerRuntimeException, RuntimeException403 {
+
+        Utente u;
+        if((u=utenteRepository.findFirstByMetaId(metaId))==null)
+            throw new ServerRuntimeException("errore nella ricerca dell'utente");
+
+        List<UtenteInMeeting>uim =
+                utenteInMeetingRepository.findUtenteInMeetingsByUtente(u);
+        if(uim == null)
+            throw  new RuntimeException403("non hai partecipato ancora a nessun meeting");
+
+        return uim.stream()
+                .map(UtenteInMeeting::getMeeting)
+                .filter(meeting -> !meeting.isAvviato())
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public boolean compilaQuestionario(Integer value, String metaId, Long id_meeting) throws ServerRuntimeException, RuntimeException403 {
+
+        Utente u;
+        if((u=utenteRepository.findFirstByMetaId(metaId))==null)
+            throw new ServerRuntimeException("errore nella ricerca dell'utente");
+
+        //controllo della valutazione
+        if(value == null || (value<1 || value>5))
+            throw new RuntimeException403("valore non valido");
+
+        Meeting m;
+        if((m = meetingRepository.findMeetingById(id_meeting))==null){
+            throw new RuntimeException403("meeting non trovato");
+        }
+
+        //controllo se esiste il feedbackmeeting
+        FeedbackMeeting fm = feedbackMeetingRepository
+                .findFeedbackMeetingByUtenteAndMeeting(u,m);
+        if(fm==null)   throw new ServerRuntimeException("errore nella ricerca del feedback meeting");
+
+        //controllo se il questionario già è stato compilato
+        if(fm.isCompiledQuestionario())
+            throw new RuntimeException403("questionario già compilato");
+
+        //se non è compilato allora procedo con la compilazione
+        Scenario sc = m.getScenario_iniziale();
+        if(sc == null)  throw new ServerRuntimeException("errore nella ricerca dello scenario");
+
+        //prelevo media e numero dei voti
+        float media = sc.getMedia_valutazione();
+        int num_voti = sc.getNum_voti();
+
+        //calcolo media
+        float newMedia = ((media * num_voti)+value)/(num_voti + 1);
+
+        //inserimento della media nello scenario
+        sc.setMedia_valutazione(newMedia);
+        sc.setNum_voti(num_voti+1);
+        scenarioRepository.save(sc);
+
+        return true;
     }
 }

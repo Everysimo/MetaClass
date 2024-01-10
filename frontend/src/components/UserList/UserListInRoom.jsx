@@ -6,13 +6,20 @@ const UserListInRoom = () => {
     const [isPopupOpen, setPopupOpen] = useState(false);
     const [newName, setNewName] = useState("");
     const [selectedUserId, setSelectedUserId] = useState(null);
+    const [showButtonsMap, setShowButtonsMap] = useState({});
 
     const { id: id_stanza } = useParams();
     console.log('idStanza', id_stanza);
 
-    useEffect(() => {
-        fetchUserList();
-    }, []);
+    useEffect(() => { fetchUserList(); }, []);
+
+    // Function to toggle button visibility for a specific user card
+    const toggleButtons = (userId) => {
+        setShowButtonsMap(prevState => ({
+            ...prevState,
+            [userId]: !prevState[userId] || false,
+        }));
+    };
 
     const requestOption = {
         method: 'POST',
@@ -24,8 +31,10 @@ const UserListInRoom = () => {
 
     const fetchUserList = async () => {
         try {
-            const response = await fetch(`http://localhost:8080/visualizzaUtentiInStanza/${id_stanza}`, requestOption);
-
+            const response = await fetch(
+                `http://localhost:8080/visualizzaUtentiInStanza/${id_stanza}`,
+                requestOption
+            );
             if (!response.ok) {
                 throw new Error('Errore nella richiesta');
             }
@@ -49,7 +58,6 @@ const UserListInRoom = () => {
 
     const handleChangeName = async () => {
         setPopupOpen(false); // Chiudi il popup quando si conferma il cambio nome
-
         console.log("newname", newName)
 
         const nome = newName;
@@ -99,8 +107,10 @@ const UserListInRoom = () => {
         };
 
         try {
-            const response = await fetch(`http://localhost:8080/kickarePartecipante/${id_stanza}/${selectedUserId}`, requestOption);
-
+            const response = await fetch(
+                `http://localhost:8080/kickarePartecipante/${id_stanza}/${selectedUserId}`,
+                requestOption
+            );
             if (!response.ok) {
                 throw new Error('Errore nella richiesta di kickare partecipante');
             }
@@ -130,8 +140,10 @@ const UserListInRoom = () => {
         };
 
         try {
-            const response = await fetch(`http://localhost:8080/.../${id_stanza}/${selectedUserId}`, requestOption);
-
+            const response = await fetch(
+                `http://localhost:8080/.../${id_stanza}/${selectedUserId}`,
+                requestOption
+            );
             if (!response.ok) {
                 throw new Error('Errore nella richiesta di silenziare partecipante');
             }
@@ -146,6 +158,48 @@ const UserListInRoom = () => {
         }
     }
 
+    const handlePromotionButton = (idutente) => {
+        console.log(idutente);
+        setSelectedUserId(idutente);
+        handlePromotion();
+    };
+
+    const handlePromotion = async () => {
+        console.log('Before fetch call:', id_stanza, selectedUserId);
+
+        if (!id_stanza || !selectedUserId) {
+            console.error('Invalid id_stanza or selectedUserId');
+            return;
+        }
+
+        const requestOption = {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + sessionStorage.getItem("token")
+            },
+        };
+
+        try {
+            console.log('About to make fetch call');
+            const response = await fetch(
+                `http://localhost:8080/promuoviOrganizzatore/${id_stanza}/${selectedUserId}`,
+                requestOption
+            );
+            console.log('Fetch call completed');
+            console.log(response);
+            if (!response.ok) {
+                throw new Error('Error in promoting the user');
+            }
+
+            const data = await response.json();
+            console.log('data:', data);
+        } catch (error) {
+            console.error('Error during user promotion:', error);
+        }
+    };
+
+
     return (
         <div>
             <h2>Utenti In Stanza:</h2>
@@ -153,11 +207,15 @@ const UserListInRoom = () => {
                 <div key={user.id} className="user-card">
                     <span>Nome: {`${user.nome} ${user.cognome}`}</span><br/>
                     <span>Email: {`${user.email}`}</span>
-                    {/* Aggiungi il pulsante e passa l'idutente a handleChangeNameButton */}
-                    <button onClick={() => handleChangeNameButton(user.id)}>Cambia Nome</button>
-                    <button onClick={() => handleKickUserButton(user.id)}>Kicka Partecipante</button>
-                    <button onClick={() => handleSilenziaUserButton(user.id)}>Silenzia Partecipante</button>
-
+                    <button onClick={() => toggleButtons(user.id)}>
+                        Options
+                    </button>
+                    <div className={`button-container${showButtonsMap[user.id] ? ' open' : ''}`}>
+                        <button onClick={() => handleChangeNameButton(user.id)}>Cambia Nome</button>
+                        <button onClick={() => handleKickUserButton(user.id)}>Kicka Partecipante</button>
+                        <button onClick={() => handleSilenziaUserButton(user.id)}>Silenzia Partecipante</button>
+                        <button onClick={() => handlePromotionButton(user.id)}>Promuovi</button>
+                    </div>
                 </div>
             ))}
 
