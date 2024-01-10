@@ -1,65 +1,41 @@
-import React, {Component} from 'react';
-import '../Forms/CreaScenarioForm/creaScenario.css';
+import React, { useState } from 'react';
+import "./MyModifyForm.css";
+import {useParams} from "react-router-dom";
 
-export default class AvviaMeeting extends Component {
-    state = {
-        id_meeting: this.props.id_meeting || "", // Imposta il valore iniziale con quello ricevuto come prop
-        isVisible: true, isErrorPopupVisible: false, errorMessage: "",
+const TerminaMeeting = () => {
+    const { id_meeting: id_meeting } = useParams();
+    //si usa useParams per farsi passare il parametro
+    const terminaMeeting = () => {
+        console.log("sono nel button Invia");
+        handleAvviaMeting();
     };
 
-    sendDataToServer = async () => {
-        const {id_meeting} = this.state;
-
-        // Validazione: Assicurati che idCategoria sia >= 0
-
-        const dataToSend = {
-            id_meeting,
-        };
-
+    const handleAvviaMeting = async () => {
         const requestOption = {
-            method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(dataToSend)
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + sessionStorage.getItem("token")
+            },
         };
 
         try {
             const response = await fetch(`http://localhost:8080/terminaMeeting/${id_meeting}`, requestOption);
-
             const responseData = await response.json();
-            console.log("Risposta dal server:", responseData);
+            console.log("Risposta del server:", responseData);
         } catch (error) {
-            console.error('ERRORE:', error);
+            console.error('Errore:', error);
         }
     };
 
-    callFunction = () => {
-        // Invia i dati al server utilizzando this.state.id_meeting
-        this.sendDataToServer();
-        console.log("dati del form", this.state);
-
-    };
-
-    handleClose = () => {
-        // Nascondi la card impostando isVisible su false
-        this.setState({isVisible: false});
-
-        // Chiama la funzione di chiusura ricevuta come prop
-        if (this.props.onClose) {
-            this.props.onClose();
-        }
-    };
-
-
-    render() {
-        return (<div>
-            <div className={`card ${this.state.isVisible ? '' : 'hidden'}`}>
-                <button className="close-button" onClick={this.handleClose}>
-                    X
-                </button>
-                <div className="card-content">
-                    <div className="button-container">
-                        <button onClick={() => this.callFunction()}>Termina Meeting</button>
-                    </div>
+    return (
+        <>
+            <div className="card-content">
+                <div className="button-container">
+                    <button type="button" onClick={terminaMeeting}> TerminaMeeting </button>
                 </div>
             </div>
-        </div>);
-    };
-}
+        </>
+    );
+};
+export default TerminaMeeting;
