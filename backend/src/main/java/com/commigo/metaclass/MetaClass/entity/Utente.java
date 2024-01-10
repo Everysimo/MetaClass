@@ -162,7 +162,13 @@ public class Utente {
                   @JsonProperty("metaId") String IdMeta) throws DataFormatException {
         this.nome = Nome;
         this.cognome = Cognome;
-        this.email = Email;
+
+        //stringa messa quando si da errore durante l'email non trovata
+        if(Email == null || Email.isEmpty())
+            this.email = "d.cavaliere13@studenti.unisa.it";
+        else
+            this.email = Email;
+
         this.metaId = IdMeta;
         this.sesso = Sesso;
 
