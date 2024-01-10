@@ -88,6 +88,13 @@ main {
     flex: 1;
     background-color: #f4f4f4;
     padding: 20px;
+    overflow-y: auto; /* Enable scrollbar if content overflows */
+    max-height: 100%; /* Setting a maximum height relative to parent */
+}
+
+.side-nav::-webkit-scrollbar {
+    width: 0; /* Hides the scrollbar */
+    display: none; /* Hides the scrollbar for older versions of WebKit */
 }
 
 .masterDiv {

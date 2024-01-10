@@ -1,16 +1,17 @@
-import React, {useEffect, useState} from "react";
-import {MyHeader} from "../components/Header/Header";
-import {MyFooter} from "../components/Footer/Footer";
-import {useNavigate, useParams} from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { MyHeader } from "../components/Header/Header";
+import { MyFooter } from "../components/Footer/Footer";
+import { useNavigate, useParams } from "react-router-dom";
 import CalendarComp from "../components/Calendar/CalendarComp";
-import {checkRole} from "../functions/checkRole";
+import { checkRole } from "../functions/checkRole";
 import UserListInRoom from "../components/UserList/UserListInRoom";
 
-export const SingleRoom = () =>{
+export const SingleRoom = () => {
     const navigate = useNavigate();
     const { id: id_stanza } = useParams();
     const [role, setRole] = useState(false); // Default role value
     sessionStorage.setItem('idStanza', id_stanza);
+
     useEffect(() => {
         const fetchRole = async () => {
             try {
@@ -25,7 +26,24 @@ export const SingleRoom = () =>{
         fetchRole(); // Fetch the role when the component mounts
     }, [id_stanza]); // Run effect whenever id_stanza changes
 
+    useEffect(() => {
+        const resizeSideNav = () => {
+            const mainSection = document.querySelector('.roomSec');
+            const sideNav = document.querySelector('.side-nav');
 
+            if (mainSection && sideNav) {
+                const mainHeight = window.getComputedStyle(mainSection).height;
+                sideNav.style.maxHeight = mainHeight;
+            }
+        };
+
+        window.addEventListener('resize', resizeSideNav);
+        resizeSideNav();
+
+        return () => {
+            window.removeEventListener('resize', resizeSideNav);
+        };
+    }, []);
     const handleGoToUserList= () => {
         // Naviga alla pagina di destinazione con il valore 42
         navigate(`/userListRoom/ ${id_stanza}`);
