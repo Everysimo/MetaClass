@@ -1,6 +1,8 @@
 import { useParams } from "react-router-dom";
 import React, { useEffect, useState } from "react";
 import './UserList.css';
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {faAlignCenter} from "@fortawesome/free-solid-svg-icons";
 
 const UserListInRoom = () => {
     const [userList, setUserList] = useState([]);
@@ -184,9 +186,9 @@ const UserListInRoom = () => {
                     <span>Nome: {`${user.nome} ${user.cognome}`}</span><br />
                     <span>Email: {`${user.email}`}</span>
                     <button onClick={() => toggleButtons(user.id)}>
-                        Options
+                        Options <FontAwesomeIcon icon={faAlignCenter} style={{color: "#ffffff",}} />
                     </button>
-                    <div className={`button-container${showButtonsMap[user.id] ? ' open' : ''}`}>
+                    <div className={`options-container${showButtonsMap[user.id] ? ' open' : ''}`}>
                         <button onClick={() => handleChangeNameButton(user.id)}>Cambia Nome</button>
                         <button onClick={() => handleKickUserButton(user.id)}>Kicka Partecipante</button>
                         <button onClick={() => handleSilenziaUserButton(user.id)}>Silenzia Partecipante</button>

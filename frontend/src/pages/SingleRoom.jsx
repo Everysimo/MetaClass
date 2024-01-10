@@ -5,18 +5,27 @@ import { useNavigate, useParams } from "react-router-dom";
 import CalendarComp from "../components/Calendar/CalendarComp";
 import { checkRole } from "../functions/checkRole";
 import UserListInRoom from "../components/UserList/UserListInRoom";
+import {faChalkboardUser} from "@fortawesome/free-solid-svg-icons";
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import AvviaMeeting from "../components/GestioneMeeting/AvviaMeeting";
 
 export const SingleRoom = () => {
     const navigate = useNavigate();
     const { id: id_stanza } = useParams();
-    const [role, setRole] = useState(false); // Default role value
+    const [role, setRole] = useState("Partecipante"); // Default role value
+    const [isAvviaMeetingVisible, setIsAvviaMeetingVisible] = useState(false);
     sessionStorage.setItem('idStanza', id_stanza);
 
     useEffect(() => {
         const fetchRole = async () => {
             try {
+                console.log("fetching");
                 const fetchedRole = await checkRole(id_stanza);
-                setRole(fetchedRole === 'Organizzatore' || 'Organizzatore_Master'); // Update role state
+                setRole(
+                    fetchedRole === "Organizzatore" || fetchedRole === "Organizzatore_Master" ?
+                        fetchedRole : "Partecipante"
+                );
+                console.log(fetchedRole);
             } catch (error) {
                 console.error(error);
                 // Handle error fetching role, set role state accordingly if needed
@@ -44,10 +53,6 @@ export const SingleRoom = () => {
             window.removeEventListener('resize', resizeSideNav);
         };
     }, []);
-    const handleGoToUserList= () => {
-        // Naviga alla pagina di destinazione con il valore 42
-        navigate(`/userListRoom/ ${id_stanza}`);
-    };
 
     const handleGoToModifyDataRoom= () => {
         // Naviga alla pagina di destinazione con il valore 42
@@ -74,15 +79,33 @@ export const SingleRoom = () => {
             </header>
             <main>
                 <section className={"roomSec"}>
+                    <FontAwesomeIcon icon={faChalkboardUser} size="4x" style={{color: "#c70049",}} />
                     <h1>Stanza {id_stanza}</h1>
                     <div className={"masterDiv"}>
                         {role &&
-                            <div className={"childDiv"}>
-                                <h2>Schedula un nuovo meeting</h2>
-                                <CalendarComp/>
-                            </div>
+                            <>
+                                <div className={"childDiv"}>
+                                    <h2>Schedula un nuovo meeting</h2>
+                                    <CalendarComp/>
+                                </div>
+                                <div className={"childDiv"}>
+                                    <h5> IN QUANTO ORGANIZZATORE...</h5>
+                                    <button onClick={() => {
+                                        setIsAvviaMeetingVisible(prevVisibility => !prevVisibility)
+                                    }}
+                                    >
+                                        AvviaMeeting
+                                    </button>
+                                    {isAvviaMeetingVisible &&
+                                        <AvviaMeeting
+                                            id_meeting={1}
+                                            onClose={() => setIsAvviaMeetingVisible(false)}
+                                        />
+                                    }
+                                </div>
+                            </>
                         }
-                        <div className={"childDiv"}>
+                    <div className={"childDiv"}>
                             <button onClick={handleGoToModifyDataRoom}>Modifica la stanza</button>
                             <button onClick={handleGoToChangeScenario}>Modifica lo scenario della stanza</button>
                             <button onClick={handleGoToAccessManagement}>Gestione degli accessi</button>

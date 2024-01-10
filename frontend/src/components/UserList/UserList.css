@@ -28,7 +28,7 @@
     font-size: small;
 }
 
-.button-container {
+.options-container {
     display: flex;
     flex-direction: column;
     overflow: hidden;
