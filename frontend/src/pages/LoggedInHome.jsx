@@ -47,12 +47,6 @@ export const LoggedInHome = () => {
     };
 
 
-
-
-
-
-
-
     return (
         <>
             <header>
