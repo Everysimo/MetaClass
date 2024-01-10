@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import { Divider } from "@chakra-ui/react";
 import './creaScenario.css';
 import { wait } from "@testing-library/user-event/dist/utils";
 

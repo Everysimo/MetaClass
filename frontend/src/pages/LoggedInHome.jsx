@@ -10,7 +10,7 @@ import { useNavigate } from 'react-router-dom';
 import CreaCategoria from "../components/CreaCategoria/CreaCategoria";
 import CreaScenario from "../components/Forms/CreaScenarioForm/CreaScenario";
 import ModificaScenario from "../components/Forms/CreaScenarioForm/ModificaScenario";
-import AccediStanza from "../components/Forms/enterRoomPopup/accediStanza";
+import AccediStanza from "../components/Forms/enterRoomForm/accediStanza";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faChalkboardUser, faCirclePlus, faDoorOpen, faUser} from "@fortawesome/free-solid-svg-icons";
 
@@ -20,7 +20,6 @@ export const LoggedInHome = () => {
     const [isVisibleScen, setIsVisibleScen] = useState(false);
     const [isVisibleModScen, setIsVisibleModScen] = useState(false);
     const [isVisibleCat, setIsVisibleCat] = useState(false);
-    const [isVisibleAcc, setIsVisibleAcc] = useState(false);
 
     //fatte per prova per vedere se mi porta alla pagina tramite button
     const navigate = useNavigate();
@@ -43,7 +42,6 @@ export const LoggedInHome = () => {
         setIsVisibleScen(false);
         setIsVisibleModScen(false);
         setIsVisibleCat(false);
-        setIsVisibleAcc(false);
     };
 
     return (

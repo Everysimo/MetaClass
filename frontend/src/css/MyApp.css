@@ -76,12 +76,20 @@ section p{
 
 main {
     display: flex;
+    background-attachment: scroll;
+    background-size: cover;
+    background-image: linear-gradient(
+            to bottom,
+            rgba(255, 255, 255, 0.6),
+            rgba(255, 255, 255, 0.8)),
+            url("../img/vr3_fhd.jpg");
 }
 
 .roomSec {
     flex: 3;
     padding: 20px;
     min-height: 600px;
+    background: transparent;
 }
 
 .side-nav {
@@ -89,7 +97,8 @@ main {
     background-color: #f4f4f4;
     padding: 20px;
     overflow-y: auto; /* Enable scrollbar if content overflows */
-    max-height: 100%; /* Setting a maximum height relative to parent */
+    z-index: 2;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
 }
 
 .side-nav::-webkit-scrollbar {

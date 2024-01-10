@@ -20,7 +20,10 @@ export default class AvviaMeeting extends Component {
 
         const requestOption = {
             method: 'POST',
-            headers: {'Content-Type': 'application/json'},
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: 'Bearer ' + sessionStorage.getItem('token')
+            },
             body: JSON.stringify(dataToSend)
         };
 
