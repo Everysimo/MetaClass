@@ -73,7 +73,7 @@ section p{
 }
 .masterDiv {
     display: flex; /* Display children horizontally */
-    padding: 5%;
+    padding: 0;
 }
 
 .childDiv {
@@ -82,14 +82,12 @@ section p{
     margin: 5%; /* Optional: Add margin between .child elements */
 }
 
-
 #sec1, #sec2, #sec3{
     background-position: center;
     background-repeat: no-repeat;
     background-size: cover;
     background-attachment: fixed;
 }
-
 #sec1{ background-image: linear-gradient(to bottom, rgba(0, 47, 83, 0.8), rgba(199, 0, 73, 0.7)), url("../img/vr3_fhd.jpg"); }
 #sec2{ background-image: linear-gradient(to bottom, rgba(0, 47, 83, 0.8), rgba(199, 0, 73, 0.7)), url("../img/vr2_fhd.jpg"); }
 #sec3{ background-image: linear-gradient(to bottom, rgba(0, 47, 83, 0.8), rgba(199, 0, 73, 0.7)), url("../img/vr1_fhd.jpg"); }
@@ -122,4 +120,8 @@ section p{
     section h1{ font-size: xx-large; }
     section p { font-size: larger;}
     #sec1, #sec2, #sec3 { background-attachment: scroll; }
+    .contentSec, .masterDiv{
+        display: flex;
+        flex-direction: column;
+    }
 }

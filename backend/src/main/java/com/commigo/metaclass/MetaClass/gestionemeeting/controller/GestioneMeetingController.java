@@ -251,5 +251,6 @@ public class GestioneMeetingController {
                     .body(new Response<>(false, se.getMessage()));
         }
     }
+
 }
 

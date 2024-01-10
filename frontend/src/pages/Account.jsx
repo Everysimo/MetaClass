@@ -6,13 +6,14 @@ import { MyFooter } from "../components/Footer/Footer";
 import EditUserDetails from '../components/Forms/ModifyUsersForm/EditUserDetails';
 
 export const Account = () => {
-    const [userDetails, setUserDetails] = useState(null);
+    const [userDetails, setUserDetails] = useState();
 
     useEffect(() => {
         const fetchData = async () => {
             try {
                 const data = await fetchUserDetails();
                 setUserDetails(data);
+                console.log(userDetails);
             } catch (error) {
                 console.error(error);
             }
