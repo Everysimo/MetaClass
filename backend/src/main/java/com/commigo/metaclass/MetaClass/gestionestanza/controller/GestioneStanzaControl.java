@@ -80,8 +80,10 @@ public class GestioneStanzaControl {
         }
     }
 
-    @PostMapping(value = "/declassaOrganizzatore")
-    public ResponseEntity<Response<Boolean>> declassaOrganizzatore(@RequestBody RichiestaDTO richiesta, HttpServletRequest request) {
+    @PostMapping(value = "/declassaOrganizzatore/{IdStanza}/{IdUtente}")
+    public ResponseEntity<Response<Boolean>> declassaOrganizzatore(@PathVariable Long IdStanza,
+                                                                   @PathVariable Long IdUtente,
+                                                                   HttpServletRequest request) {
         try {
             if (!validationToken.isTokenValid(request)) {
                 throw new RuntimeException403("Token non valido");
@@ -89,7 +91,7 @@ public class GestioneStanzaControl {
 
             String metaID = jwtTokenUtil.getMetaIdFromToken(validationToken.getToken());
 
-            return ResponseEntity.ok(stanzaService.downgradeUtente(metaID, richiesta.getId_og(), richiesta.getId_stanza()));
+            return ResponseEntity.ok(stanzaService.downgradeUtente(metaID, IdUtente, IdStanza));
 
         } catch (Exception e) {
             return ResponseEntity.status(500)
@@ -188,15 +190,17 @@ public class GestioneStanzaControl {
 
     }
 
-    @PostMapping(value = "/promuoviOrganizzatore")
-    public ResponseEntity<Response<Boolean>> promuoviOrganizzatore(@RequestBody RichiestaDTO richiesta, HttpServletRequest request) {
+    @PostMapping(value = "/promuoviOrganizzatore/{IdStanza}/{IdUtente}")
+    public ResponseEntity<Response<Boolean>> promuoviOrganizzatore(@PathVariable Long IdStanza,
+                                                                   @PathVariable Long IdUtente,
+                                                                   HttpServletRequest request) {
         try {
             if (!validationToken.isTokenValid(request)) {
                 throw new RuntimeException403("Token non valido");
             }
 
             String metaID = jwtTokenUtil.getMetaIdFromToken(validationToken.getToken());
-                return ResponseEntity.ok(stanzaService.upgradeUtente(metaID, richiesta.getId_og(), richiesta.getId_stanza()));
+                return ResponseEntity.ok(stanzaService.upgradeUtente(metaID, IdUtente, IdStanza));
 
         } catch (Exception e) {
             return ResponseEntity.status(500)
