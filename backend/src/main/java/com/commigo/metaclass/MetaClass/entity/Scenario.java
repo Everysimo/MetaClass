@@ -10,6 +10,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.validator.constraints.URL;
 
@@ -55,6 +57,7 @@ public class Scenario {
     @NotNull(message = "La categoria non può essere nulla")
     @ManyToOne(cascade = CascadeType.MERGE)
     @JoinColumn(name = "id_categoria")
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Categoria categoria;
 
     @Column(name = "Data_Creazione", updatable = false)

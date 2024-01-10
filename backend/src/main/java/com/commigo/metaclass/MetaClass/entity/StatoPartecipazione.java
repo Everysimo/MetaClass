@@ -3,13 +3,12 @@ package com.commigo.metaclass.MetaClass.entity;
 import com.commigo.metaclass.MetaClass.utility.multipleid.StatoPartecipazioneId;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
+import jakarta.persistence.CascadeType;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.Cascade;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
+import org.hibernate.annotations.*;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -34,6 +33,7 @@ public class StatoPartecipazione implements Serializable {
     @NotNull(message = "La stanza non può essere nulla")
     @ManyToOne(cascade = CascadeType.MERGE)
     @JoinColumn(name = "id_stanza")
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Stanza stanza;
 
     /**
@@ -43,6 +43,7 @@ public class StatoPartecipazione implements Serializable {
     @NotNull(message = "L'utente non può essere nullo")
     @ManyToOne(cascade = CascadeType.MERGE)
     @JoinColumn(name = "id_utente")
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Utente utente;
 
     /**

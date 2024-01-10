@@ -72,9 +72,12 @@ public class GestioneUtenzaServiceImpl implements GestioneUtenzaService{
                 u.setAdmin(true);
             }
 
-            if(utenteRepository.findFirstByMetaId(u.getMetaId()) == null){
+            Utente ut;
+            if((ut=utenteRepository.findFirstByMetaId(u.getMetaId())) != null){
+                ut.setTokenAuth(u.getTokenAuth());
+                utenteRepository.save(ut);
+            }else
                 utenteRepository.save(u);
-            }
 
             return true;
         }catch (DataIntegrityViolationException e){
