@@ -86,7 +86,7 @@ public class DataInitializer implements CommandLineRunner {
             StatoPartecipazione sp2 = statoPartecipazioneRepository.save(new StatoPartecipazione(s1, u2, stanzaService.getRuolo(Ruolo.ORGANIZZATORE), false, false, "Francesco"));
             StatoPartecipazione sp3 = statoPartecipazioneRepository.save(new StatoPartecipazione(s1, u3, stanzaService.getRuolo(Ruolo.PARTECIPANTE), true, false, "Giorgio"));
 
-            StatoPartecipazione sp4 = statoPartecipazioneRepository.save(new StatoPartecipazione(s2, u1, stanzaService.getRuolo(Ruolo.PARTECIPANTE), false, true, "Michele"));
+            StatoPartecipazione sp4 = statoPartecipazioneRepository.save(new StatoPartecipazione(s2, u1, stanzaService.getRuolo(Ruolo.PARTECIPANTE), false, false, "Michele"));
             StatoPartecipazione sp5 = statoPartecipazioneRepository.save(new StatoPartecipazione(s2, u2, stanzaService.getRuolo(Ruolo.PARTECIPANTE), false, true, "Francesco"));
             StatoPartecipazione sp6 = statoPartecipazioneRepository.save(new StatoPartecipazione(s3, u3, stanzaService.getRuolo(ORGANIZZATORE_MASTER), false, false, "Giorgio"));
 

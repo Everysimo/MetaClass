@@ -1,6 +1,8 @@
 package com.commigo.metaclass.MetaClass.gestioneamministrazione.service;
 
 import com.commigo.metaclass.MetaClass.entity.*;
+import com.commigo.metaclass.MetaClass.exceptions.RuntimeException403;
+import com.commigo.metaclass.MetaClass.exceptions.ServerRuntimeException;
 import com.commigo.metaclass.MetaClass.gestioneamministrazione.repository.CategoriaRepository;
 import com.commigo.metaclass.MetaClass.gestioneamministrazione.repository.ImmagineRepository;
 import com.commigo.metaclass.MetaClass.gestioneamministrazione.repository.ScenarioRepository;
@@ -41,19 +43,25 @@ public class GestioneAmministrazioneServiceImpl implements GestioneAmministrazio
     private StatoPartecipazioneRepository statoPartecipazioneRepository;
 
     @Override
-    public Utente findUtenteById(String id) {
-        return utenteRepository.findUtenteById(utenteRepository.findByMetaId(id));
-    }
+    public boolean deleteBanToUser(Long idUtente, Long idStanza) throws RuntimeException403, ServerRuntimeException {
 
-    @Override
-    public Stanza findStanzaById(Long id)
-    {
-        return stanzaRepository.findStanzaById(id);
-    }
+        Utente utente = utenteRepository.findUtenteById(idUtente);
+        if(utente == null) throw new RuntimeException403("Utente non trovato");
 
-    @Override
-    public boolean isBannedUser(Utente utente, Stanza stanza) {
-        return statoPartecipazioneRepository.isBannedUser(stanza.getId(),utente.getId());
+        Stanza stanza = stanzaRepository.findStanzaById(idStanza);
+        if(stanza == null) throw new RuntimeException403("Stanza non trovata");
+
+        StatoPartecipazione sp = statoPartecipazioneRepository
+                .findStatoPartecipazioneByUtenteAndStanza(utente, stanza);
+        if(sp==null) throw new ServerRuntimeException("Stanza non trovata");
+
+        if(!sp.isBannato())   throw new RuntimeException403("L'utente non e' bannato");
+
+        sp.setBannato(false);
+        statoPartecipazioneRepository.save(sp);
+
+        return true;
+
     }
 
     /**
@@ -104,5 +112,6 @@ public class GestioneAmministrazioneServiceImpl implements GestioneAmministrazio
             return null;
         }
     }
+
 }
 

@@ -88,6 +88,11 @@ public class StatoPartecipazione implements Serializable {
 
     public void checkRule(){
         try{
+
+          if(this.utente.isAdmin() && this.isBannato)
+                  throw new TransactionSystemException("un'amministratore se viene bannato "+
+                          "se lo può recovare!");
+
           if(!this.ruolo.getNome().equalsIgnoreCase(Ruolo.PARTECIPANTE)){
              if(this.isInAttesa){
 
