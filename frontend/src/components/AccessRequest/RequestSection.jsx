@@ -22,7 +22,7 @@ const RequestSection = () => {
 
     const fetchGestioneAccessi = async () => {
         try {
-            const response = await fetch(`http://localhost:8080/visualizzaUtentiBannatiInStanza/${id_stanza}`, requestOption);
+            const response = await fetch(`http://localhost:8080/visualizzaUtentiInAttesaInStanza/${encodeURIComponent(id_stanza)}`, requestOption);
 
             if (!response.ok) {
                 throw new Error('Errore richiesta not ok.');

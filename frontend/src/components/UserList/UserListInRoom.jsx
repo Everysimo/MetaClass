@@ -52,13 +52,16 @@ const UserListInRoom = () => {
 
         console.log("newname", newName)
 
+        const nome = newName;
+
+
         const requestOption = {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': 'Bearer ' + sessionStorage.getItem("token")
             },
-            body: JSON.stringify({ newName })
+            body: JSON.stringify({ nome })
         };
 
         try {
