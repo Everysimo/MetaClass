@@ -10,6 +10,10 @@ import com.commigo.metaclass.MetaClass.utility.response.ResponseUtils;
 import com.commigo.metaclass.MetaClass.utility.response.types.Response;
 import com.commigo.metaclass.MetaClass.webconfig.JwtTokenUtil;
 import com.commigo.metaclass.MetaClass.webconfig.ValidationToken;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.micrometer.common.util.StringUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -284,6 +288,42 @@ public class GestioneMeetingController {
         }catch (ServerRuntimeException se) {
             return ResponseEntity.status(500)
                     .body(new Response<>(null, se.getMessage()));
+        }
+    }
+
+    @PostMapping("/compilaQuestionario/{id_meeting}")
+    public ResponseEntity<Response<Boolean>> compilaQuestionario(@RequestBody String JSONvalue,
+                                                                 @PathVariable Long id_meeting,
+                                                                 HttpServletRequest request) {
+
+        try {
+            //controllo token
+            if (!validationToken.isTokenValid(request)) {
+                throw new RuntimeException403("Token non valido");
+            }
+
+            ObjectMapper objectMapper = new ObjectMapper();
+            JsonNode jsonNode = objectMapper.readTree(JSONvalue);
+            JsonNode valutazioneNode = jsonNode.get("valutazione");
+
+            int value = (valutazioneNode != null && !valutazioneNode.isNull()) ? valutazioneNode.asInt() : 0;
+            if(value==0)
+                throw new RuntimeException403("inserire 'valutazione' come attributo");
+
+            String metaID = jwtTokenUtil.getMetaIdFromToken(validationToken.getToken());
+
+            meetingService.compilaQuestionario(value, metaID, id_meeting);
+            return ResponseEntity.ok(new Response<>
+                    (true,"questionario compilato con successo"));
+
+        }catch (RuntimeException403 e) {
+            return ResponseEntity.status(403)
+                    .body(new Response<>(null, e.getMessage()));
+        }catch (ServerRuntimeException se) {
+            return ResponseEntity.status(500)
+                    .body(new Response<>(null, se.getMessage()));
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
         }
     }
 

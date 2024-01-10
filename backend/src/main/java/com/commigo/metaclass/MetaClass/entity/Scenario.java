@@ -46,10 +46,10 @@ public class Scenario {
     @NotBlank(message = "La descrizione non può essere vuoto")
     private String descrizione;
 
-    @DecimalMin(value = "1", message = "Il valore della media deve essere almeno 1")
-    @DecimalMax(value = "5", message = "Il valore della media non può superare 5")
-    @Column(nullable = false, columnDefinition = "FLOAT DEFAULT 1.0")
-    private float media_valutazione = 1;
+    private float media_valutazione;
+
+    @NotNull(message = "Il numero dei voti non può mai essere nullo")
+    private int num_voti = 0;
 
     /**
      *Chiave Esterna sulla Categoria
