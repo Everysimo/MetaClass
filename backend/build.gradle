@@ -16,13 +16,23 @@ repositories {
 	mavenCentral()
 }
 
+apply plugin: 'checkstyle'
 checkstyle {
-	toolVersion = '8.36.1'
+	toolVersion = '6.4.1'
 	sourceSets = [sourceSets.main]
-	configFile = file('config/checkstyle/checkstyle.xml')
+	configFile = rootProject.file("config/checkstyle/google_checks.xml")
 	showViolations = true
 	ignoreFailures = true
 }
+checkstyleTest {
+	enabled = false
+}
+tasks.withType(Checkstyle) {
+	reports {
+		html.destination rootProject.file("build/reports/checkstyle.html")
+	}
+}
+
 
 
 dependencies {
