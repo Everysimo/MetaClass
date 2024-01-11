@@ -64,7 +64,7 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService {
 
                 if (statoPartecipazione == null) {
 
-                    statoPartecipazione = new StatoPartecipazione(stanza, u, getRuolo(Ruolo.PARTECIPANTE), false, false, u.getNome());
+                    statoPartecipazione = new StatoPartecipazione(stanza, u, getRuolo(Ruolo.PARTECIPANTE), false, false, u.getNome(), true);
                     return ResponseEntity.ok(new AccessResponse<>(1, "Stai per effettuare l'accesso alla stanza", false));
 
                 } else if (statoPartecipazione.isBannato()) {
@@ -144,7 +144,7 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService {
         stanzaRepository.save(s);
 
        StatoPartecipazione sp = new StatoPartecipazione(s, u,
-              getRuolo(Ruolo.ORGANIZZATORE_MASTER), false, false, u.getNome());
+              getRuolo(Ruolo.ORGANIZZATORE_MASTER), false, false, u.getNome(), true);
 
        statoPartecipazioneRepository.save(sp);
 
@@ -153,30 +153,62 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService {
 
 
     @Override
-    public Response<Boolean> downgradeUtente(String id_Uogm, long id_og, long id_stanza) {
+    public Response<Boolean> downgradeUtente(String id_Uogm, long id_og, long id_stanza) throws ServerRuntimeException, RuntimeException403 {
 
-        Utente ogm = utenteRepository.findFirstByMetaId(id_Uogm);
-        Utente og = utenteRepository.findUtenteById(id_og);
-        Stanza stanza = stanzaRepository.findStanzaById(id_stanza);
+        //controllo organizzatore master
+        Utente ogm;
+        if((ogm = utenteRepository.findFirstByMetaId(id_Uogm))==null)
+            throw new ServerRuntimeException("errore nella ricerca dell'organizzatore master");
 
+        //controllo utente da promuovere
+        Utente og;
+        if((og=utenteRepository.findUtenteById(id_og))==null)
+            throw new RuntimeException403("utente non trovato");
 
-        StatoPartecipazione stato_ogm = statoPartecipazioneRepository.findStatoPartecipazioneByUtenteAndStanza(ogm, stanza);
-        if (stato_ogm.getRuolo().getNome().equalsIgnoreCase(Ruolo.ORGANIZZATORE_MASTER)) {
-            StatoPartecipazione stato_og = statoPartecipazioneRepository.findStatoPartecipazioneByUtenteAndStanza(og, stanza);
-            if (stato_og.getRuolo().getNome().equalsIgnoreCase(Ruolo.ORGANIZZATORE)) {
-                stato_og.getRuolo().setNome(Ruolo.PARTECIPANTE);
+        //controllo stanza
+        Stanza stanza;
+        if((stanza = stanzaRepository.findStanzaById(id_stanza))==null)
+            throw new RuntimeException403("stanza non trovata");
 
-                return ResponseEntity.ok(new Response<>(true, "L'utente selezionato ora è un partecipante")).getBody();
+        //controllo dell'accesso dell'organizzatore master nella stanza
+        StatoPartecipazione stato_ogm = statoPartecipazioneRepository
+                .findStatoPartecipazioneByUtenteAndStanza(ogm, stanza);
+        if(stato_ogm==null)  throw new ServerRuntimeException("l'organizzatore master sembra "+
+                "non aver acceduto alla stanza");
 
-            } else if (stato_og.getRuolo().getNome().equalsIgnoreCase(Ruolo.PARTECIPANTE)) {
+        //controllo del ruolo di organizztaore master
+        if (!stato_ogm.getRuolo().getNome().equalsIgnoreCase(Ruolo.ORGANIZZATORE_MASTER)) {
+            throw new RuntimeException403("Non puoi declassare un'utente perché " +
+                    "non sei un'organizzatore master");
+        }
 
-                return ResponseEntity.status(403).body(new Response<>(false, "L'utente selezionato è già un partecipante")).getBody();
+        //ricerco e controllo se l'utente ha fatto accesso alla stanza
+        StatoPartecipazione stato_og = statoPartecipazioneRepository
+                .findStatoPartecipazioneByUtenteAndStanza(og, stanza);
+        if(stato_og==null)   throw new RuntimeException403("l'utente non ha acceduto alla stanza, forse è stato kickato");
 
-            } else {
-                return ResponseEntity.status(403).body(new Response<>(false, "L'utente selezionato non può essere declassato")).getBody();
-            }
+        //verifico se l'utente è in attesa
+        if(stato_og.isInAttesa())
+            throw new RuntimeException403("l'utente è in attesa di entrare in stanza, non può essere declassato");
+
+        //verifico se l'utente è bannato
+        if(stato_og.isBannato())
+            throw new RuntimeException403("l'utente è bannato, non può essere promosso");
+
+        //verifico il ruolo dell'utente nella stanza
+        if (stato_og.getRuolo().getNome().equalsIgnoreCase(Ruolo.ORGANIZZATORE)) {
+
+            //se è organizzatpre allora posso declassarlo a partecipante
+            Ruolo r = ruoloRepository.findByNome(Ruolo.PARTECIPANTE);
+            stato_og.setRuolo(r);
+            statoPartecipazioneRepository.save(stato_og);
+
+            return ResponseEntity.ok(new Response<>(true, "L'utente selezionato ora è un partecipante")).getBody();
+
+        } else if (stato_og.getRuolo().getNome().equalsIgnoreCase(Ruolo.PARTECIPANTE)) {
+            throw new RuntimeException403("L'utente selezionato è già un partecipante");
         } else {
-            return ResponseEntity.status(403).body(new Response<>(false, "Non puoi declassare un'utente perché non sei un'organizzatore master")).getBody();
+            throw new RuntimeException403("Sembra sia stato inviato un organizzatore master");
         }
     }
 
@@ -223,6 +255,36 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService {
                 }
             }else{
                 return ResponseEntity.status(403).body(new Response<>(false, "Per accettare o rifiutare richiesta di accesso alla stanza devi essere almeno un organizzatore"));
+            }
+        }else{
+            return ResponseEntity.status(403).body(new Response<>(false, "La stanza selezionata non esiste"));
+        }
+    }
+
+    @Override
+    public ResponseEntity<Response<Boolean>> SilenziaPartecipante(String metaID, Long IdStanza, Long IdUtente) {
+
+        Utente og = utenteRepository.findFirstByMetaId(metaID);
+        Utente silenzia = utenteRepository.findUtenteById(IdUtente);
+        Stanza stanza = stanzaRepository.findStanzaById(IdStanza);
+
+        if(stanza != null) {
+            StatoPartecipazione statoOg = statoPartecipazioneRepository.findStatoPartecipazioneByUtenteAndStanza(og, stanza);
+            if (statoOg.getRuolo().getNome().equalsIgnoreCase(Ruolo.ORGANIZZATORE_MASTER) || statoOg.getRuolo().getNome().equalsIgnoreCase(Ruolo.ORGANIZZATORE) && !statoOg.isBannato()) {
+                StatoPartecipazione statoSilenzio = statoPartecipazioneRepository.findStatoPartecipazioneByUtenteAndStanza(silenzia, stanza);
+                if (statoSilenzio != null) {
+                    if (!statoSilenzio.isSilenziato()) {
+                        statoSilenzio.setSilenziato(true);
+                        statoPartecipazioneRepository.save(statoSilenzio);
+                        return ResponseEntity.ok(new Response<>(true, "L'utente selezionato ora è silenziato"));
+                    } else {
+                        return ResponseEntity.ok(new Response<>(true, "L'utente selezionato è gia silenziato"));
+                    }
+                } else {
+                    return ResponseEntity.status(403).body(new Response<>(false, "L'utente selezioanto non è presente nella stanza"));
+                }
+            }else{
+                return ResponseEntity.status(403).body(new Response<>(false, "Per silenziare un partecipante nella stanza devi essere almeno un organizzatore"));
             }
         }else{
             return ResponseEntity.status(403).body(new Response<>(false, "La stanza selezionata non esiste"));
@@ -300,32 +362,64 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService {
     }
 
     @Override
-    public Response<Boolean> upgradeUtente(String id_Uogm, long id_og, long id_stanza) {
+    public Response<Boolean> upgradeUtente(String id_Uogm, long id_og, long id_stanza) throws ServerRuntimeException, RuntimeException403 {
 
-        Utente ogm = utenteRepository.findFirstByMetaId(id_Uogm);
-        Utente og = utenteRepository.findUtenteById(id_og);
-        Stanza stanza = stanzaRepository.findStanzaById(id_stanza);
+        //controllo organizzatore master
+        Utente ogm;
+        if((ogm = utenteRepository.findFirstByMetaId(id_Uogm))==null)
+            throw new ServerRuntimeException("errore nella ricerca dell'organizzatore master");
 
+        //controllo utente da promuovere
+        Utente og;
+        if((og=utenteRepository.findUtenteById(id_og))==null)
+            throw new RuntimeException403("utente non trovato");
 
-        StatoPartecipazione stato_ogm = statoPartecipazioneRepository.findStatoPartecipazioneByUtenteAndStanza(ogm, stanza);
-        if (stato_ogm.getRuolo().getNome().equalsIgnoreCase(Ruolo.ORGANIZZATORE_MASTER)) {
-            StatoPartecipazione stato_og = statoPartecipazioneRepository.findStatoPartecipazioneByUtenteAndStanza(og, stanza);
-            if (stato_og.getRuolo().getNome().equalsIgnoreCase(Ruolo.PARTECIPANTE)) {
-                stato_og.getRuolo().setNome(Ruolo.ORGANIZZATORE);
+        //controllo stanza
+        Stanza stanza;
+        if((stanza = stanzaRepository.findStanzaById(id_stanza))==null)
+            throw new RuntimeException403("stanza non trovata");
+
+        //controllo dell'accesso dell'organizzatore master nella stanza
+        StatoPartecipazione stato_ogm = statoPartecipazioneRepository
+                .findStatoPartecipazioneByUtenteAndStanza(ogm, stanza);
+        if(stato_ogm==null)  throw new ServerRuntimeException("l'organizzatore master sembra "+
+                "non aver acceduto alla stanza");
+
+        //controllo del ruolo di organizztaore master
+        if (!stato_ogm.getRuolo().getNome().equalsIgnoreCase(Ruolo.ORGANIZZATORE_MASTER)) {
+              throw new RuntimeException403("Non puoi promuovere un'utente perché " +
+                      "non sei un'organizzatore master");
+        }
+
+        //ricerco e controllo se l'utente ha fatto accesso alla stanza
+        StatoPartecipazione stato_og = statoPartecipazioneRepository
+                .findStatoPartecipazioneByUtenteAndStanza(og, stanza);
+        if(stato_og==null)   throw new RuntimeException403("l'utente non ha acceduto alla stanza, magari è stato kickato");
+
+        //verifico se l'utente è in attesa
+        if(stato_og.isInAttesa())
+            throw new RuntimeException403("l'utente è in attesa di entrare in stanza, non può essere promosso");
+
+        //verifico se l'utente è bannato
+        if(stato_og.isBannato())
+            throw new RuntimeException403("l'utente è bannato, non può essere promosso");
+
+        //verifico il ruolo dell'utente nella stanza
+        if (stato_og.getRuolo().getNome().equalsIgnoreCase(Ruolo.PARTECIPANTE)) {
+
+                //se è partecipante allora posso promuoverlo ad organizzatore
+                Ruolo r = ruoloRepository.findByNome(Ruolo.ORGANIZZATORE);
+                stato_og.setRuolo(r);
                 statoPartecipazioneRepository.save(stato_og);
 
                 return ResponseEntity.ok(new Response<>(true, "L'utente selezionato ora è un organizzatore")).getBody();
 
             } else if (stato_og.getRuolo().getNome().equalsIgnoreCase(Ruolo.ORGANIZZATORE)) {
-
-                return ResponseEntity.status(403).body(new Response<>(false, "L'utente selezionato è già un'organizzatore")).getBody();
-
+                  throw new RuntimeException403("L'utente selezionato è già un'organizzatore");
             } else {
-                return ResponseEntity.status(403).body(new Response<>(false, "L'utente selezionato non può essere declassato ad organizzatore")).getBody();
+                  throw new RuntimeException403("Sembra sia stato inviato un organizzatore master");
             }
-        } else {
-            return ResponseEntity.status(403).body(new Response<>(false, "Non puoi promuovere un'utente perché non sei un'organizzatore master")).getBody();
-        }
+
     }
 
 

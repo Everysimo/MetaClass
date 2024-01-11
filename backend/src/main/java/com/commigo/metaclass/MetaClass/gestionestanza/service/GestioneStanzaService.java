@@ -7,6 +7,7 @@ import com.commigo.metaclass.MetaClass.exceptions.ServerRuntimeException;
 import com.commigo.metaclass.MetaClass.utility.response.types.AccessResponse;
 import com.commigo.metaclass.MetaClass.utility.response.types.Response;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
 
 import java.util.List;
 import java.util.Map;
@@ -19,13 +20,13 @@ public interface GestioneStanzaService
     ResponseEntity<Response<Boolean>> banOrganizzatore(Stanza stanza, String metaId, Long idOrganizzatore);
     boolean creaStanza(Stanza s) throws Exception;
     Response<Boolean> deleteRoom(String metaID, Long id_stanza);
-    Response<Boolean> downgradeUtente(String id_Uogm, long og, long stanza);
+    Response<Boolean> downgradeUtente(String id_Uogm, long og, long stanza) throws ServerRuntimeException, RuntimeException403;
     Boolean modificaDatiStanza(Map<String,Object> params, Long id) throws RuntimeException403, RuntimeException401;
 
     Stanza findStanza(Long id);
     ResponseEntity<AccessResponse<Integer>> richiestaAccessoStanza(String codiceStanza, String id_utente);
     void saveRoom(Stanza stanza);
-    Response<Boolean> upgradeUtente(String id_Uogm, long og, long stanza);
+    Response<Boolean> upgradeUtente(String id_Uogm, long og, long stanza) throws ServerRuntimeException, RuntimeException403;
     ResponseEntity<Response<List<Utente>>> visualizzaUtentiInStanza(Long Id);
     ResponseEntity<Response<List<Utente>>> visualizzaUtentiInAttesaInStanza(Long Id, String metaID);
 
@@ -42,4 +43,7 @@ public interface GestioneStanzaService
 
     Ruolo getRuoloByUserAndStanzaID(String metaID, Long idStanza) throws ServerRuntimeException, RuntimeException403;
     ResponseEntity<Response<Boolean>> gestioneAccesso(String metaID, Long idUtente, Long idStanza, boolean scelta);
+
+    ResponseEntity<Response<Boolean>> SilenziaPartecipante(String metaID, Long IdStanza, Long IdUtente);
+
 }

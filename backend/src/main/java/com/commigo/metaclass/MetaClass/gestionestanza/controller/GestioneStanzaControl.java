@@ -167,6 +167,12 @@ public class GestioneStanzaControl {
 
             return ResponseEntity.ok(stanzaService.downgradeUtente(metaID, IdUtente, IdStanza));
 
+        } catch (ServerRuntimeException se) {
+            return ResponseEntity.status(500)
+                    .body(new Response<>(false, "Errore durante l'operazione: "+se.getMessage()));
+        } catch (RuntimeException403 re) {
+            return ResponseEntity.status(403)
+                    .body(new Response<>(false, "Errore durante l'operazione: "+re.getMessage()));
         } catch (Exception e) {
             return ResponseEntity.status(500)
                     .body(new Response<>(false, "Errore durante l'operazione"));
@@ -309,8 +315,15 @@ public class GestioneStanzaControl {
             }
 
             String metaID = jwtTokenUtil.getMetaIdFromToken(validationToken.getToken());
+
             return ResponseEntity.ok(stanzaService.upgradeUtente(metaID, IdUtente, IdStanza));
 
+        } catch (ServerRuntimeException se) {
+            return ResponseEntity.status(500)
+                    .body(new Response<>(false, "Errore durante l'operazione: "+se.getMessage()));
+        } catch (RuntimeException403 re) {
+            return ResponseEntity.status(403)
+                    .body(new Response<>(false, "Errore durante l'operazione: "+re.getMessage()));
         } catch (Exception e) {
             return ResponseEntity.status(500)
                     .body(new Response<>(false, "Errore durante l'operazione"));
@@ -561,4 +574,28 @@ public class GestioneStanzaControl {
                 .body(new Response<>(null, "Errore durante l'operazione: " + e.getMessage()));
        }
     }
+
+    @PostMapping(value = "/silenziarePartecipante/{IdStanza}/{IdUtente}")
+    public ResponseEntity<Response<Boolean>> SilenziaPartecipante(@PathVariable Long IdStanza,
+                                                                @PathVariable Long IdUtente,
+                                                                HttpServletRequest request) {
+
+        try {
+            if (!validationToken.isTokenValid(request)) {
+                throw new RuntimeException403("Token non valido");
+            }
+
+            String metaID = jwtTokenUtil.getMetaIdFromToken(validationToken.getToken());
+
+            return stanzaService.SilenziaPartecipante(metaID, IdStanza, IdUtente);
+
+        } catch (RuntimeException403 e) {
+            e.printStackTrace();
+            return ResponseEntity.status(403).body(new Response<>(null, "Errore nell'operazione"));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(500).body(new Response<>(null, "Errore durante l'operazione"));
+        }
+    }
+
 }
