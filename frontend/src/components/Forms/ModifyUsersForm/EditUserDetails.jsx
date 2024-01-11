@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import axios from 'axios';
-import './EditUserDetails.css';
+import '../PopUpStyles.css';
 
 const EditUserDetails = ({ userDetails, setUserDetails }) => {
     const [showModal, setShowModal] = useState(false);
@@ -71,7 +71,7 @@ const EditUserDetails = ({ userDetails, setUserDetails }) => {
     }, [formReset]);
 
     return (
-        <div>
+        <div className={"childDiv"}>
             <button onClick={() => setShowModal(true)}>Modify Details</button>
 
             {showModal && (

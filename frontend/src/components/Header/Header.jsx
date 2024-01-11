@@ -7,7 +7,7 @@ export function MyHeader(){
     return(
         <div className={"table-row"}>
             <div className={"table-cell"} id={"header-left"}>
-                <img src={Comm} className='App-logo' alt='no image'></img>
+                <img src={Comm} className='App-logo' alt='nessuna immagine'></img>
             </div>
             <div className={"table-cell"} id={"header"}>
                 <div id={"menu"}>

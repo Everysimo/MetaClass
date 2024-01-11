@@ -8,12 +8,12 @@
     margin-bottom: 20px;
 }
 
-.inputField {
-    margin-bottom: 1px; /* Adjust margin as needed */
-}
+.dateTimePickerContainer input{ margin: 0; }
+.inputField { margin-bottom: 1px; }
 
 .dateTimePicker {
     max-width: 100%;
+    padding-top: 5%;
 }
 
 #submitBtn {

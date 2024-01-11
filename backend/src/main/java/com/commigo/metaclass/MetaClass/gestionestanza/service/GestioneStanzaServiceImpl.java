@@ -88,6 +88,35 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService {
     }
 
     @Override
+    public ResponseEntity<Response<Boolean>> banOrganizzatore(Stanza stanza, String metaId, Long idOrganizzatore)
+    {
+        Utente utente = utenteRepository.findUtenteById(idOrganizzatore);
+        StatoPartecipazione sp = statoPartecipazioneRepository.findStatoPartecipazioneByUtenteAndStanza(utente,stanza);
+
+        if(sp.isBannato())
+            return ResponseUtils.getResponseError(HttpStatus.INTERNAL_SERVER_ERROR,"Organizzatore già bannato");
+
+        sp.setBannato(true);
+        sp.setRuolo(ruoloRepository.findByNome("Partecipante"));
+        statoPartecipazioneRepository.save(sp);
+        return ResponseUtils.getResponseOk("Organizzatore bannato con successo");
+    }
+
+    @Override
+    public ResponseEntity<Response<Boolean>> banPartecipante(Stanza stanza, String metaId, Long idPartecipante)
+    {
+        Utente utente = utenteRepository.findUtenteById(idPartecipante);
+        StatoPartecipazione sp = statoPartecipazioneRepository.findStatoPartecipazioneByUtenteAndStanza(utente,stanza);
+
+        if(sp.isBannato())
+            return ResponseUtils.getResponseError(HttpStatus.INTERNAL_SERVER_ERROR,"Utente già bannato");
+
+        sp.setBannato(true);
+        statoPartecipazioneRepository.save(sp);
+        return ResponseUtils.getResponseOk("Utente bannato con successo");
+    }
+
+    @Override
     public boolean creaStanza(Stanza s) throws Exception {
         String metaID = jwtTokenUtil.getMetaIdFromToken(validationToken.getToken());
 
@@ -170,6 +199,37 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService {
     }
 
     @Override
+    public ResponseEntity<Response<Boolean>> gestioneAccesso(String metaID, Long idUtente, Long idStanza, boolean scelta) {
+
+        Utente og = utenteRepository.findFirstByMetaId(metaID);
+        Utente accesso = utenteRepository.findUtenteById(idUtente);
+        Stanza stanza = stanzaRepository.findStanzaById(idStanza);
+
+        if(stanza != null) {
+            StatoPartecipazione statoOg = statoPartecipazioneRepository.findStatoPartecipazioneByUtenteAndStanza(og, stanza);
+            if (statoOg.getRuolo().getNome().equalsIgnoreCase(Ruolo.ORGANIZZATORE_MASTER) || statoOg.getRuolo().getNome().equalsIgnoreCase(Ruolo.ORGANIZZATORE) && !statoOg.isBannato()) {
+                StatoPartecipazione statoAccesso = statoPartecipazioneRepository.findStatoPartecipazioneByUtenteAndStanza(accesso, stanza);
+                if (statoAccesso.isInAttesa()) {
+                    if (scelta) {
+                        statoAccesso.setInAttesa(false);
+                        statoPartecipazioneRepository.save(statoAccesso);
+                        return ResponseEntity.ok(new Response<>(true, "L'utente selezionato non è più in attesa e sta per entrare nella stanza"));
+                    } else {
+                        statoPartecipazioneRepository.delete(statoAccesso);
+                        return ResponseEntity.ok(new Response<>(true, "L'utente selezionato non è più in attesa, hai rifiutato la richiesta di accesso alla stanza"));
+                    }
+                } else {
+                    return ResponseEntity.status(403).body(new Response<>(false, "L'utente selezioanto non è in attesa di entrare in questa stanza"));
+                }
+            }else{
+                return ResponseEntity.status(403).body(new Response<>(false, "Per accettare o rifiutare richiesta di accesso alla stanza devi essere almeno un organizzatore"));
+            }
+        }else{
+            return ResponseEntity.status(403).body(new Response<>(false, "La stanza selezionata non esiste"));
+        }
+    }
+
+    @Override
     public Boolean modificaDatiStanza(Map<String, Object> params, Long id) throws RuntimeException403, RuntimeException401 {
 
         //controllo del ruolo di ogm
@@ -196,11 +256,6 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService {
     @Override
     public Stanza findStanza(Long id) {
         return stanzaRepository.findStanzaById(id);
-    }
-
-    @Override
-    public List<StatoPartecipazione> findStatoPartecipazioniInAttesa(Stanza stanza, boolean isInAttesa) {
-        return statoPartecipazioneRepository.finsAllByStanzaAndisInAttesa(stanza.getId(), isInAttesa);
     }
 
     @Override
@@ -239,11 +294,9 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService {
     }
 
     @Override
-    public StatoPartecipazione setStatoPartecipazione(Stanza stanza, Utente utente, boolean isInAttesa) {
-        StatoPartecipazione sp = statoPartecipazioneRepository.findStatoPartecipazioneByUtenteAndStanza(utente, stanza);
-        sp.setInAttesa(isInAttesa);
-        statoPartecipazioneRepository.save(sp);
-        return sp;
+    public void saveRoom(Stanza stanza)
+    {
+        stanzaRepository.save(stanza);
     }
 
     @Override

@@ -31,22 +31,26 @@ export const Account = () => {
             <header>
                 <MyHeader />
             </header>
-            <section className={"sec"}>
-                <div className="user-details">
-                    {userDetails && (
-                        <>
-                            {/* Display current user details */}
-                            <p><strong>Name:</strong> {userDetails.nome}</p>
-                            <p><strong>Surname:</strong> {userDetails.cognome}</p>
-                            <p><strong>Email:</strong> {userDetails.email}</p>
-                            <p><strong>Birthday:</strong> {userDetails.dataDiNascita}</p>
-                            {/* Include other details as needed */}
-                        </>
-                    )}
-                </div>
-                {/* Pass setUserDetails as prop to EditUserDetails */}
-                <EditUserDetails userDetails={userDetails} setUserDetails={setUserDetails} />
-                <LogoutButton />
+            <section className={"sec"} id={"sec1"}>
+                <h1 style={{color: "#ffffff"}}>Dettagli account</h1>
+                    <div className={"user-details"}>
+                        <FontAwesomeIcon icon={faUser} size="2xl" style={{color: "#002f53"}}/>
+                        {userDetails && (
+                            <>
+                                {/* Display current user details */}
+                                <p><strong>Name:</strong> {userDetails.nome}</p>
+                                <p><strong>Surname:</strong> {userDetails.cognome}</p>
+                                <p><strong>Email:</strong> {userDetails.email}</p>
+                                <p><strong>Birthday:</strong> {userDetails.dataDiNascita}</p>
+                            </>
+                        )}
+                        <div className={"masterDiv"}>
+                            <EditUserDetails userDetails={userDetails} setUserDetails={setUserDetails} />
+                            <div className={"childDiv"}>
+                                <LogoutButton />
+                            </div>
+                        </div>
+                    </div>
             </section>
             <footer>
                 <MyFooter />

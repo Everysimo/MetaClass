@@ -11,11 +11,9 @@ export const Login = () =>{
                 <MyHeader />
             </header>
             <section className={"sec"} id={"sec1"}>
-                <div className={"table-container"}>
-                    <div className={"table-row"}>
-                        <div className={"table-cell"}>
-                            <Facebook />
-                        </div>
+                <div className={"masterDiv"}>
+                    <div className={"childDiv"}>
+                        <Facebook />
                     </div>
                 </div>
             </section>

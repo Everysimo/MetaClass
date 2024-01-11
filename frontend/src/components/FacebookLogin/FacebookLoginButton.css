@@ -6,8 +6,8 @@
     justify-content: center;
     word-break: break-word;
     margin: auto;
-    width: 50%;
-    height: 50%;
+    width: 70%;
+    height: auto;
 }
 
 @media only screen and (max-width: 1000px) {

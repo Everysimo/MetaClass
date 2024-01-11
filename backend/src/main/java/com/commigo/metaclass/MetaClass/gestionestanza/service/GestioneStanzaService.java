@@ -15,14 +15,16 @@ public interface GestioneStanzaService
 {
 
     ResponseEntity<AccessResponse<Integer>> accessoStanza(String codiceStanza, String id_utente);
+    ResponseEntity<Response<Boolean>> banPartecipante(Stanza stanza, String metaId, Long idPartecipante);
+    ResponseEntity<Response<Boolean>> banOrganizzatore(Stanza stanza, String metaId, Long idOrganizzatore);
     boolean creaStanza(Stanza s) throws Exception;
     Response<Boolean> deleteRoom(String metaID, Long id_stanza);
     Response<Boolean> downgradeUtente(String id_Uogm, long og, long stanza);
     Boolean modificaDatiStanza(Map<String,Object> params, Long id) throws RuntimeException403, RuntimeException401;
+
     Stanza findStanza(Long id);
-    List<StatoPartecipazione> findStatoPartecipazioniInAttesa(Stanza stanza,boolean isInAttesa);
     ResponseEntity<AccessResponse<Integer>> richiestaAccessoStanza(String codiceStanza, String id_utente);
-    StatoPartecipazione setStatoPartecipazione(Stanza stanza, Utente utente, boolean isInAttesa);
+    void saveRoom(Stanza stanza);
     Response<Boolean> upgradeUtente(String id_Uogm, long og, long stanza);
     ResponseEntity<Response<List<Utente>>> visualizzaUtentiInStanza(Long Id);
     ResponseEntity<Response<List<Utente>>> visualizzaUtentiInAttesaInStanza(Long Id, String metaID);
@@ -39,4 +41,5 @@ public interface GestioneStanzaService
     ResponseEntity<Response<Boolean>> kickPartecipante(String metaID, Long idStanza, Long idUtente);
 
     Ruolo getRuoloByUserAndStanzaID(String metaID, Long idStanza) throws ServerRuntimeException, RuntimeException403;
+    ResponseEntity<Response<Boolean>> gestioneAccesso(String metaID, Long idUtente, Long idStanza, boolean scelta);
 }

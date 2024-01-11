@@ -76,12 +76,20 @@ section p{
 
 main {
     display: flex;
+    background-attachment: scroll;
+    background-size: cover;
+    background-image: linear-gradient(
+            to bottom,
+            rgba(255, 255, 255, 0.6),
+            rgba(255, 255, 255, 0.8)),
+            url("../img/vr3_fhd.jpg");
 }
 
 .roomSec {
     flex: 3;
     padding: 20px;
     min-height: 600px;
+    background: transparent;
 }
 
 .side-nav {
@@ -89,7 +97,8 @@ main {
     background-color: #f4f4f4;
     padding: 20px;
     overflow-y: auto; /* Enable scrollbar if content overflows */
-    max-height: 100%; /* Setting a maximum height relative to parent */
+    z-index: 2;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
 }
 
 .side-nav::-webkit-scrollbar {
@@ -99,7 +108,7 @@ main {
 
 .masterDiv {
     display: flex; /* Display children horizontally */
-    justify-content: center;
+    justify-content: space-around;
     padding: 0;
 }
 
@@ -148,12 +157,21 @@ main {
     grid-template-columns: repeat(2, 1fr);
     gap: 8px;
 }
-.layout div{
-    border: 2px solid #cccccc;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 8px 12px rgba(0, 0, 0, 0.15); /* Increase the shadow effect */
+.startButton{
+    border-radius: 50%;
 }
+.user-details,
+.layout div{
+    border-radius: 10px;
+    border: 1px solid #002f53;
+    padding: 20px;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}
+.user-details{
+    background: #f4f4f4;
+    margin: 0 20% 0 20%;
+}
+.user-details p{ border-bottom: 1px solid #002f53}
 
 @media only screen and (max-width: 1000px) {
     section { min-height: 0;}
@@ -165,4 +183,5 @@ main {
         flex-direction: column;
     }
     .layout{ grid-template-columns: repeat(1, 1fr); }
+    .user-details{ margin: 0;}
 }

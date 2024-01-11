@@ -7,22 +7,19 @@ import { MyHeader } from '../components/Header/Header';
 import { MyFooter } from "../components/Footer/Footer";
 import LogoutButton from "../components/LogoutButton/logoutButton";
 import { useNavigate } from 'react-router-dom';
-import AvviaMeeting from "../components/GestioneMeeting/AvviaMeeting";
 import CreaCategoria from "../components/CreaCategoria/CreaCategoria";
 import CreaScenario from "../components/Forms/CreaScenarioForm/CreaScenario";
 import ModificaScenario from "../components/Forms/CreaScenarioForm/ModificaScenario";
-import AccediStanza from "../components/enterRoomPopup/accediStanza";
+import AccediStanza from "../components/Forms/enterRoomForm/accediStanza";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faChalkboardUser, faCirclePlus, faDoorOpen, faUser} from "@fortawesome/free-solid-svg-icons";
 
 export const LoggedInHome = () => {
     const nome = sessionStorage.getItem('nome');
     const isAdmin = sessionStorage.getItem('isAdmin') === 'true';
-    const [isAvviaMeetingVisible, setIsAvviaMeetingVisible] = useState(false);
     const [isVisibleScen, setIsVisibleScen] = useState(false);
     const [isVisibleModScen, setIsVisibleModScen] = useState(false);
     const [isVisibleCat, setIsVisibleCat] = useState(false);
-    const [isVisibleAcc, setIsVisibleAcc] = useState(false);
 
     //fatte per prova per vedere se mi porta alla pagina tramite button
     const navigate = useNavigate();
@@ -42,11 +39,9 @@ export const LoggedInHome = () => {
         navigate(`/createroom`);
     };
     const closeAllComponents = () => {
-        setIsAvviaMeetingVisible(false);
         setIsVisibleScen(false);
         setIsVisibleModScen(false);
         setIsVisibleCat(false);
-        setIsVisibleAcc(false);
     };
 
     return (
@@ -76,63 +71,41 @@ export const LoggedInHome = () => {
                 <div>
                     <FontAwesomeIcon icon={faDoorOpen} size="2xl" style={{color: "#c70049",}} />
                     <h2>Ingresso stanza</h2>
-                    <button onClick={() => {
-                        closeAllComponents();
-                        setIsVisibleAcc(prevVisibility => !prevVisibility)
-                    }}
-                    >
-                        Accedi Stanza
-                    </button>
+                    <AccediStanza />
                 </div>
-                {isVisibleAcc &&
-                    <div>
-                        <AccediStanza onClose={() => setIsVisibleAcc(false)}/>
-                    </div>
-                }
             </section>
-            <section className={"contentSec"}>
+            {isAdmin &&
+                <section className={"contentSec"}>
                     <div className={"childDiv"}>
-                        <h5> IN QUANTO ORGANIZZATORE...</h5>
+                        <h5> IN QUANTO ADMIN...</h5>
                         <button onClick={() => {
                             closeAllComponents();
-                            setIsAvviaMeetingVisible(prevVisibility => !prevVisibility)
-                        }}
-                        >
-                            AvviaMeeting
+                            setIsVisibleCat(prevVisibility => !prevVisibility)
+                        }}>
+                            Crea Categoria
                         </button>
-                        {isAvviaMeetingVisible &&
-                            <AvviaMeeting id_meeting={1} onClose={() => setIsAvviaMeetingVisible(false)}/>
-                        }
+                        {isVisibleCat && <CreaCategoria onClose={() => setIsVisibleCat(false)}/>}
+
+                        <button onClick={() => {
+                            closeAllComponents();
+                            setIsVisibleScen(prevVisibility => !prevVisibility)
+                        }}>
+                            Crea Scenario
+                        </button>
+                        {isVisibleScen && <CreaScenario onClose={() => setIsVisibleScen(false)}/>}
+
+                        <button onClick={() => {
+                            closeAllComponents();
+                            setIsVisibleModScen(prevVisibility => !prevVisibility)
+                        }}>
+                            Modifica Scenario
+                        </button>
+                        {isVisibleModScen && <ModificaScenario onClose={() => setIsVisibleModScen(false)}/>}
+
+                        <LogoutButton/>
                     </div>
-                    {isAdmin &&
-                        <div className={"childDiv"}>
-                            <h5> IN QUANTO ADMIN...</h5>
-
-                            <button onClick={() => {
-                                closeAllComponents();
-                                setIsVisibleCat(prevVisibility => !prevVisibility)
-                            }}>Crea Categoria
-                            </button>
-                            {isVisibleCat && <CreaCategoria onClose={() => setIsVisibleCat(false)}/>}
-
-                            <button onClick={() => {
-                                closeAllComponents();
-                                setIsVisibleScen(prevVisibility => !prevVisibility)
-                            }}>Crea Scenario
-                            </button>
-                            {isVisibleScen && <CreaScenario onClose={() => setIsVisibleScen(false)}/>}
-
-                            <button onClick={() => {
-                                closeAllComponents();
-                                setIsVisibleModScen(prevVisibility => !prevVisibility)
-                            }}>Modifica Scenario
-                            </button>
-                            {isVisibleModScen && <ModificaScenario onClose={() => setIsVisibleModScen(false)}/>}
-
-                            <LogoutButton/>
-                        </div>
-                    }
-            </section>
+                </section>
+            }
             <footer>
             <MyFooter/>
             </footer>

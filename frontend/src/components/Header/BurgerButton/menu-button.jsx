@@ -38,7 +38,7 @@ const BurgerButton = () => {
                     <li><Link to="/">ABOUT</Link></li>
                     <li><Link to="/">CONTACTS</Link></li>
                 </ul>
-                <img src={MCLogo} className='App-logo' alt='no image' id={"menu2-image"} />
+                <img src={MCLogo} className='App-logo' alt='nessuna immagine' id={"menu2-image"} />
                 </nav>
             </div>
         </div>
