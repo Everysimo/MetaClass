@@ -112,10 +112,9 @@ const UserListInRoom = () => {
 
     const handleSilenziaUserButton = (idutente) => {
         console.log("idutente", idutente);
-        setSelectedUserId(idutente);
-        handleSilenziaUser();
+        handleSilenziaUser(idutente);
     }
-    const handleSilenziaUser = async () => {
+    const handleSilenziaUser = async (idutente) => {
         const requestOption = {
             method: 'POST',
             headers: {
@@ -125,7 +124,7 @@ const UserListInRoom = () => {
         };
         try {
             const response = await fetch(
-                `http://localhost:8080/.../${id_stanza}/${selectedUserId}`,
+                `http://localhost:8080/silenziarePartecipante/${id_stanza}/${idutente}`,
                 requestOption
             );
             if (!response.ok) {
