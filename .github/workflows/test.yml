@@ -25,7 +25,10 @@ jobs:
         with:
           java-version: '17'
           distribution: 'adopt'
-          
+
+      - name: Build with Gradle
+        run: ./gradlew build --scan
+
       - name: Set execute permission for Gradle Wrapper
         working-directory: ./backend
         run: chmod +x gradlew
