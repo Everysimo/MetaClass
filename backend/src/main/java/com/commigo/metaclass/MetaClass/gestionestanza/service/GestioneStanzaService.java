@@ -20,7 +20,7 @@ public interface GestioneStanzaService
     ResponseEntity<Response<Boolean>> banOrganizzatore(Stanza stanza, String metaId, Long idOrganizzatore);
     boolean creaStanza(Stanza s) throws Exception;
     Response<Boolean> deleteRoom(String metaID, Long id_stanza);
-    Response<Boolean> downgradeUtente(String id_Uogm, long og, long stanza);
+    Response<Boolean> downgradeUtente(String id_Uogm, long og, long stanza) throws ServerRuntimeException, RuntimeException403;
     Boolean modificaDatiStanza(Map<String,Object> params, Long id) throws RuntimeException403, RuntimeException401;
 
     Stanza findStanza(Long id);

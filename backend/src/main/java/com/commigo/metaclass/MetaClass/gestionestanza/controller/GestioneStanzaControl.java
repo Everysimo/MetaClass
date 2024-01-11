@@ -167,6 +167,12 @@ public class GestioneStanzaControl {
 
             return ResponseEntity.ok(stanzaService.downgradeUtente(metaID, IdUtente, IdStanza));
 
+        } catch (ServerRuntimeException se) {
+            return ResponseEntity.status(500)
+                    .body(new Response<>(false, "Errore durante l'operazione: "+se.getMessage()));
+        } catch (RuntimeException403 re) {
+            return ResponseEntity.status(403)
+                    .body(new Response<>(false, "Errore durante l'operazione: "+re.getMessage()));
         } catch (Exception e) {
             return ResponseEntity.status(500)
                     .body(new Response<>(false, "Errore durante l'operazione"));
