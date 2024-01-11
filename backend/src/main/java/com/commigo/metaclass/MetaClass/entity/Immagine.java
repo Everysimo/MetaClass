@@ -49,7 +49,6 @@ public class Immagine {
     @NotBlank(message = "Il nome non può essere vuoto")
     private String nome;
 
-    @URL(message = "L'URL dell'immagine non è valido")
     @NotNull(message = "l'URL non può essere nullo")
     @Column(length = MAX_URL_LENGTH, unique = true)
     @Size(min = MIN_URL_LENGTH, max = MAX_URL_LENGTH,
