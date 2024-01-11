@@ -194,36 +194,31 @@ public class GestioneStanzaControl {
         }
     }
 
-    @PostMapping(value = "/gestioneAccessi")
-    public ResponseEntity<Response<List<StatoPartecipazione>>> gestioneAccessi(@RequestBody GestioneAccessiRequest request, HttpServletRequest session, BindingResult result) throws RuntimeException403 {
+    @PostMapping(value = "/gestioneAccessi/{idStanza}/{idUtente}")
+    public ResponseEntity<Response<Boolean>> gestioneAccessi(@PathVariable Long idStanza,
+                                                             @PathVariable Long idUtente,
+                                                             @RequestBody String scelta,
+                                                             HttpServletRequest request){
+        try {
 
-        if (!validationToken.isTokenValid(session)) {
-            throw new RuntimeException403("Token non valido");
+            if (!validationToken.isTokenValid(request)) {
+                throw new RuntimeException403("Token non valido");
+            }
+
+            ObjectMapper objectMapper = new ObjectMapper();
+            JsonNode jsonNode = objectMapper.readTree(scelta);
+            Boolean Newscelta = jsonNode.get("scelta").asBoolean();
+
+            String metaID = jwtTokenUtil.getMetaIdFromToken(validationToken.getToken());
+            return stanzaService.gestioneAccesso(metaID, idUtente, idStanza, Newscelta);
+
+        }catch(RuntimeException403 re){
+            return ResponseEntity.status(403)
+                    .body(new Response<>(false, "Errore nell'operazione: "+re.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(500)
+                    .body(new Response<>(false, "Errore durante l'operazione" + e.getMessage()));
         }
-
-        if(result.hasErrors())
-        {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new Response<>(null,RequestUtils.errorsRequest(result)));
-        }
-
-        Stanza stanza = stanzaService.findStanza(request.getIdstanza());
-        if(stanza == null)
-        {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new Response<>(null,"Id stanza non valido"));
-        }
-
-        List<StatoPartecipazione> list = stanzaService.findStatoPartecipazioniInAttesa(stanza,true);
-
-        if(request.isAccept())
-        {
-            return ResponseEntity.ok(new Response<>(list.stream().filter((sp) -> sp.getUtente().getId() == request.getIdutente()).toList(),
-                    "Utente a cui è stata accettata la richiesta"));
-        }
-
-        return ResponseEntity.ok(new Response<>(list,"Lista stati partecipazioni in attesa della stanza"));
-
     }
 
 
