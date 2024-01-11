@@ -88,6 +88,35 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService {
     }
 
     @Override
+    public ResponseEntity<Response<Boolean>> banOrganizzatore(Stanza stanza, String metaId, Long idOrganizzatore)
+    {
+        Utente utente = utenteRepository.findUtenteById(idOrganizzatore);
+        StatoPartecipazione sp = statoPartecipazioneRepository.findStatoPartecipazioneByUtenteAndStanza(utente,stanza);
+
+        if(sp.isBannato())
+            return ResponseUtils.getResponseError(HttpStatus.INTERNAL_SERVER_ERROR,"Organizzatore già bannato");
+
+        sp.setBannato(true);
+        sp.setRuolo(ruoloRepository.findByNome("Partecipante"));
+        statoPartecipazioneRepository.save(sp);
+        return ResponseUtils.getResponseOk("Organizzatore bannato con successo");
+    }
+
+    @Override
+    public ResponseEntity<Response<Boolean>> banPartecipante(Stanza stanza, String metaId, Long idPartecipante)
+    {
+        Utente utente = utenteRepository.findUtenteById(idPartecipante);
+        StatoPartecipazione sp = statoPartecipazioneRepository.findStatoPartecipazioneByUtenteAndStanza(utente,stanza);
+
+        if(sp.isBannato())
+            return ResponseUtils.getResponseError(HttpStatus.INTERNAL_SERVER_ERROR,"Utente già bannato");
+
+        sp.setBannato(true);
+        statoPartecipazioneRepository.save(sp);
+        return ResponseUtils.getResponseOk("Utente bannato con successo");
+    }
+
+    @Override
     public boolean creaStanza(Stanza s) throws Exception {
         String metaID = jwtTokenUtil.getMetaIdFromToken(validationToken.getToken());
 
@@ -236,6 +265,12 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService {
                     "Errore durante la richiesta: " + e.getMessage(), false));
         }
 
+    }
+
+    @Override
+    public void saveRoom(Stanza stanza)
+    {
+        stanzaRepository.save(stanza);
     }
 
     @Override
