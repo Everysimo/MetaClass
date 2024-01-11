@@ -26,7 +26,7 @@ public interface GestioneStanzaService
     Stanza findStanza(Long id);
     ResponseEntity<AccessResponse<Integer>> richiestaAccessoStanza(String codiceStanza, String id_utente);
     void saveRoom(Stanza stanza);
-    Response<Boolean> upgradeUtente(String id_Uogm, long og, long stanza);
+    Response<Boolean> upgradeUtente(String id_Uogm, long og, long stanza) throws ServerRuntimeException, RuntimeException403;
     ResponseEntity<Response<List<Utente>>> visualizzaUtentiInStanza(Long Id);
     ResponseEntity<Response<List<Utente>>> visualizzaUtentiInAttesaInStanza(Long Id, String metaID);
 

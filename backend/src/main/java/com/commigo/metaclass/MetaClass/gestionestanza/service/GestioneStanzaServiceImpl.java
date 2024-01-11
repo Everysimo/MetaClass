@@ -330,32 +330,64 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService {
     }
 
     @Override
-    public Response<Boolean> upgradeUtente(String id_Uogm, long id_og, long id_stanza) {
+    public Response<Boolean> upgradeUtente(String id_Uogm, long id_og, long id_stanza) throws ServerRuntimeException, RuntimeException403 {
 
-        Utente ogm = utenteRepository.findFirstByMetaId(id_Uogm);
-        Utente og = utenteRepository.findUtenteById(id_og);
-        Stanza stanza = stanzaRepository.findStanzaById(id_stanza);
+        //controllo organizzatore master
+        Utente ogm;
+        if((ogm = utenteRepository.findFirstByMetaId(id_Uogm))==null)
+            throw new ServerRuntimeException("errore nella ricerca dell'organizzatore master");
 
+        //controllo utente da promuovere
+        Utente og;
+        if((og=utenteRepository.findUtenteById(id_og))==null)
+            throw new RuntimeException403("utente non trovato");
 
-        StatoPartecipazione stato_ogm = statoPartecipazioneRepository.findStatoPartecipazioneByUtenteAndStanza(ogm, stanza);
-        if (stato_ogm.getRuolo().getNome().equalsIgnoreCase(Ruolo.ORGANIZZATORE_MASTER)) {
-            StatoPartecipazione stato_og = statoPartecipazioneRepository.findStatoPartecipazioneByUtenteAndStanza(og, stanza);
-            if (stato_og.getRuolo().getNome().equalsIgnoreCase(Ruolo.PARTECIPANTE)) {
-                stato_og.getRuolo().setNome(Ruolo.ORGANIZZATORE);
+        //controllo stanza
+        Stanza stanza;
+        if((stanza = stanzaRepository.findStanzaById(id_stanza))==null)
+            throw new RuntimeException403("stanza non trovata");
+
+        //controllo dell'accesso dell'organizzatore master nella stanza
+        StatoPartecipazione stato_ogm = statoPartecipazioneRepository
+                .findStatoPartecipazioneByUtenteAndStanza(ogm, stanza);
+        if(stato_ogm==null)  throw new ServerRuntimeException("l'organizzatore master sembra "+
+                "non aver acceduto alla stanza");
+
+        //controllo del ruolo di organizztaore master
+        if (!stato_ogm.getRuolo().getNome().equalsIgnoreCase(Ruolo.ORGANIZZATORE_MASTER)) {
+              throw new RuntimeException403("Non puoi promuovere un'utente perché " +
+                      "non sei un'organizzatore master");
+        }
+
+        //ricerco e controllo se l'utente ha fatto accesso alla stanza
+        StatoPartecipazione stato_og = statoPartecipazioneRepository
+                .findStatoPartecipazioneByUtenteAndStanza(og, stanza);
+        if(stato_og==null)   throw new RuntimeException403("l'utente non ha acceduto alla stanza, magari è stato kickato");
+
+        //verifico se l'utente è in attesa
+        if(stato_og.isInAttesa())
+            throw new RuntimeException403("l'utente è in attesa di entrare in stanza, non può essere promosso");
+
+        //verifico se l'utente è bannato
+        if(stato_og.isBannato())
+            throw new RuntimeException403("l'utente è bannato, non può essere promosso");
+
+        //verifico il ruolo dell'utente nella stanza
+        if (stato_og.getRuolo().getNome().equalsIgnoreCase(Ruolo.PARTECIPANTE)) {
+
+                //se è partecipante allora posso promuoverlo ad organizzatore
+                Ruolo r = ruoloRepository.findByNome(Ruolo.ORGANIZZATORE);
+                stato_og.setRuolo(r);
                 statoPartecipazioneRepository.save(stato_og);
 
                 return ResponseEntity.ok(new Response<>(true, "L'utente selezionato ora è un organizzatore")).getBody();
 
             } else if (stato_og.getRuolo().getNome().equalsIgnoreCase(Ruolo.ORGANIZZATORE)) {
-
-                return ResponseEntity.status(403).body(new Response<>(false, "L'utente selezionato è già un'organizzatore")).getBody();
-
+                  throw new RuntimeException403("L'utente selezionato è già un'organizzatore");
             } else {
-                return ResponseEntity.status(403).body(new Response<>(false, "L'utente selezionato non può essere declassato ad organizzatore")).getBody();
+                  throw new RuntimeException403("Sembra sia stato inviato un organizzatore master");
             }
-        } else {
-            return ResponseEntity.status(403).body(new Response<>(false, "Non puoi promuovere un'utente perché non sei un'organizzatore master")).getBody();
-        }
+
     }
 
 
