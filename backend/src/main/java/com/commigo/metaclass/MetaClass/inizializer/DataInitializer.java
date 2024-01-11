@@ -76,7 +76,7 @@ public class DataInitializer implements CommandLineRunner {
 
 
         //Aggiunta della Stanza
-            Stanza s1 = stanzaRepository.save(new Stanza(1L, "StanzaLavoro1", "Stanza 1 per il lavoro", true, 500, sc1, "000001"));
+            Stanza s1 = stanzaRepository.save(new Stanza(1L, "StanzaLavoro1", "Stanza 1 per il lavoro", false, 500, sc1, "000001"));
             Stanza s2 = stanzaRepository.save(new Stanza(2L, "StanzaScuola1", "Stanza 1 per la scuola", false, 200, sc2, "000002"));
             Stanza s3 = stanzaRepository.save(new Stanza(3L, "StanzaDivertimento1", "Stanza 1 per il divertimento", true, 50, sc3, "000003"));
             Stanza s4 = stanzaRepository.save(new Stanza(4L, "StanzaCarmine1", "Stanza 1 per il Carmine", true, 50, sc3, "000004"));
@@ -86,7 +86,7 @@ public class DataInitializer implements CommandLineRunner {
            //STESSA COSA VALE PER isInAttesa SIA PER ORGANIZZATORI CHE ORGANIZZATORI MASTER
 
             StatoPartecipazione sp1 = statoPartecipazioneRepository.save(new StatoPartecipazione(s1, u1, stanzaService.getRuolo(ORGANIZZATORE_MASTER), false, false, "Michele", false));
-            StatoPartecipazione sp2 = statoPartecipazioneRepository.save(new StatoPartecipazione(s1, u2, stanzaService.getRuolo(Ruolo.ORGANIZZATORE), false, false, "Francesco", true));
+            //StatoPartecipazione sp2 = statoPartecipazioneRepository.save(new StatoPartecipazione(s1, u2, stanzaService.getRuolo(Ruolo.PARTECIPANTE), false, false, "Francesco", true));
             StatoPartecipazione sp3 = statoPartecipazioneRepository.save(new StatoPartecipazione(s1, u3, stanzaService.getRuolo(Ruolo.PARTECIPANTE), true, false, "Giorgio", true));
 
             StatoPartecipazione sp4 = statoPartecipazioneRepository.save(new StatoPartecipazione(s2, u1, stanzaService.getRuolo(Ruolo.PARTECIPANTE), false, false, "Michele", false));
