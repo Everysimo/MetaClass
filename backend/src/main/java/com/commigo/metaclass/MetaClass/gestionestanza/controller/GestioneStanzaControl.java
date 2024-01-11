@@ -100,7 +100,7 @@ public class GestioneStanzaControl {
             if(stanza == null)
             {
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                        .body(new Response<>(null,"Id stanza non valido"));
+                        .body(new Response<>(null,"ID stanza non valido"));
             }
 
             String metaID = jwtTokenUtil.getMetaIdFromToken(validationToken.getToken());
