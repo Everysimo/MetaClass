@@ -71,7 +71,7 @@ const EditUserDetails = ({ userDetails, setUserDetails }) => {
     }, [formReset]);
 
     return (
-        <div>
+        <div className={"childDiv"}>
             <button onClick={() => setShowModal(true)}>Modify Details</button>
 
             {showModal && (

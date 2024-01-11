@@ -31,9 +31,10 @@ export const Account = () => {
             <header>
                 <MyHeader />
             </header>
-            <section className={"sec"}>
-                <h1>Dettagli account</h1>
+            <section className={"sec"} id={"sec1"}>
+                <h1 style={{color: "#ffffff"}}>Dettagli account</h1>
                     <div className={"user-details"}>
+                        <FontAwesomeIcon icon={faUser} size="2xl" style={{color: "#002f53"}}/>
                         {userDetails && (
                             <>
                                 {/* Display current user details */}
@@ -44,9 +45,7 @@ export const Account = () => {
                             </>
                         )}
                         <div className={"masterDiv"}>
-                            <div className={"childDiv"}>
-                                <EditUserDetails userDetails={userDetails} setUserDetails={setUserDetails} />
-                            </div>
+                            <EditUserDetails userDetails={userDetails} setUserDetails={setUserDetails} />
                             <div className={"childDiv"}>
                                 <LogoutButton />
                             </div>

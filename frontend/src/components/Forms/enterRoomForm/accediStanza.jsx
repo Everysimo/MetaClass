@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import '../PopUpStyles.css';
+import {wait} from "@testing-library/user-event/dist/utils";
 
 const AccediStanza = () => {
     const [showModal, setShowModal] = useState(false);
     const [codice, setCodice] = useState('');
-    const [errorMessage, setErrorMessage] = useState('');
+    const [errorMessage, setErrorMessage] = useState("");
     const [formReset, setFormReset] = useState(false);
     const [displayOKButton, setDisplayOKButton] = useState(false);
 
@@ -41,18 +42,32 @@ const AccediStanza = () => {
         const dataToSend = {
             codice,
         };
+        const requestOption = {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + sessionStorage.getItem("token")
+            },
+            body: JSON.stringify(dataToSend)
+        };
 
-        try {
-            const response = await axios.post('http://localhost:8080/accessoStanza', dataToSend);
-            console.log('Risposta dal server:', response.data);
-            setShowModal(false);
-            resetForm();
-        } catch (error) {
+        try{
+            console.log("la stringa json:", JSON.stringify(dataToSend));
+            const response = await fetch('http://localhost:8080/accessoStanza', requestOption);
+            const responseData = await response.json();
+            console.log("Risposta dal server:", responseData);
+            wait(1000)
+            if (responseData && responseData.value) {
+                console.log(responseData.message);
+                setErrorMessage(responseData.message);
+                setDisplayOKButton(true);
+            }
+        }
+        catch (error) {
             console.error('ERRORE:', error);
-            setErrorMessage('Errore durante l\'invio dei dati');
-            setDisplayOKButton(true);
         }
     };
+
 
     useEffect(() => {
         if (formReset) {

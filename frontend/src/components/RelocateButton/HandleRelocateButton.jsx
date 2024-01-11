@@ -1,5 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import {faUser} from "@fortawesome/free-solid-svg-icons";
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 
 const NavigateToPageBtn = () => {
     const navigate = useNavigate();
@@ -9,11 +11,7 @@ const NavigateToPageBtn = () => {
         navigate('/Account');
     };
 
-    return (
-        <div>
-            <button onClick={navigateToSpecificPage}>Account</button>
-        </div>
-    );
+    return ( <button onClick={navigateToSpecificPage}>Account <FontAwesomeIcon icon={faUser} size="xl" style={{color: "#ffffff"}}/></button> );
 };
 
 export default NavigateToPageBtn;

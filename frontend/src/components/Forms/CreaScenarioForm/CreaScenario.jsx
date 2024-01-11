@@ -54,13 +54,16 @@ export default class CreaScenario extends Component {
 
         const requestOption = {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + sessionStorage.getItem("token")
+            },
             body: JSON.stringify(dataToSend),
         };
 
         try {
             console.log("la stringa json:", JSON.stringify(dataToSend));
-            const response = await fetch('http://localhost:8080/updateScenario', requestOption);
+            const response = await fetch('http://localhost:8080/admin/updateScenario', requestOption);
             const responseData = await response.json();
             console.log("Risposta dal server:", responseData);
         } catch (error) {

@@ -28,7 +28,7 @@ export function MyFooter() {
         <div className={"table-container"}>
             <div className={"table-row"}>
                 <div className={"table-cell"}>
-                    <img src={Comm} className='App-logo' alt='no image'></img>
+                    <img src={Comm} className='App-logo' alt='nessuna immagine'></img>
                 </div>
             </div>
             <GenerateRows Nomi={stringsArray}/>

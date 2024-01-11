@@ -1,5 +1,4 @@
 import {MyHeader} from "../components/Header/Header";
-import MyModifyForm from "../components/Forms/ModifyRoomForm/MyModifyForm";
 import {MyFooter} from "../components/Footer/Footer";
 import React from "react";
 import SelectScenario from "../components/SelectNewScenario/SelectScenario";

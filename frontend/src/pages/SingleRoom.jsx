@@ -8,6 +8,7 @@ import UserListInRoom from "../components/UserList/UserListInRoom";
 import {faChalkboardUser, faPlay} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import AvviaMeeting from "../components/GestioneMeeting/AvviaMeeting";
+import MeetingListInRoom from "../components/MeetingList/MeetingList";
 
 export const SingleRoom = () => {
     const navigate = useNavigate();
@@ -99,18 +100,10 @@ export const SingleRoom = () => {
                     {role &&
                         <div className={"masterDiv"}>
                             <div className={"childDiv"}>
-                                <button onClick={() => {
-                                    setIsAvviaMeetingVisible(prevVisibility => !prevVisibility)
-                                }}
-                                >
-                                    Avvia Meeting <FontAwesomeIcon icon={faPlay} size="xl" style={{color: "#ffffff",}} />
-                                </button>
-                                {isAvviaMeetingVisible &&
                                     <AvviaMeeting
-                                        id_meeting={1}
-                                        onClose={() => setIsAvviaMeetingVisible(false)}
+                                        id_meeting={id_stanza}
                                     />
-                                }
+
                             </div>
                         </div>
                     }
@@ -118,6 +111,7 @@ export const SingleRoom = () => {
                 <aside className="side-nav">
                     <div className={"childDiv"}>
                         <UserListInRoom/>
+                        <MeetingListInRoom/>
                     </div>
                 </aside>
             </main>

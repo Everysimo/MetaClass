@@ -314,7 +314,7 @@ public class GestioneStanzaControl {
             }
 
             String metaID = jwtTokenUtil.getMetaIdFromToken(validationToken.getToken());
-                return ResponseEntity.ok(stanzaService.upgradeUtente(metaID, IdUtente, IdStanza));
+            return ResponseEntity.ok(stanzaService.upgradeUtente(metaID, IdUtente, IdStanza));
 
         } catch (Exception e) {
             return ResponseEntity.status(500)
