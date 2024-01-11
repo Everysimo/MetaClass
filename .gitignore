@@ -1,7 +1,6 @@
 ### .gitignore METACLASS ###
 
 ### GRADLE ###
-!backend/gradle/wrapper/gradle-wrapper.jar
 !**backend/src/main/**/build/
 !**backend/src/test/**/build/
 backend/.gradle/

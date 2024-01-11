@@ -1,11 +1,12 @@
-
-import React, { useState } from 'react';
-import { Divider } from "@chakra-ui/react";
-import "./MyModifyForm.css";
+import React, {useEffect, useState} from 'react';
+import '../PopUpStyles.css';
 import {useParams} from "react-router-dom";
 
 const MyModifyForm = () => {
-
+    const [showModal, setShowModal] = useState(false);
+    const [formData, setFormData] = useState({});
+    const [successMessage, setSuccessMessage] = useState('');
+    const [formReset, setFormReset] = useState(false); // State for form reset
     const { id: id_stanza } = useParams();
 
     //si usa useParams per farsi passare il parametro
@@ -16,6 +17,18 @@ const MyModifyForm = () => {
         maxPosti: '',
     });
 
+    const handleCloseModal = () => {
+        setShowModal(false);
+        setFormReset(true); // Set form reset to true when modal is closed
+    };
+
+    useEffect(() => {
+        if (formReset) {
+            setFormData({}); // Reset form data
+            setSuccessMessage(''); // Reset success message
+            setFormReset(false); // Reset formReset state
+        }
+    }, [formReset]);
 
     const handleNameChange = (e) => {
         setState({ ...state, nome: e.target.value });
@@ -105,55 +118,67 @@ const MyModifyForm = () => {
 
     return (
         <>
-            <div className={'primary'}>
-                <div className={'left-label'}>
-                    <h4>MODIFICA DATI RELATIVI AD UNA STANZA</h4>
-                    <p className={'textp'}>Inserisci Nuovo Nome:</p>
-                    <input
-                        className={'input-field'}
-                        placeholder={"Aggiungi Nuovo Nome"}
-                        type="text"
-                        value={state.nome}
-                        onChange={handleNameChange}
-                    />
+            <button onClick={() => setShowModal(true)}>Modifica stanza</button>
+            {showModal && (
+                <div className="modal">
+                    <div className="modal-content">
+                        <span className="close" onClick={handleCloseModal}>&times;</span>
+                        <div className={"childDiv"}>
+                            <p className={'textp'}>Inserisci Nuovo Nome:</p>
+                            <input
+                                placeholder={"Aggiungi Nuovo Nome"}
+                                type="text"
+                                value={state.nome}
+                                onChange={handleNameChange}
+                            />
 
-                    <div className={'textarea-box'}>
-                        <p className={'textp'}>Inserisci Nuova Descrizione:</p>
-                        <textarea
-                            className={'textarea-field'}
-                            placeholder={'Aggiungi Descrizione'}
-                            rows={5}
-                            style={{ resize: 'none', width: '300px' }}
-                            type="text"
-                            value={state.descrizione}
-                            onChange={handleDescriptionChange}
-                        />
+                            <div className={'textarea-box'}>
+                                <p className={'textp'}>Inserisci Nuova Descrizione:</p>
+                                <textarea
+                                    className={'textarea-field'}
+                                    placeholder={'Aggiungi Descrizione'}
+                                    rows={5}
+                                    style={{resize: 'none', width: '300px'}}
+                                    type="text"
+                                    value={state.descrizione}
+                                    onChange={handleDescriptionChange}
+                                />
+                            </div>
+
+                            <p className={'textp'}>Scegli: pubblica o privata:</p>
+                            <div class="select">
+                                <select value={state.tipoAccesso} onChange={handleOptionChange}>
+                                    <option value=""> -Scegli un'opzione-</option>
+                                    <option value="false">Pubblica</option>
+                                    <option value="true">Privata</option>
+                                </select>
+                            </div>
+
+                            <p className={'textp'}>Inserisci numero MAX utenti:</p>
+                            <input
+                                placeholder={'MAX Posti'}
+                                type="number"
+                                min="1" max="999"
+                                value={state.maxPosti}
+                                onChange={handleMAXChange}
+                            />
+                            <button type="submit">Save Changes</button>
+                            <button
+                                type="button"
+                                onClick={deleteButton}
+                            >
+                                Elimina stanza
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => sendDataModifyRoom()}
+                            >
+                                Modifica
+                            </button>
+                        </div>
                     </div>
-
-                    <p className={'textp'}>Scegli: pubblica o privata:</p>
-                    <select className={'select-field'} value={state.tipoAccesso} onChange={handleOptionChange}>
-                        <option value=""> -Scegli un'opzione-</option>
-                        <option value="false">Pubblica</option>
-                        <option value="true">Privata</option>
-                    </select>
-
-                    <p className={'textp'}>Inserisci numero MAX utenti:</p>
-                    <input
-                        className={'number-field'}
-                        placeholder={'MAX Posti'}
-                        type="number"
-                        min="1" max="999"
-                        style={{ width: '100px' }}
-                        value={state.maxPosti}
-                        onChange={handleMAXChange}
-                    />
                 </div>
-                <Divider />
-                <br />
-
-                <button className={'button-delete'} type="button" onClick={deleteButton}> Elimina </button>
-                <button className={'button-modify'} type="button" onClick={() => sendDataModifyRoom()}> Modifica </button>
-            </div>
+            )}
         </>
     );
 };

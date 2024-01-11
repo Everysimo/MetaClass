@@ -52,12 +52,8 @@ class RoomList extends Component {
     render() {
         return (
             <>
-                <section>
-                    <h1>Elenco Stanze</h1>
-                </section>
-                <section className={"layout"} id={"stanze"}>
                     {this.state.array.map((room, index) => (
-                        <div key={index}>
+                        <div key={index} className={"user-card"}>
                             <h4>Nome della Stanza: {room.nome}</h4>
                                 <p>ID: {room.id}</p>
                                 <p>Descrizione: {room.descrizione}</p>
@@ -72,7 +68,6 @@ class RoomList extends Component {
                                 </button>
                             </div>
                             ))}
-                </section>
             </>
         );
     }
