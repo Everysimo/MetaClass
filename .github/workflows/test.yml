@@ -27,7 +27,7 @@ jobs:
           distribution: 'adopt'
 
       - name: Build with Gradle
-        run: ./gradlew build --scan
+        run: ./backend/gradlew build --scan
 
       - name: Set execute permission for Gradle Wrapper
         working-directory: ./backend
