@@ -53,16 +53,18 @@ const UserListInRoom = () => {
         setPopupOpen(true);
     }
 
+    //da aggiustare il fatto del popup
     const handleChangeName = async () => {
-        setPopupOpen(false); // Chiudi il popup quando si conferma il cambio nome
         console.log("newname", newName)
+        const nome = newName;
+
         const requestOption = {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': 'Bearer ' + sessionStorage.getItem("token")
             },
-            body: JSON.stringify({ newName })
+            body: JSON.stringify({ nome })
         };
         try {
             console.log("stringa json:",requestOption )
@@ -195,7 +197,7 @@ const UserListInRoom = () => {
                         <button onClick={() => handlePromotionButton(user.id)}>Promuovi</button>
                         {/*<button onClick={() => handleBanUserButton(user.id)}>Banna Partecipante</button>*/}
                         {/*<button onClick={handleBanOrganaiser() => }>Banna Organizzatore</button>*/}
-                        <button onClick={() => handleDeclassifyButton(user.id)}>Declassa</button>
+                        {/*<button onClick={() => handleDeclassifyButton(user.id)}>Declassa</button>*/}
                     </div>
                 </div>
             ))}
