@@ -26,9 +26,9 @@ jobs:
           java-version: '17'
           distribution: 'adopt'
 
-      - name: Move CheckStyle badge
-        if: always()
-        run: mv ./backend/target/site/badges/checkstyle-result.svg ./.github/badges/
+      - name: Run Checkstyle
+        working-directory: ./backend
+        run: ./gradlew checkstyleMain
 
       - name: Delete old JavaDoc
         run: rm -rf docs
