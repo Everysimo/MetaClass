@@ -16,6 +16,15 @@ repositories {
 	mavenCentral()
 }
 
+checkstyle {
+	toolVersion = '8.36.1'
+	sourceSets = [sourceSets.main]
+	configFile = file('config/checkstyle/checkstyle.xml')
+	showViolations = true
+	ignoreFailures = true
+}
+
+
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter'
     implementation 'org.springframework.boot:spring-boot-starter-web'
