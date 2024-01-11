@@ -20,7 +20,7 @@ const MeetingListInRoom = () => {
     const fetchUserList = async () => {
         try {
             const response = await fetch(
-                `http://localhost:8080/visualizzaMeeting/${id_stanza}`,
+                `http://localhost:8080/visualizzaSchedulingMeeting/${id_stanza}`,
                 requestOption
             );
             if (!response.ok) {
@@ -34,7 +34,7 @@ const MeetingListInRoom = () => {
     }
     return (
         <div>
-            <h2>Meeting In Stanza:</h2>
+            <h2>Meeting Schedulati:</h2>
             {meetingList && meetingList.map((meeting) => (
                 <div key={meeting.id} className="user-card">
                     <span>Nome: {`${meeting.nome} `}</span><br/>

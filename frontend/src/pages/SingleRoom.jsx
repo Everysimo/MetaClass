@@ -9,6 +9,7 @@ import {faChalkboardUser, faPlay} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import AvviaMeeting from "../components/GestioneMeeting/AvviaMeeting";
 import MeetingListInRoom from "../components/MeetingList/MeetingList";
+import MyModifyForm from "../components/Forms/ModifyRoomForm/MyModifyForm";
 
 export const SingleRoom = () => {
     const navigate = useNavigate();
@@ -79,7 +80,7 @@ export const SingleRoom = () => {
                 <MyHeader/>
             </header>
             <main>
-                <section className={"roomSec"}>
+                <section className={"roomSec"} id={"rSec"}>
                     <FontAwesomeIcon icon={faChalkboardUser} size="4x" style={{color: "#c70049",}} />
                     <h1>Stanza {id_stanza}</h1>
                     <div className={"masterDiv"}>
@@ -91,7 +92,7 @@ export const SingleRoom = () => {
                             </div>
                         }
                         <div className={"childDiv"}>
-                            <button onClick={handleGoToModifyDataRoom}>Modifica la stanza</button>
+                            <MyModifyForm />
                             <button onClick={handleGoToChangeScenario}>Modifica lo scenario della stanza</button>
                             <button onClick={handleGoToAccessManagement}>Gestione degli accessi</button>
                             <button onClick={handleGoToBannedUserList}>Visualizza Lista Utenti Bannati</button>
