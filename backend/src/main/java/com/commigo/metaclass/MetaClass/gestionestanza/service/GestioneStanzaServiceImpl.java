@@ -64,7 +64,7 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService {
 
                 if (statoPartecipazione == null) {
 
-                    statoPartecipazione = new StatoPartecipazione(stanza, u, getRuolo(Ruolo.PARTECIPANTE), false, false, u.getNome());
+                    statoPartecipazione = new StatoPartecipazione(stanza, u, getRuolo(Ruolo.PARTECIPANTE), false, false, u.getNome(), true);
                     return ResponseEntity.ok(new AccessResponse<>(1, "Stai per effettuare l'accesso alla stanza", false));
 
                 } else if (statoPartecipazione.isBannato()) {
@@ -144,7 +144,7 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService {
         stanzaRepository.save(s);
 
        StatoPartecipazione sp = new StatoPartecipazione(s, u,
-              getRuolo(Ruolo.ORGANIZZATORE_MASTER), false, false, u.getNome());
+              getRuolo(Ruolo.ORGANIZZATORE_MASTER), false, false, u.getNome(), true);
 
        statoPartecipazioneRepository.save(sp);
 
@@ -223,6 +223,36 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService {
                 }
             }else{
                 return ResponseEntity.status(403).body(new Response<>(false, "Per accettare o rifiutare richiesta di accesso alla stanza devi essere almeno un organizzatore"));
+            }
+        }else{
+            return ResponseEntity.status(403).body(new Response<>(false, "La stanza selezionata non esiste"));
+        }
+    }
+
+    @Override
+    public ResponseEntity<Response<Boolean>> SilenziaPartecipante(String metaID, Long IdStanza, Long IdUtente) {
+
+        Utente og = utenteRepository.findFirstByMetaId(metaID);
+        Utente silenzia = utenteRepository.findUtenteById(IdUtente);
+        Stanza stanza = stanzaRepository.findStanzaById(IdStanza);
+
+        if(stanza != null) {
+            StatoPartecipazione statoOg = statoPartecipazioneRepository.findStatoPartecipazioneByUtenteAndStanza(og, stanza);
+            if (statoOg.getRuolo().getNome().equalsIgnoreCase(Ruolo.ORGANIZZATORE_MASTER) || statoOg.getRuolo().getNome().equalsIgnoreCase(Ruolo.ORGANIZZATORE) && !statoOg.isBannato()) {
+                StatoPartecipazione statoSilenzio = statoPartecipazioneRepository.findStatoPartecipazioneByUtenteAndStanza(silenzia, stanza);
+                if (statoSilenzio != null) {
+                    if (!statoSilenzio.isSilenziato()) {
+                        statoSilenzio.setSilenziato(true);
+                        statoPartecipazioneRepository.save(statoSilenzio);
+                        return ResponseEntity.ok(new Response<>(true, "L'utente selezionato ora è silenziato"));
+                    } else {
+                        return ResponseEntity.ok(new Response<>(true, "L'utente selezionato è gia silenziato"));
+                    }
+                } else {
+                    return ResponseEntity.status(403).body(new Response<>(false, "L'utente selezioanto non è presente nella stanza"));
+                }
+            }else{
+                return ResponseEntity.status(403).body(new Response<>(false, "Per silenziare un partecipante nella stanza devi essere almeno un organizzatore"));
             }
         }else{
             return ResponseEntity.status(403).body(new Response<>(false, "La stanza selezionata non esiste"));

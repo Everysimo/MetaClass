@@ -67,6 +67,14 @@ public class StatoPartecipazione implements Serializable {
     @NotNull(message = "isBannato non può essere nullo")
     private boolean isBannato;
 
+
+    /**
+     * isSilenziato per verificare se l'utente è silenziato in una stanza
+     */
+
+    @NotNull(message = "isSilenziato non può essere nullo")
+    private boolean isSilenziato;
+
     /**
      *NomeInStanza identifica il nome dell'utente nella stanza specifica
      */
@@ -113,13 +121,14 @@ public class StatoPartecipazione implements Serializable {
     }
 
     public StatoPartecipazione(Stanza stanza, Utente utente, Ruolo ruolo,
-                               boolean isInAttesa, boolean isBannato, String nomeInStanza) throws Exception {
+                               boolean isInAttesa, boolean isBannato, String nomeInStanza, boolean isSilenziato) throws Exception {
         this.stanza = stanza;
         this.utente = utente;
         this.ruolo = ruolo;
         this.isInAttesa = isInAttesa;
         this.isBannato = isBannato;
         this.nomeInStanza = nomeInStanza;
+        this.isSilenziato = isSilenziato;
         checkRule();
     }
 }
