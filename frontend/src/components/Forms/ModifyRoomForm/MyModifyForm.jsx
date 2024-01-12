@@ -146,7 +146,7 @@ const MyModifyForm = () => {
                             </div>
 
                             <p className={'textp'}>Scegli: pubblica o privata:</p>
-                            <div class="select">
+                            <div className="select">
                                 <select value={state.tipoAccesso} onChange={handleOptionChange}>
                                     <option value=""> -Scegli un'opzione-</option>
                                     <option value="false">Pubblica</option>

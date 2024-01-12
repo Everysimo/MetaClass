@@ -89,6 +89,7 @@ main {
 
 .roomSec {
     flex: 3 1;
+    height: auto;
     min-height: 600px;
     background: transparent;
 }
@@ -100,8 +101,8 @@ main {
     background-color: #f4f4f4;
     padding: 20px;
     overflow-y: auto; /* Enable scrollbar if content overflows */
-    z-index: 2;
     box-shadow: 6px 0 20px 0 rgba(0, 0, 0, 0.19);
+    height: auto;
 }
 
 .side-nav::-webkit-scrollbar {
@@ -121,8 +122,16 @@ main {
     margin: 5%; /* Optional: Add margin between .child elements */
 }
 
-.whiteBg{ background-color: #ffffff; }
+.whiteBg{
+    background-color: #ffffff;
+    border-radius: 10px;
+}
 
+.fitCont{
+    min-width: 70%;
+    width: fit-content;
+    margin: auto;
+}
 #sec1, #sec2, #sec3{
     background-position: center;
     background-repeat: no-repeat;

@@ -7,8 +7,8 @@ import './CalendarComp.css';
 import axios from "axios";
 const CalendarComp = () => {
     const [selectedDateTimeRange, setSelectedDateTimeRange] = useState([
-        dayjs('2024-04-17T15:30'),
-        dayjs('2024-04-21T18:30'),
+        dayjs('2024-01-12T15:30'),
+        dayjs('2024-01-12T18:30'),
     ]);
     const [name, setName] = useState('');
     const handleDateTimeRangeChange = (newDateTimeRange) => {
