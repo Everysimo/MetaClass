@@ -53,16 +53,18 @@ const UserListInRoom = () => {
         setPopupOpen(true);
     }
 
+    //da aggiustare il fatto del popup
     const handleChangeName = async () => {
-        setPopupOpen(false); // Chiudi il popup quando si conferma il cambio nome
         console.log("newname", newName)
+        const nome = newName;
+
         const requestOption = {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': 'Bearer ' + sessionStorage.getItem("token")
             },
-            body: JSON.stringify({ newName })
+            body: JSON.stringify({ nome })
         };
         try {
             console.log("stringa json:",requestOption )
@@ -110,10 +112,9 @@ const UserListInRoom = () => {
 
     const handleSilenziaUserButton = (idutente) => {
         console.log("idutente", idutente);
-        setSelectedUserId(idutente);
-        handleSilenziaUser();
+        handleSilenziaUser(idutente);
     }
-    const handleSilenziaUser = async () => {
+    const handleSilenziaUser = async (idutente) => {
         const requestOption = {
             method: 'POST',
             headers: {
@@ -123,7 +124,7 @@ const UserListInRoom = () => {
         };
         try {
             const response = await fetch(
-                `http://localhost:8080/.../${id_stanza}/${selectedUserId}`,
+                `http://localhost:8080/silenziarePartecipante/${id_stanza}/${idutente}`,
                 requestOption
             );
             if (!response.ok) {
@@ -177,47 +178,6 @@ const UserListInRoom = () => {
         }
     };
 
-    const handleDeclassifyButton = (idutente) => {
-        console.log(idutente);
-        setSelectedUserId(idutente);
-        handleDeclassify();
-    };
-
-    const handleDeclassify = async () => {
-        console.log('Before fetch call:', id_stanza, selectedUserId);
-
-        if (!id_stanza || !selectedUserId) {
-            console.error('Invalid id_stanza or selectedUserId');
-            return;
-        }
-
-        const requestOption = {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + sessionStorage.getItem("token")
-            },
-        };
-
-        try {
-            console.log('About to make fetch call');
-            const response = await fetch(
-                `http://localhost:8080/declassaOrganizzatore/${id_stanza}/${selectedUserId}`,
-                requestOption
-            );
-            console.log('Fetch call completed');
-            console.log(response);
-            if (!response.ok) {
-                throw new Error('Error in promoting the user');
-            }
-
-            const data = await response.json();
-            console.log('data:', data);
-        } catch (error) {
-            console.error('Error during user promotion:', error);
-        }
-    };
-
 
     return (
         <div>
@@ -236,7 +196,7 @@ const UserListInRoom = () => {
                         <button onClick={() => handlePromotionButton(user.id)}>Promuovi</button>
                         {/*<button onClick={() => handleBanUserButton(user.id)}>Banna Partecipante</button>*/}
                         {/*<button onClick={handleBanOrganaiser() => }>Banna Organizzatore</button>*/}
-                        <button onClick={() => handleDeclassifyButton(user.id)}>Declassa</button>
+                        {/*<button onClick={() => handleDeclassifyButton(user.id)}>Declassa</button>*/}
                     </div>
                 </div>
             ))}

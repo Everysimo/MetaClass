@@ -76,29 +76,33 @@ section p{
 
 main {
     display: flex;
+    justify-content: center;
     background-attachment: scroll;
     background-size: cover;
+    background-position: center;
     background-image: linear-gradient(
             to bottom,
             rgba(255, 255, 255, 0.6),
             rgba(255, 255, 255, 0.8)),
-            url("../img/vr3_fhd.jpg");
+    url(http://localhost:3000/static/media/vr3_fhd.68b39104fbdae5807161.jpg);
 }
 
 .roomSec {
-    flex: 3;
-    padding: 20px;
+    flex: 3 1;
+    height: auto;
     min-height: 600px;
     background: transparent;
 }
+
+#rSec {padding: 20px;}
 
 .side-nav {
     flex: 1;
     background-color: #f4f4f4;
     padding: 20px;
     overflow-y: auto; /* Enable scrollbar if content overflows */
-    z-index: 2;
-    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    box-shadow: 6px 0 20px 0 rgba(0, 0, 0, 0.19);
+    height: auto;
 }
 
 .side-nav::-webkit-scrollbar {
@@ -118,6 +122,16 @@ main {
     margin: 5%; /* Optional: Add margin between .child elements */
 }
 
+.whiteBg{
+    background-color: #ffffff;
+    border-radius: 10px;
+}
+
+.fitCont{
+    min-width: 70%;
+    width: fit-content;
+    margin: auto;
+}
 #sec1, #sec2, #sec3{
     background-position: center;
     background-repeat: no-repeat;
@@ -154,8 +168,8 @@ main {
 .layout {
     display: grid;
     grid-template-rows: repeat(auto-fit, 1fr);
-    grid-template-columns: repeat(2, 1fr);
-    gap: 8px;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 5%;
 }
 .startButton{
     border-radius: 50%;
@@ -163,11 +177,11 @@ main {
 .user-details,
 .layout div{
     border-radius: 10px;
-    border: 1px solid #002f53;
     padding: 20px;
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
 }
 .user-details{
+    border: 1px solid #002f53;
     background: #f4f4f4;
     margin: 0 20% 0 20%;
 }

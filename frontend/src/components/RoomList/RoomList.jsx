@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import {Link} from "react-router-dom";
-import "./RoomList.css";
 
 class RoomList extends Component {
 
@@ -10,7 +9,6 @@ class RoomList extends Component {
             array: [],
         };
     }
-
 
     componentDidMount() {
         this.fetchElencoStanze();
@@ -52,27 +50,20 @@ class RoomList extends Component {
     render() {
         return (
             <>
-                <section>
-                    <h1>Elenco Stanze</h1>
-                </section>
-                <section className={"layout"} id={"stanze"}>
-                    {this.state.array.map((room, index) => (
-                        <div key={index}>
-                            <h4>Nome della Stanza: {room.nome}</h4>
-                                <p>ID: {room.id}</p>
-                                <p>Descrizione: {room.descrizione}</p>
-                                {/* inserisci gli altri dati di cui hai bisogno */}
-                                <button>
-                                    <Link
-                                        to={`/SingleRoom/${room.id}`}
-                                        style={{textDecoration: 'none', color: 'inherit'}}
-                                    >
-                                        Vai alla pagina della stanza
-                                    </Link>
-                                </button>
-                            </div>
-                            ))}
-                </section>
+                {this.state.array.map((room, index) => (
+                    <div key={index} className={"user-card"}>
+                        <h4>Stanza: {room.nome}</h4>
+                        {/* inserisci gli altri dati di cui hai bisogno */}
+                        <button>
+                            <Link
+                                to={`/SingleRoom/${room.id}`}
+                                style={{textDecoration: 'none', color: 'inherit'}}
+                            >
+                                Vai alla pagina della stanza
+                            </Link>
+                        </button>
+                    </div>
+                ))}
             </>
         );
     }

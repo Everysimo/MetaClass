@@ -76,9 +76,7 @@ public class GestioneAmministrazioneController {
 
             String metaID = jwtTokenUtil.getMetaIdFromToken(validationToken.getToken());
 
-            //verifica dei permessi
             if(!checkAdmin(metaID))  throw new RuntimeException403("Non sei amministratore");
-
             return stanzaControl.visualizzaUtentiBannatiInStanza(Id, request);
 
         }catch (RuntimeException403 re) {

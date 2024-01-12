@@ -331,7 +331,7 @@ public class GestioneStanzaControl {
     }
 
     @PostMapping(value = "/accessoStanza")
-    public ResponseEntity<AccessResponse<Integer>> richiestaAccessoStanza(@RequestBody String requestBody, HttpServletRequest request)
+    public ResponseEntity<AccessResponse<Boolean>> richiestaAccessoStanza(@RequestBody String requestBody, HttpServletRequest request)
     {
         try {
             if (!validationToken.isTokenValid(request)) {
@@ -342,15 +342,29 @@ public class GestioneStanzaControl {
 
             ObjectMapper objectMapper = new ObjectMapper();
             JsonNode jsonNode = objectMapper.readTree(requestBody);
-            String codiceStanza = jsonNode.get("codice").asText();
+            JsonNode codiceNode = jsonNode.get("codice");
+
+            //controllo se il codice è null
+            if (codiceNode == null)
+                throw new RuntimeException403("l'attributo deve essere nominato 'codice' e non diversamente");
+
+            //controllo se l'attributo è testuale
+            if(!codiceNode.isTextual())
+                throw new RuntimeException403("l'attributo deve essere una stringa");
+
+            String codiceStanza = codiceNode.asText();
 
             return ResponseEntity.ok(stanzaService.accessoStanza(codiceStanza, metaID).getBody());
 
-        } catch (RuntimeException | JsonProcessingException e) {
+        }catch (JsonProcessingException je) {
+            return ResponseEntity.status(403)
+                    .body(new AccessResponse<>(false, "Errore durante la richiesta: il body della tua richiesta è vuoto", false));
+        } catch (RuntimeException403 re) {
+            return ResponseEntity.status(403)
+                    .body(new AccessResponse<>(false, "Errore durante la richiesta: "+re.getMessage(), false));
+        }catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new AccessResponse<>(0, "Errore durante la richiesta: " + e.getMessage(), false));
-        } catch (RuntimeException403 e) {
-            throw new RuntimeException(e);
+                    .body(new AccessResponse<>(false, "Errore durante la richiesta: " + e.getMessage(), false));
         }
     }
     public ResponseEntity<Response<List<Utente>>> visualizzaUtentiBannatiInStanza(@PathVariable Long Id, HttpServletRequest request) throws RuntimeException403 {

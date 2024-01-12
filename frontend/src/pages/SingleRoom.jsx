@@ -5,16 +5,17 @@ import { useNavigate, useParams } from "react-router-dom";
 import CalendarComp from "../components/Calendar/CalendarComp";
 import { checkRole } from "../functions/checkRole";
 import UserListInRoom from "../components/UserList/UserListInRoom";
-import {faChalkboardUser, faPlay} from "@fortawesome/free-solid-svg-icons";
+import {faChalkboardUser} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import AvviaMeeting from "../components/GestioneMeeting/AvviaMeeting";
-import MeetingListInRoom from "../components/MeetingList/MeetingList";
+import MyModifyForm from "../components/Forms/ModifyRoomForm/MyModifyForm";
+import MeetingList from "../components/Calendar/CalendarComp/CalendarViewer";
+import {wait} from "@testing-library/user-event/dist/utils";
 
 export const SingleRoom = () => {
     const navigate = useNavigate();
     const { id: id_stanza } = useParams();
     const [role, setRole] = useState("Partecipante"); // Default role value
-    const [isAvviaMeetingVisible, setIsAvviaMeetingVisible] = useState(false);
     sessionStorage.setItem('idStanza', id_stanza);
 
     useEffect(() => {
@@ -23,8 +24,7 @@ export const SingleRoom = () => {
                 console.log("fetching");
                 const fetchedRole = await checkRole(id_stanza);
                 setRole(
-                    fetchedRole === "Organizzatore" || fetchedRole === "Organizzatore_Master" ?
-                        fetchedRole : "Partecipante"
+                    fetchedRole
                 );
                 console.log(fetchedRole);
             } catch (error) {
@@ -55,10 +55,6 @@ export const SingleRoom = () => {
         };
     }, []);
 
-    const handleGoToModifyDataRoom= () => {
-        // Naviga alla pagina di destinazione con il valore 42
-        navigate(`/modifyroom/ ${id_stanza}`);
-    };
     const handleGoToChangeScenario= () => {
         // Naviga alla pagina di destinazione con il valore 42
         navigate(`/changescenario/ ${id_stanza}`);
@@ -73,45 +69,46 @@ export const SingleRoom = () => {
         navigate(`/bannedUserList/ ${id_stanza}`);
     };
 
+    const isOrg = () =>{
+        return (role === 'Partecipante');
+    }
     return(
         <>
             <header>
                 <MyHeader/>
             </header>
             <main>
-                <section className={"roomSec"}>
+                <section className={"roomSec"} id={"rSec"}>
                     <FontAwesomeIcon icon={faChalkboardUser} size="4x" style={{color: "#c70049",}} />
                     <h1>Stanza {id_stanza}</h1>
-                    <div className={"masterDiv"}>
-                        {role &&
-                            <div className={"childDiv"}>
-                                <h2>Schedula un
-                                    nuovo meeting</h2>
-                                <CalendarComp/>
-                            </div>
-                        }
-                        <div className={"childDiv"}>
-                            <button onClick={handleGoToModifyDataRoom}>Modifica la stanza</button>
-                            <button onClick={handleGoToChangeScenario}>Modifica lo scenario della stanza</button>
-                            <button onClick={handleGoToAccessManagement}>Gestione degli accessi</button>
-                            <button onClick={handleGoToBannedUserList}>Visualizza Lista Utenti Bannati</button>
-                        </div>
-                    </div>
-                    {role &&
+                    <MeetingList />
+                    {!isOrg() &&
+                        <>
                         <div className={"masterDiv"}>
                             <div className={"childDiv"}>
-                                    <AvviaMeeting
-                                        id_meeting={id_stanza}
-                                    />
-
+                                <h2>Schedula un nuovo meeting</h2>
+                                <CalendarComp/>
+                            </div>
+                            <div className={"childDiv"}>
+                                <MyModifyForm/>
+                                <button onClick={handleGoToChangeScenario}>Modifica lo scenario della stanza</button>
+                                <button onClick={handleGoToAccessManagement}>Gestione degli accessi</button>
+                                <button onClick={handleGoToBannedUserList}>Visualizza Lista Utenti Bannati</button>
                             </div>
                         </div>
+                        <div className={"masterDiv"}>
+                            <div className={"childDiv"}>
+                                <AvviaMeeting
+                                    id_meeting={id_stanza}
+                                />
+                            </div>
+                        </div>
+                        </>
                     }
                 </section>
                 <aside className="side-nav">
                     <div className={"childDiv"}>
                         <UserListInRoom/>
-                        <MeetingListInRoom/>
                     </div>
                 </aside>
             </main>

@@ -10,11 +10,13 @@ import com.commigo.metaclass.MetaClass.gestionemeeting.repository.ReportReposito
 import com.commigo.metaclass.MetaClass.gestionemeeting.repository.UtenteInMeetingRepository;
 import com.commigo.metaclass.MetaClass.gestionestanza.repository.StanzaRepository;
 import com.commigo.metaclass.MetaClass.gestionestanza.repository.StatoPartecipazioneRepository;
+import com.commigo.metaclass.MetaClass.gestionestimaduratameeting.service.GestioneStimaMeetingService;
 import com.commigo.metaclass.MetaClass.gestioneutenza.repository.UtenteRepository;
 import com.commigo.metaclass.MetaClass.utility.response.types.Response;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -39,6 +41,9 @@ public class GestioneMeetingServiceImpl implements GestioneMeetingService{
     private final StatoPartecipazioneRepository statoPartecipazioneRepository;
     private final FeedbackMeetingRepository feedbackMeetingRepository;
     private final ReportRepository reportRepository;
+
+    @Autowired
+    GestioneStimaMeetingService gestioneStimaMeetingService;
 
 /**
 *
@@ -458,6 +463,10 @@ public class GestioneMeetingServiceImpl implements GestioneMeetingService{
         sc.setMedia_valutazione(newMedia);
         sc.setNum_voti(num_voti+1);
         scenarioRepository.save(sc);
+
+        //riempimento dataset
+
+        //gestioneStimaMeetingService.addUtenteInDataset(u,fm.getTempo_totale(),value);
 
         return true;
     }

@@ -15,7 +15,7 @@ import java.util.Map;
 public interface GestioneStanzaService
 {
 
-    ResponseEntity<AccessResponse<Integer>> accessoStanza(String codiceStanza, String id_utente);
+    ResponseEntity<AccessResponse<Boolean>> accessoStanza(String codiceStanza, String id_utente) throws Exception;
     ResponseEntity<Response<Boolean>> banPartecipante(Stanza stanza, String metaId, Long idPartecipante);
     ResponseEntity<Response<Boolean>> banOrganizzatore(Stanza stanza, String metaId, Long idOrganizzatore);
     boolean creaStanza(Stanza s) throws Exception;
@@ -24,7 +24,7 @@ public interface GestioneStanzaService
     Boolean modificaDatiStanza(Map<String,Object> params, Long id) throws RuntimeException403, RuntimeException401;
 
     Stanza findStanza(Long id);
-    ResponseEntity<AccessResponse<Integer>> richiestaAccessoStanza(String codiceStanza, String id_utente);
+    //ResponseEntity<AccessResponse<Boolean>> richiestaAccessoStanza(String codiceStanza, String id_utente);
     void saveRoom(Stanza stanza);
     Response<Boolean> upgradeUtente(String id_Uogm, long og, long stanza) throws ServerRuntimeException, RuntimeException403;
     ResponseEntity<Response<List<Utente>>> visualizzaUtentiInStanza(Long Id);

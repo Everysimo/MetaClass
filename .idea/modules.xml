@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/com.commigo.metaclass.MetaClass.iml" filepath="$PROJECT_DIR$/.idea/modules/com.commigo.metaclass.MetaClass.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/MetaClass.main.iml" filepath="$PROJECT_DIR$/.idea/modules/MetaClass.main.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/com.commigo.metaclass.MetaClass.main.iml" filepath="$PROJECT_DIR$/.idea/modules/com.commigo.metaclass.MetaClass.main.iml" />
     </modules>
   </component>
