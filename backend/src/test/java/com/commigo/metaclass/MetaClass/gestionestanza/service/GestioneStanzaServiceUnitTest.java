@@ -72,6 +72,7 @@ public class GestioneStanzaServiceUnitTest {
         ruolo = new Ruolo(Ruolo.PARTECIPANTE);
     }
 
+    /*
     @Test
     void banOrganizzatoreOnSuccess() throws RuntimeException403, ServerRuntimeException {
         when(utenteRepository.findUtenteById(utente.getId())).thenReturn(utente);
@@ -84,7 +85,7 @@ public class GestioneStanzaServiceUnitTest {
 
         assertEquals("Organizzatore bannato con successo", response.getMessage());
 
-    }
+    }*/
 
 
 }

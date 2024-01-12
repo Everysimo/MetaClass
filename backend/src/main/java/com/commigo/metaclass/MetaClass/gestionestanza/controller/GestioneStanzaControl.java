@@ -47,11 +47,10 @@ public class GestioneStanzaControl {
     private JwtTokenUtil jwtTokenUtil;
 
 
-    @PostMapping(value = "/banOrganizzatore/{IdStanza}/{IdOrganizzatore}")
-    public ResponseEntity<Response<Boolean>> banOrganizzatore(
-            @PathVariable Long IdStanza,
-            @RequestBody Long IdOrganizzatore,
-            HttpServletRequest request) {
+    @PostMapping(value = "/banUtente/{IdStanza}/{IdUtente}")
+    public ResponseEntity<Response<Boolean>> banUtente(@PathVariable Long IdStanza,
+                                                              @PathVariable Long IdUtente,
+                                                              HttpServletRequest request) {
 
         try {
             //controllo del token
@@ -59,57 +58,8 @@ public class GestioneStanzaControl {
                 throw new RuntimeException403("Token non valido");
             }
 
-            Stanza stanza = stanzaService.findStanza(IdStanza);
-            if(stanza == null)
-            {
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                        .body(new Response<>(null,"Id stanza non valido"));
-            }
-
             String metaID = jwtTokenUtil.getMetaIdFromToken(validationToken.getToken());
-            if(stanzaService.getRuoloByUserAndStanzaID(metaID,IdStanza).getNome().equalsIgnoreCase("Organizzatore_Master"))
-            {
-                throw new ServerRuntimeException("Non puoi bannare un organizzatore. Non sei un organizzatore master");
-            }
-
-            return stanzaService.banOrganizzatore(stanza,metaID,IdOrganizzatore);
-
-        } catch (RuntimeException403 re) {
-            return ResponseEntity.status(403)
-                    .body(new Response<>(false, "Errore durante l'operazione: " + re.getMessage()));
-        } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.status(500)
-                    .body(new Response<>(false, "Errore durante l'operazione"));
-        }
-    }
-
-    @PostMapping(value = "/banPartecipante/{IdStanza}/{IdPartecipante}")
-    public ResponseEntity<Response<Boolean>> banPartecipante(
-            @PathVariable Long IdStanza,
-            @RequestBody Long IdPartecipante,
-            HttpServletRequest request) {
-
-        try {
-            //controllo del token
-            if (!validationToken.isTokenValid(request)) {
-                throw new RuntimeException403("Token non valido");
-            }
-
-            Stanza stanza = stanzaService.findStanza(IdStanza);
-            if(stanza == null)
-            {
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                        .body(new Response<>(null,"ID stanza non valido"));
-            }
-
-            String metaID = jwtTokenUtil.getMetaIdFromToken(validationToken.getToken());
-            if(stanzaService.getRuoloByUserAndStanzaID(metaID,IdStanza).getNome().equalsIgnoreCase("Partecipante"))
-            {
-                throw new ServerRuntimeException("Non puoi bannare un partecipante essendo dello stesso grado.");
-            }
-
-            return stanzaService.banPartecipante(stanza,metaID,IdPartecipante);
+            return stanzaService.banUtente(IdStanza,metaID,IdUtente);
 
         } catch (RuntimeException403 re) {
             return ResponseEntity.status(403)

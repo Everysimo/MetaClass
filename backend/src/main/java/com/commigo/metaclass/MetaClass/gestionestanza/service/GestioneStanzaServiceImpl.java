@@ -76,33 +76,133 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService {
         }
     }
 
+
     @Override
-    public ResponseEntity<Response<Boolean>> banOrganizzatore(Stanza stanza, String metaId, Long idOrganizzatore)
-    {
-        Utente utente = utenteRepository.findUtenteById(idOrganizzatore);
-        StatoPartecipazione sp = statoPartecipazioneRepository.findStatoPartecipazioneByUtenteAndStanza(utente,stanza);
+    public ResponseEntity<Response<Boolean>> banUtente(Long IdStanza, String metaId, Long IdUtente)  throws ServerRuntimeException, RuntimeException403 {
+        Utente ogm;
+        if((ogm = utenteRepository.findFirstByMetaId(metaId))==null)
+            throw new ServerRuntimeException("errore nella ricerca dell'organizzatore master");
 
-        if(sp.isBannato())
-            return ResponseUtils.getResponseError(HttpStatus.INTERNAL_SERVER_ERROR,"Organizzatore già bannato");
+        //controllo organizzatore da bannare
+        Utente og;
+        if((og=utenteRepository.findUtenteById(IdUtente))==null)
+            throw new RuntimeException403("utente non trovato");
 
-        sp.setBannato(true);
-        sp.setRuolo(ruoloRepository.findByNome("Partecipante"));
-        statoPartecipazioneRepository.save(sp);
-        return ResponseUtils.getResponseOk("Organizzatore bannato con successo");
+        //controllo stanza
+        Stanza stanza;
+        if((stanza = stanzaRepository.findStanzaById(IdStanza))==null)
+            throw new RuntimeException403("stanza non trovata");
+
+        StatoPartecipazione stato_og = statoPartecipazioneRepository
+                .findStatoPartecipazioneByUtenteAndStanza(og, stanza);
+        if(stato_og==null)
+            throw new RuntimeException403("L'utente non ha acceduto alla stanza, forse è stato kickato");
+
+        if(stato_og.getRuolo().getNome().equalsIgnoreCase(Ruolo.ORGANIZZATORE)){
+            return banOrganizzatore(IdStanza, metaId, IdUtente);
+        }else if((stato_og.getRuolo().getNome().equalsIgnoreCase(Ruolo.PARTECIPANTE))){
+            return banPartecipante(IdStanza, metaId, IdUtente);
+        }else{
+            return ResponseEntity.ok(new Response<>(false, "Non puoi bannare un'organizzatore master"));
+        }
+    }
+        @Override
+    public ResponseEntity<Response<Boolean>> banOrganizzatore(Long IdStanza, String metaId, Long IdUtente)  throws ServerRuntimeException, RuntimeException403 {
+        //controllo organizzatore master
+            Utente ogm;
+            if((ogm = utenteRepository.findFirstByMetaId(metaId))==null)
+                throw new ServerRuntimeException("errore nella ricerca dell'organizzatore master");
+
+            //controllo organizzatore da bannare
+            Utente og;
+            if((og=utenteRepository.findUtenteById(IdUtente))==null)
+                throw new RuntimeException403("utente non trovato");
+
+            //controllo stanza
+            Stanza stanza;
+            if((stanza = stanzaRepository.findStanzaById(IdStanza))==null)
+                throw new RuntimeException403("stanza non trovata");
+
+            //controllo dell'accesso dell'organizzatore master nella stanza
+        StatoPartecipazione stato_ogm = statoPartecipazioneRepository
+                .findStatoPartecipazioneByUtenteAndStanza(ogm, stanza);
+        if(stato_ogm==null)  throw new ServerRuntimeException("l'organizzatore master sembra "+
+                "non aver acceduto alla stanza");
+
+        //controllo del ruolo di organizztaore master
+        if (stato_ogm.getRuolo().getNome().equalsIgnoreCase(Ruolo.ORGANIZZATORE_MASTER)) {
+
+            //ricerco e controllo se l'organizzatore ha fatto accesso alla stanza
+            StatoPartecipazione stato_og = statoPartecipazioneRepository
+                    .findStatoPartecipazioneByUtenteAndStanza(og, stanza);
+            if(stato_og==null)
+                throw new RuntimeException403("L'utente non ha acceduto alla stanza, forse è stato kickato");
+
+            //verifico se l'organizzatore è in attesa
+            if(stato_og.isInAttesa())
+                throw new RuntimeException403("L'utente è in attesa di entrare in stanza, non può essere bannato");
+
+            //verifico se l'organizzatore è  già bannato
+            if(stato_og.isBannato())
+                throw new RuntimeException403("L'utente selezionato è già bannato!");
+
+            //se è organizzatpre allora posso bannarlo
+            stato_og.setBannato(true);
+            statoPartecipazioneRepository.save(stato_og);
+
+            return ResponseEntity.ok(new Response<>(true, "L'organizzatore selezionato ora è bannato"));
+
+        }else{
+            throw new RuntimeException403("Non puoi bannare un'organizzatore se non sei un organizzatore master");
+        }
     }
 
     @Override
-    public ResponseEntity<Response<Boolean>> banPartecipante(Stanza stanza, String metaId, Long idPartecipante)
-    {
-        Utente utente = utenteRepository.findUtenteById(idPartecipante);
-        StatoPartecipazione sp = statoPartecipazioneRepository.findStatoPartecipazioneByUtenteAndStanza(utente,stanza);
+    public ResponseEntity<Response<Boolean>> banPartecipante(Long IdStanza, String metaId, Long IdUtente) throws ServerRuntimeException, RuntimeException403 {
+        //controllo organizzatore master
+        Utente ogm;
+        if((ogm = utenteRepository.findFirstByMetaId(metaId))==null)
+            throw new ServerRuntimeException("errore nella ricerca dell'organizzatore master");
 
-        if(sp.isBannato())
-            return ResponseUtils.getResponseError(HttpStatus.INTERNAL_SERVER_ERROR,"Utente già bannato");
+        //controllo organizzatore da bannare
+        Utente og;
+        if((og=utenteRepository.findUtenteById(IdUtente))==null)
+            throw new RuntimeException403("utente non trovato");
 
-        sp.setBannato(true);
-        statoPartecipazioneRepository.save(sp);
-        return ResponseUtils.getResponseOk("Utente bannato con successo");
+        //controllo stanza
+        Stanza stanza;
+        if((stanza = stanzaRepository.findStanzaById(IdStanza))==null)
+            throw new RuntimeException403("stanza non trovata");
+
+        //controllo dell'accesso dell'organizzatore master nella stanza
+        StatoPartecipazione stato_ogm = statoPartecipazioneRepository
+                .findStatoPartecipazioneByUtenteAndStanza(ogm, stanza);
+        if(stato_ogm==null)  throw new ServerRuntimeException("l'organizzatore master sembra "+
+                "non aver acceduto alla stanza");
+
+        //controllo del ruolo di organizztaore
+        if (stato_ogm.getRuolo().getNome().equalsIgnoreCase(Ruolo.ORGANIZZATORE_MASTER) || stato_ogm.getRuolo().getNome().equalsIgnoreCase(Ruolo.ORGANIZZATORE)) {
+            //ricerco e controllo se l'organizzatore ha fatto accesso alla stanza
+            StatoPartecipazione stato_og = statoPartecipazioneRepository
+                    .findStatoPartecipazioneByUtenteAndStanza(og, stanza);
+            if(stato_og==null)   throw new RuntimeException403("L'utente non ha acceduto alla stanza, forse è stato kickato");
+
+            //verifico se l'utente è in attesa
+            if(stato_og.isInAttesa())
+                throw new RuntimeException403("L'utente è in attesa di entrare in stanza, non può essere bannato");
+
+            //verifico se l'utente è già bannato
+            if(stato_og.isBannato())
+                throw new RuntimeException403("L'utente selezionato è già bannato!");
+
+            stato_og.setBannato(true);
+            statoPartecipazioneRepository.save(stato_og);
+            return ResponseEntity.ok(new Response<>(true, "L'utente selezionato ora è bannato"));
+
+        }else{
+            throw new RuntimeException403("Non puoi bannare un'utente perché " +
+                    "non sei almeno un organizzatore");
+        }
     }
 
     @Override
