@@ -105,4 +105,13 @@ public class Meeting {
 
           this.scenario_iniziale = new Scenario();
     }
+
+    public Meeting(String nome, LocalDateTime inizio, LocalDateTime fine, boolean isAvviato, Scenario scenario_iniziale, Stanza stanza) {
+        this.nome = nome;
+        this.inizio = inizio;
+        this.fine = fine;
+        this.isAvviato = isAvviato;
+        this.scenario_iniziale = scenario_iniziale;
+        this.stanza = stanza;
+    }
 }

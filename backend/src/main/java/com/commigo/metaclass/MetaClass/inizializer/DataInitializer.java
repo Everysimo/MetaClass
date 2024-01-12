@@ -3,6 +3,8 @@ import com.commigo.metaclass.MetaClass.entity.*;
 import com.commigo.metaclass.MetaClass.gestioneamministrazione.repository.CategoriaRepository;
 import com.commigo.metaclass.MetaClass.gestioneamministrazione.repository.ImmagineRepository;
 import com.commigo.metaclass.MetaClass.gestioneamministrazione.repository.ScenarioRepository;
+import com.commigo.metaclass.MetaClass.gestionemeeting.repository.MeetingRepository;
+import com.commigo.metaclass.MetaClass.gestionemeeting.repository.UtenteInMeetingRepository;
 import com.commigo.metaclass.MetaClass.gestionestanza.repository.RuoloRepository;
 import com.commigo.metaclass.MetaClass.gestionestanza.repository.StanzaRepository;
 import com.commigo.metaclass.MetaClass.gestionestanza.repository.StatoPartecipazioneRepository;
@@ -12,6 +14,8 @@ import com.commigo.metaclass.MetaClass.utility.multipleid.StatoPartecipazioneId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
+
+import java.time.LocalDateTime;
 
 import static com.commigo.metaclass.MetaClass.entity.Ruolo.ORGANIZZATORE_MASTER;
 
@@ -25,6 +29,9 @@ public class DataInitializer implements CommandLineRunner {
     private final UtenteRepository utenteRepository;
     private final StatoPartecipazioneRepository statoPartecipazioneRepository;
 
+    private final UtenteInMeetingRepository utenteInMeetingRepository;
+
+    private final MeetingRepository meetingRepository;
     private final ImmagineRepository immagineRepository;
 
     private final GestioneStanzaServiceImpl stanzaService;
@@ -32,13 +39,15 @@ public class DataInitializer implements CommandLineRunner {
 
 
     @Autowired
-    public DataInitializer(RuoloRepository ruoloRepository, CategoriaRepository categoriaRepository, ScenarioRepository scenarioRepository, StanzaRepository stanzaRepository, UtenteRepository utenteRepository, StatoPartecipazioneRepository statoPartecipazioneRepository, ImmagineRepository immagineRepository, GestioneStanzaServiceImpl stanzaService) {
+    public DataInitializer(RuoloRepository ruoloRepository, CategoriaRepository categoriaRepository, ScenarioRepository scenarioRepository, StanzaRepository stanzaRepository, UtenteRepository utenteRepository, StatoPartecipazioneRepository statoPartecipazioneRepository, UtenteInMeetingRepository utenteInMeetingRepository, MeetingRepository meetingRepository, ImmagineRepository immagineRepository, GestioneStanzaServiceImpl stanzaService) {
         this.ruoloRepository = ruoloRepository;
         this.categoriaRepository = categoriaRepository;
         this.scenarioRepository = scenarioRepository;
         this.stanzaRepository = stanzaRepository;
         this.utenteRepository = utenteRepository;
         this.statoPartecipazioneRepository = statoPartecipazioneRepository;
+        this.utenteInMeetingRepository = utenteInMeetingRepository;
+        this.meetingRepository = meetingRepository;
         this.immagineRepository = immagineRepository;
         this.stanzaService = stanzaService;
     }
@@ -103,6 +112,24 @@ public class DataInitializer implements CommandLineRunner {
             StatoPartecipazione sp13 = statoPartecipazioneRepository.save(new StatoPartecipazione(s4, u3, stanzaService.getRuolo(Ruolo.PARTECIPANTE), false, true, "Giorgio", false));
             StatoPartecipazione sp14 = statoPartecipazioneRepository.save(new StatoPartecipazione(s4, u4, stanzaService.getRuolo(Ruolo.PARTECIPANTE), false, false, "Domenico", false));
 
-    }
+            //Aggiunta meeting
+            LocalDateTime inizio = LocalDateTime.of(2024, 1, 12, 12, 0);
+            LocalDateTime fine = LocalDateTime.of(2024, 1, 12, 13, 0);
+            Meeting m1 = meetingRepository.save(new Meeting("Meeting1", inizio, fine, false, sc3, s4));
 
+            LocalDateTime inizio2 = LocalDateTime.of(2024, 10, 21, 12, 0);
+            LocalDateTime fine2 = LocalDateTime.of(2024, 10, 21, 14, 0);
+            Meeting m2 = meetingRepository.save(new Meeting("Meeting2", inizio2, fine2, true, sc2, s4));
+
+            //Aggiunta Utente in meeting
+            UtenteInMeeting um1 = utenteInMeetingRepository.save(new UtenteInMeeting(u5, m1, true));
+            UtenteInMeeting um2 = utenteInMeetingRepository.save(new UtenteInMeeting(u4, m1, true));
+            UtenteInMeeting um3 = utenteInMeetingRepository.save(new UtenteInMeeting(u2, m1, true));
+            UtenteInMeeting um4 = utenteInMeetingRepository.save(new UtenteInMeeting(u1, m1, true));
+
+            UtenteInMeeting um5 = utenteInMeetingRepository.save(new UtenteInMeeting(u5, m2, false));
+            UtenteInMeeting um6 = utenteInMeetingRepository.save(new UtenteInMeeting(u2, m2, false));
+            UtenteInMeeting um7 = utenteInMeetingRepository.save(new UtenteInMeeting(u3, m2, false));
+
+    }
 }

@@ -13,7 +13,7 @@ import org.springframework.stereotype.Repository;
 import java.time.LocalDateTime;
 import java.util.List;
 
-@Repository("MeetingRespository")
+@Repository("MeetingRepository")
 public interface MeetingRepository extends JpaRepository<Meeting, Long> {
     /*@Query("SELECT CASE WHEN COUNT(m) > 0 THEN true ELSE false END FROM Meeting m " +
             "WHERE (:newInizio BETWEEN m.inizio AND m.fine OR :newFine BETWEEN m.inizio AND m.fine) " +
