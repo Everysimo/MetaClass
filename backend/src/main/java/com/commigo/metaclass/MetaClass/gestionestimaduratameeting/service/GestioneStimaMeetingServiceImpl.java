@@ -4,7 +4,7 @@ import com.commigo.metaclass.MetaClass.entity.Utente;
 import com.commigo.metaclass.MetaClass.exceptions.RuntimeException403;
 import com.commigo.metaclass.MetaClass.exceptions.ServerRuntimeException;
 import com.commigo.metaclass.MetaClass.gestionestimaduratameeting.adapter.StimaDurataMeetingAdapter;
-import com.commigo.metaclass.MetaClass.gestionestimaduratameeting.adapter.StimaDurataMeetingAdapterImpl;
+//import com.commigo.metaclass.MetaClass.gestionestimaduratameeting.adapter.StimaDurataMeetingAdapterImpl;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
@@ -21,9 +21,9 @@ public class GestioneStimaMeetingServiceImpl implements GestioneStimaMeetingServ
     /**
      * constructor
      */
-    public GestioneStimaMeetingServiceImpl(){
-        stimaProgressiAdapter = new StimaDurataMeetingAdapterImpl();
-    }
+   // public GestioneStimaMeetingServiceImpl(){
+       // stimaProgressiAdapter = new StimaDurataMeetingAdapterImpl();
+    //}
 
 
    /**
