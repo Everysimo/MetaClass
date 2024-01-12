@@ -22,22 +22,23 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/*
 public class StimaDurataMeetingAdapterImpl implements StimaDurataMeetingAdapter {
-
+*/
     /**
      * modello d'intelligenza artificiale.
      */
-    private final Model modelloIntelligente;
+   /* private final Model modelloIntelligente;
     private StanzaRepository stanzaRepository;
-    private StatoPartecipazioneRepository statoPartecipazioneRepository;
+    private StatoPartecipazioneRepository statoPartecipazioneRepository; */
 
     /**
      * constructor.
      */
-    public StimaDurataMeetingAdapterImpl(){
+   /* public StimaDurataMeetingAdapterImpl(){
         modelloIntelligente = Model.fromString("");    //da inserire specifiche del modello
     }
-
+*/
     /**
      * metodo che serve a calcolare la durata consigliata di un meeting in base
      * al numero e tipo di persone presenti nella stanza.
@@ -45,6 +46,8 @@ public class StimaDurataMeetingAdapterImpl implements StimaDurataMeetingAdapter 
      * @param id_stanza identificativo stanza
      * @return durata meeting stimata
      */
+
+    /*
     @Override
     public Double getDurataMeeting(Long id_stanza) throws RuntimeException403, ServerRuntimeException {
 
@@ -82,12 +85,16 @@ public class StimaDurataMeetingAdapterImpl implements StimaDurataMeetingAdapter 
 
     }
 
+   */
+
 /**
  * questo metodo serve per aggiungere le informazioni di un utente nel dataset
  *
  * @param u
  * @param durata
 */
+
+  /*
     @Override
     public void addUtenteInDataset(Utente u, Duration durata, int immersionLevel) throws ServerRuntimeException {
         try (FileWriter fileWriter = new FileWriter("data.csv", true);
@@ -138,4 +145,5 @@ public class StimaDurataMeetingAdapterImpl implements StimaDurataMeetingAdapter 
 
 
 }
+  */
 
