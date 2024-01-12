@@ -3,6 +3,7 @@ plugins {
 	id 'org.springframework.boot' version '3.2.1'
 	id 'io.spring.dependency-management' version '1.1.4'
 	id 'checkstyle'
+	id 'jacoco'
 }
 
 group = 'com.commigo.metaclass'
@@ -52,6 +53,8 @@ dependencies {
 	implementation 'com.auth0:java-jwt:3.18.1'
 	implementation 'org.pmml4s:pmml4s_2.12:0.9.12'
 	implementation 'org.apache.commons:commons-csv:1.8'
+	testImplementation 'junit:junit:4.13.1'
+	testImplementation 'junit:junit:4.13.1'
 	annotationProcessor 'org.projectlombok:lombok:1.18.30'
 	implementation 'org.hibernate:hibernate-validator:7.0.2.Final'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
