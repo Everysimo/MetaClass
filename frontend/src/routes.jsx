@@ -11,6 +11,7 @@ import {Account} from "./pages/Account";
 import {SingleRoom} from "./pages/SingleRoom";
 import {VisualRoomList} from "./pages/visualRoomList";
 import {SelezionaScenario} from "./pages/changescenario";
+import {PreviousMeeting} from "./pages/previousMeeting";
 
 export const Rts = () =>{
     return(
@@ -27,6 +28,8 @@ export const Rts = () =>{
                 <Route path="/accessManagement/:id" element={<GestioneAccessi/>}/>
                 <Route path="/changescenario/:id" element={<SelezionaScenario/>}/>
                 <Route path="/bannedUserList/:id" element={<BannedList/>}/>
+                <Route path="/previousMeeting" element={<PreviousMeeting/>}/>
+
             </Routes>
         </Router>
     )
