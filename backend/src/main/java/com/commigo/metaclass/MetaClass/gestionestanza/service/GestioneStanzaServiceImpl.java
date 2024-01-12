@@ -206,8 +206,7 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService {
     }
 
     @Override
-    public boolean creaStanza(Stanza s) throws Exception {
-        String metaID = jwtTokenUtil.getMetaIdFromToken(validationToken.getToken());
+    public boolean creaStanza(Stanza s, String metaID) throws Exception {
 
         if (metaID == null)
             throw new ServerRuntimeException("Errore col metaID");
