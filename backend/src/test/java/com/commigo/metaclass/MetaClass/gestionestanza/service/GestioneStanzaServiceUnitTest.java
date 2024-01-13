@@ -2,31 +2,26 @@ package com.commigo.metaclass.MetaClass.gestionestanza.service;
 
 import com.commigo.metaclass.MetaClass.MetaClassApplicationTests;
 import com.commigo.metaclass.MetaClass.entity.*;
-import com.commigo.metaclass.MetaClass.exceptions.MismatchJsonProperty;
-import com.commigo.metaclass.MetaClass.exceptions.RuntimeException403;
-import com.commigo.metaclass.MetaClass.exceptions.ServerRuntimeException;
 import com.commigo.metaclass.MetaClass.gestioneamministrazione.repository.ScenarioRepository;
+import com.commigo.metaclass.MetaClass.gestionemeeting.repository.MeetingRepository;
+import com.commigo.metaclass.MetaClass.gestionemeeting.service.GestioneMeetingServiceImpl;
 import com.commigo.metaclass.MetaClass.gestionestanza.repository.RuoloRepository;
 import com.commigo.metaclass.MetaClass.gestionestanza.repository.StanzaRepository;
 import com.commigo.metaclass.MetaClass.gestionestanza.repository.StatoPartecipazioneRepository;
 import com.commigo.metaclass.MetaClass.gestioneutenza.repository.UtenteRepository;
-import com.commigo.metaclass.MetaClass.inizializer.DataInitializer;
-import com.commigo.metaclass.MetaClass.utility.response.types.Response;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
-
-import java.io.IOException;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Optional;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 
@@ -50,10 +45,15 @@ public class GestioneStanzaServiceUnitTest {
     private RuoloRepository ruoloRepository;
     @Mock
     private ScenarioRepository scenarioRepository;
+    @Mock
+    private MeetingRepository meetingRepository;
     @InjectMocks
     private GestioneStanzaServiceImpl gestioneStanzaServiceImpl;
+    @InjectMocks
+    private GestioneMeetingServiceImpl gestioneMeetingServiceImpl;
     private Stanza stanza;
     private Utente utente;
+    private Meeting meeting;
     private Ruolo partecipante;
     private Ruolo organizzatore;
     private Ruolo organizzatore_master;
@@ -81,6 +81,10 @@ public class GestioneStanzaServiceUnitTest {
         statoPartecipazione = new StatoPartecipazione(stanza, utente,
                 new Ruolo(1L, "Organizzatore_Master"), false, false,
                 "Michele", false);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+        meeting = new Meeting(1L, "MeetingStanza4",
+                LocalDateTime.parse("2024-02-02 18:00",formatter),
+                LocalDateTime.parse("2024-02-02 20:00",formatter), false, scenario, stanza );
     }
 
     /*
@@ -145,6 +149,28 @@ public class GestioneStanzaServiceUnitTest {
         // Verifica il risultato atteso
         assertTrue(result);
     }
+
+    @Test
+    void testCreaSchedulingOnSuccess() {
+
+        // Mocking
+        when(meetingRepository.findById(meeting.getId())).thenReturn(Optional.empty());
+        when(stanzaRepository.findStanzaById(stanza.getId())).thenReturn(stanza);
+        when(utenteRepository.findFirstByMetaId(utente.getMetaId())).thenReturn(utente);
+        when(statoPartecipazioneRepository.findStatoPartecipazioneByUtenteAndStanza(utente, stanza))
+                .thenReturn(statoPartecipazione);
+        when(meetingRepository.hasOverlappingMeetings(meeting.getInizio(), meeting.getFine())).thenReturn(false);
+
+        // Test
+        try {
+            boolean result = gestioneMeetingServiceImpl.creaScheduling(meeting, utente.getMetaId());
+            assertTrue(result);
+        } catch (Exception e) {
+            fail("Exception not expected: " + e.getMessage());
+        }
+
+    }
+
 
 
 }
