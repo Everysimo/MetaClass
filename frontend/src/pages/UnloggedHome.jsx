@@ -11,12 +11,12 @@ export default function UnloggedHome(){
                 <MyHeader/>
             </header>
             <section className="showcase">
-                <video muted loop autoPlay>
-                    <source src={Video} type={"video/mp4"}/>
+                <video muted loop autoPlay playsInline>
+                    <source src={Video} type="video/mp4"/>
                 </video>
                 <div className="overlay"></div>
                 <div className="text">
-                    <h2>metaclass </h2>
+                <h2>metaclass </h2>
                     <h3>a doorway to the future</h3>
                     <p>
                         Nato da un piccolo progetto universitario, il nostro obiettivo &egrave
