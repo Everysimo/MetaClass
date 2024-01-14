@@ -138,7 +138,6 @@ const MyModifyForm = () => {
                                     className={'textarea-field'}
                                     placeholder={'Aggiungi Descrizione'}
                                     rows={5}
-                                    style={{resize: 'none', width: '300px'}}
                                     type="text"
                                     value={state.descrizione}
                                     onChange={handleDescriptionChange}
@@ -162,7 +161,6 @@ const MyModifyForm = () => {
                                 value={state.maxPosti}
                                 onChange={handleMAXChange}
                             />
-                            <button type="submit">Save Changes</button>
                             <button
                                 type="button"
                                 onClick={deleteButton}
@@ -173,7 +171,7 @@ const MyModifyForm = () => {
                                 type="button"
                                 onClick={() => sendDataModifyRoom()}
                             >
-                                Modifica
+                                Salva
                             </button>
                         </div>
                     </div>

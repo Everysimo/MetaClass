@@ -252,7 +252,7 @@ const UserListInRoom = () => {
             <h2>Utenti In Stanza:</h2>
             {userList && userList.map((user) => (
                 <div key={user.id} className="user-card">
-                    <span>Nome: {`${user.nome} ${user.cognome}`}</span><br />
+                    <span>Nome: {`${user.nome} ${user.cognome}`}</span>
                     <span>Email: {`${user.email}`}</span>
                     <button onClick={() => toggleButtons(user.id)}>
                         Options <FontAwesomeIcon icon={faAlignCenter} style={{color: "#ffffff",}} />

@@ -1,6 +1,8 @@
 import React, {useEffect, useState} from 'react';
 import axios from 'axios';
 import '../PopUpStyles.css';
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {faUserPen} from "@fortawesome/free-solid-svg-icons";
 
 const EditUserDetails = ({ userDetails, setUserDetails }) => {
     const [showModal, setShowModal] = useState(false);
@@ -72,7 +74,11 @@ const EditUserDetails = ({ userDetails, setUserDetails }) => {
 
     return (
         <div className={"childDiv"}>
-            <button onClick={() => setShowModal(true)}>Modify Details</button>
+            <button
+                onClick={() => setShowModal(true)}
+            >
+                Modifica <FontAwesomeIcon icon={faUserPen} size="lg" style={{color: "#ffffff",}} />
+            </button>
 
             {showModal && (
                 <div className="modal">

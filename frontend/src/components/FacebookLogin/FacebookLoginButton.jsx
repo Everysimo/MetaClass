@@ -120,7 +120,7 @@ export default class Facebook extends Component {
             <div className={"loginForm"}>
                 {isLoggedIn ? (
                     <>
-                        <h2>Welcome, {nome}!</h2>
+                        <h2>Ciao, {nome}!</h2>
                         <div className={"masterDiv"}>
                             <span className={"childDiv"}>
                                 <NavigateToPageBtn />
@@ -130,7 +130,7 @@ export default class Facebook extends Component {
                     </>
                 ) : (
                     <>
-                        <h2>To use this system, you need to login via Facebook</h2>
+                        <h2>Per usare questo sistema, &egrave necessario il Login via Facebook</h2>
                         <FacebookLogin
                             scope={"public_profile,user_gender,user_birthday"}
                             fields={"id,name,birthday,gender,email"}
@@ -141,7 +141,7 @@ export default class Facebook extends Component {
                             }}
                             onProfileSuccess={this.responseFacebook}
                         >
-                            Login with Facebook <FontAwesomeIcon icon={faFacebook} size={"xl"} style={{ color: '#ffffff' }} />
+                            Login con Facebook <FontAwesomeIcon icon={faFacebook} size={"xl"} style={{ color: '#ffffff' }} />
                         </FacebookLogin>
                     </>
                 )}

@@ -12,7 +12,7 @@ import CreaScenario from "../components/Forms/CreaScenarioForm/CreaScenario";
 import ModificaScenario from "../components/Forms/CreaScenarioForm/ModificaScenario";
 import AccediStanza from "../components/Forms/enterRoomForm/accediStanza";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faChalkboardUser, faCirclePlus, faDoorOpen, faUser} from "@fortawesome/free-solid-svg-icons";
+import {faCirclePlus, faDoorOpen, faUser} from "@fortawesome/free-solid-svg-icons";
 import RoomList from "../components/RoomList/RoomList";
 
 export const LoggedInHome = () => {
@@ -48,11 +48,6 @@ export const LoggedInHome = () => {
         // Naviga alla pagina di destinazione con il valore 42
         navigate(`/Account`);
     };
-
-    const handleGoToRoomList= () => {
-        // Naviga alla pagina di destinazione con il valore 42
-        navigate(`/visualRoomList`);
-    };
     const handleGoToCreateRoom= () => {
         // Naviga alla pagina di destinazione con il valore 42
         navigate(`/createroom`);
@@ -68,21 +63,21 @@ export const LoggedInHome = () => {
             <header>
                 <MyHeader />
             </header>
-            <main>
+            <main className={"bg"}>
                 <section className={"roomSec"}>
                     <h1>BENTORNATO, {nome}</h1>
                     <div className={"layout"}>
-                        <div className={"whiteBg"}>
+                        <div className={"transWhiteBg"}>
                             <FontAwesomeIcon icon={faUser} size="2xl" style={{color: "#c70049",}}/>
                             <h2>Account</h2>
                             <button onClick={handleGoToProfile}>vai ad Account</button>
                         </div>
-                        <div className={"whiteBg"}>
+                        <div className={"transWhiteBg"}>
                             <FontAwesomeIcon icon={faCirclePlus} size="2xl" style={{color: "#c70049",}}/>
                             <h2>Creazione stanza</h2>
                             <button onClick={handleGoToCreateRoom}>Crea stanza</button>
                         </div>
-                        <div className={"whiteBg"}>
+                        <div className={"transWhiteBg"}>
                             <FontAwesomeIcon icon={faDoorOpen} size="2xl" style={{color: "#c70049",}}/>
                             <h2>Ingresso stanza</h2>
                             <AccediStanza/>
@@ -129,7 +124,6 @@ export const LoggedInHome = () => {
             <footer>
                 <MyFooter/>
             </footer>
-
         </>
     );
 };
