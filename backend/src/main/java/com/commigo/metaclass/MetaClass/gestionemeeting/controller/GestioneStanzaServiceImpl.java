@@ -1,4 +1,4 @@
-package com.commigo.metaclass.MetaClass.gestionestanza.service;
+package com.commigo.metaclass.MetaClass.gestionemeeting.controller;
 
 import com.commigo.metaclass.MetaClass.entity.*;
 import com.commigo.metaclass.MetaClass.exceptions.RuntimeException401;
@@ -20,7 +20,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.TransactionSystemException;
 
 import java.util.List;
 import java.util.Map;

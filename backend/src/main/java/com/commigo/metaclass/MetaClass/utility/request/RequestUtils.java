@@ -11,7 +11,7 @@ public class RequestUtils {
     public static String errorsRequest(BindingResult result){
         List<String> errors = result.getFieldErrors().stream()
                 .map(FieldError::getDefaultMessage)
-                .collect(Collectors.toList());
+                .toList();
         return String.join(", ", errors);
     }
 

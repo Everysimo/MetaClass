@@ -7,7 +7,7 @@ import com.commigo.metaclass.MetaClass.gestionemeeting.repository.MeetingReposit
 import com.commigo.metaclass.MetaClass.gestionestanza.repository.RuoloRepository;
 import com.commigo.metaclass.MetaClass.gestionestanza.repository.StanzaRepository;
 import com.commigo.metaclass.MetaClass.gestionestanza.repository.StatoPartecipazioneRepository;
-import com.commigo.metaclass.MetaClass.gestionestanza.service.GestioneStanzaServiceImpl;
+import com.commigo.metaclass.MetaClass.gestionemeeting.controller.GestioneStanzaServiceImpl;
 import com.commigo.metaclass.MetaClass.gestioneutenza.repository.UtenteRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;

@@ -88,16 +88,13 @@ public class GestioneMeetingController {
 
             //controlla se i parametri passati al meeting sono corretti
             if(result.hasErrors()) {
-                throw new ServerRuntimeException(RequestUtils.errorsRequest(result));
+                throw new RuntimeException403(RequestUtils.errorsRequest(result));
             }
 
             String metaID = jwtTokenUtil.getMetaIdFromToken(validationToken.getToken());
 
-            if (!meetingService.creaScheduling(m,metaID)) {
-                throw new RuntimeException("Meeting non effettuato");
-            } else {
-                return ResponseEntity.ok(new Response<>(true, "Meeting schedulato con successo"));
-            }
+            meetingService.creaScheduling(m,metaID);
+            return ResponseEntity.ok(new Response<>(true, "Meeting schedulato con successo"));
 
         } catch (RuntimeException403 e) {
             return ResponseEntity.status(403)

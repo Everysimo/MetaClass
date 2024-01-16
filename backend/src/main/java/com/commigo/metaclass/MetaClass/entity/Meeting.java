@@ -29,9 +29,9 @@ public class Meeting {
     public static final int MAX_NAME_LENGTH = 254;
 
     /**
-     * Costante per valore intero di 1.
+     * Costante per valore intero di 2.
      */
-    public static final int MIN_NAME_LENGTH = 1;
+    public static final int MIN_NAME_LENGTH = 2;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -48,12 +48,12 @@ public class Meeting {
     private String nome;
 
     @NotNull(message = "L'inizio non può essere nullo")
-    @Future(message = "l'inizio deve essere successivo alla data odierna")
+    @Future(message = "l'inizio deve essere successiva alla data odierna")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
     private LocalDateTime inizio;
 
     @NotNull(message = "La fine non può essere nulla")
-    @Future(message = "la fine deve essere successivo alla data odierna")
+    @Future(message = "la fine deve essere successiva alla data odierna")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
     private LocalDateTime fine;
 
