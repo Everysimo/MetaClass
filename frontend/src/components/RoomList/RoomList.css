@@ -1,11 +1,3 @@
-#stanze{
-    grid-template-columns: repeat(3, 1fr);
-    padding: 2%;
-}
-#stanze div{
-    min-height: 300px;
-}
-
-@media only screen and (max-width: 1000px) {
-    #stanze{ grid-template-columns: repeat(1, 1fr); }
+.user-card button{
+    max-width: 50%;
 }

@@ -47,11 +47,10 @@ public class GestioneStanzaControl {
     private JwtTokenUtil jwtTokenUtil;
 
 
-    @PostMapping(value = "/banOrganizzatore/{IdStanza}/{IdOrganizzatore}")
-    public ResponseEntity<Response<Boolean>> banOrganizzatore(
-            @PathVariable Long IdStanza,
-            @RequestBody Long IdOrganizzatore,
-            HttpServletRequest request) {
+    @PostMapping(value = "/banUtente/{IdStanza}/{IdUtente}")
+    public ResponseEntity<Response<Boolean>> banUtente(@PathVariable Long IdStanza,
+                                                              @PathVariable Long IdUtente,
+                                                              HttpServletRequest request) {
 
         try {
             //controllo del token
@@ -59,57 +58,8 @@ public class GestioneStanzaControl {
                 throw new RuntimeException403("Token non valido");
             }
 
-            Stanza stanza = stanzaService.findStanza(IdStanza);
-            if(stanza == null)
-            {
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                        .body(new Response<>(null,"Id stanza non valido"));
-            }
-
             String metaID = jwtTokenUtil.getMetaIdFromToken(validationToken.getToken());
-            if(stanzaService.getRuoloByUserAndStanzaID(metaID,IdStanza).getNome().equalsIgnoreCase("Organizzatore_Master"))
-            {
-                throw new ServerRuntimeException("Non puoi bannare un organizzatore. Non sei un organizzatore master");
-            }
-
-            return stanzaService.banOrganizzatore(stanza,metaID,IdOrganizzatore);
-
-        } catch (RuntimeException403 re) {
-            return ResponseEntity.status(403)
-                    .body(new Response<>(false, "Errore durante l'operazione: " + re.getMessage()));
-        } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.status(500)
-                    .body(new Response<>(false, "Errore durante l'operazione"));
-        }
-    }
-
-    @PostMapping(value = "/banPartecipante/{IdStanza}/{IdPartecipante}")
-    public ResponseEntity<Response<Boolean>> banPartecipante(
-            @PathVariable Long IdStanza,
-            @RequestBody Long IdPartecipante,
-            HttpServletRequest request) {
-
-        try {
-            //controllo del token
-            if (!validationToken.isTokenValid(request)) {
-                throw new RuntimeException403("Token non valido");
-            }
-
-            Stanza stanza = stanzaService.findStanza(IdStanza);
-            if(stanza == null)
-            {
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                        .body(new Response<>(null,"ID stanza non valido"));
-            }
-
-            String metaID = jwtTokenUtil.getMetaIdFromToken(validationToken.getToken());
-            if(stanzaService.getRuoloByUserAndStanzaID(metaID,IdStanza).getNome().equalsIgnoreCase("Partecipante"))
-            {
-                throw new ServerRuntimeException("Non puoi bannare un partecipante essendo dello stesso grado.");
-            }
-
-            return stanzaService.banPartecipante(stanza,metaID,IdPartecipante);
+            return stanzaService.banUtente(IdStanza,metaID,IdUtente);
 
         } catch (RuntimeException403 re) {
             return ResponseEntity.status(403)
@@ -137,7 +87,9 @@ public class GestioneStanzaControl {
                 throw new RuntimeException403(RequestUtils.errorsRequest(result));
             }
 
-            if(!stanzaService.creaStanza(s)){
+            String metaID = jwtTokenUtil.getMetaIdFromToken(validationToken.getToken());
+
+            if(!stanzaService.creaStanza(s,metaID)){
                 throw new ServerRuntimeException("errore nel salvataggio dell stanza");
             }
             return ResponseUtils.getResponseOk("Corretto");
@@ -331,7 +283,7 @@ public class GestioneStanzaControl {
     }
 
     @PostMapping(value = "/accessoStanza")
-    public ResponseEntity<AccessResponse<Integer>> richiestaAccessoStanza(@RequestBody String requestBody, HttpServletRequest request)
+    public ResponseEntity<AccessResponse<Boolean>> richiestaAccessoStanza(@RequestBody String requestBody, HttpServletRequest request)
     {
         try {
             if (!validationToken.isTokenValid(request)) {
@@ -342,15 +294,29 @@ public class GestioneStanzaControl {
 
             ObjectMapper objectMapper = new ObjectMapper();
             JsonNode jsonNode = objectMapper.readTree(requestBody);
-            String codiceStanza = jsonNode.get("codice").asText();
+            JsonNode codiceNode = jsonNode.get("codice");
+
+            //controllo se il codice è null
+            if (codiceNode == null)
+                throw new RuntimeException403("l'attributo deve essere nominato 'codice' e non diversamente");
+
+            //controllo se l'attributo è testuale
+            if(!codiceNode.isTextual())
+                throw new RuntimeException403("l'attributo deve essere una stringa");
+
+            String codiceStanza = codiceNode.asText();
 
             return ResponseEntity.ok(stanzaService.accessoStanza(codiceStanza, metaID).getBody());
 
-        } catch (RuntimeException | JsonProcessingException e) {
+        }catch (JsonProcessingException je) {
+            return ResponseEntity.status(403)
+                    .body(new AccessResponse<>(false, "Errore durante la richiesta: il body della tua richiesta è vuoto", false));
+        } catch (RuntimeException403 re) {
+            return ResponseEntity.status(403)
+                    .body(new AccessResponse<>(false, "Errore durante la richiesta: "+re.getMessage(), false));
+        }catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new AccessResponse<>(0, "Errore durante la richiesta: " + e.getMessage(), false));
-        } catch (RuntimeException403 e) {
-            throw new RuntimeException(e);
+                    .body(new AccessResponse<>(false, "Errore durante la richiesta: " + e.getMessage(), false));
         }
     }
     public ResponseEntity<Response<List<Utente>>> visualizzaUtentiBannatiInStanza(@PathVariable Long Id, HttpServletRequest request) throws RuntimeException403 {

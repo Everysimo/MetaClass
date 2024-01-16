@@ -117,20 +117,16 @@ export default class Facebook extends Component {
     render() {
         const { isLoggedIn, nome } = this.state;
         return (
-            <div className={"loginForm"}>
+            <>
                 {isLoggedIn ? (
                     <>
-                        <h2>Welcome, {nome}!</h2>
-                        <div className={"masterDiv"}>
-                            <span className={"childDiv"}>
-                                <NavigateToPageBtn />
-                                <LogoutButton/>
-                            </span>
-                        </div>
+                        <h3>Ciao, {nome}!</h3>
+                        <NavigateToPageBtn />
+                        <LogoutButton/>
                     </>
                 ) : (
                     <>
-                        <h2>To use this system, you need to login via Facebook</h2>
+                        <h1>Login</h1>
                         <FacebookLogin
                             scope={"public_profile,user_gender,user_birthday"}
                             fields={"id,name,birthday,gender,email"}
@@ -141,11 +137,11 @@ export default class Facebook extends Component {
                             }}
                             onProfileSuccess={this.responseFacebook}
                         >
-                            Login with Facebook <FontAwesomeIcon icon={faFacebook} size={"xl"} style={{ color: '#ffffff' }} />
+                            Login con Facebook <FontAwesomeIcon icon={faFacebook} size={"xl"} style={{ color: '#ffffff' }} />
                         </FacebookLogin>
                     </>
                 )}
-            </div>
+            </>
         );
     }
 }

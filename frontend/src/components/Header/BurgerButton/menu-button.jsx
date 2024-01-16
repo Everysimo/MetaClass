@@ -3,6 +3,7 @@ import './menu-button.css';
 import MCLogo from "../../../img/commigo.png";
 import { Link } from "react-router-dom";
 import isLoggedIn from "./loginCheck";
+import {UseSlidingAccount} from "../../SlidingAccount/slidingAccount";
 
 const BurgerButton = () => {
     const [isOpen, setIsOpen] = useState(false);
@@ -49,16 +50,11 @@ export function MyMenu() {
     return (
         <nav>
             {isLoggedIn()? (
-                <>
-                    <Link to="/Account">ACCOUNT</Link>
-                    <Link to="/LoggedInHome">HOME</Link>
-                </>
+                <Link to="/LoggedInHome">HOME</Link>
             ) : (
-                <>
-                    <Link to="/login">LOGIN</Link>
-                    <Link to="/">HOME</Link>
-                </>
+                <Link to="/">HOME</Link>
             )}
+            <UseSlidingAccount />
             <Link to="/">ABOUT</Link>
             <Link to="/">CONTACTS</Link>
         </nav>

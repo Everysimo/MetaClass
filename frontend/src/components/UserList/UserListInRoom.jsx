@@ -178,13 +178,81 @@ const UserListInRoom = () => {
         }
     };
 
+    const handleBanUserButton = (idutente) => {
+        console.log("idutente", idutente);
+        setSelectedUserId(idutente);
+        handleBanUser();
+    }
+    const handleBanUser = async () => {
+        const requestOption = {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + sessionStorage.getItem("token")
+            },
+        };
+        try {
+            const response = await fetch(
+                `http://localhost:8080/banUtente/${id_stanza}/${selectedUserId}`,
+                requestOption
+            );
+            if (!response.ok) {
+                throw new Error('Errore nella richiesta di Bannare il partecipante');
+            }
+            const data = await response.json();
+            console.log('data:', data);
+        } catch (error) {
+            console.error('Errore durante il ban dell\'utente:', error);
+        }
+    }
+
+    const handleDeclassifyButton = (idutente) => {
+        console.log(idutente);
+        setSelectedUserId(idutente);
+        handleDeclassify();
+    };
+
+    const handleDeclassify = async () => {
+        console.log('Before fetch call:', id_stanza, selectedUserId);
+
+        if (!id_stanza || !selectedUserId) {
+            console.error('Invalid id_stanza or selectedUserId');
+            return;
+        }
+
+        const requestOption = {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + sessionStorage.getItem("token")
+            },
+        };
+
+        try {
+            console.log('fetch call effettuata ');
+            const response = await fetch(
+                `http://localhost:8080/declassaOrganizzatore/{IdStanza}/{IdUtente}`,
+                requestOption
+            );
+            console.log('Fetch call completed');
+            console.log(response);
+            if (!response.ok) {
+                throw new Error('Errore nella richiesta di declassare');
+            }
+
+            const data = await response.json();
+            console.log('data:', data);
+        } catch (error) {
+            console.error('Errore nella richiesta di declassare:', error);
+        }
+    };
 
     return (
         <div>
             <h2>Utenti In Stanza:</h2>
             {userList && userList.map((user) => (
                 <div key={user.id} className="user-card">
-                    <span>Nome: {`${user.nome} ${user.cognome}`}</span><br />
+                    <span>Nome: {`${user.nome} ${user.cognome}`}</span>
                     <span>Email: {`${user.email}`}</span>
                     <button onClick={() => toggleButtons(user.id)}>
                         Options <FontAwesomeIcon icon={faAlignCenter} style={{color: "#ffffff",}} />
@@ -194,9 +262,8 @@ const UserListInRoom = () => {
                         <button onClick={() => handleKickUserButton(user.id)}>Kicka Partecipante</button>
                         <button onClick={() => handleSilenziaUserButton(user.id)}>Silenzia Partecipante</button>
                         <button onClick={() => handlePromotionButton(user.id)}>Promuovi</button>
-                        {/*<button onClick={() => handleBanUserButton(user.id)}>Banna Partecipante</button>*/}
-                        {/*<button onClick={handleBanOrganaiser() => }>Banna Organizzatore</button>*/}
-                        {/*<button onClick={() => handleDeclassifyButton(user.id)}>Declassa</button>*/}
+                        <button onClick={() => handleBanUserButton(user.id)}>Banna Partecipante</button>
+                        <button onClick={() => handleDeclassifyButton(user.id)}>Declassa</button> {/*Non Funziona*/}
                     </div>
                 </div>
             ))}

@@ -74,10 +74,9 @@ public class GestioneAmministrazioneController {
                 throw new RuntimeException403("Token non valido");
             }
 
-            //String metaID = jwtTokenUtil.getMetaIdFromToken(validationToken.getToken());
+            String metaID = jwtTokenUtil.getMetaIdFromToken(validationToken.getToken());
 
-            //verifica dei permessi
-            //if(!checkAdmin(metaID))  throw new RuntimeException403("Non sei amministratore");
+            if(!checkAdmin(metaID))  throw new RuntimeException403("Non sei amministratore");
             return stanzaControl.visualizzaUtentiBannatiInStanza(Id, request);
 
         }catch (RuntimeException403 re) {
@@ -95,12 +94,12 @@ public class GestioneAmministrazioneController {
             if (!validationToken.isTokenValid(request)) {
                 throw new RuntimeException403("Token non valido");
             }
-/*
+
             String metaID = jwtTokenUtil.getMetaIdFromToken(validationToken.getToken());
 
             //verifica dei permessi
             if(!checkAdmin(metaID))  throw new RuntimeException403("non sei amministratore");
-*/
+
             gestioneamministrazione.deleteBanToUser(idUtente,idStanza);
             return ResponseEntity.ok(new Response<>(true,"Ban annullato correttamente"));
 

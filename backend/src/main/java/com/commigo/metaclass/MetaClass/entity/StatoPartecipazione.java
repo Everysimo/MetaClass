@@ -121,7 +121,7 @@ public class StatoPartecipazione implements Serializable {
     }
 
     public StatoPartecipazione(Stanza stanza, Utente utente, Ruolo ruolo,
-                               boolean isInAttesa, boolean isBannato, String nomeInStanza, boolean isSilenziato) throws Exception {
+                               boolean isInAttesa, boolean isBannato, String nomeInStanza, boolean isSilenziato) throws TransactionSystemException {
         this.stanza = stanza;
         this.utente = utente;
         this.ruolo = ruolo;
