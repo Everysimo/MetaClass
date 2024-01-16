@@ -13,6 +13,7 @@ import java.util.Map;
 @Repository("UtenteRepository")
 public interface UtenteRepository extends JpaRepository<Utente, Long> {
 
+
     Utente findFirstByMetaId(String idMeta);
     Utente findUtenteById(long id);
     Long findByMetaId(String metaID);
