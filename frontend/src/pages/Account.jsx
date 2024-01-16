@@ -1,16 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import LogoutButton from '../components/LogoutButton/logoutButton';
+import LogoutButton from '../components/Buttons/LogoutButton/logoutButton';
 import { fetchUserDetails } from '../functions/fetchUserDetails';
-import { MyHeader } from "../components/Header/Header";
-import { MyFooter } from "../components/Footer/Footer";
+import { MyHeader } from "../components/Layout/Header/Header";
+import { MyFooter } from "../components/Layout/Footer/Footer";
 import EditUserDetails from '../components/Forms/ModifyUsersForm/EditUserDetails';
 import {faUser} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {useNavigate} from "react-router-dom";
 
 export const Account = () => {
     const [userDetails, setUserDetails] = useState();
-    const navigate = useNavigate();
 
     useEffect(() => {
         const fetchData = async () => {
@@ -28,10 +26,6 @@ export const Account = () => {
     useEffect(() => {
         console.log('Updated User Details:', userDetails);
     }, [userDetails]);
-
-    const handlePreviousMeetingButton = () => {
-        navigate('/previousMeeting');
-    }
 
     return (
         <>
@@ -55,7 +49,6 @@ export const Account = () => {
                         )}
                         <div className={"masterDiv"}>
                             <EditUserDetails userDetails={userDetails} setUserDetails={setUserDetails} />
-                            <button onClick={() => handlePreviousMeetingButton()}>Vai ai Meeting Precedenti</button>
                             <div className={"childDiv"}>
                                 <LogoutButton />
                             </div>

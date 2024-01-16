@@ -1,28 +1,33 @@
 .accountPopup {
     position: absolute;
     z-index: 999;
-    top: 105px;
-    right: 15%;
+    top: 120px;
+    right: 120px;
     background-color: white;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     color: #002f53;
-    min-width: 300px;
+    width: 300px;
     height: auto;
     padding: 20px 10px;
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
-    border-radius: 0 0 25px 25px;
+    border-radius: 10px;
     opacity: 0;
-    transition: opacity 0.5s ease-in-out;
 }
 
 .accountPopup.show {
     opacity: 1;
+    button{ display: -webkit-box; }
+}
+
+.accountPopup h2{
+    margin: 20px;
 }
 
 .accountPopup button {
+    display: none;
     min-width: 80%;
     min-height: 45px;
 }

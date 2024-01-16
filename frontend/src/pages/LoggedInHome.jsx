@@ -3,17 +3,17 @@ import React, {useEffect, useState} from 'react';
 import '../css/MyApp.css';
 import '../css/index.css';
 import '../css/LoggedHome.css';
-import { MyHeader } from '../components/Header/Header';
-import { MyFooter } from "../components/Footer/Footer";
-import LogoutButton from "../components/LogoutButton/logoutButton";
+import { MyHeader } from '../components/Layout/Header/Header';
+import { MyFooter } from "../components/Layout/Footer/Footer";
+import LogoutButton from "../components/Buttons/LogoutButton/logoutButton";
 import { useNavigate } from 'react-router-dom';
-import CreaCategoria from "../components/CreaCategoria/CreaCategoria";
+import CreaCategoria from "../components/Forms/CreaCategoria/CreaCategoria";
 import CreaScenario from "../components/Forms/CreaScenarioForm/CreaScenario";
 import ModificaScenario from "../components/Forms/CreaScenarioForm/ModificaScenario";
 import AccediStanza from "../components/Forms/enterRoomForm/accediStanza";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faCirclePlus, faDoorOpen, faUser} from "@fortawesome/free-solid-svg-icons";
-import RoomList from "../components/RoomList/RoomList";
+import RoomList from "../components/Lists/RoomList/RoomList";
 
 export const LoggedInHome = () => {
     const nome = sessionStorage.getItem('nome');
@@ -67,21 +67,31 @@ export const LoggedInHome = () => {
                 <section className={"roomSec"}>
                     <h1>BENTORNATO, {nome}</h1>
                     <div className={"layout"}>
-                        <div className={"transWhiteBg"}>
+                        <div
+                            className={"transWhiteBg"}
+                            onClick={handleGoToProfile}
+                        >
                             <FontAwesomeIcon icon={faUser} size="2xl" style={{color: "#c70049",}}/>
                             <h2>Account</h2>
-                            <button onClick={handleGoToProfile}>vai ad Account</button>
+                            <p
+                                style={{fontSize: "14px", textAlign: "center",}}
+                            >
+                                Visualizza e modifica i dettagli del tuo account
+                            </p>
                         </div>
-                        <div className={"transWhiteBg"}>
+                        <div
+                            className={"transWhiteBg"}
+                            onClick={handleGoToCreateRoom}
+                        >
                             <FontAwesomeIcon icon={faCirclePlus} size="2xl" style={{color: "#c70049",}}/>
                             <h2>Creazione stanza</h2>
-                            <button onClick={handleGoToCreateRoom}>Crea stanza</button>
+                            <p
+                                style={{fontSize: "14px", textAlign: "center",}}
+                            >
+                                Crea una stanza tutta tua e diventa Organizzatore
+                            </p>
                         </div>
-                        <div className={"transWhiteBg"}>
-                            <FontAwesomeIcon icon={faDoorOpen} size="2xl" style={{color: "#c70049",}}/>
-                            <h2>Ingresso stanza</h2>
-                            <AccediStanza/>
-                        </div>
+                        <AccediStanza/>
                     </div>
                     {isAdmin &&
                         <section className={"contentSec"}>

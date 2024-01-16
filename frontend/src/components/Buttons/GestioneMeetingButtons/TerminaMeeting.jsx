@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import '../Forms/CreaScenarioForm/creaScenario.css';
+import '../../Forms/CreaScenarioForm/creaScenario.css';
 import {faChalkboardUser, faPlay} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {wait} from "@testing-library/user-event/dist/utils";
@@ -33,7 +33,7 @@ export default class AvviaMeeting extends Component {
 
         try{
             console.log("la stringa json:", JSON.stringify(dataToSend));
-            const response = await fetch(`http://localhost:8080/avviaMeeting/${id_meeting}`, requestOption);
+            const response = await fetch(`http://localhost:8080/terminaMeeting/${id_meeting}`, requestOption);
             const responseData = await response.json();
             console.log("Risposta dal server:", responseData);
             if (responseData && responseData.value) {
@@ -54,7 +54,7 @@ export default class AvviaMeeting extends Component {
     render() {
         return (
             <div className="button-container">
-                <button onClick={() => this.callFunction()}> Avvia Meeting <FontAwesomeIcon icon={faPlay} size="xl" style={{color: "#ffffff",}}/> </button>
+                <button onClick={() => this.callFunction()}> Termina Meeting <FontAwesomeIcon icon={faPlay} size="xl" style={{color: "#ffffff",}}/> </button>
             </div>
         );
     };

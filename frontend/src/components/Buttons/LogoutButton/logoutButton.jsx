@@ -38,7 +38,7 @@ function useHandleLogout() {
 export default function LogoutButton() {
     const handleLogout = useHandleLogout();
     return (
-        <button onClick={handleLogout} className={"logoutButton"}>
+        <button onClick={handleLogout} className={"logoutButton minWidth200"}>
             Logout <FontAwesomeIcon icon={faRightFromBracket} size="xl" style={{ color: "#ffffff" }} />
         </button>
     );

@@ -2,8 +2,8 @@ import '../css/unlogged.css';
 import React from "react";
 import Video from '../media/VRvideo.mp4';
 import { Link } from "react-router-dom";
-import {MyHeader} from "../components/Header/Header";
-import {MyFooter} from "../components/Footer/Footer";
+import {MyHeader} from "../components/Layout/Header/Header";
+import {MyFooter} from "../components/Layout/Footer/Footer";
 
 export default function UnloggedHome(){
     return(
@@ -25,11 +25,6 @@ export default function UnloggedHome(){
                     </p>
                     <Link to="/login">Entra anche tu!</Link>
                 </div>
-                <ul className="social">
-                    <li><a href="#"><img src="https://i.ibb.co/x7P24fL/facebook.png"/></a></li>
-                    <li><a href="#"><img src="https://i.ibb.co/Wnxq2Nq/twitter.png"/></a></li>
-                    <li><a href="#"><img src="https://i.ibb.co/ySwtH4B/instagram.png"/></a></li>
-                </ul>
             </section>
             <footer id={"unloggedFooter"}>
                 <MyFooter />

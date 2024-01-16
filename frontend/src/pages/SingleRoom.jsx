@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from "react";
-import { MyHeader } from "../components/Header/Header";
-import { MyFooter } from "../components/Footer/Footer";
+import { MyHeader } from "../components/Layout/Header/Header";
+import { MyFooter } from "../components/Layout/Footer/Footer";
 import { useNavigate, useParams } from "react-router-dom";
 import CalendarComp from "../components/Calendar/CalendarComp";
 import { checkRole } from "../functions/checkRole";
-import UserListInRoom from "../components/UserList/UserListInRoom";
+import UserListInRoom from "../components/Lists/UserList/UserListInRoom";
 import { faChalkboardUser } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import AvviaMeeting from "../components/GestioneMeeting/AvviaMeeting";
+import AvviaMeeting from "../components/Buttons/GestioneMeetingButtons/AvviaMeeting";
 import MyModifyForm from "../components/Forms/ModifyRoomForm/MyModifyForm";
 import MeetingList from "../components/Calendar/CalendarViewer";
 

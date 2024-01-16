@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import '../Forms/CreaScenarioForm/creaScenario.css';
+import '../CreaScenarioForm/creaScenario.css';
 import { wait } from "@testing-library/user-event/dist/utils";
 
 export default class CreaCategoria extends Component {
