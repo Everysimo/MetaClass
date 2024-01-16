@@ -16,6 +16,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 import static com.commigo.metaclass.MetaClass.entity.Ruolo.ORGANIZZATORE_MASTER;
 
@@ -113,13 +114,15 @@ public class DataInitializer implements CommandLineRunner {
             StatoPartecipazione sp14 = statoPartecipazioneRepository.save(new StatoPartecipazione(s4, u4, stanzaService.getRuolo(Ruolo.PARTECIPANTE), false, false, "Domenico", false));
 
             //Aggiunta meeting
-            LocalDateTime inizio = LocalDateTime.of(2024, 1, 12, 12, 0);
-            LocalDateTime fine = LocalDateTime.of(2024, 1, 12, 13, 0);
-            Meeting m1 = meetingRepository.save(new Meeting("Meeting1", inizio, fine, false, sc3, s4));
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 
-            LocalDateTime inizio2 = LocalDateTime.of(2024, 10, 21, 12, 0);
-            LocalDateTime fine2 = LocalDateTime.of(2024, 10, 21, 14, 0);
-            Meeting m2 = meetingRepository.save(new Meeting("Meeting2", inizio2, fine2, true, sc2, s4));
+            Meeting m1 = meetingRepository.save(new Meeting(1L, "MeetingStanza4",
+                    LocalDateTime.parse("2024-02-02 18:00",formatter),
+                    LocalDateTime.parse("2024-02-02 20:00",formatter), false, sc1, s4 ));
+
+            Meeting m2 = meetingRepository.save(new Meeting(2L, "MeetingStanza4",
+                LocalDateTime.parse("2024-02-03 18:00",formatter),
+                LocalDateTime.parse("2024-02-03 20:00",formatter), false, sc1, s4 ));
 
             //Aggiunta Utente in meeting
             UtenteInMeeting um1 = utenteInMeetingRepository.save(new UtenteInMeeting(u5, m1, true));
