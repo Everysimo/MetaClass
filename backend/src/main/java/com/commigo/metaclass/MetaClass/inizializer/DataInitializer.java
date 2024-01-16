@@ -4,16 +4,18 @@ import com.commigo.metaclass.MetaClass.gestioneamministrazione.repository.Catego
 import com.commigo.metaclass.MetaClass.gestioneamministrazione.repository.ImmagineRepository;
 import com.commigo.metaclass.MetaClass.gestioneamministrazione.repository.ScenarioRepository;
 import com.commigo.metaclass.MetaClass.gestionemeeting.repository.MeetingRepository;
+import com.commigo.metaclass.MetaClass.gestionemeeting.repository.UtenteInMeetingRepository;
 import com.commigo.metaclass.MetaClass.gestionestanza.repository.RuoloRepository;
 import com.commigo.metaclass.MetaClass.gestionestanza.repository.StanzaRepository;
 import com.commigo.metaclass.MetaClass.gestionestanza.repository.StatoPartecipazioneRepository;
 import com.commigo.metaclass.MetaClass.gestionemeeting.controller.GestioneStanzaServiceImpl;
 import com.commigo.metaclass.MetaClass.gestioneutenza.repository.UtenteRepository;
+import com.commigo.metaclass.MetaClass.utility.multipleid.StatoPartecipazioneId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
-import java.time.LocalDateTime;
 
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 import static com.commigo.metaclass.MetaClass.entity.Ruolo.ORGANIZZATORE_MASTER;
@@ -28,25 +30,27 @@ public class DataInitializer implements CommandLineRunner {
     private final UtenteRepository utenteRepository;
     private final StatoPartecipazioneRepository statoPartecipazioneRepository;
 
+    private final UtenteInMeetingRepository utenteInMeetingRepository;
+
+    private final MeetingRepository meetingRepository;
     private final ImmagineRepository immagineRepository;
 
     private final GestioneStanzaServiceImpl stanzaService;
 
-    private final MeetingRepository meetingrepository;
-
 
 
     @Autowired
-    public DataInitializer(RuoloRepository ruoloRepository, CategoriaRepository categoriaRepository, ScenarioRepository scenarioRepository, StanzaRepository stanzaRepository, UtenteRepository utenteRepository, StatoPartecipazioneRepository statoPartecipazioneRepository, ImmagineRepository immagineRepository, GestioneStanzaServiceImpl stanzaService, MeetingRepository meetingrepository) {
+    public DataInitializer(RuoloRepository ruoloRepository, CategoriaRepository categoriaRepository, ScenarioRepository scenarioRepository, StanzaRepository stanzaRepository, UtenteRepository utenteRepository, StatoPartecipazioneRepository statoPartecipazioneRepository, UtenteInMeetingRepository utenteInMeetingRepository, MeetingRepository meetingRepository, ImmagineRepository immagineRepository, GestioneStanzaServiceImpl stanzaService) {
         this.ruoloRepository = ruoloRepository;
         this.categoriaRepository = categoriaRepository;
         this.scenarioRepository = scenarioRepository;
         this.stanzaRepository = stanzaRepository;
         this.utenteRepository = utenteRepository;
         this.statoPartecipazioneRepository = statoPartecipazioneRepository;
+        this.utenteInMeetingRepository = utenteInMeetingRepository;
+        this.meetingRepository = meetingRepository;
         this.immagineRepository = immagineRepository;
         this.stanzaService = stanzaService;
-        this.meetingrepository = meetingrepository;
     }
 
     @Override
@@ -82,7 +86,7 @@ public class DataInitializer implements CommandLineRunner {
 
 
         //Aggiunta della Stanza
-            Stanza s1 = stanzaRepository.save(new Stanza(1L, "StanzaLavoro1", "Stanza 1 per il lavoro", false, 500, sc1, "000001"));
+            Stanza s1 = stanzaRepository.save(new Stanza(1L, "StanzaLavoro1", "Stanza 1 per il lavoro", true, 500, sc1, "000001"));
             Stanza s2 = stanzaRepository.save(new Stanza(2L, "StanzaScuola1", "Stanza 1 per la scuola", false, 200, sc2, "000002"));
             Stanza s3 = stanzaRepository.save(new Stanza(3L, "StanzaDivertimento1", "Stanza 1 per il divertimento", true, 50, sc3, "000003"));
             Stanza s4 = stanzaRepository.save(new Stanza(4L, "StanzaCarmine1", "Stanza 1 per il Carmine", true, 50, sc3, "000004"));
@@ -96,11 +100,11 @@ public class DataInitializer implements CommandLineRunner {
             StatoPartecipazione sp3 = statoPartecipazioneRepository.save(new StatoPartecipazione(s1, u3, stanzaService.getRuolo(Ruolo.PARTECIPANTE), true, false, "Giorgio", true));
 
             StatoPartecipazione sp4 = statoPartecipazioneRepository.save(new StatoPartecipazione(s2, u1, stanzaService.getRuolo(Ruolo.PARTECIPANTE), false, false, "Michele", false));
-            StatoPartecipazione sp5 = statoPartecipazioneRepository.save(new StatoPartecipazione(s2, u2, stanzaService.getRuolo(Ruolo.ORGANIZZATORE), false, true, "Francesco", false));
+            StatoPartecipazione sp5 = statoPartecipazioneRepository.save(new StatoPartecipazione(s2, u2, stanzaService.getRuolo(Ruolo.PARTECIPANTE), false, true, "Francesco", false));
             StatoPartecipazione sp6 = statoPartecipazioneRepository.save(new StatoPartecipazione(s3, u3, stanzaService.getRuolo(ORGANIZZATORE_MASTER), false, false, "Giorgio", false));
 
             StatoPartecipazione sp7 = statoPartecipazioneRepository.save(new StatoPartecipazione(s3, u1, stanzaService.getRuolo(Ruolo.PARTECIPANTE), true, false, "Michele", false));
-            StatoPartecipazione sp8 = statoPartecipazioneRepository.save(new StatoPartecipazione(s3, u2, stanzaService.getRuolo(Ruolo.ORGANIZZATORE), false, false, "Francesco", true));
+            StatoPartecipazione sp8 = statoPartecipazioneRepository.save(new StatoPartecipazione(s3, u2, stanzaService.getRuolo(Ruolo.PARTECIPANTE), false, false, "Francesco", true));
             StatoPartecipazione sp9 = statoPartecipazioneRepository.save(new StatoPartecipazione(s3, u3, stanzaService.getRuolo(ORGANIZZATORE_MASTER), false, false, "Giorgio", true));
 
             StatoPartecipazione sp10 = statoPartecipazioneRepository.save(new StatoPartecipazione(s4, u5, stanzaService.getRuolo(ORGANIZZATORE_MASTER), false, false, "Carmine", false));
@@ -109,13 +113,26 @@ public class DataInitializer implements CommandLineRunner {
             StatoPartecipazione sp13 = statoPartecipazioneRepository.save(new StatoPartecipazione(s4, u3, stanzaService.getRuolo(Ruolo.PARTECIPANTE), false, true, "Giorgio", false));
             StatoPartecipazione sp14 = statoPartecipazioneRepository.save(new StatoPartecipazione(s4, u4, stanzaService.getRuolo(Ruolo.PARTECIPANTE), false, false, "Domenico", false));
 
-
-            //inserimento meeting
+            //Aggiunta meeting
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 
-            Meeting m1 = meetingrepository.save(new Meeting(1L, "MeetingStanza4",
+            Meeting m1 = meetingRepository.save(new Meeting(1L, "MeetingStanza4",
                     LocalDateTime.parse("2024-02-02 18:00",formatter),
                     LocalDateTime.parse("2024-02-02 20:00",formatter), false, sc1, s4 ));
-    }
 
+            Meeting m2 = meetingRepository.save(new Meeting(2L, "MeetingStanza4",
+                LocalDateTime.parse("2024-02-03 18:00",formatter),
+                LocalDateTime.parse("2024-02-03 20:00",formatter), false, sc1, s4 ));
+
+            //Aggiunta Utente in meeting
+            UtenteInMeeting um1 = utenteInMeetingRepository.save(new UtenteInMeeting(u5, m1, true));
+            UtenteInMeeting um2 = utenteInMeetingRepository.save(new UtenteInMeeting(u4, m1, true));
+            UtenteInMeeting um3 = utenteInMeetingRepository.save(new UtenteInMeeting(u2, m1, true));
+            UtenteInMeeting um4 = utenteInMeetingRepository.save(new UtenteInMeeting(u1, m1, true));
+
+            UtenteInMeeting um5 = utenteInMeetingRepository.save(new UtenteInMeeting(u5, m2, false));
+            UtenteInMeeting um6 = utenteInMeetingRepository.save(new UtenteInMeeting(u2, m2, false));
+            UtenteInMeeting um7 = utenteInMeetingRepository.save(new UtenteInMeeting(u3, m2, false));
+
+    }
 }

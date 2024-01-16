@@ -1,6 +1,6 @@
-import Comm from "../../img/commigo.png";
+import Comm from "../../../img/commigo.png";
 import './footer.css'
-import '../../css/MyApp.css'
+import '../../../css/MyApp.css'
 import React from "react";
 
 function GenerateRows({ Nomi }) {

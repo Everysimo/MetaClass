@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import LogoutButton from '../components/LogoutButton/logoutButton';
+import LogoutButton from '../components/Buttons/LogoutButton/logoutButton';
 import { fetchUserDetails } from '../functions/fetchUserDetails';
-import { MyHeader } from "../components/Header/Header";
-import { MyFooter } from "../components/Footer/Footer";
+import { MyHeader } from "../components/Layout/Header/Header";
+import { MyFooter } from "../components/Layout/Footer/Footer";
 import EditUserDetails from '../components/Forms/ModifyUsersForm/EditUserDetails';
 import {faUser} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
@@ -26,6 +26,7 @@ export const Account = () => {
     useEffect(() => {
         console.log('Updated User Details:', userDetails);
     }, [userDetails]);
+
     return (
         <>
             <header>

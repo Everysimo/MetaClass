@@ -76,6 +76,7 @@ const EditUserDetails = ({ userDetails, setUserDetails }) => {
         <div className={"childDiv"}>
             <button
                 onClick={() => setShowModal(true)}
+                className={"minWidth200"}
             >
                 Modifica <FontAwesomeIcon icon={faUserPen} size="lg" style={{color: "#ffffff",}} />
             </button>

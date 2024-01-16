@@ -5,7 +5,7 @@ header {
     position: sticky;
     z-index: 9;
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
-    min-height: 80px;
+    min-height: 105px;
 }
 
 header img,
@@ -16,12 +16,16 @@ footer img {
 }
 
 header .App-logo,
-footer .App-logo {
+footer .App-logo{
     width: 80px;
     border-radius: 50%;
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
 }
-
+#logoSelect{
+    height: 80px;
+    width: 80px;
+    font-size: 80px;
+}
 header a{
     color: white;
     margin: 10px;

@@ -11,7 +11,7 @@ const NavigateToPageBtn = () => {
         navigate('/Account');
     };
 
-    return ( <button onClick={navigateToSpecificPage}>Account <FontAwesomeIcon icon={faUser} size="xl" style={{color: "#ffffff"}}/></button> );
+    return ( <button onClick={navigateToSpecificPage} className={"minWidth200"}>Account <FontAwesomeIcon icon={faUser} size="xl" style={{color: "#ffffff"}}/></button> );
 };
 
 export default NavigateToPageBtn;

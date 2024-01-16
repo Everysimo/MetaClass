@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import '../PopUpStyles.css';
 import {wait} from "@testing-library/user-event/dist/utils";
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {faDoorOpen} from "@fortawesome/free-solid-svg-icons";
 
 const AccediStanza = () => {
     const [showModal, setShowModal] = useState(false);
@@ -79,7 +81,18 @@ const AccediStanza = () => {
 
     return (
         <>
-            <button onClick={handleShowModal}>Accedi</button>
+            <div
+                className={"transWhiteBg"}
+                onClick={handleShowModal}
+            >
+                <FontAwesomeIcon icon={faDoorOpen} size="2xl" style={{color: "#c70049",}}/>
+                <h2>Ingresso stanza</h2>
+                <p
+                    style={{fontSize: "14px", textAlign: "center",}}
+                >
+                    Se in possesso di un codice di accesso, entra ad una stanza privata
+                </p>
+            </div>
             {showModal && (
                 <div className={'modal'}>
                     <div className="modal-content">
