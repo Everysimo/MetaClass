@@ -3,6 +3,7 @@ import React from "react";
 import Video from '../media/VRvideo.mp4';
 import { Link } from "react-router-dom";
 import {MyHeader} from "../components/Header/Header";
+import {MyFooter} from "../components/Footer/Footer";
 
 export default function UnloggedHome(){
     return(
@@ -19,7 +20,7 @@ export default function UnloggedHome(){
                 <h2>metaclass </h2>
                     <h3>a doorway to the future</h3>
                     <p>
-                        Nato da un piccolo progetto universitario, il nostro obiettivo &egrave
+                        Nato da un piccolo progetto universitario, il nostro obiettivo è
                         quello di offrire un portale organizzativo per la nostra VR app!
                     </p>
                     <Link to="/login">Entra anche tu!</Link>
@@ -30,6 +31,9 @@ export default function UnloggedHome(){
                     <li><a href="#"><img src="https://i.ibb.co/ySwtH4B/instagram.png"/></a></li>
                 </ul>
             </section>
+            <footer id={"unloggedFooter"}>
+                <MyFooter />
+            </footer>
         </>
     );
 }

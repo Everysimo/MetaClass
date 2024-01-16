@@ -117,20 +117,16 @@ export default class Facebook extends Component {
     render() {
         const { isLoggedIn, nome } = this.state;
         return (
-            <div className={"loginForm"}>
+            <>
                 {isLoggedIn ? (
                     <>
-                        <h2>Ciao, {nome}!</h2>
-                        <div className={"masterDiv"}>
-                            <span className={"childDiv"}>
-                                <NavigateToPageBtn />
-                                <LogoutButton/>
-                            </span>
-                        </div>
+                        <h3>Ciao, {nome}!</h3>
+                        <NavigateToPageBtn />
+                        <LogoutButton/>
                     </>
                 ) : (
                     <>
-                        <h2>Per usare questo sistema, &egrave necessario il Login via Facebook</h2>
+                        <h1>Login</h1>
                         <FacebookLogin
                             scope={"public_profile,user_gender,user_birthday"}
                             fields={"id,name,birthday,gender,email"}
@@ -145,7 +141,7 @@ export default class Facebook extends Component {
                         </FacebookLogin>
                     </>
                 )}
-            </div>
+            </>
         );
     }
 }

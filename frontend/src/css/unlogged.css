@@ -22,6 +22,8 @@ html, body{
     z-index: 2;
 }
 
+#unloggedFooter{ margin-top: 100vh; }
+
 .showcase video
 {
     position: absolute;

@@ -1,0 +1,26 @@
+/* Popup.css */
+
+.popup-container {
+    position: fixed;
+    top: 60px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 300px; /* Set your desired width */
+    height: 200px; /* Set your desired height */
+    background-color: #fff;
+    border: 1px solid #ccc;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    transition: transform 0.3s ease-in-out;
+    overflow: hidden;
+    display: none;
+}
+
+.popup-container.open {
+    transform: translateX(-50%) translateY(0);
+}
+
+.popup-content {
+    padding: 20px;
+}
+
+/* Add more styles as needed */
