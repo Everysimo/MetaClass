@@ -31,9 +31,9 @@ public class Utente {
     public static final int MAX_NAME_LENGTH = 254;
 
     /**
-     * Costante per valore intero di 1.
+     * Costante per valore intero di 3.
      */
-    public static final int MIN_NAME_LENGTH = 1;
+    public static final int MIN_NAME_LENGTH = 3;
 
     /**
      * Lunghezza campo sesso.
@@ -100,7 +100,7 @@ public class Utente {
             max = SEX_LENGTH,
             message = "Lunghezza sesso non valida")
     @NotBlank(message = "Il sesso non può essere vuoto")
-    @Pattern(regexp = "^[MFO]$",
+    @Pattern(regexp = "^[MFO]*$",
             message = "Il genere deve essere 'M', 'F' o 'O'")
     private String sesso;
 
@@ -113,14 +113,14 @@ public class Utente {
     private boolean isAdmin;
 
     @NotNull(message = "L'email non può essere nulla")
-    @Email(message = "Formato email non valida")
+    @Email(message = "Formato email non valido")
     private String email;
 
     @Column(length = MAX_PHONE_LENGTH)
     @Size(min = MAX_PHONE_LENGTH,
             max = MAX_PHONE_LENGTH,
             message = "Lunghezza telefono non valida")
-    @Pattern(regexp = "^[0-9]{10}$",
+    @Pattern(regexp = "^[0-9]*$",
             message = "Formato telefono non valido")
     private String telefono;
 

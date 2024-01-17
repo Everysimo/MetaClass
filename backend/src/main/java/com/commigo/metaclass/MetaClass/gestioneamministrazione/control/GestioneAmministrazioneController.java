@@ -63,7 +63,7 @@ public class GestioneAmministrazioneController {
         return adminIds;
     }
 
-    private boolean checkAdmin(String metaId){
+    public boolean checkAdmin(String metaId){
         return adminMetaIds.contains(metaId);
     }
 

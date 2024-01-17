@@ -2,6 +2,8 @@ package com.commigo.metaclass.MetaClass.gestionemeeting.controller;
 
 import com.commigo.metaclass.MetaClass.MetaClassApplicationTests;
 import com.commigo.metaclass.MetaClass.entity.*;
+import com.commigo.metaclass.MetaClass.exceptions.RuntimeException403;
+import com.commigo.metaclass.MetaClass.exceptions.ServerRuntimeException;
 import com.commigo.metaclass.MetaClass.gestioneamministrazione.repository.ScenarioRepository;
 import com.commigo.metaclass.MetaClass.gestionemeeting.repository.MeetingRepository;
 import com.commigo.metaclass.MetaClass.gestionemeeting.service.GestioneMeetingService;
@@ -18,10 +20,12 @@ import jakarta.validation.*;
 import org.hibernate.validator.HibernateValidator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -43,10 +47,10 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 
-@SpringBootTest
+
 @RunWith(SpringRunner.class)
 @ContextConfiguration(classes = MetaClassApplicationTests.class)
-@ActiveProfiles("test")
+@ExtendWith(MockitoExtension.class)
 public class GestioneMeetingControllerUnitTest {
 
     /**
@@ -129,7 +133,7 @@ public class GestioneMeetingControllerUnitTest {
      * successivamente si controlla ogni istruzione del metodo
      */
     @Test
-    public void testSchedulingMeeting() {
+    public void testSchedulingMeeting(){
 
         //test case 4.1.1
         testCasesSchedulingMeeting(1);
@@ -160,9 +164,11 @@ public class GestioneMeetingControllerUnitTest {
         when(validationToken.isTokenValid(any(HttpServletRequest.class))).thenReturn(true);
 
         // Simula la decodifica del token e restituisce un metaID valido
-        when(jwtTokenUtil.getMetaIdFromToken(anyString())).thenReturn(utente.getMetaId());
+        when(jwtTokenUtil.getMetaIdFromToken(validationToken.getToken()))
+                .thenReturn(utente.getMetaId());
 
         try{
+            when(meetingService.creaScheduling(meeting, utente.getMetaId())).thenReturn(true);
             // Chiamata al metodo da testare
             ResponseEntity<Response<Boolean>> responseEntity =
                     meetingController.schedulingMeeting(meeting, bindingResult, request);
@@ -283,6 +289,9 @@ public class GestioneMeetingControllerUnitTest {
             assertTrue(true);
         else if(message.equalsIgnoreCase("la fine deve essere successiva alla data odierna, " +
                 "L'inizio deve essere precedente alla fine"))
+            assertTrue(true);
+        else if(message.equalsIgnoreCase("L'inizio deve essere precedente alla fine, la fine " +
+                "deve essere successiva alla data odierna"))
             assertTrue(true);
         else
             assertEquals(message,RequestUtils.errorsRequest(bindingResult));
