@@ -14,10 +14,19 @@ export default class CreaScenario extends Component {
     };
 
     handleNameChange = (e) => {
-        this.setState({nome: e.target.value});
+        const inputValue = e.target.value;
+
+        //prima lettera grande
+        const capitalizedInput = inputValue.charAt(0).toUpperCase() + inputValue.slice(1);
+        this.setState({ nome: capitalizedInput, error: null });
+
     };
+
     handleDescChange = (e) => {
-        this.setState({ descrizione: e.target.value });
+        const inputValue = e.target.value;
+
+        const capitalizedInput = inputValue.charAt(0).toUpperCase() + inputValue.slice(1);
+        this.setState({ descrizione: capitalizedInput, error: null });
     };
     handleImmageChange = (e) => {
         this.setState({ imageUrl: e.target.value });
@@ -72,6 +81,27 @@ export default class CreaScenario extends Component {
     };
 
     callFunction = () => {
+
+        //CONTROLLI DA TRASFORMARE IN POP UP
+        if (this.state.nome.trim() === '' || this.state.nome.length < 2) {
+            this.setState({ error: 'Il campo nome non può essere vuoto o minore di 2 caratteri' });
+            return;
+        }
+
+        if (this.state.descrizione.trim() === '') {
+            this.setState({error: 'Il campo descrizione non può essere vuoto'});
+            return;
+        }else if(this.state.descrizione.length < 2 || this.state.descrizione.length > 254) {
+            this.setState({error: 'Lunghezza descrizione errata'});
+            return;
+        }else if(!isNaN(this.state.descrizione.charAt(0))) {
+            this.setState({ error: 'Errore durante la richiesta, formato Nome errato' });
+            return;
+        }
+
+
+        this.setState({ error: null });
+
         this.sendDataToServer();
         console.log("dati del form", this.state);
         wait(100);
@@ -154,6 +184,8 @@ export default class CreaScenario extends Component {
                             <button onClick={this.handleClear}>Cancella</button>
                             <button onClick={() => this.callFunction()}>Invia</button>
                         </div>
+                        {this.state.error && <p style={{ color: 'red' }}>{this.state.error}</p>}
+
                     </div>
                 </div>
             </div>
