@@ -1,4 +1,4 @@
-package com.commigo.metaclass.MetaClass.gestionemeeting.controller;
+package com.commigo.metaclass.MetaClass.gestionestanza.service;
 
 import com.commigo.metaclass.MetaClass.entity.*;
 import com.commigo.metaclass.MetaClass.exceptions.RuntimeException401;
