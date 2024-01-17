@@ -10,7 +10,7 @@ export default class MyCreateForm extends Component{
     state = {
         nome: "",
         descrizione: "",
-        tipoAccesso: false,
+        tipoAccesso: "",
         maxPosti: 0,
         id_scenario: '',            //lo uso per salvare l'id dello scenario e passarlo al backend
         selectedScenario: '',   //per salvarmi quale opzione sceglie l'utente
@@ -79,11 +79,21 @@ export default class MyCreateForm extends Component{
 
 //le varie handle richiamate quando passo i valori nelle input form
     handleNameChange = (e) => {
-        this.setState({nome: e.target.value});
+        const inputValue = e.target.value;
+      // Trasforma la prima lettera in maiuscolo
+
+            const capitalizedInput = inputValue.charAt(0).toUpperCase() + inputValue.slice(1);
+            // Aggiorna lo stato con il nuovo valore
+            this.setState({ nome: capitalizedInput, error: null });
     };
 
     handleDescriptionChange = (e) => {
-        this.setState({descrizione: e.target.value})
+        const inputValue = e.target.value;
+
+            // Trasforma la prima lettera in maiuscolo
+            const capitalizedInput = inputValue.charAt(0).toUpperCase() + inputValue.slice(1);
+            // Aggiorna lo stato con il nuovo valore
+            this.setState({ descrizione: capitalizedInput, error: null });
     };
 
     handleOptionChange = (e) => {
@@ -168,7 +178,51 @@ export default class MyCreateForm extends Component{
 
     }
 
-    callFunction = () => {
+
+    //chiamata nel momento in cui clicco sul button e mi fa i vari controlli
+    handleSubmit = () => {
+
+        //TUTTI QUESTI DIVENTARANNO POP UP (PER GATTO)
+
+        //controllo sul nome
+        if (this.state.nome.trim() === '' || this.state.nome.length < 2) {
+            this.setState({ error: 'Il campo nome non può essere vuoto o minore di 2 caratteri' });
+            return;
+        }
+
+        if (!isNaN(this.state.nome.charAt(0))) {
+            this.setState({ error: 'Errore durante la richiesta, formato Nome errato' });
+            return;
+        }
+
+        //controllo sulla descrizione
+        if (this.state.descrizione.trim() === '') {
+            this.setState({ error: 'Il campo descrizione non può essere vuoto' });
+            return;
+        }else if(this.state.descrizione.length < 2 || this.state.descrizione.length > 254){
+            this.setState({ error: 'Lunghezza descrizione errata' });
+            return;
+        }
+
+        //controllo max posti
+        if(this.state.maxPosti < 1 || this.state.maxPosti > 999){
+            this.setState({ error: 'Errore, il massimo di posti deve essere compreso tra 1 e 999' });
+            return;
+        }
+
+        //controllo tipo accesso
+        if (!this.state.tipoAccesso) {
+            this.setState({ selectedScenario: '', error: 'Errore,Tipo di Accesso alla stanza non selezionato' });
+            return;
+        }
+
+        //controllo scenario
+        if (!this.state.selectedScenario) {
+            this.setState({ selectedScenario: '', error: 'Errore, Selezione Scenario errata' });
+            return;
+        }
+
+        this.setState({ error: null });
 
         this.sendDataToServer();
         console.log("dati del form", this.state)
@@ -181,11 +235,11 @@ export default class MyCreateForm extends Component{
                     <input
                         className={'input-field'}
                         placeholder={"Aggiungi Nome"}
-                        required
                         type="text"
                         value={this.state.nome}
                         onChange={this.handleNameChange}
                     />
+
 
                     <div className={'textarea-box'}>
                         <p className={'textp'}>Inserisci Descrizione:</p>
@@ -202,8 +256,8 @@ export default class MyCreateForm extends Component{
                     </div>
 
                     <p className={'textp'}>Scegli: pubblica o privata:</p>
-                    <select className={'select-field'} value={this.state.tipoAccesso} onChange={this.handleOptionChange}
-                            required>
+                    <select className={'select-field'} value={this.state.tipoAccesso} onChange={this.handleOptionChange}>
+                        <option value="" disabled>Seleziona Tipo Accesso</option>
                         <option value={false}>Pubblica</option>
                         <option value={true}>Privata</option>
                     </select>
@@ -235,8 +289,11 @@ export default class MyCreateForm extends Component{
                 <Divider/>
 
                 <div className={'right-label'}>
-                    <button className={'button-create'} type="button" onClick={() =>  this.callFunction() }> Create</button>
+                    <button className={'button-create'} type="button" onClick={() =>  this.handleSubmit() }> Create</button>
+                    {this.state.error && <p style={{ color: 'red' }}>{this.state.error}</p>}
+                    {/*questo poi diventerà un pop up nel momento in cui clicco su invia*/}
                 </div>
+
             </div>
         )};
 }
