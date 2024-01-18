@@ -45,13 +45,5 @@ public class CustomExceptionHandler {
                 .body(new Response<>(null, errorMessage));
     }
 
-
-    /*@ExceptionHandler(HttpMessageNotReadableException.class)
-    @Order(Ordered.LOWEST_PRECEDENCE)
-    public ResponseEntity<Response<Boolean>> handleJsonParseException(HttpMessageNotReadableException ex) {
-
-        return ResponseEntity.badRequest().body(new Response<Boolean>(false,
-                "Errore nella richiesta"));
-    }*/
 }
 

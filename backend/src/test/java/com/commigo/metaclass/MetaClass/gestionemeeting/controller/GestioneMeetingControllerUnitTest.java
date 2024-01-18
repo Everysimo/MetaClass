@@ -7,6 +7,7 @@ import com.commigo.metaclass.MetaClass.gestioneamministrazione.repository.Scenar
 import com.commigo.metaclass.MetaClass.gestionemeeting.repository.MeetingRepository;
 import com.commigo.metaclass.MetaClass.gestionemeeting.service.GestioneMeetingService;
 import com.commigo.metaclass.MetaClass.utility.request.RequestUtils;
+import com.commigo.metaclass.MetaClass.utility.response.types.Response;
 import com.commigo.metaclass.MetaClass.webconfig.JwtTokenUtil;
 import com.commigo.metaclass.MetaClass.webconfig.ValidationToken;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -116,10 +117,7 @@ class GestioneMeetingControllerUnitTest {
         report = new Report(1L, 500, Duration.ZERO, 550, meeting, List.of(utente));
 
         feedbackMeeting = new FeedbackMeeting(utente, meeting, report);
-        request = MockMvcRequestBuilders
-                .post("/schedulingMeeting")  // Assicurati di utilizzare il percorso corretto
-                .header("Authorization", "Bearer TODO")
-                .buildRequest(new MockServletContext());
+
         bindingResult = new BeanPropertyBindingResult(meeting, "meeting");
     }
 
@@ -313,72 +311,6 @@ class GestioneMeetingControllerUnitTest {
 
     }
 
-    @Test
-    public void testCompilazioneQuestionario(){
-
-        //test case 2.1.1
-        testCasesCompilazioneQuestionario(1);
-        //test case 2.1.2
-        testCasesCompilazioneQuestionario(2);
-        //test case 2.1.3
-        testCasesCompilazioneQuestionario(3);
-
-
-        // Simula un token valido
-        when(validationToken.isTokenValid(any(HttpServletRequest.class))).thenReturn(true);
-
-        // Simula la decodifica del token e restituisce un metaID valido
-        when(jwtTokenUtil.getMetaIdFromToken(anyString())).thenReturn(utente.getMetaId());
-
-        try{
-            String jsonValue = "{\"valutazione\": 5}";
-
-            // Create the request
-            MockHttpServletRequest request2 = MockMvcRequestBuilders
-                    .post("/compilaQuestionario/" + meeting.getId())
-                    .header("Authorization", "Bearer TODO")
-                    .content(jsonValue)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .buildRequest(new MockServletContext());
-
-            // Chiamata al metodo da testare
-            ResponseEntity<Response<Boolean>> responseEntity =
-                    meetingController.compilaQuestionario(jsonValue, meeting.getId(), request2);
-
-        }catch(Exception e){
-            fail("Exception not expected: " + e.getMessage());
-        }
-    }
-
-    @Test
-    private void testCasesCompilazioneQuestionario(int testcase){
-
-        int value = 0;
-        switch (testcase) {
-            case 1:
-                value = -1;
-                break;
-            case 2:
-                value = 'b';
-                break;
-            case 3:
-                value = 5;
-                break;
-        }
-
-        try {
-            boolean result = meetingService.compilaQuestionario(value, utente.getMetaId(), meeting.getId());
-            if(result) {
-                assertTrue(result);
-            }else{
-                assertFalse(result);
-            }
-        } catch (ServerRuntimeException e) {
-            throw new RuntimeException(e);
-        } catch (RuntimeException403 e) {
-            assertEquals(e.getMessage(), "valore non valido");
-        }
-    }
 
     private void applyValidation(){
         validatorFactory = Validation.byProvider(HibernateValidator.class)

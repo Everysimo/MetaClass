@@ -1,29 +1,23 @@
 package com.commigo.metaclass.MetaClass.gestioneutenza.service;
 
-import com.commigo.metaclass.MetaClass.entity.Ruolo;
 import com.commigo.metaclass.MetaClass.entity.Stanza;
 import com.commigo.metaclass.MetaClass.entity.StatoPartecipazione;
 import com.commigo.metaclass.MetaClass.entity.Utente;
-import com.commigo.metaclass.MetaClass.exceptions.RuntimeException401;
 import com.commigo.metaclass.MetaClass.exceptions.RuntimeException403;
 import com.commigo.metaclass.MetaClass.exceptions.ServerRuntimeException;
 import com.commigo.metaclass.MetaClass.gestionestanza.repository.StanzaRepository;
 import com.commigo.metaclass.MetaClass.gestionestanza.repository.StatoPartecipazioneRepository;
 import com.commigo.metaclass.MetaClass.exceptions.DataNotFoundException;
 import com.commigo.metaclass.MetaClass.gestioneutenza.repository.UtenteRepository;
-import com.commigo.metaclass.MetaClass.utility.response.types.Response;
 import com.commigo.metaclass.MetaClass.webconfig.JwtTokenUtil;
 import com.commigo.metaclass.MetaClass.webconfig.ValidationToken;
 import jakarta.transaction.Transactional;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -32,7 +26,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
-
 
 @Service("GestioneUtenzaService")
 @RequiredArgsConstructor
@@ -51,6 +44,10 @@ public class GestioneUtenzaServiceImpl implements GestioneUtenzaService{
     private JwtTokenUtil jwtTokenUtil;
     private final Set<String> adminMetaIds = loadAdminMetaIdsFromFile();
 
+    /**
+     *
+     * @return
+     */
     private Set<String> loadAdminMetaIdsFromFile() {
         Set<String> adminIds = new HashSet<>();
         try (BufferedReader br = new BufferedReader(new InputStreamReader(new ClassPathResource("admins.txt").getInputStream()))) {
@@ -64,6 +61,13 @@ public class GestioneUtenzaServiceImpl implements GestioneUtenzaService{
         }
         return adminIds;
     }
+
+    /**
+     *
+     * @param u
+     * @return
+     * @throws ServerRuntimeException
+     */
     @Override
     public boolean loginMeta(Utente u) throws ServerRuntimeException {
         try {
@@ -85,6 +89,13 @@ public class GestioneUtenzaServiceImpl implements GestioneUtenzaService{
         }
     }
 
+    /**
+     *
+     * @param MetaID
+     * @param params
+     * @return
+     * @throws RuntimeException403
+     */
     @Override
     public boolean modificaDatiUtente(String MetaID, Map<String, Object> params) throws RuntimeException403{
 
@@ -100,8 +111,10 @@ public class GestioneUtenzaServiceImpl implements GestioneUtenzaService{
     }
 
     /**
+     *
      * @param MetaId
      * @return
+     * @throws ServerRuntimeException
      */
     @Override
     public List<Stanza> getStanzeByUserId(String MetaId) throws ServerRuntimeException{
@@ -122,11 +135,12 @@ public class GestioneUtenzaServiceImpl implements GestioneUtenzaService{
             }
     }
 
-/**
-*
- * @param sessionID
- * @return
-*/
+    /**
+     *
+     * @param sessionID
+     * @return
+     * @throws DataNotFoundException
+     */
     @Override
     public Utente getUtenteByUserId(String sessionID) throws DataNotFoundException {
             Utente existingUser = utenteRepository.findFirstByMetaId(sessionID);
@@ -137,11 +151,14 @@ public class GestioneUtenzaServiceImpl implements GestioneUtenzaService{
             }
     }
 
-/**
-*
- * @param metaID
- * @return
-*/
+
+    /**
+     *
+     * @param metaID
+     * @param validationToken
+     * @return
+     * @throws ServerRuntimeException
+     */
     @Override
     public boolean logoutMeta(String metaID, ValidationToken validationToken) throws ServerRuntimeException {
 

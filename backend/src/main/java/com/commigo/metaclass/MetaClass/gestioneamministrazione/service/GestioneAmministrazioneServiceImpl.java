@@ -2,7 +2,6 @@ package com.commigo.metaclass.MetaClass.gestioneamministrazione.service;
 
 import com.commigo.metaclass.MetaClass.entity.*;
 import com.commigo.metaclass.MetaClass.exceptions.RuntimeException403;
-import com.commigo.metaclass.MetaClass.exceptions.ServerRuntimeException;
 import com.commigo.metaclass.MetaClass.gestioneamministrazione.repository.CategoriaRepository;
 import com.commigo.metaclass.MetaClass.gestioneamministrazione.repository.ImmagineRepository;
 import com.commigo.metaclass.MetaClass.gestioneamministrazione.repository.ScenarioRepository;
@@ -42,25 +41,11 @@ public class GestioneAmministrazioneServiceImpl implements GestioneAmministrazio
     @Qualifier("StatoPartecipazioneRepository")
     private StatoPartecipazioneRepository statoPartecipazioneRepository;
 
-    @Override
-    public Utente findUtenteById(String id) {
-        return utenteRepository.findUtenteById(utenteRepository.findByMetaId(id));
-    }
-
-    @Override
-    public Stanza findStanzaById(Long id)
-    {
-        return stanzaRepository.findStanzaById(id);
-    }
-
-    @Override
-    public boolean isBannedUser(Utente utente, Stanza stanza) {
-        return statoPartecipazioneRepository.isBannedUser(stanza.getId(),utente.getId());
-    }
 
     /**
-     * @param c
-     * @return
+     * Metodo che permette la modifica di una Categoria
+     * @param c Categoria che deve essere modificata
+     * @return Valore booleno che identifica il successo dell'operazione
      */
     @Override
     public boolean updateCategoria(Categoria c) {
@@ -73,8 +58,9 @@ public class GestioneAmministrazioneServiceImpl implements GestioneAmministrazio
 
 
     /**
-     * @param s
-     * @return
+     * Metodo che permette la modifica di uno scenario
+     * @param s Scenario che deve essere modificato
+     * @return valore boolean che identifica il successo dell'operazione
      */
     @Override
     public boolean updateScenario(Scenario s, long IdCategoria) {
@@ -97,7 +83,8 @@ public class GestioneAmministrazioneServiceImpl implements GestioneAmministrazio
     }
 
     /**
-     * @return
+     * Meotodo che permette di ottenere una lista di stanze
+     * @return Una lista di stanze
      */
     @Override
     public List<Stanza> getStanze() {
@@ -108,6 +95,13 @@ public class GestioneAmministrazioneServiceImpl implements GestioneAmministrazio
         }
     }
 
+    /**
+     * Metodo che permette l'eliminazione di un ban di un determinato utente in una determinata stanza
+     * @param idUtente Id dell'utente a cui deve essere eliminato il ban nella stanza
+     * @param idStanza Id della stanza dalla quale va eliminato il ban dell'utente
+     * @return valore boolean che identifica la riuscita dell'operazione
+     * @throws RuntimeException403
+     */
     @Override
     public boolean deleteBanToUser(Long idUtente, Long idStanza) throws RuntimeException403 {
         Utente u;

@@ -22,6 +22,13 @@ public class StimaDurataMeetingController {
 
     @Autowired
     private GestioneStimaMeetingService gestioneStimaMeetingService;
+
+    /**
+     *
+     * @param id_stanza
+     * @param request
+     * @return
+     */
     @GetMapping(value="/stimaMeeting/{id_stanza}")
     public ResponseEntity<Response<Double>> visualizzaStimaDurataMeeting
             (@PathVariable Long id_stanza, HttpServletRequest request){

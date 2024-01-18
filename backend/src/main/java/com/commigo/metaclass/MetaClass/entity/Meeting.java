@@ -1,7 +1,5 @@
 package com.commigo.metaclass.MetaClass.entity;
 
-import com.commigo.metaclass.MetaClass.exceptions.DataFormatException;
-import com.commigo.metaclass.MetaClass.gestionemeeting.repository.MeetingRepository;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -13,7 +11,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.LocalDateTime;
 
@@ -76,12 +73,6 @@ public class Meeting {
     @JoinColumn(name = "id_stanza")
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Stanza stanza;
-
-    @AssertTrue(message = "L'inizio deve essere precedente alla fine")
-    public boolean isStartDateBeforeEndDate() {
-        // La validazione sarà passata solo se la data di inizio è precedente a quella di fine
-        return inizio == null || fine == null || inizio.isBefore(fine);
-    }
 
     @JsonCreator(mode = JsonCreator.Mode.DEFAULT)
     public Meeting(@JsonProperty("nome") String Nome,

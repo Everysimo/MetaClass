@@ -7,7 +7,11 @@ import org.springframework.stereotype.Repository;
 @Repository("RuoloRepository")
 public interface RuoloRepository extends JpaRepository<Ruolo, Long> {
 
+    /**
+     *
+     * @param nome
+     * @return
+     */
     Ruolo findByNome(String nome);
-    boolean existsRuoloByNome(String nome);
 
 }
