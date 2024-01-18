@@ -1,4 +1,5 @@
 import {useEffect, useState} from "react";
+import {Link} from "react-router-dom";
 
 export const ViewPreviousMeeting = () => {
     const [meetingArray, setMeetingArray] = useState([]);
@@ -50,8 +51,23 @@ export const ViewPreviousMeeting = () => {
                         <span className={"table-cell"}><p>Inizio: {meeting.inizio}</p></span>
                         <span className={"table-cell"}><p>Fine: {meeting.fine}</p></span>
                         <span className={"table-cell"}><p>ID della Stanza: {meeting.id_stanza.id}</p></span>
+                        {/*
+                        <button>
+                            <Link to={`/Questionario/${meeting.id}`}
+                                  style={{color: 'inherit', textDecoration: 'none'}}>
+                                Compila Questionario
+                            </Link>
+                        </button>
+                        */}
                     </div>
                 ))}
+                <p>Vai ai meeting in cui ancora non hai compilato il form:</p>
+                <button>
+                    <Link to={`/meetingwithoutQuestionario`}
+                          style={{color: 'inherit', textDecoration: 'none'}}>
+                        Visualizza
+                    </Link>
+                </button>
             </div>
         </>
     );

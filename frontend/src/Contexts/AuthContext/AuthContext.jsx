@@ -7,7 +7,7 @@ export const AuthProvider = ({ children }) => {
     const [isLoggedIn, setIsLoggedIn] = useState(sessionStorage.getItem('isLoggedIn') === 'true');
     const [userInfo, setUserInfo] = useState({
         nome: sessionStorage.getItem('nome') || '',
-        isAdmin: JSON.parse(sessionStorage.getItem('isAdmin')) || false,
+        //isAdmin: JSON.parse(sessionStorage.getItem('isAdmin')) || false,
     });
 
     const login = (userData) => {
