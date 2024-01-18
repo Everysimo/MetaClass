@@ -12,12 +12,9 @@ import com.commigo.metaclass.MetaClass.utility.response.types.LoginResponse;
 import com.commigo.metaclass.MetaClass.utility.response.types.Response;
 import com.commigo.metaclass.MetaClass.webconfig.JwtTokenUtil;
 import com.commigo.metaclass.MetaClass.webconfig.ValidationToken;
-import com.google.gson.Gson;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
-import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.ResponseEntity;
@@ -40,7 +37,13 @@ public class GestioneUtenzaController {
     @Autowired
     private ValidationToken validationToken;
 
-
+    /**
+     *
+     * @param u
+     * @param response
+     * @param result
+     * @return
+     */
     @PostMapping(value = "/login")
     public ResponseEntity<LoginResponse<Boolean>> login(@RequestBody Utente u,
                                                         HttpServletResponse response,
@@ -76,6 +79,12 @@ public class GestioneUtenzaController {
         }
     }
 
+    /**
+     *
+     * @param request
+     * @param response
+     * @return
+     */
     @PostMapping("/Manuallogout")
     public ResponseEntity<Response<Boolean>> logout(HttpServletRequest request, HttpServletResponse response) {
         try {
@@ -123,6 +132,12 @@ public class GestioneUtenzaController {
         }
     }
 
+    /**
+     *
+     * @param params
+     * @param request
+     * @return
+     */
     @PostMapping(value = "/modifyUserData")
     public ResponseEntity<Response<Boolean>> modifyUserData(@RequestBody Map<String, Object> params,
                                                             HttpServletRequest request) {
@@ -151,6 +166,11 @@ public class GestioneUtenzaController {
         }
     }
 
+    /**
+     *
+     * @param request
+     * @return
+     */
     @GetMapping(value = "/visualizzaStanze")
     public ResponseEntity<Response<List<Stanza>>> visualizzaStanze(HttpServletRequest request) {
         try {
@@ -179,7 +199,11 @@ public class GestioneUtenzaController {
     }
 
 
-
+    /**
+     *
+     * @param request
+     * @return
+     */
     @GetMapping(value = "/userDetails")
     public ResponseEntity<Response<Utente>> visualizzaDatiUtente(HttpServletRequest request) {
         Utente utente;

@@ -4,22 +4,16 @@ import com.commigo.metaclass.MetaClass.entity.Meeting;
 import com.commigo.metaclass.MetaClass.exceptions.RuntimeException403;
 import com.commigo.metaclass.MetaClass.exceptions.ServerRuntimeException;
 import com.commigo.metaclass.MetaClass.gestionemeeting.service.GestioneMeetingService;
-import com.commigo.metaclass.MetaClass.utility.multipleid.UtenteInMeetingID;
 import com.commigo.metaclass.MetaClass.utility.request.RequestUtils;
-import com.commigo.metaclass.MetaClass.utility.response.ResponseUtils;
 import com.commigo.metaclass.MetaClass.utility.response.types.Response;
 import com.commigo.metaclass.MetaClass.webconfig.JwtTokenUtil;
 import com.commigo.metaclass.MetaClass.webconfig.ValidationToken;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.micrometer.common.util.StringUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
-import org.apache.catalina.Server;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -39,41 +33,13 @@ public class GestioneMeetingController {
     @Autowired
     private JwtTokenUtil jwtTokenUtil;
 
-    /*@PostMapping(value = "/meetingStatus/{id}")
-    public ResponseEntity<Response<Boolean>> meetingStatus(@RequestBody String action, @PathVariable("id") Long idMeeting)
-    {
-        boolean value;
-        String message;
-
-        Meeting meeting = meetingService.findMeetingById(idMeeting);
-
-        if(meeting == null)
-        {
-            message = "Meeting non trovato";
-            return ResponseUtils.getResponseError(HttpStatus.INTERNAL_SERVER_ERROR,message);
-        }
-
-        switch (action)
-        {
-            case "start":
-                message = "Meeting avviato";
-                value = true;
-                //inserire la data di inizio meeting
-                break;
-            case "stop":
-                message = "Meeting terminato";
-                value = true;
-                //inserire la data di fine meeting
-                break;
-            default:
-                message = "Azione non trovata";
-                value = false;
-        }
-        if(value) return ResponseUtils.getResponseOk(message);
-        return ResponseUtils.getResponseError(HttpStatus.INTERNAL_SERVER_ERROR,message);
-
-    }*/
-
+    /**
+     * Metodo che permette di gestire la richiesta di schedulazione di un meeting
+     * @param m Meeting che deve essere schedulato
+     * @param result Variabile che contiene tutti gli errori di validazione dell'oggetto meeting
+     * @param request richiesta HTTP fornita dal client
+     * @return un valore booleano che identifica la riuscita dell'operazione ed un messaggio che descrive l'esito di essa
+     */
     @PostMapping(value = "/schedulingMeeting")
     public ResponseEntity<Response<Boolean>> schedulingMeeting(@Valid @RequestBody Meeting m,
                                                                BindingResult result,
@@ -105,6 +71,13 @@ public class GestioneMeetingController {
         }
     }
 
+    /**
+     * Metodo che permette di gestire la richiesta di modifica di schedulazione di un meeting
+     * @param m Meeting sul quale modificare la schedulazione
+     * @param result variabile che contiene tutti gli errori di validazione dell'oggetto meeting
+     * @param request richiesta HTTP fornita dal client
+     * @return un valore booleano che identifica la riuscita dell'operazione ed un messaggio che descrive l'esito di essa
+     */
     @PostMapping(value = "/modificaScheduling")
     public ResponseEntity<Response<Boolean>> modificaScheduling
             (@Valid @RequestBody Meeting m, BindingResult result, HttpServletRequest request) {
@@ -137,6 +110,12 @@ public class GestioneMeetingController {
         }
     }
 
+    /**
+     * Metodo che permette di gestire la richiesta di avvio di un meeting
+     * @param id_meeting ID del meeting che deve essere avviato
+     * @param request richiesta HTTP fornita dal client
+     * @return un valore booleano che identifica la riuscita dell'operazione ed un messaggio che descrive l'esito di essa
+     */
     @PostMapping(value = "/avviaMeeting/{id_meeting}")
     public ResponseEntity<Response<Boolean>> avviaMeeting (@PathVariable Long id_meeting,
                                                             HttpServletRequest request) {
@@ -165,6 +144,12 @@ public class GestioneMeetingController {
         }
     }
 
+    /**
+     * Metodo che permette di gestire la richiesta di visualizzazione dei meeting schedulati all'iterno di una stanza
+     * @param Id Id della stanza di cui bisogna visualizzare i meeting schedulati
+     * @param request richiesta HTTP fornita dal client
+     * @return una lista di meeting ed un messaggio che descrive l'esito dell'operazione
+     */
     @PostMapping(value = "/visualizzaSchedulingMeeting/{Id}")
     public ResponseEntity<Response<List<Meeting>>> visualizzaSchedulingMeeting(@PathVariable Long Id,
                                                                                HttpServletRequest request) {
@@ -180,7 +165,15 @@ public class GestioneMeetingController {
         }
 
     }
-        @PostMapping(value = "/accediMeeting/{id_meeting}")
+
+
+    /**
+     * Metodo che permette di gestire la richiesta di accesso ad un meeting
+     * @param id_meeting id del meeting a cui si vuole fare accesso
+     * @param request richiesta HTTP fornita dal client
+     * @return un valore booleano che identifica la riuscita dell'operazione ed un messaggio che descrive l'esito di essa
+     */
+    @PostMapping(value = "/accediMeeting/{id_meeting}")
     public ResponseEntity<Response<Boolean>> accediMeeting (@PathVariable Long id_meeting,
                                                             HttpServletRequest request) {
         try {
@@ -208,6 +201,12 @@ public class GestioneMeetingController {
 
     }
 
+    /**
+     * Metodo che permette di gestire la richiesta di terminazione di un meeting
+     * @param id_meeting id del meeting che si vuole teminare
+     * @param request richiesta HTTP fornita dal client
+     * @return un valore booleano che identifica la riuscita dell'operazione ed un messaggio che descrive l'esito di essa
+     */
     @PostMapping(value = "/terminaMeeting/{id_meeting}")
     public ResponseEntity<Response<Boolean>> terminaMeeting (@PathVariable Long id_meeting,
                                                            HttpServletRequest request) {
@@ -235,6 +234,12 @@ public class GestioneMeetingController {
         }
     }
 
+    /**
+     * Metodo che permette di gestire la richista di uscita da un determianto meeting
+     * @param id_meeting id del meeting da cui si vuole uscire
+     * @param request richiesta HTTP fornita dal client
+     * @return un valore booleano che identifica la riuscita dell'operazione ed un messaggio che descrive l'esito di essa
+     */
     @PostMapping(value = "/uscitaMeeting/{id_meeting}")
     public ResponseEntity<Response<Boolean>> uscitaMeeting (@PathVariable Long id_meeting,
                                                              HttpServletRequest request) {
@@ -262,6 +267,11 @@ public class GestioneMeetingController {
         }
     }
 
+    /**
+     * Metodo che permette di gestire la richiesta di visualizzazione del questionario
+     * @param request richiesta HTTP fornita dal client
+     * @returnun una lista di meeting in cui l'utente deve compilare in questionario ed un messaggio che descrive l'esito di essa
+     */
     @GetMapping("/visualizzaQuestionari")
     public ResponseEntity<Response<List<Meeting>>> visualizzaQuestionario (
             HttpServletRequest request) {
@@ -287,6 +297,13 @@ public class GestioneMeetingController {
         }
     }
 
+    /**
+     *  Metodo che permette di gestire la richiesta di compilazione del questionario
+     * @param JSONvalue Valori inseriti dall'utente all'interno del questionario
+     * @param id_meeting id del metting a cui fa riferimento il questionario
+     * @param request richiesta HTTP fornita dal client
+     * @returnun unvalore booleano che identifica la riuscita dell'operazione ed un messaggio che descrive l'esito di essa
+     */
     @PostMapping("/compilaQuestionario/{id_meeting}")
     public ResponseEntity<Response<Boolean>> compilaQuestionario(@RequestBody String JSONvalue,
                                                                  @PathVariable Long id_meeting,
@@ -323,6 +340,11 @@ public class GestioneMeetingController {
         }
     }
 
+    /**
+     * Metodo che permette di gestire la visualizzazione dei metting precedenti a cui ha partecipato l'utente
+     * @param request
+     * @return una lista di meeting in cui ed un messaggio che descrive l'esito dell'operazione
+     */
     @GetMapping("/visualizzaMeetingPrecedenti")
     public ResponseEntity<Response<List<Meeting>>> visualizzaMeetingPrecedeni (
             HttpServletRequest request) {
@@ -347,7 +369,5 @@ public class GestioneMeetingController {
                     .body(new Response<>(null, se.getMessage()));
         }
     }
-
-
 }
 

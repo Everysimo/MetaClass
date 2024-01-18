@@ -1,7 +1,5 @@
 package com.commigo.metaclass.MetaClass.entity;
 
-import com.commigo.metaclass.MetaClass.exceptions.DataFormatException;
-import com.commigo.metaclass.MetaClass.gestionemeeting.repository.MeetingRepository;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -13,9 +11,10 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 
 @Entity
 @Data
@@ -49,12 +48,10 @@ public class Meeting {
 
     @NotNull(message = "L'inizio non può essere nullo")
     @Future(message = "l'inizio deve essere successiva alla data odierna")
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
     private LocalDateTime inizio;
 
     @NotNull(message = "La fine non può essere nulla")
     @Future(message = "la fine deve essere successiva alla data odierna")
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
     private LocalDateTime fine;
 
     @NotNull(message = "isAvviato non può essere nullo")
@@ -77,41 +74,49 @@ public class Meeting {
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Stanza stanza;
 
-    @AssertTrue(message = "L'inizio deve essere precedente alla fine")
-    public boolean isStartDateBeforeEndDate() {
-        // La validazione sarà passata solo se la data di inizio è precedente a quella di fine
-        return inizio == null || fine == null || inizio.isBefore(fine);
-    }
-
     @JsonCreator(mode = JsonCreator.Mode.DEFAULT)
     public Meeting(@JsonProperty("nome") String Nome,
-                   @JsonProperty("inizio") LocalDateTime Inizio,
-                   @JsonProperty("fine") LocalDateTime Fine,
+                   @JsonProperty("inizio") String Inizio,
+                   @JsonProperty("fine") String Fine,
                    @JsonProperty("id_stanza") Long stanza,
-                   @JsonProperty("id_meeting") Long meeting) {
+                   @JsonProperty("id_meeting") Long meeting) throws DataFormatException {
 
 
-          if (meeting != null) {
-              this.id = meeting;
-          }
-          this.nome = Nome;
-          this.inizio = Inizio;
-          this.fine = Fine;
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 
-          this.isAvviato = false;
+        if (meeting != null) {
+            this.id = meeting;
+        }
 
-          this.stanza = new Stanza();
-          this.stanza.setId(stanza);
+        this.nome = Nome;
 
-          this.scenario_iniziale = new Scenario();
+        try{
+           this.inizio = LocalDateTime.parse(Inizio,formatter);
+        }catch(DateTimeParseException ex){
+            throw new DataFormatException("Formato 'inizio' non valido (yyyy-MM-dd HH:mm)");
+        }
+
+        try{
+            this.fine = LocalDateTime.parse(Fine,formatter);
+        }catch(DateTimeParseException ex){
+            throw new DataFormatException("Formato 'fine' non valido (yyyy-MM-dd HH:mm)");
+        }
+
+        this.isAvviato = false;
+
+        this.stanza = new Stanza();
+        this.stanza.setId(stanza);
+
+        this.scenario_iniziale = new Scenario();
     }
 
-    public Meeting(String nome, LocalDateTime inizio, LocalDateTime fine, boolean isAvviato, Scenario scenario_iniziale, Stanza stanza) {
+
+    /*public Meeting(String nome, LocalDateTime inizio, LocalDateTime fine, boolean isAvviato, Scenario scenario_iniziale, Stanza stanza) {
         this.nome = nome;
         this.inizio = inizio;
         this.fine = fine;
         this.isAvviato = isAvviato;
         this.scenario_iniziale = scenario_iniziale;
         this.stanza = stanza;
-    }
+    }*/
 }
