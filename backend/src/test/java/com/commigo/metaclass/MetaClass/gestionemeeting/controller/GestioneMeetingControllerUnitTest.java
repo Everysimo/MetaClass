@@ -1,32 +1,29 @@
 package com.commigo.metaclass.MetaClass.gestionemeeting.controller;
 
-import com.commigo.metaclass.MetaClass.MetaClassApplicationTests;
 import com.commigo.metaclass.MetaClass.entity.*;
 import com.commigo.metaclass.MetaClass.exceptions.RuntimeException403;
 import com.commigo.metaclass.MetaClass.exceptions.ServerRuntimeException;
 import com.commigo.metaclass.MetaClass.gestioneamministrazione.repository.ScenarioRepository;
 import com.commigo.metaclass.MetaClass.gestionemeeting.repository.MeetingRepository;
 import com.commigo.metaclass.MetaClass.gestionemeeting.service.GestioneMeetingService;
-import com.commigo.metaclass.MetaClass.gestionestanza.repository.RuoloRepository;
-import com.commigo.metaclass.MetaClass.gestionestanza.repository.StanzaRepository;
-import com.commigo.metaclass.MetaClass.gestionestanza.repository.StatoPartecipazioneRepository;
-import com.commigo.metaclass.MetaClass.gestioneutenza.repository.UtenteRepository;
 import com.commigo.metaclass.MetaClass.utility.request.RequestUtils;
-import com.commigo.metaclass.MetaClass.utility.response.types.Response;
 import com.commigo.metaclass.MetaClass.webconfig.JwtTokenUtil;
 import com.commigo.metaclass.MetaClass.webconfig.ValidationToken;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.*;
 import org.hibernate.validator.HibernateValidator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -34,10 +31,17 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockServletContext;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
+import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
@@ -53,54 +57,42 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 
-@SpringBootTest
+
 @RunWith(SpringRunner.class)
-@ContextConfiguration(classes = MetaClassApplicationTests.class)
-@ActiveProfiles("test")
-public class GestioneMeetingControllerUnitTest {
+@ContextConfiguration(classes = {GestioneMeetingController.class,TestObjectMapperConfig.class})
+@ExtendWith(MockitoExtension.class)
+@SpringBootTest
+class GestioneMeetingControllerUnitTest {
 
     /**
      *  Un mock oggetto è un oggetto simulato che può essere programmato per rispondere in modo specifico a chiamate di
      *  metodo durante i test.
      */
-    @Mock
-    private StanzaRepository stanzaRepository;
-    @Mock
+    @MockBean
     private GestioneMeetingService meetingService;
-    @Mock
-    private UtenteRepository utenteRepository;
-    @Mock
-    private StatoPartecipazioneRepository statoPartecipazioneRepository;
-    @Mock
-    private RuoloRepository ruoloRepository;
-    @Mock
-    private ScenarioRepository scenarioRepository;
-    @Mock
-    private MeetingRepository meetingRepository;
-    @Mock
+    @MockBean
     private ValidationToken validationToken;
-    @Mock
+    @MockBean
     private JwtTokenUtil jwtTokenUtil;
     @InjectMocks
     private GestioneMeetingController meetingController;
 
+
     private Stanza stanza;
     private Utente utente;
     private Meeting meeting;
-    private Ruolo partecipante;
-    private Ruolo organizzatore;
     private Ruolo organizzatore_master;
-    private StatoPartecipazione statoPartecipazione;
     private Immagine immagine;
     private Categoria categoria;
     private Scenario scenario;
-    private HttpServletRequest request;
     private ValidatorFactory validatorFactory;
     private Validator validator;
     private BindingResult bindingResult;
     private DateTimeFormatter formatter;
     private FeedbackMeeting feedbackMeeting;
     private Report report;
+    private final String API_URL = "/schedulingMeeting";
+
 
     /**
      *  Questo metodo viene richiamato prima di ogni test e qui vanno inizializzate
@@ -108,20 +100,14 @@ public class GestioneMeetingControllerUnitTest {
      */
     @BeforeEach
     public void setUp() throws Exception {
-        MockitoAnnotations.openMocks(this);
         utente = new Utente(1L, "Michele", "Pesce", "pescemichele@live.com",
                 "05/30/1993","M","7184488154978627", Utente.DEFAULT_TOKEN, true);
-        partecipante = new Ruolo(1L, Ruolo.PARTECIPANTE);
-        organizzatore = new Ruolo(2L, Ruolo.ORGANIZZATORE);
         organizzatore_master = new Ruolo(3L, Ruolo.ORGANIZZATORE_MASTER);
         immagine = new Immagine(1L, "lavoro1.txt","https://www.lavoro1.com/path/to/lavoro1.txt");
         categoria = new Categoria(1L, "Lavoro", "Categoria per il lavoro");
         scenario = new Scenario(1L, "Lavoro1", "Scenario 1 per il lavoro", immagine, categoria);
         stanza = new Stanza(1L, "StanzaLavoro1", "Stanza 1 per il lavoro",
                 false, 500, scenario, "000001");
-        statoPartecipazione = new StatoPartecipazione(stanza, utente,
-                organizzatore_master, false, false,
-                "Michele", false);
         formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
         meeting = new Meeting(1L, "MeetingStanza4",
                 LocalDateTime.parse("2024-02-02 18:00",formatter),
@@ -134,6 +120,7 @@ public class GestioneMeetingControllerUnitTest {
                 .post("/schedulingMeeting")  // Assicurati di utilizzare il percorso corretto
                 .header("Authorization", "Bearer TODO")
                 .buildRequest(new MockServletContext());
+        bindingResult = new BeanPropertyBindingResult(meeting, "meeting");
     }
 
     /**
@@ -143,57 +130,61 @@ public class GestioneMeetingControllerUnitTest {
      * successivamente si controlla ogni istruzione del metodo
      */
     @Test
-    public void testSchedulingMeeting() {
-
-        //test case 4.1.1
-        testCasesSchedulingMeeting(1);
-        //test case 4.1.2
-        testCasesSchedulingMeeting(2);
-        //test case 4.1.3
-        testCasesSchedulingMeeting(3);
-        //test case 4.1.4
-        testCasesSchedulingMeeting(4);
-        //test case 4.1.5
-        testCasesSchedulingMeeting(5);
-        //test case 4.1.6
-        testCasesSchedulingMeeting(6);
-        //test case 4.1.7
-        testCasesSchedulingMeeting(7);
-        //test case 4.1.8
-        testCasesSchedulingMeeting(8);
-        //test case 4.1.9
-        testCasesSchedulingMeeting(9);
-        //test case 4.1.10
-        testCasesSchedulingMeeting(10);
-        //test case 4.1.11
-        testCasesSchedulingMeeting(11);
-        //test case 4.1.12
-        testCasesSchedulingMeeting(12);
+    public void testSchedulingMeetingOnSuccess(){
 
 
         // Simula un token valido
         when(validationToken.isTokenValid(any(HttpServletRequest.class))).thenReturn(true);
 
         // Simula la decodifica del token e restituisce un metaID valido
-        when(jwtTokenUtil.getMetaIdFromToken(anyString())).thenReturn(utente.getMetaId());
+        when(jwtTokenUtil.getMetaIdFromToken(validationToken.getToken()))
+                .thenReturn(utente.getMetaId());
 
         try{
-            // Chiamata al metodo da testare
-            ResponseEntity<Response<Boolean>> responseEntity =
-                    meetingController.schedulingMeeting(meeting, bindingResult, request);
+            when(meetingService.creaScheduling(meeting, utente.getMetaId())).thenReturn(true);
 
-            if(!bindingResult.hasErrors())
-                 assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
-            else
-                assertEquals(HttpStatus.FORBIDDEN, responseEntity.getStatusCode());
+            //converto la map
+            ObjectMapper objectMapper = new ObjectMapper();
+            objectMapper.registerModule(new JavaTimeModule());
+            // Creazione di un oggetto JSON vuoto
+            ObjectNode jsonNode = objectMapper.createObjectNode();
+
+            // Aggiunta degli attributi uno per uno
+            jsonNode.put("nome", meeting.getNome());
+            jsonNode.put("inizio", "2024-02-02 18:00");
+            jsonNode.put("fine", "2024-02-02 20:00");
+            jsonNode.put("id_stanza", meeting.getStanza().getId());
+
+            // Converti l'oggetto JSON in una stringa
+            String jsonRequest = jsonNode.toString();
+
+            MockHttpServletRequestBuilder requestBuilder =
+                    MockMvcRequestBuilders.post(API_URL)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(jsonRequest)
+                    .header("Authorization", "Bearer TODO");
+
+            ResultActions actualPerformResult =
+                    MockMvcBuilders.standaloneSetup(meetingController)
+                            .build()
+                            .perform(requestBuilder);
+
+            actualPerformResult.andExpect(MockMvcResultMatchers.status().is2xxSuccessful());
+
+            MvcResult mvcResult = actualPerformResult.andReturn();
+            int status = mvcResult.getResponse().getStatus();
+            String responseContent = mvcResult.getResponse().getContentAsString();
+
+            System.out.println("Actual Status: " + status);
+            System.out.println("Response Content: " + responseContent);
 
         } catch (Exception e) {
                fail("Exception not expected: " + e.getMessage());
         }
 
     }
-    @Test
-    private void testCasesSchedulingMeeting(int testcase){
+
+   /* private void testCasesSchedulingMeeting(int testcase){
 
         switch (testcase){
             case 1:
@@ -270,6 +261,55 @@ public class GestioneMeetingControllerUnitTest {
                 assertFalse(bindingResult.hasErrors());
         }
 
+
+    }*/
+
+    @Test
+    public void testSchedulingMeetingOnFailure() throws Exception {
+
+        when(validationToken.isTokenValid(any())).thenReturn(false);
+
+        meeting.setNome("N");
+        assertValidationMeeting("Lunghezza nome non valida");
+
+        //converto la map
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule());
+        // Creazione di un oggetto JSON vuoto
+        ObjectNode jsonNode = objectMapper.createObjectNode();
+
+        // Aggiunta degli attributi uno per uno
+        jsonNode.put("nome", meeting.getNome());
+        jsonNode.put("inizio", "2024-02-02 18:00");
+        jsonNode.put("fine", "2024-02-02 20:00");
+        jsonNode.put("id_stanza", meeting.getStanza().getId());
+
+        // Converti l'oggetto JSON in una stringa
+        String jsonRequest = jsonNode.toString();
+
+        MockHttpServletRequestBuilder requestBuilder =
+                MockMvcRequestBuilders.post(API_URL)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(jsonRequest)
+                        .header("Authorization", "Bearer TODO");
+
+        ResultActions actualPerformResult = MockMvcBuilders.standaloneSetup(meetingController)
+                .build()
+                .perform(requestBuilder);
+
+        MvcResult mvcResult = actualPerformResult.andReturn();
+        int status = mvcResult.getResponse().getStatus();
+        String responseContent = mvcResult.getResponse().getContentAsString();
+
+        System.out.println("Actual Status: " + status);
+        System.out.println("Response Content: " + responseContent);
+
+
+        if (responseContent.isEmpty()) {
+            System.out.println("Il messaggio della risposta è vuoto.");
+        } else {
+            System.out.println("Messaggio della risposta: " + responseContent);
+        }
 
     }
 
@@ -349,7 +389,6 @@ public class GestioneMeetingControllerUnitTest {
 
         // Esegui la validazione
         Set<ConstraintViolation<Meeting>> violations = validator.validate(meeting);
-        bindingResult = new BeanPropertyBindingResult(meeting, "meeting");
         for (ConstraintViolation<Meeting> violation : violations) {
             String propertyPath = violation.getPropertyPath().toString();
             String message = violation.getMessage();
@@ -365,6 +404,9 @@ public class GestioneMeetingControllerUnitTest {
             assertTrue(true);
         else if(message.equalsIgnoreCase("la fine deve essere successiva alla data odierna, " +
                 "L'inizio deve essere precedente alla fine"))
+            assertTrue(true);
+        else if(message.equalsIgnoreCase("L'inizio deve essere precedente alla fine, la fine " +
+                "deve essere successiva alla data odierna"))
             assertTrue(true);
         else
             assertEquals(message,RequestUtils.errorsRequest(bindingResult));

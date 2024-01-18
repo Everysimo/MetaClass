@@ -31,7 +31,6 @@ import java.util.List;
 public class GestioneMeetingController {
 
     @Autowired
-    @Qualifier("GestioneMeetingService")
     private GestioneMeetingService meetingService;
 
     @Autowired

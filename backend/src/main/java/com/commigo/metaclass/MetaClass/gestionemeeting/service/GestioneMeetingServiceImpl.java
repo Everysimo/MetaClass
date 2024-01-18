@@ -27,7 +27,7 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-@Service("GestioneMeetingService")
+@Service
 @RequiredArgsConstructor
 @Slf4j
 @Transactional    //ogni operazione è una transazione

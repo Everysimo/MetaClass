@@ -25,7 +25,7 @@ import java.time.LocalDateTime;
 public class Scenario {
 
     public static final int MAX_LENGTH = 254;
-    public static final int MIN_LENGTH = 1;
+    public static final int MIN_LENGTH = 3;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -42,9 +42,8 @@ public class Scenario {
 
     @NotNull(message = "La descrizione non può essere nulla")
     @Size(min = MIN_LENGTH, max = MAX_LENGTH, message = "Lunghezza della descrizione non valida")
-    @Pattern(regexp="^[a-zA-Z0-9.,!?()'\"\\-\\s]+$",
+    @Pattern(regexp="^[A-Z][a-zA-Z0-9.,!?()'\"\\-\\s]+$",
             message = "Formato descrizione errato")
-    @NotBlank(message = "La descrizione non può essere vuoto")
     private String descrizione;
 
     private float media_valutazione;

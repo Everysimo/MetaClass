@@ -1,148 +1,102 @@
+import React, { useState, useEffect } from 'react';
+import '../PopUpStyles.css';
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {faCirclePlus} from "@fortawesome/free-solid-svg-icons";
+const MyCreateForm = () => {
+    const [showCreateFormModal, setShowCreateFormModal] = useState(false);
 
-import React, {Component} from 'react'
-import "./MyCreateForm.css"
-import {Divider} from "@chakra-ui/react";
-
-export default class MyCreateForm extends Component{
-
-
-    //stato di partenza dei parametri
-    state = {
-        nome: "",
-        descrizione: "",
-        tipoAccesso: false,
-        maxPosti: 0,
-        id_scenario: '',            //lo uso per salvare l'id dello scenario e passarlo al backend
-        selectedScenario: '',   //per salvarmi quale opzione sceglie l'utente
-        array: []       //un array in cui mi salvo i dati provenienti dal backend (lista scenari)
+    const handleShowCreateForm = () => {
+        setShowCreateFormModal(true);
     };
 
-    //funzione per richiamare la funzione per prelevare gli scenari dal backend
-    componentDidMount() {
-        // Chiamata alla funzione per recuperare l'array di scenari
-        this.fetchScenarios();
-    }
+    const handleCloseCreateFormModal = () => {
+        setShowCreateFormModal(false);
+    };
+    const [state, setState] = useState({
+        nome: "",
+        descrizione: "",
+        tipoAccesso: "",
+        maxPosti: 0,
+        id_scenario: '',
+        selectedScenario: '',
+        array: []
+    });
 
+    useEffect(() => {
+        fetchScenarios();
+    }, []);
 
-    requestOption = {
+    const requestOption = {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',
             'Authorization': 'Bearer ' + sessionStorage.getItem("token")
         },
     };
-    fetchScenarios = async () => {
+
+    const fetchScenarios = async () => {
         try {
-            const response = await fetch('http://localhost:8080/visualizzaScenari', this.requestOption);
+            const response = await fetch('http://localhost:8080/visualizzaScenari', requestOption);
 
             if (!response.ok) {
                 throw new Error('Errore nel recupero degli scenari.');
             }
-            //mi vado a salvare la stringa json in una const
+
             const data = await response.json();
-            console.log('data:', data)
+            setState(prevState => ({ ...prevState, array: data.value }));
 
-            //IMPORTANTE -> QUESTO E' IL METODO PER CONVERTIRE L'ARRAY
-            this.setState({array: data.value})
-            console.log("array:", this.state.array);
-
-            //questo lo faccio per vedere se riesco a stamparmi un parametro dell'array(uno tra nome, descrizione, id, media...)
-            this.state.array.forEach((parametro, indice) => {
+            state.array.forEach((parametro, indice) => {
                 const descr = parametro.descrizione;
                 console.log(`Descrizione ${indice + 1}: ${descr}`);
             });
-            //esempio di come scorrere l'array per il nome
-            /*
-                        if (Array.isArray(data.value) && data.value.length > 0) {
-                            console.log('Scorrendo array value:');
-                            data.value.forEach((item, index) => {
-                                const nome = item.nome;
-                                console.log(`Elemento ${index + 1}: ${nome}`);
-                            });
-                        } else {
-                            console.error('Nessun elemento trovato nell\'array value');
-                        }
-             */
-
-                        /* -> altro esempio
-                        data.value.map()
-                        console.log("nome:", data.value)
-                        */
-
         } catch (error) {
             console.error('Errore durante il recupero degli scenari:', error.message);
         }
     };
 
-    //funzione similar costruttore per settare i valori
-
-
-//le varie handle richiamate quando passo i valori nelle input form
-    handleNameChange = (e) => {
-        this.setState({nome: e.target.value});
+    const handleNameChange = (e) => {
+        const inputValue = e.target.value;
+        const capitalizedInput = inputValue.charAt(0).toUpperCase() + inputValue.slice(1);
+        setState(prevState => ({ ...prevState, nome: capitalizedInput, error: null }));
     };
 
-    handleDescriptionChange = (e) => {
-        this.setState({descrizione: e.target.value})
+    const handleDescriptionChange = (e) => {
+        const inputValue = e.target.value;
+        const capitalizedInput = inputValue.charAt(0).toUpperCase() + inputValue.slice(1);
+        setState(prevState => ({ ...prevState, descrizione: capitalizedInput, error: null }));
     };
 
-    handleOptionChange = (e) => {
-        this.setState({tipoAccesso: e.target.value})
+    const handleOptionChange = (e) => {
+        setState(prevState => ({ ...prevState, tipoAccesso: e.target.value }));
     };
 
-    handleMAXChange = (e) => {
-        this.setState({maxPosti: e.target.value})
+    const handleMAXChange = (e) => {
+        setState(prevState => ({ ...prevState, maxPosti: e.target.value }));
     };
 
-
-    //funzione alla scelta del parametro nel form
-    handleScenarioChange = (e) => {
-        //mi salvo la variabile scelta in una const
+    const handleScenarioChange = (e) => {
         const selectedScenarioName = e.target.value;
-        console.log('Valore selezionato:', selectedScenarioName);
-
-        //setto la mia variabile selectedscenario con il valore scelto
-        this.setState({ selectedScenario: selectedScenarioName });
-
-        //richiamo una funzione per prelevare dal nome scelto, l'id corrispondente
-        this.findScenarioByName(selectedScenarioName);
+        setState(prevState => ({ ...prevState, selectedScenario: selectedScenarioName }));
+        findScenarioByName(selectedScenarioName);
     };
 
-
-
-    //funzione trova dal nome
-    findScenarioByName = (nome) => {
-
-        const { selectedScenario, array } = this.state;
-        console.log("in funziione find->", nome)
-
-        //scorre l'array, e cerca quella entry nell'array che ha quel nome
+    const findScenarioByName = (nome) => {
+        const { selectedScenario, array } = state;
         const foundScenario = array.find((scenario) => scenario.nome === nome);
 
-        //se l'ha trovata sarà true, => allora mi salva sia la posizione in cui l'ha trovata e sia l'id stesso
         if (foundScenario) {
             const positionInArray = array.indexOf(foundScenario);
             const selectedScenarioId = foundScenario.id;
             console.log(`Nome dello scenario trovato: ${selectedScenario}, ID: ${selectedScenarioId}, Posizione nell'array: ${positionInArray}`);
-
-            // setto lo stato della mia var id_scenario con l'id che è stato scelto
-            this.setState({id_scenario: selectedScenarioId});
-
+            setState(prevState => ({ ...prevState, id_scenario: selectedScenarioId }));
         } else {
             console.error(`Scenario non trovato per il nome: ${selectedScenario}`);
         }
     };
 
-    /*funzione per inviare i parametri a crea stanza*/
-    sendDataToServer = async() =>{
-        const {nome, descrizione, tipoAccesso, maxPosti, id_scenario} = this.state;
-        const dataToSend = {
-            nome,
-            descrizione,
-            tipoAccesso,
-            maxPosti,
-            id_scenario
-        };
+    const sendDataToServer = async () => {
+        const { nome, descrizione, tipoAccesso, maxPosti, id_scenario } = state;
+        const dataToSend = { nome, descrizione, tipoAccesso, maxPosti, id_scenario };
 
         const requestOption = {
             method: 'POST',
@@ -153,90 +107,164 @@ export default class MyCreateForm extends Component{
             body: JSON.stringify(dataToSend)
         };
 
-        try{
-            console.log("token:" , sessionStorage.getItem("token"))
+        try {
+            console.log("token:", sessionStorage.getItem("token"))
             console.log("la stringa json:", JSON.stringify(dataToSend));
-            //col fetch faccio la richiesta, al URL descritto
             const response = await fetch('http://localhost:8080/creastanza', requestOption);
-            //con la await attento la risposta dal fetch
             const responseData = await response.json();
             console.log("Risposta dal server:", responseData);
-        }catch(error){
+        } catch (error) {
             console.error('ERRORE:', error);
         }
+    };
 
+    const handleSubmit = () => {
+        if (state.nome.trim() === '' || state.nome.length < 2) {
+            setState(prevState => ({
+                ...prevState,
+                error: 'Il campo nome non può essere vuoto o minore di 2 caratteri'
+            }));
+            return;
+        }
 
-    }
+        if (!isNaN(state.nome.charAt(0))) {
+            setState(prevState => ({
+                ...prevState,
+                error: 'Errore durante la richiesta, formato Nome errato'
+            }));
+            return;
+        }
 
-    callFunction = () => {
+        if (state.descrizione.trim() === '') {
+            setState(prevState => ({
+                ...prevState,
+                error: 'Il campo descrizione non può essere vuoto'
+            }));
+            return;
+        } else if (state.descrizione.length < 2 || state.descrizione.length > 254) {
+            setState(prevState => ({
+                ...prevState,
+                error: 'Lunghezza descrizione errata'
+            }));
+            return;
+        }
 
-        this.sendDataToServer();
-        console.log("dati del form", this.state)
-    }
-    render(){
-        return(
-            <div className={'primary'}>
-                <div className={'left-label'}>
-                    <p className={'textp'}>Inserisci Nome:</p>
-                    <input
-                        className={'input-field'}
-                        placeholder={"Aggiungi Nome"}
-                        required
-                        type="text"
-                        value={this.state.nome}
-                        onChange={this.handleNameChange}
-                    />
+        if (state.maxPosti < 1 || state.maxPosti > 999) {
+            setState(prevState => ({
+                ...prevState,
+                error: 'Errore, il massimo di posti deve essere compreso tra 1 e 999'
+            }));
+            return;
+        }
 
-                    <div className={'textarea-box'}>
-                        <p className={'textp'}>Inserisci Descrizione:</p>
-                        <textarea
-                            className={'textarea-field'}
-                            placeholder={'Aggiungi descrizione'}
-                            required
-                            rows={5}
-                            style={{resize: 'none', width: '300px'}}
-                            type="text"
-                            value={this.state.descrizione}
-                            onChange={this.handleDescriptionChange}
-                        />
-                    </div>
+        if (!state.tipoAccesso) {
+            setState(prevState => ({
+                ...prevState,
+                selectedScenario: '',
+                error: 'Errore,Tipo di Accesso alla stanza non selezionato'
+            }));
+            return;
+        }
 
-                    <p className={'textp'}>Scegli: pubblica o privata:</p>
-                    <select className={'select-field'} value={this.state.tipoAccesso} onChange={this.handleOptionChange}
-                            required>
-                        <option value={false}>Pubblica</option>
-                        <option value={true}>Privata</option>
-                    </select>
+        if (!state.selectedScenario) {
+            setState(prevState => ({
+                ...prevState,
+                selectedScenario: '',
+                error: 'Errore, Selezione Scenario errata'
+            }));
+            return;
+        }
 
-                    <p className={'textp'}>Inserisci numero MAX utenti:</p>
-                    <input
-                        className={'number-field'}
-                        required
-                        placeholder={'MAX Posti'}
-                        type="number"
-                        min="1" max="999"
-                        style={{width: '100px'}}
-                        value={this.maxPosti}
-                        onChange={this.handleMAXChange}
-                    />
+        setState(prevState => ({ ...prevState, error: null }));
+        sendDataToServer();
+        console.log("dati del form", state)
+    };
 
-                    <p className={'textp'}>Seleziona uno scenario</p>
-                    <select className={'select-field'} value={this.state.selectedScenario} onChange={this.handleScenarioChange}>
-                        <option value="" disabled>Seleziona uno scenario</option>
-                        {this.state.array.map((valore) => (
-                            <option key={valore.id} value={valore.nome}>
-                                {valore.nome}
-                            </option>
-                        ))}
-                    </select>
-
-                </div>
-
-                <Divider/>
-
-                <div className={'right-label'}>
-                    <button className={'button-create'} type="button" onClick={() =>  this.callFunction() }> Create</button>
-                </div>
+    return (
+        <>
+            <div
+                className={"transWhiteBg"}
+                onClick={handleShowCreateForm}
+            >
+                <FontAwesomeIcon icon={faCirclePlus} size="2xl" style={{color: "#c70049",}}/>
+                <h2>Creazione stanza</h2>
+                <p
+                    style={{fontSize: "14px", textAlign: "center",}}
+                >
+                    Crea una stanza tutta tua e diventa Organizzatore
+                </p>
             </div>
-        )};
-}
+            {showCreateFormModal && (
+                <div className="modal">
+                    <div className="modal-content">
+                        {/* Add a close button inside the modal */}
+                        <span className="close" onClick={handleCloseCreateFormModal}>&times;</span>
+                        <div className={"masterDiv"}>
+                            <div className={"childDiv"}>
+                                <p className={'textp'}>Inserisci Nome:</p>
+                                <input
+                                    className={'input-field'}
+                                    placeholder={"Aggiungi Nome"}
+                                    type="text"
+                                    value={state.nome}
+                                    onChange={handleNameChange}
+                                />
+                                <div className={"textarea-box"}>
+                                    <p className={'textp'}>Inserisci Descrizione:</p>
+                                    <textarea
+                                        className={'textarea-field'}
+                                        placeholder={'Aggiungi descrizione'}
+                                        required
+                                        rows={5}
+                                        type="text"
+                                        value={state.descrizione}
+                                        onChange={handleDescriptionChange}
+                                    />
+                                </div>
+                            </div>
+                            <div className={"childDiv"}>
+                                <p className={'textp'}>Scegli: pubblica o privata:</p>
+                                <select className={'select-field'} value={state.tipoAccesso}
+                                        onChange={handleOptionChange}>
+                                    <option value="" disabled>Seleziona Tipo Accesso</option>
+                                    <option value={false}>Pubblica</option>
+                                    <option value={true}>Privata</option>
+                                </select>
+                                <p className={'textp'}>Inserisci numero MAX utenti:</p>
+                                <input
+                                    className={'number-field'}
+                                    required
+                                    placeholder={'MAX Posti'}
+                                    type="number"
+                                    min="1" max="999"
+                                    value={state.maxPosti}
+                                    onChange={handleMAXChange}
+                                />
+                                <p className={'textp'}>Seleziona uno scenario</p>
+                                <select className={'select-field'} value={state.selectedScenario}
+                                        onChange={handleScenarioChange}>
+                                    <option value="" disabled>Seleziona uno scenario</option>
+                                    {state.array.map((valore) => (
+                                        <option key={valore.id} value={valore.nome}>
+                                            {valore.nome}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+                        </div>
+                        <button
+                            className={'button-create'}
+                            type="button"
+                            onClick={handleSubmit}
+                        >
+                            Create
+                        </button>
+                        {state.error && <p style={{color: 'red'}}>{state.error}</p>}
+                    </div>
+                </div>
+            )}
+        </>
+    );
+};
+
+export default MyCreateForm;
