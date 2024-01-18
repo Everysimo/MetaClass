@@ -65,4 +65,12 @@ public class Report {
         this.durataMeeting = Duration.ZERO;
     }
 
+    public Report(long id, int num_Partecipanti, Duration durataMeeting, int max_Partecipanti, Meeting meeting, List<Utente> lista_partecipanti) {
+        this.id = id;
+        this.num_Partecipanti = num_Partecipanti;
+        this.durataMeeting = durataMeeting;
+        this.max_Partecipanti = max_Partecipanti;
+        this.meeting = meeting;
+        this.lista_partecipanti = lista_partecipanti;
+    }
 }

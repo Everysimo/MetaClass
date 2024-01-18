@@ -2,6 +2,8 @@ package com.commigo.metaclass.MetaClass.gestionemeeting.controller;
 
 import com.commigo.metaclass.MetaClass.MetaClassApplicationTests;
 import com.commigo.metaclass.MetaClass.entity.*;
+import com.commigo.metaclass.MetaClass.exceptions.RuntimeException403;
+import com.commigo.metaclass.MetaClass.exceptions.ServerRuntimeException;
 import com.commigo.metaclass.MetaClass.gestioneamministrazione.repository.ScenarioRepository;
 import com.commigo.metaclass.MetaClass.gestionemeeting.repository.MeetingRepository;
 import com.commigo.metaclass.MetaClass.gestionemeeting.service.GestioneMeetingService;
@@ -13,6 +15,9 @@ import com.commigo.metaclass.MetaClass.utility.request.RequestUtils;
 import com.commigo.metaclass.MetaClass.utility.response.types.Response;
 import com.commigo.metaclass.MetaClass.webconfig.JwtTokenUtil;
 import com.commigo.metaclass.MetaClass.webconfig.ValidationToken;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.*;
 import org.hibernate.validator.HibernateValidator;
@@ -24,19 +29,24 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockServletContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.util.List;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -89,7 +99,8 @@ public class GestioneMeetingControllerUnitTest {
     private Validator validator;
     private BindingResult bindingResult;
     private DateTimeFormatter formatter;
-
+    private FeedbackMeeting feedbackMeeting;
+    private Report report;
 
     /**
      *  Questo metodo viene richiamato prima di ogni test e qui vanno inizializzate
@@ -115,11 +126,14 @@ public class GestioneMeetingControllerUnitTest {
         meeting = new Meeting(1L, "MeetingStanza4",
                 LocalDateTime.parse("2024-02-02 18:00",formatter),
                 LocalDateTime.parse("2024-02-02 20:00",formatter), false, scenario, stanza );
+
+        report = new Report(1L, 500, Duration.ZERO, 550, meeting, List.of(utente));
+
+        feedbackMeeting = new FeedbackMeeting(utente, meeting, report);
         request = MockMvcRequestBuilders
                 .post("/schedulingMeeting")  // Assicurati di utilizzare il percorso corretto
                 .header("Authorization", "Bearer TODO")
                 .buildRequest(new MockServletContext());
-
     }
 
     /**
@@ -155,6 +169,7 @@ public class GestioneMeetingControllerUnitTest {
         testCasesSchedulingMeeting(11);
         //test case 4.1.12
         testCasesSchedulingMeeting(12);
+
 
         // Simula un token valido
         when(validationToken.isTokenValid(any(HttpServletRequest.class))).thenReturn(true);
@@ -256,6 +271,73 @@ public class GestioneMeetingControllerUnitTest {
         }
 
 
+    }
+
+    @Test
+    public void testCompilazioneQuestionario(){
+
+        //test case 2.1.1
+        testCasesCompilazioneQuestionario(1);
+        //test case 2.1.2
+        testCasesCompilazioneQuestionario(2);
+        //test case 2.1.3
+        testCasesCompilazioneQuestionario(3);
+
+
+        // Simula un token valido
+        when(validationToken.isTokenValid(any(HttpServletRequest.class))).thenReturn(true);
+
+        // Simula la decodifica del token e restituisce un metaID valido
+        when(jwtTokenUtil.getMetaIdFromToken(anyString())).thenReturn(utente.getMetaId());
+
+        try{
+            String jsonValue = "{\"valutazione\": 5}";
+
+            // Create the request
+            MockHttpServletRequest request2 = MockMvcRequestBuilders
+                    .post("/compilaQuestionario/" + meeting.getId())
+                    .header("Authorization", "Bearer TODO")
+                    .content(jsonValue)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .buildRequest(new MockServletContext());
+
+            // Chiamata al metodo da testare
+            ResponseEntity<Response<Boolean>> responseEntity =
+                    meetingController.compilaQuestionario(jsonValue, meeting.getId(), request2);
+
+        }catch(Exception e){
+            fail("Exception not expected: " + e.getMessage());
+        }
+    }
+
+    @Test
+    private void testCasesCompilazioneQuestionario(int testcase){
+
+        int value = 0;
+        switch (testcase) {
+            case 1:
+                value = -1;
+                break;
+            case 2:
+                value = 'b';
+                break;
+            case 3:
+                value = 5;
+                break;
+        }
+
+        try {
+            boolean result = meetingService.compilaQuestionario(value, utente.getMetaId(), meeting.getId());
+            if(result) {
+                assertTrue(result);
+            }else{
+                assertFalse(result);
+            }
+        } catch (ServerRuntimeException e) {
+            throw new RuntimeException(e);
+        } catch (RuntimeException403 e) {
+            assertEquals(e.getMessage(), "valore non valido");
+        }
     }
 
     private void applyValidation(){

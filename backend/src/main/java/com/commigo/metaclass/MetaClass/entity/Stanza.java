@@ -1,11 +1,8 @@
 package com.commigo.metaclass.MetaClass.entity;
 
-import com.commigo.metaclass.MetaClass.exceptions.DataFormatException;
 import com.commigo.metaclass.MetaClass.exceptions.MismatchJsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.exc.MismatchedInputException;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
@@ -14,10 +11,7 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
-import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 
 @Entity
@@ -145,4 +139,9 @@ public class Stanza {
         //aggiunta dello scenario
         this.scenario = scenario;
     }
+
+    public void DropAccesso(){
+        this.tipo_Accesso = Boolean.parseBoolean(null);
+    }
+
 }

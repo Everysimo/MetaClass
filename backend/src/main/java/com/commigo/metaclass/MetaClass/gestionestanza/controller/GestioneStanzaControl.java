@@ -5,7 +5,7 @@ import com.commigo.metaclass.MetaClass.exceptions.ClientRuntimeException;
 import com.commigo.metaclass.MetaClass.exceptions.RuntimeException401;
 import com.commigo.metaclass.MetaClass.exceptions.RuntimeException403;
 import com.commigo.metaclass.MetaClass.exceptions.ServerRuntimeException;
-import com.commigo.metaclass.MetaClass.gestionemeeting.controller.GestioneStanzaService;
+import com.commigo.metaclass.MetaClass.gestionestanza.service.GestioneStanzaService;
 import com.commigo.metaclass.MetaClass.utility.MapValidator;
 import com.commigo.metaclass.MetaClass.utility.request.RequestUtils;
 import com.commigo.metaclass.MetaClass.utility.response.ResponseUtils;
