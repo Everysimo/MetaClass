@@ -1,26 +1,45 @@
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import '../PopUpStyles.css';
-import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faUserPen} from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faUserPen } from "@fortawesome/free-solid-svg-icons";
 
 const EditUserDetails = ({ userDetails, setUserDetails }) => {
     const [showModal, setShowModal] = useState(false);
     const [formData, setFormData] = useState({});
     const [successMessage, setSuccessMessage] = useState('');
+    const [errorMessage, setErrorMessage] = useState('');
     const [formReset, setFormReset] = useState(false); // State for form reset
 
     const handleInputChange = (e) => {
+        setErrorMessage(''); // Reset error message on input change
+
         if (e.target.name === 'dataDiNascita') {
-            const date = new Date(e.target.value);
-            const formattedDate = `${(date.getMonth() + 1)
+            const selectedDate = new Date(e.target.value);
+            const currentDate = new Date();
+
+            if (selectedDate > currentDate) {
+                setErrorMessage('La data di nascita non può essere nel futuro!');
+                return;
+            }
+
+            const formattedDate = `${(selectedDate.getMonth() + 1)
                 .toString()
-                .padStart(2, '0')}/${date.getDate().toString().padStart(2, '0')}/${date.getFullYear()}`;
+                .padStart(2, '0')}/${selectedDate.getDate().toString().padStart(2, '0')}/${selectedDate.getFullYear()}`;
+
             setFormData({ ...formData, [e.target.name]: formattedDate });
+        } else if (e.target.name === 'email') {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(e.target.value)) {
+                setErrorMessage('Formato email non valido');
+                return;
+            }
+            setFormData({ ...formData, [e.target.name]: e.target.value });
         } else {
             setFormData({ ...formData, [e.target.name]: e.target.value });
         }
     };
+
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -29,6 +48,12 @@ const EditUserDetails = ({ userDetails, setUserDetails }) => {
             const token = sessionStorage.getItem('token');
             if (!token) {
                 throw new Error('Token not found');
+            }
+
+            // Validate at least one field is filled
+            if (!Object.values(formData).some(value => value !== undefined && value !== '')) {
+                setErrorMessage('At least one field should be filled');
+                return;
             }
 
             const response = await axios.post(
@@ -48,13 +73,13 @@ const EditUserDetails = ({ userDetails, setUserDetails }) => {
                 setSuccessMessage(response.data.message);
                 setShowModal(true);
                 setUserDetails({ ...userDetails, ...formData }); // Update userDetails with the form data
+                setErrorMessage(''); // Clear error message on success
             } else {
                 setSuccessMessage(response.data.message || 'Changes were unsuccessful');
                 setShowModal(true);
             }
         } catch (error) {
-            console.error('Update error:', error);
-            setSuccessMessage('Changes were unsuccessful');
+            setSuccessMessage(error.response.data.message);
             setShowModal(true);
         }
     };
@@ -68,6 +93,7 @@ const EditUserDetails = ({ userDetails, setUserDetails }) => {
         if (formReset) {
             setFormData({}); // Reset form data
             setSuccessMessage(''); // Reset success message
+            setErrorMessage(''); // Reset error message
             setFormReset(false); // Reset formReset state
         }
     }, [formReset]);
@@ -78,7 +104,7 @@ const EditUserDetails = ({ userDetails, setUserDetails }) => {
                 onClick={() => setShowModal(true)}
                 className={"minWidth200"}
             >
-                Modifica <FontAwesomeIcon icon={faUserPen} size="lg" style={{color: "#ffffff",}} />
+                Modifica <FontAwesomeIcon icon={faUserPen} size="lg" style={{ color: "#ffffff" }} />
             </button>
 
             {showModal && (
@@ -114,8 +140,11 @@ const EditUserDetails = ({ userDetails, setUserDetails }) => {
                                     placeholder={userDetails ? userDetails.dataDiNascita : 'Enter Date of Birth'}
                                     onChange={handleInputChange}
                                 />
-                                <button type="submit">Save Changes</button>
+                                <button type="submit">Salva</button>
                             </form>
+                        )}
+                        {errorMessage && (
+                            <p className="error-message">{errorMessage}</p>
                         )}
                     </div>
                 </div>
@@ -125,4 +154,3 @@ const EditUserDetails = ({ userDetails, setUserDetails }) => {
 };
 
 export default EditUserDetails;
-

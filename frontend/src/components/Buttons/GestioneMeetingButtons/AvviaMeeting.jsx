@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import '../../Forms/CreaScenarioForm/creaScenario.css';
 import {faChalkboardUser, faPlay} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {wait} from "@testing-library/user-event/dist/utils";
