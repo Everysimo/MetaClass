@@ -3,7 +3,9 @@ import com.commigo.metaclass.MetaClass.entity.*;
 import com.commigo.metaclass.MetaClass.gestioneamministrazione.repository.CategoriaRepository;
 import com.commigo.metaclass.MetaClass.gestioneamministrazione.repository.ImmagineRepository;
 import com.commigo.metaclass.MetaClass.gestioneamministrazione.repository.ScenarioRepository;
+import com.commigo.metaclass.MetaClass.gestionemeeting.repository.FeedbackMeetingRepository;
 import com.commigo.metaclass.MetaClass.gestionemeeting.repository.MeetingRepository;
+import com.commigo.metaclass.MetaClass.gestionemeeting.repository.ReportRepository;
 import com.commigo.metaclass.MetaClass.gestionemeeting.repository.UtenteInMeetingRepository;
 import com.commigo.metaclass.MetaClass.gestionestanza.repository.RuoloRepository;
 import com.commigo.metaclass.MetaClass.gestionestanza.repository.StanzaRepository;
@@ -14,8 +16,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
 
 import static com.commigo.metaclass.MetaClass.entity.Ruolo.ORGANIZZATORE_MASTER;
 
@@ -27,6 +32,8 @@ public class DataInitializer implements CommandLineRunner {
     private final ScenarioRepository scenarioRepository;
     private final StanzaRepository stanzaRepository;
     private final UtenteRepository utenteRepository;
+    private final ReportRepository reportRepository;
+    private final FeedbackMeetingRepository feedbackMeetingRepository;
     private final StatoPartecipazioneRepository statoPartecipazioneRepository;
 
     private final UtenteInMeetingRepository utenteInMeetingRepository;
@@ -39,12 +46,14 @@ public class DataInitializer implements CommandLineRunner {
 
 
     @Autowired
-    public DataInitializer(RuoloRepository ruoloRepository, CategoriaRepository categoriaRepository, ScenarioRepository scenarioRepository, StanzaRepository stanzaRepository, UtenteRepository utenteRepository, StatoPartecipazioneRepository statoPartecipazioneRepository, UtenteInMeetingRepository utenteInMeetingRepository, MeetingRepository meetingRepository, ImmagineRepository immagineRepository, GestioneStanzaServiceImpl stanzaService) {
+    public DataInitializer(RuoloRepository ruoloRepository, CategoriaRepository categoriaRepository, ScenarioRepository scenarioRepository, StanzaRepository stanzaRepository, UtenteRepository utenteRepository, ReportRepository reportRepository, FeedbackMeetingRepository feedbackMeetingRepository, StatoPartecipazioneRepository statoPartecipazioneRepository, UtenteInMeetingRepository utenteInMeetingRepository, MeetingRepository meetingRepository, ImmagineRepository immagineRepository, GestioneStanzaServiceImpl stanzaService) {
         this.ruoloRepository = ruoloRepository;
         this.categoriaRepository = categoriaRepository;
         this.scenarioRepository = scenarioRepository;
         this.stanzaRepository = stanzaRepository;
         this.utenteRepository = utenteRepository;
+        this.reportRepository = reportRepository;
+        this.feedbackMeetingRepository = feedbackMeetingRepository;
         this.statoPartecipazioneRepository = statoPartecipazioneRepository;
         this.utenteInMeetingRepository = utenteInMeetingRepository;
         this.meetingRepository = meetingRepository;
@@ -133,5 +142,40 @@ public class DataInitializer implements CommandLineRunner {
             UtenteInMeeting um6 = utenteInMeetingRepository.save(new UtenteInMeeting(u2, m2, false));
             UtenteInMeeting um7 = utenteInMeetingRepository.save(new UtenteInMeeting(u3, m2, false));
 
+            //aggiunta repoort
+            List<Utente> usersRep1 = new ArrayList<>();
+            usersRep1.add(u1);
+            usersRep1.add(u2);
+            usersRep1.add(u4);
+            usersRep1.add(u5);
+            Report rep1 =  reportRepository.save(new Report(1L,4, Duration.ofHours(1),4,m1,usersRep1));
+            List<Utente> usersRep2 = new ArrayList<>();
+            usersRep2.add(u2);
+            usersRep2.add(u3);
+            usersRep2.add(u5);
+            Report rep2 =  reportRepository.save(new Report(2L,3, Duration.ofHours(1),3,m2,usersRep2));
+
+            //aggiunta feedackmeeting
+            FeedbackMeeting feed1 = feedbackMeetingRepository.save(
+                    new FeedbackMeeting(u1,m1,rep1,Duration.ofMinutes(30),
+                            LocalDateTime.parse("2024-02-03 19:00",formatter),false));
+            FeedbackMeeting feed2 = feedbackMeetingRepository.save(
+                new FeedbackMeeting(u2,m1,rep1,Duration.ofMinutes(30),
+                        LocalDateTime.parse("2024-02-03 19:00",formatter),false));
+        FeedbackMeeting feed3 = feedbackMeetingRepository.save(
+                new FeedbackMeeting(u4,m1,rep1,Duration.ofMinutes(30),
+                        LocalDateTime.parse("2024-02-03 19:00",formatter),true));
+        FeedbackMeeting feed4 = feedbackMeetingRepository.save(
+                new FeedbackMeeting(u5,m1,rep1,Duration.ofMinutes(30),
+                        LocalDateTime.parse("2024-02-03 19:00",formatter),false));
+        FeedbackMeeting feed5 = feedbackMeetingRepository.save(
+                new FeedbackMeeting(u2,m2,rep2,Duration.ofMinutes(30),
+                        LocalDateTime.parse("2024-02-03 19:00",formatter),false));
+        FeedbackMeeting feed6 = feedbackMeetingRepository.save(
+                new FeedbackMeeting(u3,m2,rep2,Duration.ofMinutes(30),
+                        LocalDateTime.parse("2024-02-03 19:00",formatter),true));
+        FeedbackMeeting feed7 = feedbackMeetingRepository.save(
+                new FeedbackMeeting(u5,m2,rep2,Duration.ofMinutes(30),
+                        LocalDateTime.parse("2024-02-03 19:00",formatter),false));
     }
 }

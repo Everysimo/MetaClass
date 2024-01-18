@@ -1,5 +1,6 @@
 package com.commigo.metaclass.MetaClass.entity;
 
+import com.commigo.metaclass.MetaClass.exceptions.DataFormatException;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -61,7 +62,7 @@ public class Meeting {
      *Chiave Esterna sullo Scenario
      */
     @NotNull(message = "Lo scenario non può essere nullo")
-    @ManyToOne(fetch = FetchType.LAZY, optional = true)
+    @ManyToOne(fetch = FetchType.EAGER, optional = true)
     @JoinColumn(name = "id_scenario",  nullable = true)
     private Scenario scenario_iniziale;
 
@@ -73,6 +74,12 @@ public class Meeting {
     @JoinColumn(name = "id_stanza")
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Stanza stanza;
+
+    @AssertTrue(message = "L'inizio deve essere precedente alla fine")
+    public boolean isStartDateBeforeEndDate() {
+        // La validazione sarà passata solo se la data di inizio è precedente a quella di fine
+        return inizio == null || fine == null || inizio.isBefore(fine);
+    }
 
     @JsonCreator(mode = JsonCreator.Mode.DEFAULT)
     public Meeting(@JsonProperty("nome") String Nome,
@@ -110,13 +117,4 @@ public class Meeting {
         this.scenario_iniziale = new Scenario();
     }
 
-
-    /*public Meeting(String nome, LocalDateTime inizio, LocalDateTime fine, boolean isAvviato, Scenario scenario_iniziale, Stanza stanza) {
-        this.nome = nome;
-        this.inizio = inizio;
-        this.fine = fine;
-        this.isAvviato = isAvviato;
-        this.scenario_iniziale = scenario_iniziale;
-        this.stanza = stanza;
-    }*/
 }

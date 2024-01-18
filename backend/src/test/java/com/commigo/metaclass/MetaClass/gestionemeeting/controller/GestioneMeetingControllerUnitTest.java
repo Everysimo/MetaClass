@@ -104,7 +104,7 @@ class GestioneMeetingControllerUnitTest {
     private Report report;
     private final String API_URL_Scheduling = "/schedulingMeeting";
     private final String API_URL_Compilazione = "/compilaQuestionario/1";
-    private int valutazione;
+    private Integer valutazione;
 
 
     /**
@@ -450,11 +450,11 @@ class GestioneMeetingControllerUnitTest {
     }
 
     @Test
-    public void testCompilazioneQuestionarioOnFailure(){
+    public void testCompilazioneQuestionarioOnFailureValueNotInsert(){
 
-        valutazione = 5;
+        valutazione = null;
         // Simula un token valido
-        when(validationToken.isTokenValid(any(HttpServletRequest.class))).thenReturn(false);
+        when(validationToken.isTokenValid(any(HttpServletRequest.class))).thenReturn(true);
 
         try{
             //vedere i metodi private testExpectedResult e sendRequest

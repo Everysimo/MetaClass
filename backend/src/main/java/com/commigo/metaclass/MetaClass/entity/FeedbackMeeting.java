@@ -73,4 +73,13 @@ public class FeedbackMeeting {
          this.compiledQuestionario = false;
     }
 
+    public FeedbackMeeting(Utente utente, Meeting meeting, Report report, Duration tempo_totale, LocalDateTime ultimo, boolean compiled){
+        this.utente = utente;
+        this.meeting = meeting;
+        this.report = report;
+        this.tempo_totale = tempo_totale;
+        this.dataUltimoAccesso = ultimo;
+        this.compiledQuestionario = compiled;
+    }
+
 }
