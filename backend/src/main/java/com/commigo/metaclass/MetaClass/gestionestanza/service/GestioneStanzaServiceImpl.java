@@ -364,7 +364,7 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService {
 
         StatoPartecipazione stato_ogm = statoPartecipazioneRepository.findStatoPartecipazioneByUtenteAndStanza(ogm, stanza);
         if (stato_ogm.getRuolo().getNome().equalsIgnoreCase(Ruolo.ORGANIZZATORE_MASTER) || ogm.isAdmin()) {
-            stanzaRepository.delete(stanza);
+            stanzaRepository.deleteStanzaById(stanza.getId());
             return ResponseEntity.ok(new Response<>(true, "Stanza eliminata con successo")).getBody();
         } else {
             return ResponseEntity.status(403).body(new Response<>(false, "Non puoi eliminare una stanza se non sei un'organizzatore master")).getBody();
@@ -826,6 +826,35 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService {
         return scenarioRepository.findAll();
     }
 
+    public ResponseEntity<Response<Boolean>> UnmutePartecipante(String metaID, Long IdStanza, Long IdUtente){
+
+        Utente og = utenteRepository.findFirstByMetaId(metaID);
+        Utente silenzia = utenteRepository.findUtenteById(IdUtente);
+        Stanza stanza = stanzaRepository.findStanzaById(IdStanza);
+
+        if(stanza != null) {
+            StatoPartecipazione statoOg = statoPartecipazioneRepository.findStatoPartecipazioneByUtenteAndStanza(og, stanza);
+            if (statoOg.getRuolo().getNome().equalsIgnoreCase(Ruolo.ORGANIZZATORE_MASTER) || statoOg.getRuolo().getNome().equalsIgnoreCase(Ruolo.ORGANIZZATORE) && !statoOg.isBannato()) {
+                StatoPartecipazione statoSilenzio = statoPartecipazioneRepository.findStatoPartecipazioneByUtenteAndStanza(silenzia, stanza);
+                if (statoSilenzio != null) {
+                    if (statoSilenzio.isSilenziato()) {
+                        statoSilenzio.setSilenziato(false);
+                        statoPartecipazioneRepository.save(statoSilenzio);
+                        return ResponseEntity.ok(new Response<>(true, "L'utente selezionato ora non è più silenziato"));
+                    } else {
+                        return ResponseEntity.ok(new Response<>(true, "L'utente selezionato è gia mutato"));
+                    }
+                } else {
+                    return ResponseEntity.status(403).body(new Response<>(false, "L'utente selezioanto non è presente nella stanza"));
+                }
+            }else{
+                return ResponseEntity.status(403).body(new Response<>(false, "Per silenziare un partecipante nella stanza devi essere almeno un organizzatore"));
+            }
+        }else{
+            return ResponseEntity.status(403).body(new Response<>(false, "La stanza selezionata non esiste"));
+        }
+    }
+    /*
     public ResponseEntity<Response<Boolean>> Unmute(String metaID, Long IdStanza) {
 
         Utente utente = utenteRepository.findFirstByMetaId(metaID);
@@ -871,5 +900,5 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService {
             return ResponseEntity.status(403).body(new Response<>(false, "La stanza selezionata non esiste"));
         }
     }
-
+    */
 }
