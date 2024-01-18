@@ -204,4 +204,7 @@ public interface GestioneStanzaService
      */
     ResponseEntity<Response<Boolean>> SilenziaPartecipante(String metaID, Long IdStanza, Long IdUtente);
 
+    ResponseEntity<Response<Boolean>> Unmute(String metaID, Long IdStanza);
+    ResponseEntity<Response<Boolean>> mute(String metaID, Long IdStanza);
+
 }

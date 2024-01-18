@@ -635,4 +635,47 @@ public class GestioneStanzaControl {
         }
     }
 
+    @PostMapping(value = "/unmute/{IdStanza}")
+    public ResponseEntity<Response<Boolean>> unmute(@PathVariable Long IdStanza,
+                                                    HttpServletRequest request) {
+
+        try {
+            if (!validationToken.isTokenValid(request)) {
+                throw new RuntimeException403("Token non valido");
+            }
+
+            String metaID = jwtTokenUtil.getMetaIdFromToken(validationToken.getToken());
+
+            return stanzaService.Unmute(metaID, IdStanza);
+
+        } catch (RuntimeException403 e) {
+            e.printStackTrace();
+            return ResponseEntity.status(403).body(new Response<>(null, "Errore nell'operazione"));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(500).body(new Response<>(null, "Errore durante l'operazione"));
+        }
+    }
+
+    @PostMapping(value = "/mute/{IdStanza}")
+    public ResponseEntity<Response<Boolean>> mute(@PathVariable Long IdStanza,
+                                                    HttpServletRequest request) {
+
+        try {
+            if (!validationToken.isTokenValid(request)) {
+                throw new RuntimeException403("Token non valido");
+            }
+
+            String metaID = jwtTokenUtil.getMetaIdFromToken(validationToken.getToken());
+
+            return stanzaService.mute(metaID, IdStanza);
+
+        } catch (RuntimeException403 e) {
+            e.printStackTrace();
+            return ResponseEntity.status(403).body(new Response<>(null, "Errore nell'operazione"));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(500).body(new Response<>(null, "Errore durante l'operazione"));
+        }
+    }
 }

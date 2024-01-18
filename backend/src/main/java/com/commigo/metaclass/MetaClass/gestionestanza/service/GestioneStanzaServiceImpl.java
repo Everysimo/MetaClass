@@ -826,4 +826,50 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService {
         return scenarioRepository.findAll();
     }
 
+    public ResponseEntity<Response<Boolean>> Unmute(String metaID, Long IdStanza) {
+
+        Utente utente = utenteRepository.findFirstByMetaId(metaID);
+        Stanza stanza = stanzaRepository.findStanzaById(IdStanza);
+
+        if(stanza != null) {
+            StatoPartecipazione statoUtente = statoPartecipazioneRepository.findStatoPartecipazioneByUtenteAndStanza(utente, stanza);
+            if (statoUtente != null){
+                if (statoUtente.isSilenziato()) {
+                        statoUtente.setSilenziato(false);
+                        statoPartecipazioneRepository.save(statoUtente);
+                        return ResponseEntity.ok(new Response<>(true, "Ora non sei più mutato"));
+                } else {
+                    return ResponseEntity.ok(new Response<>(true, "Eri era già non mutato"));
+                }
+            } else {
+                return ResponseEntity.status(403).body(new Response<>(false, "L'utente selezioanto non è presente nella stanza"));
+            }
+        }else{
+            return ResponseEntity.status(403).body(new Response<>(false, "La stanza selezionata non esiste"));
+        }
+    }
+
+    public ResponseEntity<Response<Boolean>> mute(String metaID, Long IdStanza) {
+
+        Utente utente = utenteRepository.findFirstByMetaId(metaID);
+        Stanza stanza = stanzaRepository.findStanzaById(IdStanza);
+
+        if(stanza != null) {
+            StatoPartecipazione statoUtente = statoPartecipazioneRepository.findStatoPartecipazioneByUtenteAndStanza(utente, stanza);
+            if (statoUtente != null){
+                if (!statoUtente.isSilenziato()) {
+                    statoUtente.setSilenziato(true);
+                    statoPartecipazioneRepository.save(statoUtente);
+                    return ResponseEntity.ok(new Response<>(true, "Ora sei mutato"));
+                } else {
+                    return ResponseEntity.ok(new Response<>(true, "Sei già mutato"));
+                }
+            } else {
+                return ResponseEntity.status(403).body(new Response<>(false, "L'utente selezioanto non è presente nella stanza"));
+            }
+        }else{
+            return ResponseEntity.status(403).body(new Response<>(false, "La stanza selezionata non esiste"));
+        }
+    }
+
 }
