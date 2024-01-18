@@ -8,7 +8,7 @@ import {MyFooter} from "../components/Layout/Footer/Footer";
 export default function UnloggedHome(){
     return(
         <>
-            <header>
+            <header >
                 <MyHeader/>
             </header>
             <section className="showcase">

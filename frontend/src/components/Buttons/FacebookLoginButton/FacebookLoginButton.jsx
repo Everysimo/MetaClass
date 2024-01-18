@@ -102,7 +102,6 @@ export default class Facebook extends Component {
         try {
             const response = await fetch("http://localhost:8080/login", requestOptions);
             const responseData = await response.json();
-            console.log("Server response:", responseData);
             const token = responseData.token;
             sessionStorage.setItem("token", token);
             sessionStorage.setItem("isAdmin", JSON.stringify(this.state.isAdmin));
