@@ -41,18 +41,15 @@ export const ViewPreviousMeeting = () => {
     }
 
     return(
-
         <>
             <h3>TUTTI I MIEI MEETING</h3>
-            <div>
+            <div className={"table-container"} style={{background: "transparent"}}>
                 {meetingArray.map((meeting) => (
-                    <div key={meeting.id}>
-                        <h3>Nome del Meeting: {meeting.nome}</h3>
-                        <p>Inizio: {meeting.inizio}</p>
-                        <p>Fine: {meeting.fine}</p>
-                        <p>ID della Stanza: {meeting.id_stanza.id}</p>
-                        {/* Aggiungi altri campi se necessario */}
-                        <hr />
+                    <div key={meeting.id} className={"table-row"}>
+                        <span className={"table-cell"}><h3>Nome del Meeting: {meeting.nome}</h3></span>
+                        <span className={"table-cell"}><p>Inizio: {meeting.inizio}</p></span>
+                        <span className={"table-cell"}><p>Fine: {meeting.fine}</p></span>
+                        <span className={"table-cell"}><p>ID della Stanza: {meeting.id_stanza.id}</p></span>
                     </div>
                 ))}
             </div>

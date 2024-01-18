@@ -25,7 +25,6 @@ export const Rts = () =>{
                 <Route path="/changescenario/:id" element={<SelezionaScenario/>}/>
                 <Route path="/bannedUserList/:id" element={<BannedList/>}/>
                 <Route path="/previousMeeting" element={<PreviousMeeting/>}/>
-
             </Routes>
         </Router>
     )

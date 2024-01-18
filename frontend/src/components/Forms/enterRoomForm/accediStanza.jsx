@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 import '../PopUpStyles.css';
 import {wait} from "@testing-library/user-event/dist/utils";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";

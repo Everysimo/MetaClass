@@ -10,9 +10,8 @@ export const PreviousMeeting = () => {
             <MyHeader/>
         </header>
             <section>
-                <div>
-                    <ViewPreviousMeeting/>
-                </div>
+
+            <ViewPreviousMeeting/>
             </section>
         <footer>
             <MyFooter/>

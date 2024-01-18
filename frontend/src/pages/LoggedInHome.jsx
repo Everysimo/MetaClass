@@ -12,8 +12,9 @@ import CreaScenario from "../components/Forms/CreaScenarioForm/CreaScenario";
 import ModificaScenario from "../components/Forms/CreaScenarioForm/ModificaScenario";
 import AccediStanza from "../components/Forms/enterRoomForm/accediStanza";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faCirclePlus, faDoorOpen, faUser} from "@fortawesome/free-solid-svg-icons";
+import {faCalendarDays, faUser} from "@fortawesome/free-solid-svg-icons";
 import RoomList from "../components/Lists/RoomList/RoomList";
+import MyCreateForm from "../components/Forms/CreateRoomForm/MyCreateForm";
 
 export const LoggedInHome = () => {
     const nome = sessionStorage.getItem('nome');
@@ -48,9 +49,9 @@ export const LoggedInHome = () => {
         // Naviga alla pagina di destinazione con il valore 42
         navigate(`/Account`);
     };
-    const handleGoToCreateRoom= () => {
+    const handleGoToMeetings= () => {
         // Naviga alla pagina di destinazione con il valore 42
-        navigate(`/createroom`);
+        navigate(`/previousMeeting`);
     };
     const closeAllComponents = () => {
         setIsVisibleScen(false);
@@ -79,19 +80,20 @@ export const LoggedInHome = () => {
                                 Visualizza e modifica i dettagli del tuo account
                             </p>
                         </div>
+                        <MyCreateForm/>
+                        <AccediStanza/>
                         <div
                             className={"transWhiteBg"}
-                            onClick={handleGoToCreateRoom}
+                            onClick={handleGoToMeetings}
                         >
-                            <FontAwesomeIcon icon={faCirclePlus} size="2xl" style={{color: "#c70049",}}/>
-                            <h2>Creazione stanza</h2>
+                            <FontAwesomeIcon icon={faCalendarDays} size="2xl" style={{color: "#c70049",}} />
+                            <h2>Bacheca meetings</h2>
                             <p
                                 style={{fontSize: "14px", textAlign: "center",}}
                             >
-                                Crea una stanza tutta tua e diventa Organizzatore
+                                Visualizza tutti i meetings a cui hai partecipato
                             </p>
                         </div>
-                        <AccediStanza/>
                     </div>
                     {isAdmin &&
                         <section className={"contentSec"}>
