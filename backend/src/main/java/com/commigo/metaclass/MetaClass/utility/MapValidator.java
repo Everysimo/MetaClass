@@ -40,12 +40,6 @@ public class MapValidator {
                         attributeName+ "' ha un valore che non rispetta il suo tipo di dato");
             }
 
-/*            //controllo correttezza attributo
-            if (!VALID_ATTRIBUTE_NAMES_STANZA.contains(attributeName)) {
-                throw new ClientRuntimeException("Errore nella richiesta: L'attributo '"+
-                        attributeName+ "' non è presente nell'entità Stanza");
-            }*/
-
         }
         return true;
 
@@ -101,55 +95,4 @@ public class MapValidator {
 
     }
 
-    /*public void utenteValidateForTest(Map<String, Object> params) throws ClientRuntimeException {
-
-        for (Map.Entry<String, Object> entry : params.entrySet()) {
-            String attributeName = entry.getKey();
-            Object attributeValue = entry.getValue();
-
-            try{
-
-                if (attributeName.equalsIgnoreCase("dataDiNascita")) {
-                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/dd/yyyy");
-
-                    try {
-                        LocalDate data = LocalDate.parse((CharSequence) attributeValue, formatter);
-
-                        // Creare un DateTimeFormatter per il formato di output
-                        DateTimeFormatter formatterOutput = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-
-                        // Formattare la data di output nel nuovo formato
-                        String outputDate = data.format(formatterOutput);
-
-                        params.put(attributeName, outputDate);
-
-                    } catch (DateTimeParseException e) {
-                        throw new DataFormatException("Formato della data di nascita non valido. Formato richiesto: MM/dd/yyyy");
-                    }
-                }else{
-                    Set<ConstraintViolation<Utente>> violations =
-                            validator.validateValue(Utente.class, attributeName, attributeValue);
-
-                    if (!violations.isEmpty()) {
-                        // Handle validation errors for the specific attribute
-                        throw new ClientRuntimeException("Errore nella richiesta: "+ violations.iterator().next().getMessage());
-                    }
-
-                }
-
-
-            }catch(IllegalArgumentException e){
-                throw new ClientRuntimeException("Errore nella richiesta: L'attributo '"+
-                        attributeName+ "' non è presente nell'entità Utente");
-            }catch (ValidationException ve){
-                throw new ClientRuntimeException("Errore nella richiesta: L'attributo '"+
-                        attributeName+ "' ha un valore che non rispetta il suo tipo di dato");
-            }catch(DataFormatException ve){
-                throw new ClientRuntimeException("Errore nella richiesta: L'attributo '"+
-                        attributeName+ "' ha un valore sbagliato");
-            }
-
-        }
-
-    }*/
 }

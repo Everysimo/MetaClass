@@ -17,6 +17,7 @@
     border-radius: 8px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
     min-width: 50%;
+    max-width: 700px;
     div{
         padding: 0;
         box-shadow: none;

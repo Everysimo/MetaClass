@@ -13,15 +13,29 @@ import java.util.Map;
 @Repository("UtenteRepository")
 public interface UtenteRepository extends JpaRepository<Utente, Long> {
 
-
+    /**
+     *
+     * @param idMeta
+     * @return
+     */
     Utente findFirstByMetaId(String idMeta);
+
+    /**
+     *
+     * @param id
+     * @return
+     */
     Utente findUtenteById(long id);
-    Long findByMetaId(String metaID);
-    Utente findUtenteByTokenAuth(String tokenAuth);
 
     //il valore restituito indica il numero di righe modificate, quindi:
     // 1 se tutto ok
     // 0 se non è ok
+    /**
+     *
+     * @param SessionID
+     * @param attributes
+     * @return
+     */
     @Modifying
     @Transactional
     @Query("UPDATE Utente u SET " +
@@ -35,6 +49,5 @@ public interface UtenteRepository extends JpaRepository<Utente, Long> {
             "u.tokenAuth = COALESCE(:#{#attributes['tokenAuth']}, u.tokenAuth) " +
             "WHERE u.metaId = :SessionID")
     int updateAttributes(@Param("SessionID") String SessionID, @Param("attributes") Map<String, Object> attributes);
-
 
 }

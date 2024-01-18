@@ -8,7 +8,6 @@ import com.commigo.metaclass.MetaClass.gestioneamministrazione.repository.Scenar
 import com.commigo.metaclass.MetaClass.gestionestanza.repository.RuoloRepository;
 import com.commigo.metaclass.MetaClass.gestionestanza.repository.StanzaRepository;
 import com.commigo.metaclass.MetaClass.gestionestanza.repository.StatoPartecipazioneRepository;
-import com.commigo.metaclass.MetaClass.gestionestanza.service.GestioneStanzaService;
 import com.commigo.metaclass.MetaClass.gestioneutenza.repository.UtenteRepository;
 import com.commigo.metaclass.MetaClass.utility.response.ResponseUtils;
 import com.commigo.metaclass.MetaClass.utility.response.types.AccessResponse;
@@ -42,6 +41,12 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService {
     @Autowired
     private JwtTokenUtil jwtTokenUtil;
 
+    /**
+     * @param codiceStanza
+     * @param id_utente
+     * @return
+     * @throws Exception
+     */
     @Override
     public ResponseEntity<AccessResponse<Boolean>> accessoStanza(String codiceStanza, String id_utente)
             throws ServerRuntimeException, RuntimeException403{
@@ -76,7 +81,15 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService {
         }
     }
 
-
+    /**
+     *
+     * @param IdStanza
+     * @param metaId
+     * @param IdUtente
+     * @return
+     * @throws ServerRuntimeException
+     * @throws RuntimeException403
+     */
     @Override
     public ResponseEntity<Response<Boolean>> banUtente(Long IdStanza, String metaId, Long IdUtente)  throws ServerRuntimeException, RuntimeException403 {
         Utente ogm;
@@ -106,7 +119,17 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService {
             return ResponseEntity.ok(new Response<>(false, "Non puoi bannare un'organizzatore master"));
         }
     }
-        @Override
+
+    /**
+     *
+     * @param IdStanza
+     * @param metaId
+     * @param IdUtente
+     * @return
+     * @throws ServerRuntimeException
+     * @throws RuntimeException403
+     */
+    @Override
     public ResponseEntity<Response<Boolean>> banOrganizzatore(Long IdStanza, String metaId, Long IdUtente)  throws ServerRuntimeException, RuntimeException403 {
         //controllo organizzatore master
             Utente ogm;
@@ -157,6 +180,15 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService {
         }
     }
 
+    /**
+     *
+     * @param IdStanza
+     * @param metaId
+     * @param IdUtente
+     * @return
+     * @throws ServerRuntimeException
+     * @throws RuntimeException403
+     */
     @Override
     public ResponseEntity<Response<Boolean>> banPartecipante(Long IdStanza, String metaId, Long IdUtente) throws ServerRuntimeException, RuntimeException403 {
         //controllo organizzatore master
@@ -205,6 +237,13 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService {
         }
     }
 
+    /**
+     *
+     * @param s
+     * @param metaID
+     * @return
+     * @throws Exception
+     */
     @Override
     public boolean creaStanza(Stanza s, String metaID) throws Exception {
 
@@ -239,7 +278,15 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService {
         return true;
     }
 
-
+    /**
+     *
+     * @param id_Uogm
+     * @param id_og
+     * @param id_stanza
+     * @return
+     * @throws ServerRuntimeException
+     * @throws RuntimeException403
+     */
     @Override
     public Response<Boolean> downgradeUtente(String id_Uogm, long id_og, long id_stanza) throws ServerRuntimeException, RuntimeException403 {
 
@@ -300,6 +347,12 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService {
         }
     }
 
+    /**
+     *
+     * @param metaID
+     * @param id_stanza
+     * @return
+     */
     @Override
     public Response<Boolean> deleteRoom(String metaID, Long id_stanza) {
 
@@ -311,13 +364,21 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService {
 
         StatoPartecipazione stato_ogm = statoPartecipazioneRepository.findStatoPartecipazioneByUtenteAndStanza(ogm, stanza);
         if (stato_ogm.getRuolo().getNome().equalsIgnoreCase(Ruolo.ORGANIZZATORE_MASTER) || ogm.isAdmin()) {
-            stanzaRepository.delete(stanza);
+            stanzaRepository.deleteStanzaById(stanza.getId());
             return ResponseEntity.ok(new Response<>(true, "Stanza eliminata con successo")).getBody();
         } else {
             return ResponseEntity.status(403).body(new Response<>(false, "Non puoi eliminare una stanza se non sei un'organizzatore master")).getBody();
         }
     }
 
+    /**
+     *
+     * @param metaID
+     * @param idUtente
+     * @param idStanza
+     * @param scelta
+     * @return
+     */
     @Override
     public ResponseEntity<Response<Boolean>> gestioneAccesso(String metaID, Long idUtente, Long idStanza, boolean scelta) {
 
@@ -349,6 +410,13 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService {
         }
     }
 
+    /**
+     *
+     * @param metaID
+     * @param IdStanza
+     * @param IdUtente
+     * @return
+     */
     @Override
     public ResponseEntity<Response<Boolean>> SilenziaPartecipante(String metaID, Long IdStanza, Long IdUtente) {
 
@@ -379,6 +447,14 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService {
         }
     }
 
+    /**
+     *
+     * @param params
+     * @param id
+     * @return
+     * @throws RuntimeException403
+     * @throws RuntimeException401
+     */
     @Override
     public Boolean modificaDatiStanza(Map<String, Object> params, Long id) throws RuntimeException403, RuntimeException401 {
 
@@ -403,18 +479,34 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService {
         }
     }
 
+    /**
+     *
+     * @param id
+     * @return
+     */
     @Override
-    public Stanza findStanza(Long id) {
-        return stanzaRepository.findStanzaById(id);
+    public ResponseEntity<Response<Scenario>> findStanza(Long id) {
+        Stanza stanza = stanzaRepository.findStanzaById(id);
+
+        if (stanza == null) {
+            return ResponseEntity.status(500)
+                    .body(new Response<>(null, "La stanza selezionata non esiste"));
+        } else {
+
+            return ResponseEntity
+                    .ok(new Response<>(stanza.getScenario(), "operazione effettuata con successo"));
+        }
     }
 
-
-    @Override
-    public void saveRoom(Stanza stanza)
-    {
-        stanzaRepository.save(stanza);
-    }
-
+    /**
+     *
+     * @param id_Uogm
+     * @param id_og
+     * @param id_stanza
+     * @return
+     * @throws ServerRuntimeException
+     * @throws RuntimeException403
+     */
     @Override
     public Response<Boolean> upgradeUtente(String id_Uogm, long id_og, long id_stanza) throws ServerRuntimeException, RuntimeException403 {
 
@@ -476,7 +568,11 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService {
 
     }
 
-
+    /**
+     *
+     * @param Id
+     * @return
+     */
     @Override
     public ResponseEntity<Response<List<Utente>>> visualizzaUtentiInStanza(Long Id) {
 
@@ -495,6 +591,11 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService {
         }
     }
 
+    /**
+     *
+     * @param Id
+     * @return
+     */
     @Override
     public ResponseEntity<Response<List<Utente>>> visualizzaUtentiBannatiInStanza(Long Id) {
 
@@ -513,6 +614,12 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService {
         }
     }
 
+    /**
+     *
+     * @param Id
+     * @param metaID
+     * @return
+     */
     @Override
     public ResponseEntity<Response<List<Utente>>> visualizzaUtentiInAttesaInStanza(Long Id, String metaID) {
         Stanza stanza = stanzaRepository.findStanzaById(Id);
@@ -540,11 +647,13 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService {
         }
     }
 
-    @Override
-    public Scenario visualizzaScenarioStanza(Stanza stanza) {
-        return stanza.getScenario();
-    }
-
+    /**
+     *
+     * @param metaID
+     * @param idScenario
+     * @param idStanza
+     * @return
+     */
     @Override
     public ResponseEntity<Response<Boolean>> modificaScenario(String metaID, Long idScenario, Long idStanza) {
         Utente u = utenteRepository.findFirstByMetaId(metaID);
@@ -579,6 +688,15 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService {
 
     }
 
+    /**
+     *
+     * @param metaID
+     * @param idStanza
+     * @param idUtente
+     * @param nome
+     * @return
+     */
+    @Override
     public ResponseEntity<Response<Boolean>> modificaNomePartecipante(String metaID, Long idStanza, Long idUtente, String nome){
         Utente og = utenteRepository.findFirstByMetaId(metaID);
         Stanza stanza = stanzaRepository.findStanzaById(idStanza);
@@ -609,6 +727,13 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService {
         }
     }
 
+    /**
+     *
+     * @param metaID
+     * @param idStanza
+     * @param idUtente
+     * @return
+     */
     @Override
     public ResponseEntity<Response<Boolean>> kickPartecipante(String metaID, Long idStanza, Long idUtente){
         Utente og = utenteRepository.findFirstByMetaId(metaID);
@@ -638,12 +763,12 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService {
         }
     }
 
-/**
-*
- * @param metaID
- * @param idStanza
- * @return
-*/
+    /**
+    *
+     * @param metaID
+     * @param idStanza
+     * @return
+    */
     @Override
     public Ruolo getRuoloByUserAndStanzaID(String metaID, Long idStanza) throws ServerRuntimeException, RuntimeException403 {
 
@@ -667,15 +792,20 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService {
         return sp.getRuolo();
     }
 
-    /**
-             * @param Id
-             * @return
-             */
+     /**
+     * @param Id
+     * @return
+     */
     @Override
     public Stanza visualizzaStanza(Long Id) {
         return stanzaRepository.findStanzaById(Id);
     }
 
+    /**
+     *
+     * @param nome
+     * @return
+     */
     public Ruolo getRuolo(String nome) {
 
         Ruolo ruolo = ruoloRepository.findByNome(nome);
@@ -688,42 +818,87 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService {
         return ruolo;
     }
 
+    /**
+     *
+     * @return
+     */
     public List<Scenario> getAllScenari() {
         return scenarioRepository.findAll();
     }
 
-    /* @Override
-    public ResponseEntity<AccessResponse<Integer>> richiestaAccessoStanza(String codiceStanza, String id_utente) {
-        try {
-            Stanza stanza = stanzaRepository.findStanzaByCodice(codiceStanza);
+    public ResponseEntity<Response<Boolean>> UnmutePartecipante(String metaID, Long IdStanza, Long IdUtente){
 
-            Utente u = utenteRepository.findFirstByMetaId(id_utente);
-            StatoPartecipazione statoPartecipazione = statoPartecipazioneRepository.findStatoPartecipazioneByUtenteAndStanza(u, stanza);
+        Utente og = utenteRepository.findFirstByMetaId(metaID);
+        Utente silenzia = utenteRepository.findUtenteById(IdUtente);
+        Stanza stanza = stanzaRepository.findStanzaById(IdStanza);
 
-            if (statoPartecipazione == null) {
-
-                // statoPartecipazione = new StatoPartecipazione(stanza, u, getRuolo(Ruolo.PARTECIPANTE), true, false, u.getNome());
-                return ResponseEntity.ok(new AccessResponse<>(5, "La stanza è privata, sei in attesa di entrare", true));
-
-            } else if (statoPartecipazione.isBannato()) {
-
-                return ResponseEntity.status(403).body(new AccessResponse<>(6, "Sei stato bannato da questa stanza, non richiedere di entrare", false));
-
-            } else if (statoPartecipazione.isInAttesa()) {
-
-                return ResponseEntity.status(403).body(new AccessResponse<>(7, "Sei già in attesa di entrare in questa stanza", true));
-
-            } else {
-
-                return ResponseEntity.status(403).body(new AccessResponse<>(8, "Sei già all'interno di questa stanza", false));
-
+        if(stanza != null) {
+            StatoPartecipazione statoOg = statoPartecipazioneRepository.findStatoPartecipazioneByUtenteAndStanza(og, stanza);
+            if (statoOg.getRuolo().getNome().equalsIgnoreCase(Ruolo.ORGANIZZATORE_MASTER) || statoOg.getRuolo().getNome().equalsIgnoreCase(Ruolo.ORGANIZZATORE) && !statoOg.isBannato()) {
+                StatoPartecipazione statoSilenzio = statoPartecipazioneRepository.findStatoPartecipazioneByUtenteAndStanza(silenzia, stanza);
+                if (statoSilenzio != null) {
+                    if (statoSilenzio.isSilenziato()) {
+                        statoSilenzio.setSilenziato(false);
+                        statoPartecipazioneRepository.save(statoSilenzio);
+                        return ResponseEntity.ok(new Response<>(true, "L'utente selezionato ora non è più silenziato"));
+                    } else {
+                        return ResponseEntity.ok(new Response<>(true, "L'utente selezionato è gia mutato"));
+                    }
+                } else {
+                    return ResponseEntity.status(403).body(new Response<>(false, "L'utente selezioanto non è presente nella stanza"));
+                }
+            }else{
+                return ResponseEntity.status(403).body(new Response<>(false, "Per silenziare un partecipante nella stanza devi essere almeno un organizzatore"));
             }
-
-
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(403).body(new AccessResponse<>(0,
-                    "Errore durante la richiesta: " + e.getMessage(), false));
+        }else{
+            return ResponseEntity.status(403).body(new Response<>(false, "La stanza selezionata non esiste"));
         }
+    }
+    /*
+    public ResponseEntity<Response<Boolean>> Unmute(String metaID, Long IdStanza) {
 
-    }*/
+        Utente utente = utenteRepository.findFirstByMetaId(metaID);
+        Stanza stanza = stanzaRepository.findStanzaById(IdStanza);
+
+        if(stanza != null) {
+            StatoPartecipazione statoUtente = statoPartecipazioneRepository.findStatoPartecipazioneByUtenteAndStanza(utente, stanza);
+            if (statoUtente != null){
+                if (statoUtente.isSilenziato()) {
+                        statoUtente.setSilenziato(false);
+                        statoPartecipazioneRepository.save(statoUtente);
+                        return ResponseEntity.ok(new Response<>(true, "Ora non sei più mutato"));
+                } else {
+                    return ResponseEntity.ok(new Response<>(true, "Eri era già non mutato"));
+                }
+            } else {
+                return ResponseEntity.status(403).body(new Response<>(false, "L'utente selezioanto non è presente nella stanza"));
+            }
+        }else{
+            return ResponseEntity.status(403).body(new Response<>(false, "La stanza selezionata non esiste"));
+        }
+    }
+
+    public ResponseEntity<Response<Boolean>> mute(String metaID, Long IdStanza) {
+
+        Utente utente = utenteRepository.findFirstByMetaId(metaID);
+        Stanza stanza = stanzaRepository.findStanzaById(IdStanza);
+
+        if(stanza != null) {
+            StatoPartecipazione statoUtente = statoPartecipazioneRepository.findStatoPartecipazioneByUtenteAndStanza(utente, stanza);
+            if (statoUtente != null){
+                if (!statoUtente.isSilenziato()) {
+                    statoUtente.setSilenziato(true);
+                    statoPartecipazioneRepository.save(statoUtente);
+                    return ResponseEntity.ok(new Response<>(true, "Ora sei mutato"));
+                } else {
+                    return ResponseEntity.ok(new Response<>(true, "Sei già mutato"));
+                }
+            } else {
+                return ResponseEntity.status(403).body(new Response<>(false, "L'utente selezioanto non è presente nella stanza"));
+            }
+        }else{
+            return ResponseEntity.status(403).body(new Response<>(false, "La stanza selezionata non esiste"));
+        }
+    }
+    */
 }

@@ -45,11 +45,14 @@ public class GestioneMeetingServiceImpl implements GestioneMeetingService{
     @Autowired
     GestioneStimaMeetingService gestioneStimaMeetingService;
 
-/**
-*
- * @param meeting
- * @return
-*/
+    /**
+     * Metodo che permette la schedulazione di un meeting
+     * @param meeting meeting che si vuole schedulare
+     * @param metaID metaID dell'utente che vuole schedulare il meeting
+     * @return valore booleano che identifica il successo dell'operazione
+     * @throws ServerRuntimeException
+     * @throws RuntimeException403
+     */
     @Override
     public boolean creaScheduling(Meeting meeting, String metaID) throws ServerRuntimeException, RuntimeException403 {
             //cerca il meeting per verificare se registrato o meno
@@ -96,11 +99,13 @@ public class GestioneMeetingServiceImpl implements GestioneMeetingService{
             return true;
     }
 
-/**
-*
- * @param meeting
- * @return
-*/
+    /**
+     * Metodo che permette la modifica di un meeting precedentemente schedulato
+     * @param meeting Meeting di cui si vuole modificare la schedulazione
+     * @return valore boolean che identifica il successo dell'operazione
+     * @throws ServerRuntimeException
+     * @throws RuntimeException403
+     */
    @Override
    public boolean modificaScheduling(Meeting meeting) throws ServerRuntimeException, RuntimeException403 {
     // Cerca il meeting per verificare se è registrato o meno
@@ -121,29 +126,15 @@ public class GestioneMeetingServiceImpl implements GestioneMeetingService{
       }
    }
 
-    @Override
-    public Meeting findMeetingById(Long id) {
-        if(meetingRepository.findById(id).isPresent())
-        {
-            return meetingRepository.findById(id).get();
-        }
-        return null;
-    }
 
-    @Override
-    public Meeting saveMeeting(Meeting meeting)
-    {
-        return meetingRepository.save(meeting);
-    }
-
-/**
-*
- * @param metaID
- * @param id_meeting
- * @return
- * @throws ServerRuntimeException
- * @throws RuntimeException403
-*/
+    /**
+     * Metodo che permette di fare accesso ad un meeting
+     * @param metaID metaID dell'utente che vuole effettuare l'accesso all'interno del meeting
+     * @param id_meeting id del meeting a cui si vuole fare accesso
+     * @return valore booleano che identifica il successo dell'operazione
+     * @throws ServerRuntimeException
+     * @throws RuntimeException403
+     */
     @Override
     public Boolean accediMeeting(String metaID, Long id_meeting) throws ServerRuntimeException, RuntimeException403 {
 
@@ -198,6 +189,14 @@ public class GestioneMeetingServiceImpl implements GestioneMeetingService{
 
     }
 
+    /**
+     * metodo che permette di avviare un meeting
+     * @param metaID metaID dell'utente che vuole avviare il meeting
+     * @param id_meeting id del meeting che deve essere avviato
+     * @return valore booleano che identifica il successo dell'operazione
+     * @throws ServerRuntimeException
+     * @throws RuntimeException403
+     */
     @Override
     public Boolean avviaMeeting(String metaID, Long id_meeting) throws ServerRuntimeException, RuntimeException403 {
 
@@ -248,6 +247,14 @@ public class GestioneMeetingServiceImpl implements GestioneMeetingService{
 
     }
 
+    /**
+     * metodo che permette di temrminare un meeting precedentemente avviato
+     * @param metaID metaID
+     * @param id_meeting
+     * @return
+     * @throws ServerRuntimeException
+     * @throws RuntimeException403
+     */
     @Override
     public Boolean terminaMeeting(String metaID, Long id_meeting) throws ServerRuntimeException, RuntimeException403 {
 
@@ -323,14 +330,14 @@ public class GestioneMeetingServiceImpl implements GestioneMeetingService{
         }
     }
 
-/**
-*
- * @param metaID
- * @param id_meeting
- * @return
- * @throws ServerRuntimeException
- * @throws RuntimeException403
-*/
+    /**
+     *
+     * @param metaID
+     * @param id_meeting
+     * @return
+     * @throws ServerRuntimeException
+     * @throws RuntimeException403
+     */
     @Override
     public Boolean uscitaMeeting(String metaID, Long id_meeting) throws ServerRuntimeException, RuntimeException403 {
         Utente u;
@@ -369,6 +376,11 @@ public class GestioneMeetingServiceImpl implements GestioneMeetingService{
 
     }
 
+    /**
+     *
+     * @param idStanza
+     * @return
+     */
     @Override
     public ResponseEntity<Response<List<Meeting>>> visualizzaSchedulingMeeting(Long idStanza) {
 
@@ -386,6 +398,13 @@ public class GestioneMeetingServiceImpl implements GestioneMeetingService{
         }
     }
 
+    /**
+     *
+     * @param metaId
+     * @return
+     * @throws ServerRuntimeException
+     * @throws RuntimeException403
+     */
     @Override
     public List<Meeting> visualizzaQuestionari(String metaId) throws ServerRuntimeException, RuntimeException403 {
 
@@ -405,6 +424,13 @@ public class GestioneMeetingServiceImpl implements GestioneMeetingService{
 
     }
 
+    /**
+     *
+     * @param metaId
+     * @return
+     * @throws ServerRuntimeException
+     * @throws RuntimeException403
+     */
     @Override
     public List<Meeting> getMeetingPrecedenti(String metaId) throws ServerRuntimeException, RuntimeException403 {
 
@@ -423,6 +449,15 @@ public class GestioneMeetingServiceImpl implements GestioneMeetingService{
                 .collect(Collectors.toList());
     }
 
+    /**
+     *
+     * @param value
+     * @param metaId
+     * @param id_meeting
+     * @return
+     * @throws ServerRuntimeException
+     * @throws RuntimeException403
+     */
     @Override
     public boolean compilaQuestionario(Integer value, String metaId, Long id_meeting) throws ServerRuntimeException, RuntimeException403 {
 

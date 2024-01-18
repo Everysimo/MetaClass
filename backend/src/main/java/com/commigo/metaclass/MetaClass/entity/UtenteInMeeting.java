@@ -1,7 +1,6 @@
 package com.commigo.metaclass.MetaClass.entity;
 
 import com.commigo.metaclass.MetaClass.utility.multipleid.UtenteInMeetingID;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;

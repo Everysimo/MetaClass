@@ -1,32 +1,28 @@
-import React, { Component } from 'react';
-import '../CreaScenarioForm/creaScenario.css';
+import React, { useState } from 'react';
+import '../PopUpStyles.css';
 import { wait } from "@testing-library/user-event/dist/utils";
 
-export default class CreaCategoria extends Component {
-    state = {
+const CreaCategoria = (props) => {
+    const [formData, setFormData] = useState({
         nome: "",
         descrizione: "",
-        isVisible: true,
-        isErrorPopupVisible: false,
-        errorMessage: "",
+    });
+
+    const [isVisible, setIsVisible] = useState(true);
+    const [errorMessage, setErrorMessage] = useState("");
+    const [successMessage, setSuccessMessage] = useState("");
+    const [loading, setLoading] = useState(false);
+
+    const handleNameChange = (e) => {
+        setFormData({ ...formData, nome: e.target.value });
     };
 
-    handleNameChange = (e) => {
-        this.setState({nome: e.target.value});
-    };
-    handleDescChange = (e) => {
-        this.setState({ descrizione: e.target.value });
+    const handleDescChange = (e) => {
+        setFormData({ ...formData, descrizione: e.target.value });
     };
 
-    handleErrorPopupClose = () => {
-        this.setState({
-            isErrorPopupVisible: false,
-            errorMessage: "",
-        });
-    };
-
-    sendDataToServer = async () => {
-        const { nome, descrizione} = this.state;
+    const sendDataToServer = async () => {
+        const { nome, descrizione } = formData;
 
         // Validazione: Assicurati che idCategoria sia >= 0
 
@@ -45,81 +41,93 @@ export default class CreaCategoria extends Component {
         };
 
         try {
+            setLoading(true);
             console.log("la stringa json:", JSON.stringify(dataToSend));
             const response = await fetch('http://localhost:8080/admin/updateCategoria', requestOption);
             const responseData = await response.json();
             console.log("Risposta dal server:", responseData);
+
+            if (response.ok) {
+                setSuccessMessage(responseData.message);
+            } else {
+                setErrorMessage(responseData.message || 'Errore durante l\'operazione');
+            }
         } catch (error) {
             console.error('ERRORE:', error);
+            setErrorMessage('Errore durante la connessione al server');
+        } finally {
+            setLoading(false);
         }
     };
 
-    callFunction = () => {
-        this.sendDataToServer();
-        console.log("dati del form", this.state);
+    const callFunction = () => {
+        setSuccessMessage('');
+        setErrorMessage('');
+        sendDataToServer();
         wait(100);
-        this.handleClear();
+        handleClear();
     };
 
-    handleClear = () => {
-        this.setState({
+    const handleClear = () => {
+        setFormData({
             nome: '',
             descrizione: '',
         });
     };
-    handleClose = () => {
-        // Nascondi la card impostando isVisible su false
-        this.setState({ isVisible: false });
 
-        // Chiama la funzione di chiusura ricevuta come prop
-        if (this.props.onClose) {
-            this.props.onClose();
+    const handleClose = () => {
+        setIsVisible(false);
+
+        if (props.onClose) {
+            props.onClose();
         }
     };
-     renderErrorPopup = () => {
-        return (
-            <div className={`error-popup ${this.state.isErrorPopupVisible ? '' : 'hidden'}`}>
-                {this.state.errorMessage}
-                <button onClick={this.handleErrorPopupClose}>Chiudi</button>
-            </div>
-        );
-    };
 
-
-    render() {
-        return (
-            <div>
-                {this.renderErrorPopup()}
-                <div className={`card ${this.state.isVisible ? '' : 'hidden'}`}>
-                    <button className="close-button" onClick={this.handleClose}>
-                        X
-                    </button>
-                    <div className="card-content">
-                        <label>
-                            Nome:
-                            <input
-                                type="text"
-                                name="nome"
-                                value={this.state.nome}
-                                onChange={this.handleNameChange}
-                            />
-                        </label>
-                        <label>
-                            Descrizione:
-                            <input
-                                type="text"
-                                name="descrizione"
-                                value={this.state.descrizione}
-                                onChange={this.handleDescChange}
-                            />
-                        </label>
-                        <div className="button-container">
-                            <button onClick={this.handleClear}>Cancella</button>
-                            <button onClick={() => this.callFunction()}>Invia</button>
-                        </div>
-                    </div>
+    return (
+        <div className={"modal"}>
+            <div className={`modal-content ${isVisible ? '' : 'hidden'}`}>
+                <span className="close" onClick={handleClose}>
+                    &times;
+                </span>
+                <div className="card-content">
+                    {loading ? (
+                        <p>Loading...</p>
+                    ) : (
+                        <>
+                            {successMessage ? (
+                                <p>{successMessage}</p>
+                            ) : errorMessage ? (
+                                <p>{errorMessage}</p>
+                            ) : (
+                                <>
+                                    <label>
+                                        Nome:
+                                        <input
+                                            type="text"
+                                            name="nome"
+                                            value={formData.nome}
+                                            onChange={handleNameChange}
+                                        />
+                                    </label>
+                                    <label>
+                                        Descrizione:
+                                        <input
+                                            type="text"
+                                            name="descrizione"
+                                            value={formData.descrizione}
+                                            onChange={handleDescChange}
+                                        />
+                                    </label>
+                                    <button onClick={handleClear}>Cancella</button>
+                                    <button onClick={callFunction}>Invia</button>
+                                </>
+                            )}
+                        </>
+                    )}
                 </div>
             </div>
-        );
-    };
-}
+        </div>
+    );
+};
+
+export default CreaCategoria;

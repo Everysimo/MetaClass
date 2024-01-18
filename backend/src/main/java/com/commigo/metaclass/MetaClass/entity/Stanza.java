@@ -21,9 +21,14 @@ import java.time.LocalDateTime;
 public class Stanza {
 
     /**
-     * Costante per valore intero di 50.
+     * Costante per valore intero di 2.
      */
-    public static final int MAX_NAME_LENGTH = 50;
+    public static final int MIN_NAME_LENGTH = 2;
+
+    /**
+     * Costante per valore intero di 254.
+     */
+    public static final int MAX_NAME_LENGTH = 254;
 
     /**
      * Costante per valore intero di 254.
@@ -42,7 +47,7 @@ public class Stanza {
      */
     @NotNull(message = "Il nome non può essere nullo")
     @Column(length = MAX_NAME_LENGTH)
-    @Size(min = 1,
+    @Size(min = MIN_NAME_LENGTH,
             max = MAX_NAME_LENGTH,
             message = "Lunghezza nome errata")
     @Pattern(regexp="^[A-Z][a-zA-Z0-9\\s]*$",
@@ -67,7 +72,7 @@ public class Stanza {
      */
     @NotNull(message = "La descrizione della stanza non può essere nulla")
     @Column(length = MAX_DESCR_LENGTH)
-    @Size(min = 1,
+    @Size(min = MIN_NAME_LENGTH,
             max = MAX_DESCR_LENGTH,
             message = "Lunghezza descrizione errata")
     @Pattern(regexp="^[A-Z][a-zA-Z0-9.,!?()'\"\\-\\s]*$",

@@ -4,7 +4,6 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faCirclePlus} from "@fortawesome/free-solid-svg-icons";
 const MyCreateForm = () => {
     const [showCreateFormModal, setShowCreateFormModal] = useState(false);
-
     const handleShowCreateForm = () => {
         setShowCreateFormModal(true);
     };
@@ -198,7 +197,12 @@ const MyCreateForm = () => {
                 <div className="modal">
                     <div className="modal-content">
                         {/* Add a close button inside the modal */}
-                        <span className="close" onClick={handleCloseCreateFormModal}>&times;</span>
+                        <span
+                            className="close"
+                            onClick={handleCloseCreateFormModal}
+                        >
+                            &times;
+                        </span>
                         <div className={"masterDiv"}>
                             <div className={"childDiv"}>
                                 <p className={'textp'}>Inserisci Nome:</p>

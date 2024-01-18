@@ -49,6 +49,10 @@ public class GestioneAmministrazioneController {
 
     private final Set<String> adminMetaIds = loadAdminMetaIdsFromFile();
 
+    /**
+     * Metodo che prende dal file "admins.txt" tutti i metaID degli admin
+     * @return
+     */
     private Set<String> loadAdminMetaIdsFromFile() {
         Set<String> adminIds = new HashSet<>();
         try (BufferedReader br = new BufferedReader(new InputStreamReader(new ClassPathResource("admins.txt").getInputStream()))) {
@@ -63,10 +67,22 @@ public class GestioneAmministrazioneController {
         return adminIds;
     }
 
+    /**
+     *  confronta il metaID di un utente con quelli degli admin, per verificare se l'utente è un admin
+     * @param metaId metaID che deve essere confrontato
+     * @return
+     */
     public boolean checkAdmin(String metaId){
         return adminMetaIds.contains(metaId);
     }
 
+    /**
+     * Metodo che gestisce la richiesta di fornire la lista degli utenti bannati in una determinata stanza da parte di un admin di sistema
+     * @param Id Id della stanza di cui vogliamo visualizzare gli utenti bannati
+     * @param request richiesta HTTP fornita dal client
+     * @return
+     * @throws RuntimeException403
+     */
     @PostMapping(value = "/visualizzaUtentiBannatiInStanza/{Id}")
     public ResponseEntity<Response<List<Utente>>> visualizzaUtentiBannatiInStanza(@PathVariable Long Id, HttpServletRequest request) throws RuntimeException403 {
         try{
@@ -85,6 +101,13 @@ public class GestioneAmministrazioneController {
         }
     }
 
+    /**
+     * Metodo che gestisce la richiesta di annullamento del ban di un determinato utente in una determinata stanza da parte di un admin di sistema
+     * @param idUtente Id dell'utente a cui deve essere eliminato il ban
+     * @param idStanza Id della stanza in cui l'utente è bannato
+     * @param request richiesta HTTP fornita dal client
+     * @return
+     */
     @PostMapping(value = "annullaBan/{idstanza}/{idUtente}")
     public ResponseEntity<Response<Boolean>> annullaBan(@PathVariable Long idUtente,
                                                         @PathVariable("idstanza") Long idStanza,
@@ -110,6 +133,13 @@ public class GestioneAmministrazioneController {
     }
 
 
+    /**
+     * Metodo che gestisce la richiesta di modifica di una categoria da parte di un admin di sistema
+     * @param c Categoria che deve essere modificata
+     * @param result Variabile che contiene tutti gli errori di validazione dell'oggetto categoria
+     * @param request richiesta HTTP fornita dal client
+     * @return un valore booleano che identifica la riuscita dell'operazione ed un messaggio che descrive l'esito di essa
+     */
     @PostMapping(value = "updateCategoria")
     public ResponseEntity<Response<Boolean>> updateCategoria(@Valid @RequestBody Categoria c,
                                                              BindingResult result,
@@ -145,6 +175,13 @@ public class GestioneAmministrazioneController {
         }
     }
 
+    /**
+     * Metodo che gestisce la richiesta di modificare uno scenario da  parte di un admin di sistema
+     * @param s Scenario che deve essere modificato
+     * @param result Variabile che contiene tutti gli errori di validazione dell'oggetto scenario
+     * @param request richiesta HTTP fornita dal client
+     * @return un valore booleano che identifica la riuscita dell'operazione ed un messaggio che descrive l'esito di essa
+     */
     @PostMapping(value = "updateScenario")
     public ResponseEntity<Response<Boolean>> updateScenario(@Valid @RequestBody Scenario s,
                                                             BindingResult result,
@@ -179,6 +216,11 @@ public class GestioneAmministrazioneController {
         }
     }
 
+    /**
+     * Metodo che permette di gestire la richiesta di visualizzare tutte le stanza da parte di un adin di sistema
+     * @param request richiesta HTTP fornita dal client
+     * @return una lista di stanze ed un messaggio che descrive l'esito dell'operazione
+     */
     @GetMapping(value = "allStanze")
     public ResponseEntity<Response<List<Stanza>>> visualizzaStanze(HttpServletRequest request) {
         List<Stanza> stanze;
@@ -213,11 +255,17 @@ public class GestioneAmministrazioneController {
         }
     }
 
+    /**
+     * Metodo che permette di gestire la richiesta di modifica di una determinata stanza da parte di un admin
+     * @param Id ID della stanza che deve essere modificata
+     * @param params Nuovi attributi della stanza
+     * @param request richiesta HTTP fornita dal client
+     * @return un valore booleano che identifica la riuscita dell'operazione ed un messaggio che descrive l'esito di essa
+     */
     @PostMapping(value = "modificaStanza/{Id}")
-    public ResponseEntity<Response<Boolean>> modifyRoomDataAdmin(
-            @PathVariable Long Id,
-            @RequestBody Map<String, Object> params,
-            HttpServletRequest request){
+    public ResponseEntity<Response<Boolean>> modifyRoomDataAdmin(@PathVariable Long Id,
+                                                                @RequestBody Map<String, Object> params,
+                                                                HttpServletRequest request){
 
 
        try{ //validazione dl token
@@ -237,6 +285,12 @@ public class GestioneAmministrazioneController {
        }
     }
 
+    /**
+     * Metodo che permette di gestire la richiesta di eliminazione di una stanza da parte di un admin di sistema
+     * @param Id ID della stanza che deve essere eliminata
+     * @param request richiesta HTTP fornita dal client
+     * @return un valore booleano che identifica la riuscita dell'operazione ed un messaggio che descrive l'esito di essa
+     */
     @PostMapping(value = "eliminaStanza/{Id}")
     public ResponseEntity<Response<Boolean>> eliminaStanza(@PathVariable Long Id,
                                                            HttpServletRequest request){
@@ -259,6 +313,12 @@ public class GestioneAmministrazioneController {
 
    }
 
+    /**
+     * Metodo che permette di gestire la richiesta di visualizzazione di una stanza da parte di un admin di sistema
+     * @param Id ID della stanza che deve essere visualizzata
+     * @param request richiesta HTTP fornita dal client
+     * @return la stanza che deve essere visualizzata, ed un messaggio che descrive l'esito dell'operazione
+     */
     @PostMapping(value = "visualizzaStanza/{Id}")
     public ResponseEntity<Response<Stanza>> visualizzaStanza(@PathVariable Long Id,
                                                              HttpServletRequest request) {
