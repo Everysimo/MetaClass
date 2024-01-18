@@ -27,6 +27,7 @@ export default class Facebook extends Component {
     }
 
     handleUserID = (response) => {
+        console.log(response);
         if (response && response.userID) {
             this.setState({
                 metaId: response.userID,
@@ -46,17 +47,12 @@ export default class Facebook extends Component {
         }
     };
 
-    handleAdmin = (response) => {
-        return !!response.isAdmin;
-    };
-
     responseFacebook = (response) => {
         if (response && response.name) {
             const nameParts = response.name.split(" ");
             const nome = nameParts.slice(0, -1).join(" ");
             const cognome = nameParts.slice(-1).join(" ");
             const gender = this.handleGender(response);
-            const admin = this.handleAdmin(response);
             this.setState(
                 {
                     nome,
@@ -65,11 +61,10 @@ export default class Facebook extends Component {
                     eta: response.birthday,
                     sesso: gender,
                     isLoggedIn: true,
-                    isAdmin: admin,
                 },
                 () => {
-                    this.saveLoginStatusToLocalStorage();
                     this.sendDataToServer();
+                    this.saveLoginStatusToLocalStorage();
                 }
             );
         } else {
@@ -102,7 +97,11 @@ export default class Facebook extends Component {
         try {
             const response = await fetch("http://localhost:8080/login", requestOptions);
             const responseData = await response.json();
+            console.log(responseData)
             const token = responseData.token;
+            this.setState({
+                isAdmin: responseData.isAdmin
+            });
             sessionStorage.setItem("token", token);
             sessionStorage.setItem("isAdmin", JSON.stringify(this.state.isAdmin));
         } catch (error) {

@@ -1,9 +1,11 @@
-import React, { Component } from 'react';
-import './creaScenario.css';
+import React, { useState } from 'react';
+import '../PopUpStyles.css';
 import { wait } from "@testing-library/user-event/dist/utils";
 
-export default class CreaScenario extends Component {
-    state = {
+const CreaScenario = (props) => {
+    const [showCreateFormModal, setShowCreateFormModal] = useState(false);
+
+    const [state, setState] = useState({
         nome: "",
         descrizione: "",
         imageUrl: "",
@@ -11,43 +13,49 @@ export default class CreaScenario extends Component {
         isVisible: true,
         isErrorPopupVisible: false,
         errorMessage: "",
+    });
+    const handleShowCreateForm = () => {
+        setShowCreateFormModal(true);
     };
 
-    handleNameChange = (e) => {
+    const handleCloseCreateFormModal = () => {
+        setShowCreateFormModal(false);
+    };
+
+    const handleNameChange = (e) => {
         const inputValue = e.target.value;
-
-        //prima lettera grande
         const capitalizedInput = inputValue.charAt(0).toUpperCase() + inputValue.slice(1);
-        this.setState({ nome: capitalizedInput, error: null });
-
+        setState({ ...state, nome: capitalizedInput, error: null });
     };
 
-    handleDescChange = (e) => {
+    const handleDescChange = (e) => {
         const inputValue = e.target.value;
-
         const capitalizedInput = inputValue.charAt(0).toUpperCase() + inputValue.slice(1);
-        this.setState({ descrizione: capitalizedInput, error: null });
-    };
-    handleImmageChange = (e) => {
-        this.setState({ imageUrl: e.target.value });
-    };
-    handleCateChange = (e) => {
-        this.setState({ categoria: e.target.value });
+        setState({ ...state, descrizione: capitalizedInput, error: null });
     };
 
-    handleErrorPopupClose = () => {
-        this.setState({
+    const handleImmageChange = (e) => {
+        setState({ ...state, imageUrl: e.target.value });
+    };
+
+    const handleCateChange = (e) => {
+        setState({ ...state, categoria: e.target.value });
+    };
+
+    const handleErrorPopupClose = () => {
+        setState({
+            ...state,
             isErrorPopupVisible: false,
             errorMessage: "",
         });
     };
 
-    sendDataToServer = async () => {
-        const { nome, descrizione, imageUrl, categoria } = this.state;
+    const sendDataToServer = async () => {
+        const { nome, descrizione, imageUrl, categoria } = state;
 
-        // Validazione: Assicurati che idCategoria sia >= 0
         if (categoria < 0) {
-            this.setState({
+            setState({
+                ...state,
                 isErrorPopupVisible: true,
                 errorMessage: "L'id Categoria deve essere maggiore o uguale a 0",
             });
@@ -80,115 +88,109 @@ export default class CreaScenario extends Component {
         }
     };
 
-    callFunction = () => {
-
-        //CONTROLLI DA TRASFORMARE IN POP UP
-        if (this.state.nome.trim() === '' || this.state.nome.length < 2) {
-            this.setState({ error: 'Il campo nome non può essere vuoto o minore di 2 caratteri' });
+    const callFunction = () => {
+        if (state.nome.trim() === '' || state.nome.length < 2) {
+            setState({ ...state, error: 'Il campo nome non può essere vuoto o minore di 2 caratteri' });
             return;
         }
 
-        if (this.state.descrizione.trim() === '') {
-            this.setState({error: 'Il campo descrizione non può essere vuoto'});
+        if (state.descrizione.trim() === '') {
+            setState({ ...state, error: 'Il campo descrizione non può essere vuoto' });
             return;
-        }else if(this.state.descrizione.length < 2 || this.state.descrizione.length > 254) {
-            this.setState({error: 'Lunghezza descrizione errata'});
+        } else if (state.descrizione.length < 2 || state.descrizione.length > 254) {
+            setState({ ...state, error: 'Lunghezza descrizione errata' });
             return;
-        }else if(!isNaN(this.state.descrizione.charAt(0))) {
-            this.setState({ error: 'Errore durante la richiesta, formato Nome errato' });
+        } else if (!isNaN(state.descrizione.charAt(0))) {
+            setState({ ...state, error: 'Errore durante la richiesta, formato Nome errato' });
             return;
         }
 
+        setState({ ...state, error: null });
 
-        this.setState({ error: null });
-
-        this.sendDataToServer();
-        console.log("dati del form", this.state);
+        sendDataToServer();
+        console.log("dati del form", state);
         wait(100);
-        this.handleClear();
+        handleClear();
     };
 
-    handleClear = () => {
-        this.setState({
+    const handleClear = () => {
+        setState({
+            ...state,
             nome: '',
             descrizione: '',
             imageUrl: '',
             categoria: 0,
         });
     };
-    handleClose = () => {
-        // Nascondi la card impostando isVisible su false
-        this.setState({ isVisible: false });
 
-        // Chiama la funzione di chiusura ricevuta come prop
-        if (this.props.onClose) {
-            this.props.onClose();
+    const handleClose = () => {
+        setState({ ...state, isVisible: false });
+        if (props.onClose) {
+            props.onClose();
         }
     };
-    renderErrorPopup = () => {
+
+    const renderErrorPopup = () => {
         return (
-            <div className={`error-popup ${this.state.isErrorPopupVisible ? '' : 'hidden'}`}>
-                {this.state.errorMessage}
-                <button onClick={this.handleErrorPopupClose}>Chiudi</button>
+            <div className={`error-popup ${state.isErrorPopupVisible ? '' : 'hidden'}`}>
+                {state.errorMessage}
+                <button onClick={handleErrorPopupClose}>Chiudi</button>
             </div>
         );
     };
 
-    render() {
-        return (
-            <div>
-                {this.renderErrorPopup()}
-                <div className={`card ${this.state.isVisible ? '' : 'hidden'}`}>
-                    <button className="close-button" onClick={this.handleClose}>
-                        X
-                    </button>
-                    <div className="card-content">
-                        <label>
-                            Nome:
-                            <input
-                                type="text"
-                                name="nome"
-                                value={this.state.nome}
-                                onChange={this.handleNameChange}
-                            />
-                        </label>
-                        <label>
-                            Descrizione:
-                            <input
-                                type="text"
-                                name="descrizione"
-                                value={this.state.descrizione}
-                                onChange={this.handleDescChange}
-                            />
-                        </label>
-                        <label>
-                            Immagine:
-                            <input
-                                type="text"
-                                name="immagine"
-                                value={this.state.imageUrl}
-                                onChange={this.handleImmageChange}
-                            />
-                        </label>
-                        <label>
-                            Id Categoria:
-                            <input
-                                type="number"
-                                name="idCategoria"
-                                value={this.state.categoria}
-                                onChange={this.handleCateChange}
-                                min={0}
-                            />
-                        </label>
-                        <div className="button-container">
-                            <button onClick={this.handleClear}>Cancella</button>
-                            <button onClick={() => this.callFunction()}>Invia</button>
-                        </div>
-                        {this.state.error && <p style={{ color: 'red' }}>{this.state.error}</p>}
-
-                    </div>
+    return (
+        <div className={"modal"}>
+            <div className={`modal-content ${state.isVisible ? '' : 'hidden'}`}>
+                <span className="close" onClick={handleClose}>
+                    &times;
+                </span>
+                <div className="card-content">
+                    <label>
+                        Nome:
+                        <input
+                            type="text"
+                            name="nome"
+                            value={state.nome}
+                            onChange={handleNameChange}
+                        />
+                    </label>
+                    <label>
+                        Descrizione:
+                        <input
+                            type="text"
+                            name="descrizione"
+                            value={state.descrizione}
+                            onChange={handleDescChange}
+                        />
+                    </label>
+                    <label>
+                        Immagine:
+                        <input
+                            type="text"
+                            name="immagine"
+                            value={state.imageUrl}
+                            onChange={handleImmageChange}
+                        />
+                    </label>
+                    <label>
+                        Id Categoria:
+                        <input
+                            type="number"
+                            name="idCategoria"
+                            value={state.categoria}
+                            onChange={handleCateChange}
+                            min={0}
+                        />
+                    </label>
+                    <button onClick={handleClear}>Cancella</button>
+                    <button onClick={callFunction}>Invia</button>
+                    {state.error && <p style={{ color: 'red' }}>{state.error}</p>}
                 </div>
             </div>
-        );
-    };
-}
+        </div>
+    );
+};
+
+export default CreaScenario;
+

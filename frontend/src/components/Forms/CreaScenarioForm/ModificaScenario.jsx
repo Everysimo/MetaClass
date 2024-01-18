@@ -1,48 +1,39 @@
-import React, { Component } from 'react';
-import './creaScenario.css';
-import { wait } from "@testing-library/user-event/dist/utils";
+import React, { useState } from 'react';
+import '../PopUpStyles.css';
 
-export default class ModificaScenario extends Component {
-    state = {
+const ModificaScenario = (props) => {
+    const [successMessage, setSuccessMessage] = useState('');
+    const [errorMessage, setErrorMessage] = useState('');
+    const [loading, setLoading] = useState(false);
+    const [state, setState] = useState({
         nome: "",
         descrizione: "",
         imageUrl: "",
         categoria: 0,
-        isVisible: true,
-        isErrorPopupVisible: false,
-        errorMessage: "",
+        isVisible: true
+    });
+
+    const handleNameChange = (e) => {
+        setState({ ...state, nome: e.target.value });
     };
 
-    handleNameChange = (e) => {
-        this.setState({nome: e.target.value});
-    };
-    handleDescChange = (e) => {
-        this.setState({ descrizione: e.target.value });
-    };
-    handleImmageChange = (e) => {
-        this.setState({ imageUrl: e.target.value });
-    };
-    handleCateChange = (e) => {
-        this.setState({ categoria: e.target.value });
+    const handleDescChange = (e) => {
+        setState({ ...state, descrizione: e.target.value });
     };
 
-
-    handleErrorPopupClose = () => {
-        this.setState({
-            isErrorPopupVisible: false,
-            errorMessage: "",
-        });
+    const handleImmageChange = (e) => {
+        setState({ ...state, imageUrl: e.target.value });
     };
 
-    sendDataToServer = async () => {
-        const { nome, descrizione, imageUrl, categoria } = this.state;
+    const handleCateChange = (e) => {
+        setState({ ...state, categoria: e.target.value });
+    };
 
-        // Validazione: Assicurati che idCategoria sia >= 0
+    const sendDataToServer = async () => {
+        const { nome, descrizione, imageUrl, categoria } = state;
+
         if (categoria < 0) {
-            this.setState({
-                isErrorPopupVisible: true,
-                errorMessage: "L'id Categoria deve essere maggiore o uguale a 0",
-            });
+            setErrorMessage("L'id Categoria deve essere maggiore o uguale a 0");
             return;
         }
 
@@ -63,104 +54,109 @@ export default class ModificaScenario extends Component {
         };
 
         try {
-            console.log("la stringa json:", JSON.stringify(dataToSend));
+            setLoading(true);
             const response = await fetch('http://localhost:8080/admin/updateScenario', requestOption);
             const responseData = await response.json();
             console.log("Risposta dal server:", responseData);
+
+            if (response.ok) {
+                setSuccessMessage(responseData.message);
+            } else {
+                setErrorMessage(responseData.message || 'Errore durante l\'operazione');
+            }
         } catch (error) {
             console.error('ERRORE:', error);
-
-            
+            setErrorMessage('Errore durante la connessione al server');
+        } finally {
+            setLoading(false);
         }
     };
 
-    callFunction = () => {
-        this.sendDataToServer();
-        console.log("dati del form", this.state);
-        wait(100);
-        this.handleClear();
+    const callFunction = () => {
+        setSuccessMessage('');
+        setErrorMessage('');
+        sendDataToServer();
     };
 
-    handleClear = () => {
-        this.setState({
+    const handleClear = () => {
+        setState({
+            ...state,
             nome: '',
             descrizione: '',
             imageUrl: '',
             categoria: 0,
         });
     };
-    handleClose = () => {
-        // Nascondi la card impostando isVisible su false
-        this.setState({ isVisible: false });
 
-        // Chiama la funzione di chiusura ricevuta come prop
-        if (this.props.onClose) {
-            this.props.onClose();
+    const handleClose = () => {
+        setState({ ...state, isVisible: false });
+        if (props.onClose) {
+            props.onClose();
         }
     };
 
-    renderErrorPopup = () => {
-        return (
-            <div className={`error-popup ${this.state.isErrorPopupVisible ? '' : 'hidden'}`}>
-                {this.state.errorMessage}
-                <button onClick={this.handleErrorPopupClose}>Chiudi</button>
+    return (
+        <div className={"modal"}>
+            <div className={`modal-content ${state.isVisible ? '' : 'hidden'}`}>
+                <span className="close" onClick={handleClose}>
+                    &times;
+                </span>
+                {loading ? (
+                    <p>Loading...</p>
+                ) : (
+                    <>
+                        {successMessage ? (
+                            <p>{successMessage}</p>
+                        ) : errorMessage ? (
+                            <p>{errorMessage}</p>
+                        ) : (
+                            <>
+                                <label>
+                                    Nome:
+                                    <input
+                                        type="text"
+                                        name="nome"
+                                        value={state.nome}
+                                        onChange={handleNameChange}
+                                    />
+                                </label>
+                                <label>
+                                    Descrizione:
+                                    <input
+                                        type="text"
+                                        name="descrizione"
+                                        value={state.descrizione}
+                                        onChange={handleDescChange}
+                                    />
+                                </label>
+                                <label>
+                                    Immagine:
+                                    <input
+                                        type="text"
+                                        name="immagine"
+                                        value={state.imageUrl}
+                                        onChange={handleImmageChange}
+                                    />
+                                </label>
+                                <label>
+                                    Id Categoria:
+                                    <input
+                                        type="number"
+                                        name="idCategoria"
+                                        value={state.categoria}
+                                        onChange={handleCateChange}
+                                        min={0}
+                                    />
+                                </label>
+                                <button onClick={handleClear}>Cancella</button>
+                                <button onClick={callFunction}>Invia</button>
+                            </>
+                        )}
+                    </>
+                )}
             </div>
-        );
-    };
+        </div>
+    );
+};
 
-    render() {
-        return (
-            <div>
-                {this.renderErrorPopup()}
-                <div className={`card ${this.state.isVisible ? '' : 'hidden'}`}>
-                    <button className="close-button" onClick={this.handleClose}>
-                        X
-                    </button>
-                    <div className="card-content">
-                        <label>
-                            Nome:
-                            <input
-                                type="text"
-                                name="nome"
-                                value={this.state.nome}
-                                onChange={this.handleNameChange}
-                            />
-                        </label>
-                        <label>
-                            Descrizione:
-                            <input
-                                type="text"
-                                name="descrizione"
-                                value={this.state.descrizione}
-                                onChange={this.handleDescChange}
-                            />
-                        </label>
-                        <label>
-                            Immagine:
-                            <input
-                                type="text"
-                                name="immagine"
-                                value={this.state.imageUrl}
-                                onChange={this.handleImmageChange}
-                            />
-                        </label>
-                        <label>
-                            Id Categoria:
-                            <input
-                                type="number"
-                                name="idCategoria"
-                                value={this.state.categoria}
-                                onChange={this.handleCateChange}
-                                min={0}
-                            />
-                        </label>
-                        <div className="button-container">
-                            <button onClick={this.handleClear}>Cancella</button>
-                            <button onClick={() => this.callFunction()}>Invia</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        );
-    };
-}
+export default ModificaScenario;

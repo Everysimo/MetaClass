@@ -53,6 +53,7 @@ export const LoggedInHome = () => {
         // Naviga alla pagina di destinazione con il valore 42
         navigate(`/previousMeeting`);
     };
+
     const closeAllComponents = () => {
         setIsVisibleScen(false);
         setIsVisibleModScen(false);
@@ -94,43 +95,53 @@ export const LoggedInHome = () => {
                                 Visualizza tutti i meetings a cui hai partecipato
                             </p>
                         </div>
-                    </div>
-                    {isAdmin &&
-                        <section className={"contentSec"}>
-                            <div className={"childDiv"}>
-                                <h5> IN QUANTO ADMIN...</h5>
-                                <button onClick={() => {
-                                    closeAllComponents();
-                                    setIsVisibleCat(prevVisibility => !prevVisibility)
-                                }}>
-                                    Crea Categoria
-                                </button>
-                                {isVisibleCat && <CreaCategoria onClose={() => setIsVisibleCat(false)}/>}
-
-                                <button onClick={() => {
-                                    closeAllComponents();
-                                    setIsVisibleScen(prevVisibility => !prevVisibility)
-                                }}>
-                                    Crea Scenario
-                                </button>
+                        {isAdmin &&
+                            <>
+                                <div
+                                    className={"transWhiteBg"}
+                                    onClick={() => {
+                                        closeAllComponents();
+                                        setIsVisibleCat(prevVisibility => !prevVisibility)
+                                    }}>
+                                    <h2>Crea Categoria</h2>
+                                    <p
+                                        style={{fontSize: "14px", textAlign: "center",}}
+                                    >Funzione amministratore per creare una nuova categoria</p>
+                                </div>
+                                {isVisibleCat &&
+                                    <CreaCategoria onClose={() => setIsVisibleCat(false)}/>}
+                                <div
+                                    className={"transWhiteBg"}
+                                    onClick={() => {
+                                        closeAllComponents();
+                                        setIsVisibleScen(prevVisibility => !prevVisibility)
+                                    }}>
+                                    <h2>Crea Scenario</h2>
+                                    <p
+                                        style={{fontSize: "14px", textAlign: "center",}}
+                                    >Funzione amministratore per creare un nuovo scenario</p>
+                                </div>
                                 {isVisibleScen && <CreaScenario onClose={() => setIsVisibleScen(false)}/>}
 
-                                <button onClick={() => {
-                                    closeAllComponents();
-                                    setIsVisibleModScen(prevVisibility => !prevVisibility)
-                                }}>
-                                    Modifica Scenario
-                                </button>
+                                <div
+                                    className={"transWhiteBg"}
+                                    onClick={() => {
+                                        closeAllComponents();
+                                        setIsVisibleModScen(prevVisibility => !prevVisibility)
+                                    }}>
+                                    <h2>Modifica Scenario</h2>
+                                    <p
+                                        style={{fontSize: "14px", textAlign: "center",}}
+                                    >Funzione amministratore per modificare uno scenario</p>
+                                </div>
                                 {isVisibleModScen && <ModificaScenario onClose={() => setIsVisibleModScen(false)}/>}
-
-                                <LogoutButton/>
-                            </div>
-                        </section>
-                    }
+                            </>
+                        }
+                    </div>
                 </section>
                 <aside className={"side-nav"}>
                     <h2>Le mie stanze:</h2>
-                    <RoomList />
+                    <RoomList/>
                 </aside>
             </main>
             <footer>

@@ -38,8 +38,8 @@ main {
     }
     section div{
         padding: 5%;
-        width: 400px;
-        height: 300px;
+        width: 500px;
+        height: 400px;
         justify-content: center;
         align-items: center;
         border-radius: 10px;
@@ -63,10 +63,10 @@ button {
     background-color: #002f53; /* Set button background color */
     border: none; /* Remove default border */
     color: white; /* Set text color */
-    border-radius: 10px; /* Add rounded corners */
+    border-radius: 5px; /* Add rounded corners */
     cursor: pointer; /* Change cursor to pointer on hover */
     font-size: large;
-    margin: 5%;
+    margin: 2%;
     transition: background-color 0.5s ease, transform 0.5s ease, box-shadow 0.5s ease; /* Slower transitions */
 }
 
