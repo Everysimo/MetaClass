@@ -98,9 +98,7 @@ public class GestioneStanzaControl {
 
             String metaID = jwtTokenUtil.getMetaIdFromToken(validationToken.getToken());
 
-            if(!stanzaService.creaStanza(s,metaID)){
-                throw new ServerRuntimeException("errore nel salvataggio dell stanza");
-            }
+            stanzaService.creaStanza(s,metaID);
             return ResponseUtils.getResponseOk("Corretto");
 
 
