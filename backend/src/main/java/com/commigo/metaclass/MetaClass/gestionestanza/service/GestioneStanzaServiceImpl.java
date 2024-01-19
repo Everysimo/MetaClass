@@ -275,7 +275,7 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService {
         stanzaRepository.save(s);
 
        StatoPartecipazione sp = new StatoPartecipazione(s, u,
-              getRuolo(Ruolo.ORGANIZZATORE_MASTER), false, false, u.getNome(), true);
+              ruoloRepository.findByNome(Ruolo.ORGANIZZATORE_MASTER), false, false, u.getNome(), true);
 
        statoPartecipazioneRepository.save(sp);
 
@@ -805,22 +805,7 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService {
         return stanzaRepository.findStanzaById(Id);
     }
 
-    /**
-     *
-     * @param nome
-     * @return
-     */
-    public Ruolo getRuolo(String nome) {
 
-        Ruolo ruolo = ruoloRepository.findByNome(nome);
-
-        if (ruolo == null) {
-            ruolo = new Ruolo(nome);
-            System.out.println(ruolo);
-            ruoloRepository.save(ruolo);
-        }
-        return ruolo;
-    }
 
     /**
      *

@@ -103,23 +103,23 @@ public class DataInitializer implements CommandLineRunner {
            //SE VIENE INSERITO UN ORGANIZZATORE_MASTER BANNATO ALLORA DA ERRORE
            //STESSA COSA VALE PER isInAttesa SIA PER ORGANIZZATORI CHE ORGANIZZATORI MASTER
 
-            StatoPartecipazione sp1 = statoPartecipazioneRepository.save(new StatoPartecipazione(s1, u1, stanzaService.getRuolo(ORGANIZZATORE_MASTER), false, false, "Michele", false));
-            StatoPartecipazione sp2 = statoPartecipazioneRepository.save(new StatoPartecipazione(s1, u2, stanzaService.getRuolo(Ruolo.ORGANIZZATORE), false, false, "Francesco", true));
-            StatoPartecipazione sp3 = statoPartecipazioneRepository.save(new StatoPartecipazione(s1, u3, stanzaService.getRuolo(Ruolo.PARTECIPANTE), true, false, "Giorgio", true));
+            StatoPartecipazione sp1 = statoPartecipazioneRepository.save(new StatoPartecipazione(s1, u1, ruoloRepository.findByNome(ORGANIZZATORE_MASTER), false, false, "Michele", false));
+            StatoPartecipazione sp2 = statoPartecipazioneRepository.save(new StatoPartecipazione(s1, u2, ruoloRepository.findByNome(Ruolo.ORGANIZZATORE), false, false, "Francesco", true));
+            StatoPartecipazione sp3 = statoPartecipazioneRepository.save(new StatoPartecipazione(s1, u3, ruoloRepository.findByNome(Ruolo.PARTECIPANTE), true, false, "Giorgio", true));
 
-            StatoPartecipazione sp4 = statoPartecipazioneRepository.save(new StatoPartecipazione(s2, u1, stanzaService.getRuolo(Ruolo.PARTECIPANTE), false, false, "Michele", false));
-            StatoPartecipazione sp5 = statoPartecipazioneRepository.save(new StatoPartecipazione(s2, u2, stanzaService.getRuolo(Ruolo.PARTECIPANTE), false, true, "Francesco", false));
-            StatoPartecipazione sp6 = statoPartecipazioneRepository.save(new StatoPartecipazione(s3, u3, stanzaService.getRuolo(ORGANIZZATORE_MASTER), false, false, "Giorgio", false));
+            StatoPartecipazione sp4 = statoPartecipazioneRepository.save(new StatoPartecipazione(s2, u1, ruoloRepository.findByNome(Ruolo.PARTECIPANTE), false, false, "Michele", false));
+            StatoPartecipazione sp5 = statoPartecipazioneRepository.save(new StatoPartecipazione(s2, u2, ruoloRepository.findByNome(Ruolo.PARTECIPANTE), false, true, "Francesco", false));
+            StatoPartecipazione sp6 = statoPartecipazioneRepository.save(new StatoPartecipazione(s3, u3, ruoloRepository.findByNome(ORGANIZZATORE_MASTER), false, false, "Giorgio", false));
 
-            StatoPartecipazione sp7 = statoPartecipazioneRepository.save(new StatoPartecipazione(s3, u1, stanzaService.getRuolo(Ruolo.PARTECIPANTE), true, false, "Michele", false));
-            StatoPartecipazione sp8 = statoPartecipazioneRepository.save(new StatoPartecipazione(s3, u2, stanzaService.getRuolo(Ruolo.PARTECIPANTE), false, false, "Francesco", true));
-            StatoPartecipazione sp9 = statoPartecipazioneRepository.save(new StatoPartecipazione(s3, u3, stanzaService.getRuolo(ORGANIZZATORE_MASTER), false, false, "Giorgio", true));
+            StatoPartecipazione sp7 = statoPartecipazioneRepository.save(new StatoPartecipazione(s3, u1, ruoloRepository.findByNome(Ruolo.PARTECIPANTE), true, false, "Michele", false));
+            StatoPartecipazione sp8 = statoPartecipazioneRepository.save(new StatoPartecipazione(s3, u2, ruoloRepository.findByNome(Ruolo.PARTECIPANTE), false, false, "Francesco", true));
+            StatoPartecipazione sp9 = statoPartecipazioneRepository.save(new StatoPartecipazione(s3, u3, ruoloRepository.findByNome(ORGANIZZATORE_MASTER), false, false, "Giorgio", true));
 
-            StatoPartecipazione sp10 = statoPartecipazioneRepository.save(new StatoPartecipazione(s4, u5, stanzaService.getRuolo(ORGANIZZATORE_MASTER), false, false, "Carmine", false));
-            StatoPartecipazione sp11 = statoPartecipazioneRepository.save(new StatoPartecipazione(s4, u1, stanzaService.getRuolo(Ruolo.ORGANIZZATORE), false, false, "Michele", false));
-            StatoPartecipazione sp12 = statoPartecipazioneRepository.save(new StatoPartecipazione(s4, u2, stanzaService.getRuolo(Ruolo.PARTECIPANTE), true, false, "Francesco", true));
-            StatoPartecipazione sp13 = statoPartecipazioneRepository.save(new StatoPartecipazione(s4, u3, stanzaService.getRuolo(Ruolo.PARTECIPANTE), false, true, "Giorgio", false));
-            StatoPartecipazione sp14 = statoPartecipazioneRepository.save(new StatoPartecipazione(s4, u4, stanzaService.getRuolo(Ruolo.PARTECIPANTE), false, false, "Domenico", false));
+            StatoPartecipazione sp10 = statoPartecipazioneRepository.save(new StatoPartecipazione(s4, u5, ruoloRepository.findByNome(ORGANIZZATORE_MASTER), false, false, "Carmine", false));
+            StatoPartecipazione sp11 = statoPartecipazioneRepository.save(new StatoPartecipazione(s4, u1, ruoloRepository.findByNome(Ruolo.ORGANIZZATORE), false, false, "Michele", false));
+            StatoPartecipazione sp12 = statoPartecipazioneRepository.save(new StatoPartecipazione(s4, u2, ruoloRepository.findByNome(Ruolo.PARTECIPANTE), true, false, "Francesco", true));
+            StatoPartecipazione sp13 = statoPartecipazioneRepository.save(new StatoPartecipazione(s4, u3, ruoloRepository.findByNome(Ruolo.PARTECIPANTE), false, true, "Giorgio", false));
+            StatoPartecipazione sp14 = statoPartecipazioneRepository.save(new StatoPartecipazione(s4, u4, ruoloRepository.findByNome(Ruolo.PARTECIPANTE), false, false, "Domenico", false));
 
             //Aggiunta meeting
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
