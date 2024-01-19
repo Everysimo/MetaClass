@@ -74,14 +74,14 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService {
 
             //verifico se la stanza è privata o pubblica
             if(stanza.isTipo_Accesso())
-                 return ResponseEntity.ok(new AccessResponse<>(stanza.getId(), "Accesso effettuato con successo", false));
+                return ResponseEntity.ok(new AccessResponse<>(stanza.getId(), "Accesso effettuato con successo", false));
             else
-                 return ResponseEntity.ok(new AccessResponse<>(-2L, "Richiesta accesso alla stanza effettuata", true));
+                 return ResponseEntity.ok(new AccessResponse<>(-1L, "Richiesta accesso alla stanza effettuata", true));
 
         } else if (sp.isBannato()) {
             throw new RuntimeException403("Sei stato bannato da questa stanza, non puoi entrare");
         } else {
-            throw new RuntimeException403("Sei già all'interno di questa stanza");
+            return ResponseEntity.ok(new AccessResponse<>(stanza.getId(), "Sei già all'interno di questa stanza", false));
         }
     }
 
