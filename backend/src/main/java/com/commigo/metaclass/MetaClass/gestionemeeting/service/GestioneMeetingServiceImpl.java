@@ -465,10 +465,6 @@ public class GestioneMeetingServiceImpl implements GestioneMeetingService{
         if((u=utenteRepository.findFirstByMetaId(metaId))==null)
             throw new ServerRuntimeException("errore nella ricerca dell'utente");
 
-        //controllo della valutazione
-        if(value == null || (value<1 || value>5))
-            throw new RuntimeException403("valore non valido");
-
         Meeting m;
         if((m = meetingRepository.findMeetingById(id_meeting))==null){
             throw new RuntimeException403("meeting non trovato");
@@ -482,6 +478,10 @@ public class GestioneMeetingServiceImpl implements GestioneMeetingService{
         //controllo se il questionario già è stato compilato
         if(fm.isCompiledQuestionario())
             throw new RuntimeException403("questionario già compilato");
+
+        //determino che il questionario è salvato
+        fm.setCompiledQuestionario(true);
+        feedbackMeetingRepository.save(fm);
 
         //se non è compilato allora procedo con la compilazione
         Scenario sc = m.getScenario_iniziale();

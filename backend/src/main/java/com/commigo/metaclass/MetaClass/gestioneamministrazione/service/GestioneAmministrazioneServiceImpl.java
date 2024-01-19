@@ -2,19 +2,26 @@ package com.commigo.metaclass.MetaClass.gestioneamministrazione.service;
 
 import com.commigo.metaclass.MetaClass.entity.*;
 import com.commigo.metaclass.MetaClass.exceptions.RuntimeException403;
+import com.commigo.metaclass.MetaClass.exceptions.ServerRuntimeException;
 import com.commigo.metaclass.MetaClass.gestioneamministrazione.repository.CategoriaRepository;
 import com.commigo.metaclass.MetaClass.gestioneamministrazione.repository.ImmagineRepository;
 import com.commigo.metaclass.MetaClass.gestioneamministrazione.repository.ScenarioRepository;
 import com.commigo.metaclass.MetaClass.gestionestanza.repository.StanzaRepository;
 import com.commigo.metaclass.MetaClass.gestionestanza.repository.StatoPartecipazioneRepository;
 import com.commigo.metaclass.MetaClass.gestioneutenza.repository.UtenteRepository;
+import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-@Service("GestioneAmministrazioneService")
+@Service
+@RequiredArgsConstructor
+@Slf4j
+@Transactional
 public class GestioneAmministrazioneServiceImpl implements GestioneAmministrazioneService{
 
     @Autowired
@@ -63,11 +70,12 @@ public class GestioneAmministrazioneServiceImpl implements GestioneAmministrazio
      * @return valore boolean che identifica il successo dell'operazione
      */
     @Override
-    public boolean updateScenario(Scenario s, long IdCategoria) {
+    public boolean updateScenario(Scenario s, long IdCategoria) throws ServerRuntimeException {
 
         //gestione della categoria
         Categoria cat;
-        if((cat = categoriaRepository.findById(IdCategoria))==null)   return false;
+        if((cat = categoriaRepository.findById(IdCategoria))==null)
+            throw new ServerRuntimeException("categoria non valida");
 
         s.setCategoria(cat);
 
@@ -75,11 +83,11 @@ public class GestioneAmministrazioneServiceImpl implements GestioneAmministrazio
         s.setImage(image);
 
         //getsione dello scenario
-        if((scenarioRepository.findByNome(s.getNome()))==null){
-            scenarioRepository.save(s);
-            return true;
-        }
-        return false;
+        if((scenarioRepository.findByNome(s.getNome()))!=null)
+            throw new ServerRuntimeException("Il nome dello scenario"+s.getNome()+"già è in uso");
+
+        scenarioRepository.save(s);
+        return true;
     }
 
     /**

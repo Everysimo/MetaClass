@@ -85,7 +85,6 @@ class GestioneMeetingControllerUnitTest {
     private StanzaRepository stanzaRepository;
     @InjectMocks
     private GestioneMeetingController meetingController;
-
     private static final int CLIENT_ERROR_STATUS = 400;
     private static final int SUCCESSFUL_STATUS = 200;
     private Stanza stanza;
@@ -234,17 +233,18 @@ class GestioneMeetingControllerUnitTest {
 
     private void testExpectedResult(int status, ResultActions actualPerformResult) throws Exception {
 
-        if(status==CLIENT_ERROR_STATUS)
-            actualPerformResult.andExpect(status().is4xxClientError());
-        else if(status==SUCCESSFUL_STATUS)
-            actualPerformResult.andExpect(status().is2xxSuccessful());
-
         MvcResult mvcResult = actualPerformResult.andReturn();
         int resultStatus = mvcResult.getResponse().getStatus();
         String responseContent = mvcResult.getResponse().getContentAsString();
 
         System.out.println("Actual Status: " + resultStatus);
         System.out.println("Response Content: " + responseContent);
+
+        if(status==CLIENT_ERROR_STATUS)
+            actualPerformResult.andExpect(status().is4xxClientError());
+        else if(status==SUCCESSFUL_STATUS)
+            actualPerformResult.andExpect(status().is2xxSuccessful());
+
     }
 
     /**
@@ -465,6 +465,67 @@ class GestioneMeetingControllerUnitTest {
         }
     }
 
+    @Test
+    public void testCompilazioneQuestionarioOnTestCase1(){
+
+        valutazione = -1;
+        // Simula un token valido
+        when(validationToken.isTokenValid(any(HttpServletRequest.class))).thenReturn(true);
+
+        try{
+
+            //vedere i metodi private testExpectedResult e sendRequest
+            testExpectedResult(CLIENT_ERROR_STATUS, sendRequestQuestionario());
+
+        } catch (Exception e) {
+            fail("Exception not expected: " + e.getMessage());
+        }
+    }
+
+    @Test
+    public void testCompilazioneQuestionarioOnTestCase2(){
+
+        String json = "{\"valutazione\":\"b\"}";
+        System.out.println(json);
+        // Simula un token valido
+        when(validationToken.isTokenValid(any(HttpServletRequest.class))).thenReturn(true);
+
+        try{
+
+
+            //formattamento della richiesta
+            MockHttpServletRequestBuilder requestBuilder =
+                    MockMvcRequestBuilders.post(API_URL_Compilazione)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(json)
+                            .header("Authorization", "Bearer TODO");
+
+            //ritorno della risposta
+            ResultActions ra = MockMvcBuilders.standaloneSetup(meetingController)
+                    .build()
+                    .perform(requestBuilder);
+
+            testExpectedResult(CLIENT_ERROR_STATUS,ra);
+
+
+
+        } catch (Exception e) {
+            fail("Exception not expected: " + e.getMessage());
+        }
+    }
+    @Test
+    public void testCompilaQuestionarioOnServerFailure() throws Exception {
+        valutazione = 5;
+        when(validationToken.isTokenValid(any())).thenReturn(true);
+
+        when(meetingService.compilaQuestionario(valutazione, utente.getMetaId(), meeting.getId()))
+                .thenThrow(ServerRuntimeException.class);
+
+        //vedere i metodi private testExpectedResult e sendRequest
+        sendRequestServerFailureQuestionario(ServerRuntimeException.class);
+    }
+
+
     private String JSONConvertitorQuestionario(){
         //CREAAZIONE DEL BODY DELLA RICHIESTA
         //Converto l'istanza meeting in una stringa JSON accettabile del controller
@@ -485,7 +546,6 @@ class GestioneMeetingControllerUnitTest {
      */
     private ResultActions sendRequestQuestionario() throws Exception {
 
-
         //formattamento della richiesta
         MockHttpServletRequestBuilder requestBuilder =
                 MockMvcRequestBuilders.post(API_URL_Compilazione)
@@ -497,6 +557,36 @@ class GestioneMeetingControllerUnitTest {
         return  MockMvcBuilders.standaloneSetup(meetingController)
                 .build()
                 .perform(requestBuilder);
+    }
+
+    private void sendRequestServerFailureQuestionario(Class<? extends Exception> exceptionClass) throws Exception {
+        // Formattamento della richiesta
+        MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders
+                .post(API_URL_Compilazione)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(JSONConvertitorQuestionario())  // Metodo privato della classe
+                .header("Authorization", "Bearer TODO");
+
+        try {
+            // Forza il metodo creaScheduling a lanciare un'eccezione ServerRuntimeException
+            doThrow(exceptionClass)
+                    .when(meetingService).compilaQuestionario(any(),any(), any());
+
+            // Esecuzione della richiesta e ritorno della risposta
+            MvcResult result = MockMvcBuilders
+                    .standaloneSetup(meetingController)
+                    .build()
+                    .perform(requestBuilder)
+                    .andReturn();
+
+            // Verifica del codice di stato
+            int statusCode = result.getResponse().getStatus();
+            assertThat(statusCode).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
+
+        } finally {
+            // Ripristina il comportamento normale del metodo creaScheduling dopo il test
+            Mockito.reset(meetingService);
+        }
     }
 
 }
