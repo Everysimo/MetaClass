@@ -32,7 +32,6 @@ import java.util.Map;
 public class GestioneStanzaControl {
 
     @Autowired
-    @Qualifier("GestioneStanzaService")
     private GestioneStanzaService stanzaService;
 
     @Autowired

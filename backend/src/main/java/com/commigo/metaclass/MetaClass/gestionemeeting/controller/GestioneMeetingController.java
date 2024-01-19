@@ -307,7 +307,7 @@ public class GestioneMeetingController {
     @PostMapping("/compilaQuestionario/{id_meeting}")
     public ResponseEntity<Response<Boolean>> compilaQuestionario(@RequestBody String JSONvalue,
                                                                  @PathVariable Long id_meeting,
-                                                                 HttpServletRequest request) {
+                                                                 HttpServletRequest request) throws Exception{
 
         try {
             //controllo token
@@ -319,13 +319,21 @@ public class GestioneMeetingController {
             JsonNode jsonNode = objectMapper.readTree(JSONvalue);
             JsonNode valutazioneNode = jsonNode.get("valutazione");
 
-            int value = (valutazioneNode != null && !valutazioneNode.isNull()) ? valutazioneNode.asInt() : 0;
-            if(value==0)
+            int value;
+            if(valutazioneNode.isNull())
                 throw new RuntimeException403("inserire 'valutazione' come attributo");
+            if(!valutazioneNode.isInt())
+                throw new RuntimeException403("inserire un valore intero [1,5]");
+            value = valutazioneNode.asInt();
+            //controllo della valutazione
+            if(value<1 || value>5){
+                throw new RuntimeException403("valore non valido");
+            }
 
             String metaID = jwtTokenUtil.getMetaIdFromToken(validationToken.getToken());
 
             meetingService.compilaQuestionario(value, metaID, id_meeting);
+
             return ResponseEntity.ok(new Response<>
                     (true,"questionario compilato con successo"));
 
@@ -335,8 +343,6 @@ public class GestioneMeetingController {
         }catch (ServerRuntimeException se) {
             return ResponseEntity.status(500)
                     .body(new Response<>(null, se.getMessage()));
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
         }
     }
 

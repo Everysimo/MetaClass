@@ -15,7 +15,9 @@ import com.commigo.metaclass.MetaClass.utility.response.types.Response;
 import com.commigo.metaclass.MetaClass.webconfig.JwtTokenUtil;
 import com.commigo.metaclass.MetaClass.webconfig.ValidationToken;
 import jakarta.transaction.Transactional;
+import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,8 +26,10 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Map;
 
-@Service("GestioneStanzaService")
+@Service
 @RequiredArgsConstructor
+@NoArgsConstructor(force = true)   //nel caso non funziona nulla, eliminate sta riga
+@Slf4j
 @Transactional    //ogni operazione è una transazione
 public class GestioneStanzaServiceImpl implements GestioneStanzaService {
 

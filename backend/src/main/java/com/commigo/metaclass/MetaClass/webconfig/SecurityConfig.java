@@ -1,5 +1,8 @@
 package com.commigo.metaclass.MetaClass.webconfig;
 
+import com.commigo.metaclass.MetaClass.gestionestanza.controller.GestioneStanzaControl;
+import com.commigo.metaclass.MetaClass.gestionestanza.service.GestioneStanzaService;
+import com.commigo.metaclass.MetaClass.gestionestanza.service.GestioneStanzaServiceImpl;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;

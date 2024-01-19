@@ -1,4 +1,4 @@
-package com.commigo.metaclass.MetaClass.gestioneamministrazione.control;
+package com.commigo.metaclass.MetaClass.gestioneamministrazione.controller;
 
 import com.commigo.metaclass.MetaClass.entity.Categoria;
 import com.commigo.metaclass.MetaClass.entity.Scenario;
@@ -15,7 +15,6 @@ import com.commigo.metaclass.MetaClass.webconfig.ValidationToken;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -35,7 +34,6 @@ import java.util.Set;
 public class GestioneAmministrazioneController {
 
     @Autowired
-    @Qualifier("GestioneAmministrazioneService")
     private GestioneAmministrazioneService gestioneamministrazione;
 
     @Autowired
@@ -204,14 +202,12 @@ public class GestioneAmministrazioneController {
                 throw new RuntimeException403(RequestUtils.errorsRequest(result));
             }
 
-            if (!gestioneamministrazione.updateScenario(s, s.getCategoria().getId())) {
-                throw new ServerRuntimeException("Errore durante l'inserimento dello scenario");
-            } else {
-                return ResponseEntity.ok(new Response<>(true, "scenario creato con successo"));
-            }
+            gestioneamministrazione.updateScenario(s, s.getCategoria().getId());
+            return ResponseEntity.ok(new Response<>(true, "scenario creato con successo"));
+
         }catch(RuntimeException403 e){
             return ResponseEntity.status(403).body(new Response<>(false, e.getMessage()));
-        }  catch (ServerRuntimeException e) {
+        }catch (ServerRuntimeException e) {
             return ResponseEntity.status(500).body(new Response<>(false, e.getMessage()));
         }
     }
