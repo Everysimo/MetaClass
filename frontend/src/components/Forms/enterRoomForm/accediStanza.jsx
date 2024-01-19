@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import '../PopUpStyles.css';
 import {wait} from "@testing-library/user-event/dist/utils";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
@@ -41,7 +42,7 @@ const AccediStanza = () => {
         }
 
         const dataToSend = {
-            codice,
+            codice
         };
         const requestOption = {
             method: 'POST',
@@ -58,7 +59,7 @@ const AccediStanza = () => {
             const responseData = await response.json();
             console.log("Risposta dal server:", responseData);
             wait(1000)
-            if (responseData && responseData.value) {
+            if (responseData) {
                 console.log(responseData.message);
                 setErrorMessage(responseData.message);
                 setDisplayOKButton(true);
