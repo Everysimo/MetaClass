@@ -4,6 +4,7 @@ import '../PopUpStyles.css';
 import {wait} from "@testing-library/user-event/dist/utils";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faDoorOpen} from "@fortawesome/free-solid-svg-icons";
+import {useNavigate} from "react-router-dom";
 
 const AccediStanza = () => {
     const [showModal, setShowModal] = useState(false);
@@ -12,10 +13,11 @@ const AccediStanza = () => {
     const [formReset, setFormReset] = useState(false);
     const [displayOKButton, setDisplayOKButton] = useState(false);
 
+    const navigate = useNavigate();
+
     const handleShowModal = () => {
         setShowModal(true);
     };
-
     const handleCloseModal = () => {
         setShowModal(false);
         resetForm();
@@ -61,8 +63,14 @@ const AccediStanza = () => {
             wait(1000)
             if (responseData) {
                 console.log(responseData.message);
+                console.log(responseData.value);
+                setErrorMessage(responseData.message);
+            }
+            if(responseData.value>0)
+            {
                 setErrorMessage(responseData.message);
                 setDisplayOKButton(true);
+                navigate(`/SingleRoom/${responseData.value}`);
             }
         }
         catch (error) {
@@ -90,7 +98,7 @@ const AccediStanza = () => {
                 <p
                     style={{fontSize: "14px", textAlign: "center",}}
                 >
-                    Se in possesso di un codice di accesso, entra ad una stanza privata
+                    Se in possesso di un codice di accesso, entra ad una stanza.
                 </p>
             </div>
             {showModal && (
@@ -111,7 +119,7 @@ const AccediStanza = () => {
                         </label>
                         {errorMessage && <p>{errorMessage}</p>}
                         {displayOKButton && <button onClick={resetForm}>OK</button>}
-                        {!displayOKButton && <button onClick={() => setCodice('')}>Cancella</button>}
+                        {!displayOKButton && <button onClick={resetForm}>Cancella</button>}
                         {!displayOKButton && <button onClick={sendDataToServer}>Invia</button>}
                     </div>
                 </div>
