@@ -76,7 +76,7 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService {
             if(stanza.isTipo_Accesso())
                  return ResponseEntity.ok(new AccessResponse<>(stanza.getId(), "Accesso effettuato con successo", false));
             else
-                 return ResponseEntity.ok(new AccessResponse<>(-1L, "Richiesta accesso alla stanza effettuata", true));
+                 return ResponseEntity.ok(new AccessResponse<>(-2L, "Richiesta accesso alla stanza effettuata", true));
 
         } else if (sp.isBannato()) {
             throw new RuntimeException403("Sei stato bannato da questa stanza, non puoi entrare");
