@@ -52,4 +52,6 @@ public interface StatoPartecipazioneRepository extends JpaRepository<StatoPartec
     @Query("SELECT sp.utente FROM StatoPartecipazione sp WHERE sp.isInAttesa=true AND  sp.isBannato=false and sp.stanza.id = :id")
     List<Utente> findUtentiInAttesaInStanza(@Param("id") Long id);
 
+    void deleteAllByStanza(Stanza s);
+
 }
