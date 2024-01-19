@@ -28,7 +28,6 @@ import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
-@NoArgsConstructor(force = true)   //nel caso non funziona nulla, eliminate sta riga
 @Slf4j
 @Transactional    //ogni operazione è una transazione
 public class GestioneStanzaServiceImpl implements GestioneStanzaService {
