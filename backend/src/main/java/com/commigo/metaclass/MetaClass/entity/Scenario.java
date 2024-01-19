@@ -76,7 +76,7 @@ public class Scenario {
     @JsonCreator
     public Scenario(@JsonProperty("nome") String Nome,
                     @JsonProperty("descrizione") String Descrizione,
-                    @JsonProperty("url_immagine") @URL String url ,
+                    @JsonProperty("url_immagine") String url ,
                     @JsonProperty("id_categoria") Long idCategoria) throws MismatchJsonProperty {
 
         if (Nome == null || Descrizione == null || url == null || idCategoria == null) {
