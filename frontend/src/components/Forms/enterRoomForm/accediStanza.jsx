@@ -60,7 +60,7 @@ const AccediStanza = () => {
             const response = await fetch('http://localhost:8080/accessoStanza', requestOption);
             const responseData = await response.json();
             console.log("Risposta dal server:", responseData);
-            wait(1000)
+            resetForm();
             if (responseData) {
                 console.log(responseData.message);
                 console.log(responseData.value);
