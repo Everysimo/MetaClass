@@ -418,9 +418,11 @@ public class GestioneMeetingServiceImpl implements GestioneMeetingService{
             throw  new RuntimeException403("non hai partecipato ancora a nessun meeting");
 
         return feedbacks.stream()
-                        .map(FeedbackMeeting::getMeeting)
-                        .filter(meeting -> !meeting.isAvviato())
-                        .collect(Collectors.toList());
+                .filter(feedbackMeeting -> !feedbackMeeting.isCompiledQuestionario())
+                .map(FeedbackMeeting::getMeeting)
+                .filter(meeting -> !meeting.isAvviato())
+                .collect(Collectors.toList());
+
 
     }
 
