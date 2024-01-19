@@ -1,11 +1,14 @@
 package com.commigo.metaclass.MetaClass.gestionestanza.controller;
 
 import com.commigo.metaclass.MetaClass.entity.*;
+import com.commigo.metaclass.MetaClass.exceptions.CustomExceptionHandler;
 import com.commigo.metaclass.MetaClass.exceptions.ServerRuntimeException;
 import com.commigo.metaclass.MetaClass.gestionemeeting.service.GestioneMeetingService;
 import com.commigo.metaclass.MetaClass.gestionestanza.repository.StanzaRepository;
+import com.commigo.metaclass.MetaClass.gestionestanza.service.GestioneStanzaService;
 import com.commigo.metaclass.MetaClass.webconfig.JwtTokenUtil;
 import com.commigo.metaclass.MetaClass.webconfig.ValidationToken;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -49,7 +52,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 
 @RunWith(SpringRunner.class)
-@ContextConfiguration(classes = GestioneStanzaControl.class)
+@ContextConfiguration(classes ={GestioneStanzaControl.class,CustomExceptionHandler.class})
 @ExtendWith(MockitoExtension.class)
 @SpringBootTest
 class GestioneStanzaControllerUnitTest {
@@ -59,7 +62,7 @@ class GestioneStanzaControllerUnitTest {
      *  metodo durante i test.
      */
     @MockBean
-    private GestioneMeetingService meetingService;
+    private GestioneStanzaService stanzaService;
     @MockBean
     private ValidationToken validationToken;
     @MockBean
@@ -67,7 +70,7 @@ class GestioneStanzaControllerUnitTest {
     @MockBean
     private StanzaRepository stanzaRepository;
     @InjectMocks
-    private GestioneStanzaControl meetingController;
+    private GestioneStanzaControl stanzaController;
     private static final int CLIENT_ERROR_STATUS = 400;
     private static final int SUCCESSFUL_STATUS = 200;
     private Stanza stanza;
@@ -84,8 +87,7 @@ class GestioneStanzaControllerUnitTest {
     private DateTimeFormatter notCorrectFormatter;
     private FeedbackMeeting feedbackMeeting;
     private Report report;
-    private final String API_URL_Scheduling = "/schedulingMeeting";
-    private final String API_URL_Compilazione = "/compilaQuestionario/1";
+    private final String API_URL_CREASTANZA = "/creastanza";
     private Integer valutazione;
 
 
@@ -111,11 +113,10 @@ class GestioneStanzaControllerUnitTest {
 
         report = new Report(1L, 500, Duration.ZERO, 550, meeting, List.of(utente));
 
-        feedbackMeeting = new FeedbackMeeting(utente, meeting, report);
         bindingResult = new BeanPropertyBindingResult(meeting, "meeting");
     }
 
-    private String JSONConvertitorMeeting(Meeting meeting){
+    private String JSONConvertitorStanza(Stanza stanza){
         //CREAAZIONE DEL BODY DELLA RICHIESTA
         //Converto l'istanza meeting in una stringa JSON accettabile del controller
         ObjectMapper objectMapper = new ObjectMapper();
@@ -123,82 +124,54 @@ class GestioneStanzaControllerUnitTest {
         ObjectNode jsonNode = objectMapper.createObjectNode();
 
         // Aggiunta degli attributi uno per uno
-        jsonNode.put("nome", meeting.getNome());
-        jsonNode.put("id_stanza", meeting.getStanza().getId());
-        jsonNode.put("inizio", meeting.getInizio().format(formatter));
-        jsonNode.put("fine", meeting.getFine().format(formatter));
+        jsonNode.put("nome", stanza.getNome());
+        jsonNode.put("descrizione", stanza.getDescrizione());
+        jsonNode.put("tipoAccesso", stanza.isTipo_Accesso());
+        jsonNode.put("maxPosti", stanza.getMax_Posti());
+        jsonNode.put("id_scenario", stanza.getScenario().getId());
 
         return jsonNode.toString();
     }
 
     /**
-     * metodo che prende un meeting e invia la richiesta al server
-     * @param meeting
+     * metodo che prende una stanza e invia la richiesta al server
+     * @param stanza
      * @retrun ResultActions
      * @throws Exception
      */
-    private ResultActions sendRequestMeeting(Meeting meeting) throws Exception {
+    private ResultActions sendRequestStanza(Stanza stanza) throws Exception {
 
 
         //formattamento della richiesta
         MockHttpServletRequestBuilder requestBuilder =
-                MockMvcRequestBuilders.post(API_URL_Scheduling)
+                MockMvcRequestBuilders.post(API_URL_CREASTANZA)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(JSONConvertitorMeeting(meeting))     //metodo privato della classe
+                        .content(JSONConvertitorStanza(stanza))     //metodo privato della classe
                         .header("Authorization", "Bearer TODO");
 
         //ritorno della risposta
-        return  MockMvcBuilders.standaloneSetup(meetingController)
+        return  MockMvcBuilders.standaloneSetup(stanzaController)
                 .build()
                 .perform(requestBuilder);
-    }
-
-    public ResultActions sendBadRequestMeeting(Meeting meeting, String inizio, String fine) throws Exception {
-
-        //CREAZIONE DEL BODY DELLA RICHIESTA
-        //Converto l'istanza meeting in una stringa JSON accettabile del controller
-        ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.registerModule(new JavaTimeModule());
-        ObjectNode jsonNode = objectMapper.createObjectNode();
-
-        // Aggiunta degli attributi uno per uno
-        jsonNode.put("nome", meeting.getNome());
-        jsonNode.put("inizio", "2024-02-02 18,00");
-        jsonNode.put("fine", fine);
-        jsonNode.put("id_stanza", 1);
-        System.out.println(meeting.getInizio().format(formatter));
-
-        //formattamento della richiesta
-        MockHttpServletRequestBuilder requestBuilder =
-                MockMvcRequestBuilders.post(API_URL_Scheduling)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(jsonNode.toString())     //metodo privato della classe
-                        .header("Authorization", "Bearer TODO");
-
-        //ritorno della risposta
-        return  MockMvcBuilders.standaloneSetup(meetingController)
-                .build()
-                .perform(requestBuilder);
-
     }
 
     //metodo che produce una richiesta testa un errore 500 durante la richiesta
-    private void sendRequestServerFailureMeetinng(Meeting meeting) throws Exception {
+    private void sendRequestServerFailureStanza(Stanza stanza) throws Exception {
         // Formattamento della richiesta
         MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders
-                .post(API_URL_Scheduling)
+                .post(API_URL_CREASTANZA)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(JSONConvertitorMeeting(meeting))  // Metodo privato della classe
+                .content(JSONConvertitorStanza(stanza))  // Metodo privato della classe
                 .header("Authorization", "Bearer TODO");
 
         try {
-            // Forza il metodo creaScheduling a lanciare un'eccezione ServerRuntimeException
+            // Forza il metodo creaStanza a lanciare un'eccezione ServerRuntimeException
             doThrow(ServerRuntimeException.class)
-                    .when(meetingService).creaScheduling(any(), any());
+                    .when(stanzaService).creaStanza(any(), any());
 
             // Esecuzione della richiesta e ritorno della risposta
             MvcResult result = MockMvcBuilders
-                    .standaloneSetup(meetingController)
+                    .standaloneSetup(stanzaController)
                     .build()
                     .perform(requestBuilder)
                     .andReturn();
@@ -209,7 +182,7 @@ class GestioneStanzaControllerUnitTest {
 
         } finally {
             // Ripristina il comportamento normale del metodo creaScheduling dopo il test
-            Mockito.reset(meetingService);
+            Mockito.reset(stanzaService);
         }
     }
 
@@ -231,13 +204,13 @@ class GestioneStanzaControllerUnitTest {
     }
 
     /**
-     * testing scheduling meeting
-     * per ogni test case vado a richiamare un metodo che mi valida dei meeting volontariamente
-     * errati per testare i messaggi di errori che vengono ritornati
+     * testing crea stanza
+     * per ogni test case vado a richiamare un metodo che valida delle stanze volontariamente
+     * errate per testare i messaggi di errori che vengono ritornati
      * successivamente si controlla ogni istruzione del metodo
      */
     @Test
-    public void testSchedulingMeetingOnSuccess(){
+    public void testCreaStanzaOnSuccess(){
 
         // Simula un token valido
         when(validationToken.isTokenValid(any(HttpServletRequest.class))).thenReturn(true);
@@ -246,10 +219,10 @@ class GestioneStanzaControllerUnitTest {
                 .thenReturn(utente.getMetaId());
 
         try{
-            when(meetingService.creaScheduling(meeting, utente.getMetaId())).thenReturn(true);
+            when(stanzaService.creaStanza(stanza, utente.getMetaId())).thenReturn(true);
 
             //vedere i metodi private testExpectedResult e sendRequest
-            testExpectedResult(SUCCESSFUL_STATUS, sendRequestMeeting(meeting));
+            testExpectedResult(SUCCESSFUL_STATUS, sendRequestStanza(stanza));
 
         } catch (Exception e) {
             fail("Exception not expected: " + e.getMessage());
@@ -258,318 +231,172 @@ class GestioneStanzaControllerUnitTest {
     }
 
     @Test
-    public void testSchedulingMeetingOnTokenValidationFailed() throws Exception {
+    public void testCreaStanzaOnTokenValidationFailed() throws Exception {
 
         when(validationToken.isTokenValid(any())).thenReturn(false);
 
-        testExpectedResult(CLIENT_ERROR_STATUS, sendRequestMeeting(meeting));
+        testExpectedResult(CLIENT_ERROR_STATUS, sendRequestStanza(stanza));
 
     }
 
     @Test
-    public void testSchedulingMeetingOnServerFailure() throws Exception {
+    public void testCreaStanzaOnServerFailure() throws Exception {
         when(validationToken.isTokenValid(any())).thenReturn(true);
 
         // Simula la decodifica del token e restituisce un metaID valido
         when(jwtTokenUtil.getMetaIdFromToken(validationToken.getToken()))
                 .thenReturn(utente.getMetaId());
 
-        when(meetingService.creaScheduling(meeting, utente.getMetaId()))
+        when(stanzaService.creaStanza(stanza, utente.getMetaId()))
                 .thenThrow(ServerRuntimeException.class);
 
         //vedere i metodi private testExpectedResult e sendRequest
-        sendRequestServerFailureMeetinng(meeting);
+        sendRequestServerFailureStanza(stanza);
     }
 
     @Test
-    public void testSchedulingMeetingOnTestCase1() throws Exception {
+    public void testCreaStanzaOnTestCase1() throws Exception {
 
         when(validationToken.isTokenValid(any())).thenReturn(true);
 
-        meeting.setNome("N");
-        testExpectedResult(CLIENT_ERROR_STATUS, sendRequestMeeting(meeting));
+        stanza.setNome("C");
+        testExpectedResult(CLIENT_ERROR_STATUS, sendRequestStanza(stanza));
 
     }
 
     @Test
-    public void testSchedulingMeetingOnTestCase2() throws Exception {
+    public void testCreaStanzaOnTestCase2() throws Exception {
 
         when(validationToken.isTokenValid(any())).thenReturn(true);
 
-        meeting.setNome("Meeting#");
-        testExpectedResult(CLIENT_ERROR_STATUS, sendRequestMeeting(meeting));
+        stanza.setNome("1Stanza");
+        testExpectedResult(CLIENT_ERROR_STATUS, sendRequestStanza(stanza));
 
     }
 
     @Test
-    public void testSchedulingMeetingOnTestCase3() throws Exception {
+    public void testCreaStanzaOnTestCase5() throws Exception {
+
+        when(validationToken.isTokenValid(any())).thenReturn(true);
+        stanza.setDescrizione("");
+        testExpectedResult(CLIENT_ERROR_STATUS, sendRequestStanza(stanza));
+    }
+
+    @Test
+    public void testCreaStanzaOnTestCase6() throws Exception {
 
         when(validationToken.isTokenValid(any())).thenReturn(true);
 
-        meeting.setNome("Meeting1");
-        meeting.setInizio(LocalDateTime.parse("2024-02-02 20:00",formatter));
-        testExpectedResult(CLIENT_ERROR_STATUS, sendRequestMeeting(meeting));
-
+        stanza.setDescrizione("Una stanza virtuale luminosa e moderna, con pareti bianche e una grande finestra virtuale che offre una vista su un cielo azzurro. Al centro, un tavolo digitale circondato da sedie ergonomiche, mentre schermi fluttuanti mostrano presentazioni e volti sorridenti dei partecipanti. Ambientazione accogliente e tecnologica, perfetta per incontri online produttivi.");
+        testExpectedResult(CLIENT_ERROR_STATUS, sendRequestStanza(stanza));
     }
 
     @Test
-    public void testSchedulingMeetingOnTestCase4() throws Exception {
+    public void testCreaStanzaOnTestCase7() throws Exception {
 
         when(validationToken.isTokenValid(any())).thenReturn(true);
 
-        meeting.setInizio(LocalDateTime.parse("2024-02-02 22:00",formatter));
-        testExpectedResult(CLIENT_ERROR_STATUS, sendRequestMeeting(meeting));
+        stanza.setDescrizione("questa stanza funge da esempio.");
+        testExpectedResult(CLIENT_ERROR_STATUS, sendRequestStanza(stanza));
 
     }
 
     @Test
-    public void testSchedulingMeetingOnTestCase5() throws Exception {
-
-        when(validationToken.isTokenValid(any())).thenReturn(true);
-        meeting.setStanza(stanza);
-        testExpectedResult(CLIENT_ERROR_STATUS, sendBadRequestMeeting(meeting,"2024-02-02 18,00",
-                "2024-02-02 22:00"));
-
-    }
-
-    @Test
-    public void testSchedulingMeetingOnTestCase6() throws Exception {
+    public void testCreaStanzaOnTestCase9() throws Exception {
 
         when(validationToken.isTokenValid(any())).thenReturn(true);
 
-        meeting.setInizio(LocalDateTime.parse("2024-02-02 18:00",formatter));
-        meeting.setFine(LocalDateTime.parse("2024-02-02 18:00",formatter));
-        testExpectedResult(CLIENT_ERROR_STATUS, sendRequestMeeting(meeting));
+        stanza.setMax_Posti(0);
+        testExpectedResult(CLIENT_ERROR_STATUS, sendRequestStanza(stanza));
 
     }
 
     @Test
-    public void testSchedulingMeetingOnTestCase7() throws Exception {
+    public void testCreaStanzaOnTestCase10() throws Exception {
 
         when(validationToken.isTokenValid(any())).thenReturn(true);
 
-        meeting.setFine(LocalDateTime.parse("2024-02-02 16:00",formatter));
-        testExpectedResult(CLIENT_ERROR_STATUS, sendRequestMeeting(meeting));
-
+        stanza.setMax_Posti(1000);
+        testExpectedResult(CLIENT_ERROR_STATUS, sendRequestStanza(stanza));
     }
 
     @Test
-    public void testSchedulingMeetingOnTestCase8() throws Exception {
+    public void testCreaStanzaOnTestCase11() throws Exception {
 
-        when(validationToken.isTokenValid(any())).thenReturn(true);
-
-        try{
-            meeting.setFine(LocalDateTime.parse("2024-02-02 16:00",formatter));
-        }catch(DateTimeParseException e){
-            testExpectedResult(CLIENT_ERROR_STATUS, sendRequestMeeting(meeting));
-        }
-
-    }
-
-    @Test
-    public void testSchedulingMeetingOnTestCase9() throws Exception {
-
-        when(validationToken.isTokenValid(any())).thenReturn(true);
-
-        meeting.setInizio(LocalDateTime.now().minusDays(1));
-        testExpectedResult(CLIENT_ERROR_STATUS, sendRequestMeeting(meeting));
-
-        meeting.setInizio(LocalDateTime.parse("2024-02-02 18:00",formatter));
-        meeting.setFine(LocalDateTime.now().minusDays(1));
-
-        testExpectedResult(CLIENT_ERROR_STATUS, sendRequestMeeting(meeting));
-
-    }
-
-    @Test
-    public void testSchedulingMeetingOnTestCase10() throws Exception {
-
-        try{
-            meeting.setInizio(LocalDateTime.parse("2024-02-02 18,00",notCorrectFormatter));
-        }catch(DateTimeParseException e){
-            try{
-                meeting.setFine(LocalDateTime.parse("2024-02-02 18,00",notCorrectFormatter));
-            }catch(DateTimeParseException ex){
-                testExpectedResult(CLIENT_ERROR_STATUS, sendRequestMeeting(meeting));
-            }
-            testExpectedResult(CLIENT_ERROR_STATUS, sendRequestMeeting(meeting));
-        }
-
-    }
-
-    @Test
-    public void testCompilazioneQuestionarioOnSuccess(){
-
-        valutazione = 5;
-        // Simula un token valido
-        when(validationToken.isTokenValid(any(HttpServletRequest.class))).thenReturn(true);
-
-        // Simula la decodifica del token e restituisce un metaID valido
-        when(jwtTokenUtil.getMetaIdFromToken(anyString())).thenReturn(utente.getMetaId());
-
-        try{
-            //vedere i metodi private testExpectedResult e sendRequest
-            testExpectedResult(SUCCESSFUL_STATUS, sendRequestQuestionario());
-
-        } catch (Exception e) {
-            fail("Exception not expected: " + e.getMessage());
-        }
-    }
-
-    @Test
-    public void testCompilazioneQuestionarioOnFailureToken(){
-
-        valutazione = 5;
-        // Simula un token valido
-        when(validationToken.isTokenValid(any(HttpServletRequest.class))).thenReturn(false);
-
-        try{
-            //vedere i metodi private testExpectedResult e sendRequest
-            testExpectedResult(CLIENT_ERROR_STATUS, sendRequestQuestionario());
-
-        } catch (Exception e) {
-            fail("Exception not expected: " + e.getMessage());
-        }
-    }
-
-    @Test
-    public void testCompilazioneQuestionarioOnFailureValueNotInsert(){
-
-        valutazione = null;
-        // Simula un token valido
-        when(validationToken.isTokenValid(any(HttpServletRequest.class))).thenReturn(true);
-
-        try{
-            //vedere i metodi private testExpectedResult e sendRequest
-            testExpectedResult(CLIENT_ERROR_STATUS, sendRequestQuestionario());
-
-        } catch (Exception e) {
-            fail("Exception not expected: " + e.getMessage());
-        }
-    }
-
-    @Test
-    public void testCompilazioneQuestionarioOnTestCase1(){
-
-        valutazione = -1;
         // Simula un token valido
         when(validationToken.isTokenValid(any(HttpServletRequest.class))).thenReturn(true);
 
         try{
 
-            //vedere i metodi private testExpectedResult e sendRequest
-            testExpectedResult(CLIENT_ERROR_STATUS, sendRequestQuestionario());
+            ObjectMapper objectMapper = new ObjectMapper();
+            objectMapper.registerModule(new JavaTimeModule());
+            ObjectNode jsonNode = objectMapper.createObjectNode();
 
-        } catch (Exception e) {
-            fail("Exception not expected: " + e.getMessage());
-        }
-    }
-
-    @Test
-    public void testCompilazioneQuestionarioOnTestCase2(){
-
-        String json = "{\"valutazione\":\"b\"}";
-        System.out.println(json);
-        // Simula un token valido
-        when(validationToken.isTokenValid(any(HttpServletRequest.class))).thenReturn(true);
-
-        try{
+            // Aggiunta degli attributi uno per uno
+            jsonNode.put("nome", stanza.getNome());
+            jsonNode.put("descrizione", stanza.getDescrizione());
+            jsonNode.put("tipoAccesso", stanza.isTipo_Accesso());
+            jsonNode.put("maxPosti", "A");
+            jsonNode.put("id_scenario", stanza.getScenario().getId());
 
 
             //formattamento della richiesta
             MockHttpServletRequestBuilder requestBuilder =
-                    MockMvcRequestBuilders.post(API_URL_Compilazione)
+                    MockMvcRequestBuilders.post(API_URL_CREASTANZA)
                             .contentType(MediaType.APPLICATION_JSON)
-                            .content(json)
+                            .content(jsonNode.toString())
                             .header("Authorization", "Bearer TODO");
 
             //ritorno della risposta
-            ResultActions ra = MockMvcBuilders.standaloneSetup(meetingController)
+            ResultActions ra = MockMvcBuilders.standaloneSetup(stanzaController)
                     .build()
                     .perform(requestBuilder);
 
-            testExpectedResult(CLIENT_ERROR_STATUS,ra);
-
-
+            testExpectedResult(CLIENT_ERROR_STATUS, ra);
 
         } catch (Exception e) {
             fail("Exception not expected: " + e.getMessage());
         }
+
     }
+
     @Test
-    public void testCompilaQuestionarioOnServerFailure() throws Exception {
-        valutazione = 5;
-        when(validationToken.isTokenValid(any())).thenReturn(true);
+    public void testCreaStanzaOnTestCase12() throws Exception {
 
-        when(meetingService.compilaQuestionario(valutazione, utente.getMetaId(), meeting.getId()))
-                .thenThrow(ServerRuntimeException.class);
+        // Simula un token valido
+        when(validationToken.isTokenValid(any(HttpServletRequest.class))).thenReturn(true);
 
-        //vedere i metodi private testExpectedResult e sendRequest
-        sendRequestServerFailureQuestionario(ServerRuntimeException.class);
-    }
+        try{
+
+            ObjectMapper objectMapper = new ObjectMapper();
+            objectMapper.registerModule(new JavaTimeModule());
+            ObjectNode jsonNode = objectMapper.createObjectNode();
+
+            // Aggiunta degli attributi uno per uno
+            jsonNode.put("nome", stanza.getNome());
+            jsonNode.put("descrizione", stanza.getDescrizione());
+            jsonNode.put("tipoAccesso", stanza.isTipo_Accesso());
+            jsonNode.put("maxPosti", stanza.getMax_Posti());
+            jsonNode.put("id_scenario", (JsonNode) null);
 
 
-    private String JSONConvertitorQuestionario(){
-        //CREAAZIONE DEL BODY DELLA RICHIESTA
-        //Converto l'istanza meeting in una stringa JSON accettabile del controller
-        ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.registerModule(new JavaTimeModule());
-        ObjectNode jsonNode = objectMapper.createObjectNode();
+            //formattamento della richiesta
+            MockHttpServletRequestBuilder requestBuilder =
+                    MockMvcRequestBuilders.post(API_URL_CREASTANZA)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(jsonNode.toString())
+                            .header("Authorization", "Bearer TODO");
 
-        // Aggiunta degli attributi uno per uno
-        jsonNode.put("valutazione", valutazione);
-
-        return jsonNode.toString();
-    }
-
-    /**
-     * metodo che prende un meeting e invia la richiesta al server
-     * @retrun ResultActions
-     * @throws Exception
-     */
-    private ResultActions sendRequestQuestionario() throws Exception {
-
-        //formattamento della richiesta
-        MockHttpServletRequestBuilder requestBuilder =
-                MockMvcRequestBuilders.post(API_URL_Compilazione)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(JSONConvertitorQuestionario())     //metodo privato della classe
-                        .header("Authorization", "Bearer TODO");
-
-        //ritorno della risposta
-        return  MockMvcBuilders.standaloneSetup(meetingController)
-                .build()
-                .perform(requestBuilder);
-    }
-
-    private void sendRequestServerFailureQuestionario(Class<? extends Exception> exceptionClass) throws Exception {
-        // Formattamento della richiesta
-        MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders
-                .post(API_URL_Compilazione)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(JSONConvertitorQuestionario())  // Metodo privato della classe
-                .header("Authorization", "Bearer TODO");
-
-        try {
-            // Forza il metodo creaScheduling a lanciare un'eccezione ServerRuntimeException
-            doThrow(exceptionClass)
-                    .when(meetingService).compilaQuestionario(any(),any(), any());
-
-            // Esecuzione della richiesta e ritorno della risposta
-            MvcResult result = MockMvcBuilders
-                    .standaloneSetup(meetingController)
+            //ritorno della risposta
+            ResultActions ra = MockMvcBuilders.standaloneSetup(stanzaController)
                     .build()
-                    .perform(requestBuilder)
-                    .andReturn();
+                    .perform(requestBuilder);
 
-            // Verifica del codice di stato
-            int statusCode = result.getResponse().getStatus();
-            assertThat(statusCode).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
+            testExpectedResult(CLIENT_ERROR_STATUS, ra);
 
-        } finally {
-            // Ripristina il comportamento normale del metodo creaScheduling dopo il test
-            Mockito.reset(meetingService);
+        } catch (Exception e) {
+            fail("Exception not expected: " + e.getMessage());
         }
-    }
 
+    }
 }

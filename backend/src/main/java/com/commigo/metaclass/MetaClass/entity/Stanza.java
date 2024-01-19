@@ -50,8 +50,8 @@ public class Stanza {
     @Size(min = MIN_NAME_LENGTH,
             max = MAX_NAME_LENGTH,
             message = "Lunghezza nome errata")
-    @Pattern(regexp="^[A-Z][a-zA-Z0-9\\s]*$",
-            message="Formato nome errato")
+    @Pattern(regexp = "^[A-Z][a-zA-Z0-9\\s]*$",
+            message = "Formato nome errato")
     @NotBlank(message = "Il nome non può essere vuoto")
     private String nome;
 
@@ -63,8 +63,8 @@ public class Stanza {
     @Size(min = 6,
             max = 6,
             message = "Lunghezza codice_stanza errato")
-    @Pattern(regexp="^[0-9]{6}$",
-            message="Formato codice_stanza errato")
+    @Pattern(regexp = "^[0-9]*$",
+            message = "Formato codice_stanza errato")
     private String codice;
 
     /**
@@ -75,19 +75,19 @@ public class Stanza {
     @Size(min = MIN_NAME_LENGTH,
             max = MAX_DESCR_LENGTH,
             message = "Lunghezza descrizione errata")
-    @Pattern(regexp="^[A-Z][a-zA-Z0-9.,!?()'\"\\-\\s]*$",
-            message="Formato descrizione errata")
+    @Pattern(regexp = "^[A-Z][a-zA-Z0-9.,!?()'\"\\-\\s]*$",
+            message = "Formato descrizione errata")
     @NotBlank(message = "La descrizione non può essere vuota")
     private String descrizione;
 
     /**
-     *Tipo di Accesso alla Stanza, ovvero la stanza è pubblica (1) o privata (0)
+     * Tipo di Accesso alla Stanza, ovvero la stanza è pubblica (1) o privata (0)
      */
     @NotNull(message = "Il tipo di accesso non può essere nullo")
     private boolean tipo_Accesso;
 
     /**
-     *Identifica il numero massimo di posti nella stanza
+     * Identifica il numero massimo di posti nella stanza
      */
     @NotNull(message = "Il numero massimo di posti non può essere nullo")
     @Min(value = 1, message = "Il valore del  parametro non deve essere inferiore ad 1")
@@ -109,21 +109,27 @@ public class Stanza {
     @Column(name = "Data_Aggiornamento")
     @UpdateTimestamp
     private LocalDateTime data_Aggiornamento;
+
     @JsonCreator
     public Stanza(@JsonProperty("nome") String nome,
                   @JsonProperty("descrizione") String descrizione,
                   @JsonProperty("tipoAccesso") boolean tipoAccesso,
-                  @JsonProperty("maxPosti") int maxPosti,
+                  @JsonProperty("maxPosti") Object maxPosti,
                   @JsonProperty("id_scenario") Long id_scenario) throws MismatchJsonProperty {
 
         if (nome == null || descrizione == null || id_scenario == null) {
             throw new MismatchJsonProperty("gli attributi non sono corretti");
         }
 
+        if (maxPosti instanceof Integer) {
+            this.max_Posti = (int) maxPosti;
+        } else {
+            throw new MismatchJsonProperty("maxPosti non è un intero");
+        }
+
         this.nome = nome;
         this.descrizione = descrizione;
         this.tipo_Accesso = tipoAccesso;
-        this.max_Posti = (maxPosti > 0)? maxPosti:1;
 
         //aggiunta dello scenario
         this.scenario = new Scenario();
@@ -139,14 +145,9 @@ public class Stanza {
         this.nome = nome;
         this.descrizione = descrizione;
         this.tipo_Accesso = tipoAccesso;
-        this.max_Posti = (maxPosti > 0)? maxPosti:1;
+        this.max_Posti = (maxPosti > 0) ? maxPosti : 1;
         this.codice = codice;
         //aggiunta dello scenario
         this.scenario = scenario;
     }
-
-    public void DropAccesso(){
-        this.tipo_Accesso = Boolean.parseBoolean(null);
-    }
-
 }
