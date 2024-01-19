@@ -20,8 +20,15 @@ export default class CreaScenario extends Component {
         this.fetchCategoria();
     }
     fetchCategoria = async () => {
+        const requestOption1 = {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + sessionStorage.getItem("token")
+            },
+        };
         try {
-            const response = await fetch('http://localhost:8080/admin/visualizzaCategoria', this.requestOption);
+            const response = await fetch('http://localhost:8080/admin/visualizzaCategoria',requestOption1);
             console.log(response.statusMessage);
 
             if (!response.ok) {
@@ -47,6 +54,8 @@ export default class CreaScenario extends Component {
     };
 
 
+
+
     handleNameChange = (e) => {
         const inputValue = e.target.value;
 
@@ -56,16 +65,17 @@ export default class CreaScenario extends Component {
 
     };
     handleCategoriaChange = (e) => {
-        //mi salvo la variabile scelta in una const
+        // mi salvo la variabile scelta in una const
         const selectedCategoriaName = e.target.value;
         console.log('Valore selezionato:', selectedCategoriaName);
 
-        //setto la mia variabile selectedscenario con il valore scelto
-        this.setState({ id_categoria: selectedCategoriaName });
+        // setto la mia variabile selectedCategoria con il valore scelto
+        this.setState({ selectedCategoria: selectedCategoriaName });
 
-        //richiamo una funzione per prelevare dal nome scelto, l'id corrispondente
+        // richiamo una funzione per prelevare dal nome scelto, l'id corrispondente
         this.findCategoriaByName(selectedCategoriaName);
     };
+
     findCategoriaByName = (nome) => {
 
         const { selectedCategoria, array } = this.state;
@@ -111,13 +121,6 @@ export default class CreaScenario extends Component {
         const { nome, descrizione, url_immagine, id_categoria } = this.state;
 
         // Validazione: Assicurati che idCategoria sia >= 0
-        if (id_categoria < 0) {
-            this.setState({
-                isErrorPopupVisible: true,
-                errorMessage: "L'id Categoria deve essere maggiore o uguale a 0",
-            });
-            return;
-        }
 
         const dataToSend = {
             nome,
@@ -255,7 +258,6 @@ export default class CreaScenario extends Component {
                             <button onClick={() => this.callFunction()}>Invia</button>
                         </div>
                         {this.state.error && <p style={{color: 'red'}}>{this.state.error}</p>}
-
                     </div>
                 </div>
             </div>
