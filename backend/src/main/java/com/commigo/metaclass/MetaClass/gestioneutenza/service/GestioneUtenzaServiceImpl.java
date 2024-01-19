@@ -27,7 +27,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-@Service("GestioneUtenzaService")
+@Service
 @RequiredArgsConstructor
 @Slf4j    //serve per stampare delle cose nei log
 @Transactional
