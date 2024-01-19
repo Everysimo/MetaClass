@@ -78,6 +78,11 @@ public class GestioneAmministrazioneServiceImpl implements GestioneAmministrazio
         return adminMetaIds.contains(metaId);
     }
 
+    @Override
+    public List<Categoria> getCategorie() {
+        return categoriaRepository.findAll();
+    }
+
     /**
      * Metodo che permette la modifica di una Categoria
      * @param c Categoria che deve essere modificata

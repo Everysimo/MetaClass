@@ -229,6 +229,40 @@ public class GestioneAmministrazioneController {
         }
     }
 
+    @GetMapping(value = "visualizzaCategoria")
+    public ResponseEntity<Response<List<Categoria>>> visualizzaCategorie(HttpServletRequest request) {
+        List<Categoria> cats;
+        try {
+            //validazione dl token
+            if (!validationToken.isTokenValid(request)) {
+                throw new RuntimeException403("Token non valido");
+            }
+
+            String metaID = jwtTokenUtil.getMetaIdFromToken(validationToken.getToken());
+
+            //verifica dei permessi
+            if(!checkAdmin(metaID))  throw new RuntimeException403("accesso non consentito");
+
+
+            cats = gestioneamministrazione.getCategorie();
+            if(cats == null){
+                throw new ServerRuntimeException("Errore nella ricerca delle categorie");
+            }else if(cats.isEmpty()){
+                return ResponseEntity
+                        .ok(new Response<>(cats, "nessuna categoria creata"));
+            }else{
+                return ResponseEntity
+                        .ok(new Response<>(cats, "operazione effettuata con successo"));
+            }
+        } catch (RuntimeException403 re) {
+            return ResponseEntity.status(403)
+                    .body(new Response<>(null, "Errore durante l'operazione: "+re.getMessage()));
+        }catch (ServerRuntimeException e) {
+            return ResponseEntity.status(500)
+                    .body(new Response<>(null, "Errore durante l'operazione"));
+        }
+    }
+
     /**
      * Metodo che permette di gestire la richiesta di modifica di una determinata stanza da parte di un admin
      * @param Id ID della stanza che deve essere modificata

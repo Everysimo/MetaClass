@@ -15,4 +15,5 @@ public interface GestioneAmministrazioneService {
     List<Stanza> getStanze();
     boolean deleteBanToUser(Long idUtente, Long idStanza) throws RuntimeException403;
     boolean checkAdmin(String metaId);
+    List<Categoria> getCategorie();
 }
