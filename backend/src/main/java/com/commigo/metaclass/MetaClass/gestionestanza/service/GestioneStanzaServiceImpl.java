@@ -16,7 +16,6 @@ import com.commigo.metaclass.MetaClass.utility.response.types.Response;
 import com.commigo.metaclass.MetaClass.webconfig.JwtTokenUtil;
 import com.commigo.metaclass.MetaClass.webconfig.ValidationToken;
 import jakarta.transaction.Transactional;
-import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,7 +52,7 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService {
      * @throws Exception
      */
     @Override
-    public ResponseEntity<AccessResponse<Boolean>> accessoStanza(String codiceStanza, String id_utente)
+    public ResponseEntity<AccessResponse<Long>> accessoStanza(String codiceStanza, String id_utente)
             throws ServerRuntimeException, RuntimeException403{
 
         //controllo stanza se è vuota
@@ -75,14 +74,14 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService {
 
             //verifico se la stanza è privata o pubblica
             if(stanza.isTipo_Accesso())
-                 return ResponseEntity.ok(new AccessResponse<>(true, "Accesso effettuato con successo", false));
+                return ResponseEntity.ok(new AccessResponse<>(stanza.getId(), "Accesso effettuato con successo", false));
             else
-                 return ResponseEntity.ok(new AccessResponse<>(true, "Richiesta accesso alla stanza effettuata", true));
+                 return ResponseEntity.ok(new AccessResponse<>(0L, "Richiesta accesso alla stanza effettuata", true));
 
         } else if (sp.isBannato()) {
             throw new RuntimeException403("Sei stato bannato da questa stanza, non puoi entrare");
         } else {
-            throw new RuntimeException403("Sei già all'interno di questa stanza");
+            return ResponseEntity.ok(new AccessResponse<>(stanza.getId(), "Sei già all'interno di questa stanza", false));
         }
     }
 
