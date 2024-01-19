@@ -45,33 +45,13 @@ public class GestioneAmministrazioneController {
     @Autowired
     private GestioneStanzaControl stanzaControl;
 
-    private final Set<String> adminMetaIds = loadAdminMetaIdsFromFile();
-
-    /**
-     * Metodo che prende dal file "admins.txt" tutti i metaID degli admin
-     * @return
-     */
-    private Set<String> loadAdminMetaIdsFromFile() {
-        Set<String> adminIds = new HashSet<>();
-        try (BufferedReader br = new BufferedReader(new InputStreamReader(new ClassPathResource("admins.txt").getInputStream()))) {
-            String line;
-            while ((line = br.readLine()) != null) {
-                adminIds.add(line.trim());
-            }
-        } catch (IOException e) {
-            // Gestione eccezioni legate alla lettura del file (ad esempio FileNotFoundException)
-            e.printStackTrace();
-        }
-        return adminIds;
-    }
-
     /**
      *  confronta il metaID di un utente con quelli degli admin, per verificare se l'utente è un admin
      * @param metaId metaID che deve essere confrontato
      * @return
      */
     public boolean checkAdmin(String metaId){
-        return adminMetaIds.contains(metaId);
+        return gestioneamministrazione.checkAdmin(metaId); // chiamata al servizio
     }
 
     /**
@@ -207,8 +187,6 @@ public class GestioneAmministrazioneController {
 
         }catch(RuntimeException403 e){
             return ResponseEntity.status(403).body(new Response<>(false, e.getMessage()));
-        }catch (ServerRuntimeException e) {
-            return ResponseEntity.status(500).body(new Response<>(false, e.getMessage()));
         }
     }
 
@@ -241,6 +219,40 @@ public class GestioneAmministrazioneController {
             }else{
                 return ResponseEntity
                         .ok(new Response<>(stanze, "operazione effettuata con successo"));
+            }
+        } catch (RuntimeException403 re) {
+            return ResponseEntity.status(403)
+                    .body(new Response<>(null, "Errore durante l'operazione: "+re.getMessage()));
+        }catch (ServerRuntimeException e) {
+            return ResponseEntity.status(500)
+                    .body(new Response<>(null, "Errore durante l'operazione"));
+        }
+    }
+
+    @GetMapping(value = "visualizzaCategoria")
+    public ResponseEntity<Response<List<Categoria>>> visualizzaCategorie(HttpServletRequest request) {
+        List<Categoria> cats;
+        try {
+            //validazione dl token
+            if (!validationToken.isTokenValid(request)) {
+                throw new RuntimeException403("Token non valido");
+            }
+
+            String metaID = jwtTokenUtil.getMetaIdFromToken(validationToken.getToken());
+
+            //verifica dei permessi
+            if(!checkAdmin(metaID))  throw new RuntimeException403("accesso non consentito");
+
+
+            cats = gestioneamministrazione.getCategorie();
+            if(cats == null){
+                throw new ServerRuntimeException("Errore nella ricerca delle categorie");
+            }else if(cats.isEmpty()){
+                return ResponseEntity
+                        .ok(new Response<>(cats, "nessuna categoria creata"));
+            }else{
+                return ResponseEntity
+                        .ok(new Response<>(cats, "operazione effettuata con successo"));
             }
         } catch (RuntimeException403 re) {
             return ResponseEntity.status(403)

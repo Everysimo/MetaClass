@@ -9,10 +9,11 @@ export const PreviousMeeting = () => {
         <header>
             <MyHeader/>
         </header>
-            <section>
-
-            <ViewPreviousMeeting/>
-            </section>
+            <main className={"bg"}>
+                <section className={"roomSec"}>
+                    <ViewPreviousMeeting/>
+                </section>
+            </main>
         <footer>
             <MyFooter/>
         </footer>

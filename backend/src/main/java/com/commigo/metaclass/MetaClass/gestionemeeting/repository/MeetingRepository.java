@@ -58,4 +58,6 @@ public interface MeetingRepository extends JpaRepository<Meeting, Long> {
      */
     List<Meeting> findMeetingByStanza(Stanza stanza);
 
+    void deleteMeetingsByStanza(Stanza stanza);
+
 }

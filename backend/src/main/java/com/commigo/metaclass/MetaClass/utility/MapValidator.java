@@ -3,6 +3,7 @@ import com.commigo.metaclass.MetaClass.entity.Stanza;
 import com.commigo.metaclass.MetaClass.entity.Utente;
 import com.commigo.metaclass.MetaClass.exceptions.ClientRuntimeException;
 import com.commigo.metaclass.MetaClass.exceptions.DataFormatException;
+import com.commigo.metaclass.MetaClass.exceptions.RuntimeException403;
 import jakarta.validation.*;
 import jakarta.validation.Validator;
 import lombok.NoArgsConstructor;
@@ -45,7 +46,7 @@ public class MapValidator {
 
     }
 
-    public static boolean utenteValidate(Map<String, Object> params) throws ClientRuntimeException {
+    public static boolean utenteValidate(Map<String, Object> params) throws RuntimeException403 {
 
         for (Map.Entry<String, Object> entry : params.entrySet()) {
             String attributeName = entry.getKey();
@@ -68,7 +69,7 @@ public class MapValidator {
                         params.put(attributeName, outputDate);
 
                     } catch (DateTimeParseException e) {
-                        throw new ClientRuntimeException("Errore nella richiesta: Formato della data di nascita non valido. Formato richiesto: MM/dd/yyyy");
+                        throw new RuntimeException403("Errore nella richiesta: Formato della data di nascita non valido. Formato richiesto: MM/dd/yyyy");
                     }
                 }else{
                     Set<ConstraintViolation<Utente>> violations =
@@ -76,17 +77,17 @@ public class MapValidator {
 
                     if (!violations.isEmpty()) {
                         // Handle validation errors for the specific attribute
-                        throw new ClientRuntimeException("Errore nella richiesta: "+ violations.iterator().next().getMessage());
+                        throw new RuntimeException403("Errore nella richiesta: "+ violations.iterator().next().getMessage());
                     }
 
                 }
 
 
             }catch(IllegalArgumentException e){
-                throw new ClientRuntimeException("Errore nella richiesta: L'attributo '"+
+                throw new RuntimeException403("Errore nella richiesta: L'attributo '"+
                         attributeName+ "' non è presente nell'entità Utente");
             }catch (ValidationException ve){
-                throw new ClientRuntimeException("Errore nella richiesta: L'attributo '"+
+                throw new RuntimeException403("Errore nella richiesta: L'attributo '"+
                         attributeName+ "' ha un valore che non rispetta il suo tipo di dato");
             }
 
@@ -94,5 +95,4 @@ public class MapValidator {
         return true;
 
     }
-
 }

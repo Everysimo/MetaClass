@@ -5,6 +5,7 @@ import com.commigo.metaclass.MetaClass.exceptions.RuntimeException401;
 import com.commigo.metaclass.MetaClass.exceptions.RuntimeException403;
 import com.commigo.metaclass.MetaClass.exceptions.ServerRuntimeException;
 import com.commigo.metaclass.MetaClass.gestioneamministrazione.repository.ScenarioRepository;
+import com.commigo.metaclass.MetaClass.gestionemeeting.repository.MeetingRepository;
 import com.commigo.metaclass.MetaClass.gestionestanza.repository.RuoloRepository;
 import com.commigo.metaclass.MetaClass.gestionestanza.repository.StanzaRepository;
 import com.commigo.metaclass.MetaClass.gestionestanza.repository.StatoPartecipazioneRepository;
@@ -15,7 +16,6 @@ import com.commigo.metaclass.MetaClass.utility.response.types.Response;
 import com.commigo.metaclass.MetaClass.webconfig.JwtTokenUtil;
 import com.commigo.metaclass.MetaClass.webconfig.ValidationToken;
 import jakarta.transaction.Transactional;
-import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,6 +37,7 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService {
     private final StanzaRepository stanzaRepository;
     private final UtenteRepository utenteRepository;
     private final ScenarioRepository scenarioRepository;
+    private final MeetingRepository meetingRepository;
 
     @Autowired
     private ValidationToken validationToken;
@@ -51,7 +52,7 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService {
      * @throws Exception
      */
     @Override
-    public ResponseEntity<AccessResponse<Boolean>> accessoStanza(String codiceStanza, String id_utente)
+    public ResponseEntity<AccessResponse<Long>> accessoStanza(String codiceStanza, String id_utente)
             throws ServerRuntimeException, RuntimeException403{
 
         //controllo stanza se è vuota
@@ -73,14 +74,14 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService {
 
             //verifico se la stanza è privata o pubblica
             if(stanza.isTipo_Accesso())
-                 return ResponseEntity.ok(new AccessResponse<>(true, "Accesso effettuato con successo", false));
+                return ResponseEntity.ok(new AccessResponse<>(stanza.getId(), "Accesso effettuato con successo", false));
             else
-                 return ResponseEntity.ok(new AccessResponse<>(true, "Richiesta accesso alla stanza effettuata", true));
+                 return ResponseEntity.ok(new AccessResponse<>(0L, "Richiesta accesso alla stanza effettuata", true));
 
         } else if (sp.isBannato()) {
             throw new RuntimeException403("Sei stato bannato da questa stanza, non puoi entrare");
         } else {
-            throw new RuntimeException403("Sei già all'interno di questa stanza");
+            return ResponseEntity.ok(new AccessResponse<>(stanza.getId(), "Sei già all'interno di questa stanza", false));
         }
     }
 
@@ -367,7 +368,10 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService {
 
         StatoPartecipazione stato_ogm = statoPartecipazioneRepository.findStatoPartecipazioneByUtenteAndStanza(ogm, stanza);
         if (stato_ogm.getRuolo().getNome().equalsIgnoreCase(Ruolo.ORGANIZZATORE_MASTER) || ogm.isAdmin()) {
-            stanzaRepository.deleteStanzaById(stanza.getId());
+                //elimina tutti gli stati partecipazione
+                statoPartecipazioneRepository.deleteAllByStanza(stanza);
+                //elimina stanza
+                stanzaRepository.delete(stanza);
             return ResponseEntity.ok(new Response<>(true, "Stanza eliminata con successo")).getBody();
         } else {
             return ResponseEntity.status(403).body(new Response<>(false, "Non puoi eliminare una stanza se non sei un'organizzatore master")).getBody();

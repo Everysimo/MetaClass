@@ -25,13 +25,14 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+
+import java.security.SecureRandom;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
@@ -75,6 +76,8 @@ class GestioneAmministrazioneControllerUnitTest {
     private static final String API_URL = "/admin/updateScenario";
     private static final int CLIENT_ERROR_STATUS = 400;
     private static final int SUCCESSFUL_STATUS = 200;
+    private static final String UPPER_CASE_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    private static final SecureRandom secureRandom = new SecureRandom();
 
 
     /**
@@ -193,8 +196,7 @@ class GestioneAmministrazioneControllerUnitTest {
         when(jwtTokenUtil.getMetaIdFromToken(validationToken.getToken()))
                 .thenReturn(utente.getMetaId());
 
-        // Mocka il comportamento di checkAdmin() sull'oggetto mock
-        //when(ammministrazioneController.checkAdmin(utente.getMetaId())).thenReturn(true);
+        when(amministrazioneController.checkAdmin(any(String.class))).thenReturn(true);
 
         try{
             when(amministrazioneService.updateScenario(scenario, categoria.getId())).thenReturn(true);
@@ -207,35 +209,166 @@ class GestioneAmministrazioneControllerUnitTest {
 
     }
 
-    /*public void testCasesUpdateScenario(int testcase){
+    @Test
+    public void testUpdateScenarioOnAdminNotFound(){
 
-        switch (testcase){
-            case 1:
-                scenario.setNome("U");
-                assertValidationScenario("Lunghezza del nome non valida");
-                break;
-            case 2:
-                scenario.setNome("ufficio");
-                assertValidationScenario("Formato nome errato");
-                break;
-            case 3:
-                scenario.setDescrizione(null);
-                assertValidationScenario("La descrizione non può essere nulla");
-                break;
-            case 4:
-                scenario.setDescrizione(generateRandomString(255));
-                assertValidationScenario("Lunghezza della descrizione non valida");
-                break;
-            case 5:
-                scenario.setDescrizione("1Questo scenario rappresenta un ufficio di lavoro.");
-                assertValidationScenario("Formato descrizione errato");
-                break;
-            case 6:
-                applyValidation();
-                assertFalse(bindingResult.hasErrors());
+        // Simula un token valido
+        when(validationToken.isTokenValid(any(HttpServletRequest.class))).thenReturn(true);
+
+        // Simula la decodifica del token e restituisce un metaID valido
+        when(jwtTokenUtil.getMetaIdFromToken(validationToken.getToken()))
+                .thenReturn(utente.getMetaId());
+
+        when(amministrazioneController.checkAdmin(any(String.class))).thenReturn(false);
+
+
+        try{
+            when(amministrazioneService.updateScenario(scenario, categoria.getId())).thenReturn(true);
+            // Chiamata al metodo da testare
+            testExpectedResult(CLIENT_ERROR_STATUS, sendRequestScenario(scenario));
+
+        } catch (Exception e) {
+            fail("Exception not expected: " + e.getMessage());
         }
-        scenario = new Scenario(1L, "Lavoro1", "Scenario 1 per il lavoro", immagine, categoria);
 
-    }*/
+    }
+
+    @Test
+    public void testUpdateScenarioOnTokenValidationFailed() throws Exception {
+
+        when(validationToken.isTokenValid(any())).thenReturn(false);
+
+        testExpectedResult(CLIENT_ERROR_STATUS, sendRequestScenario(scenario));
+
+    }
+
+    @Test
+    public void testUpdateScenarioTestCase1(){
+        // Simula un token valido
+        when(validationToken.isTokenValid(any(HttpServletRequest.class))).thenReturn(true);
+
+        // Simula la decodifica del token e restituisce un metaID valido
+        when(jwtTokenUtil.getMetaIdFromToken(validationToken.getToken()))
+                .thenReturn(utente.getMetaId());
+
+        when(amministrazioneController.checkAdmin(any(String.class))).thenReturn(true);
+
+        scenario.setNome("U");
+        try{
+            when(amministrazioneService.updateScenario(scenario, categoria.getId())).thenReturn(true);
+            // Chiamata al metodo da testare
+            testExpectedResult(CLIENT_ERROR_STATUS, sendRequestScenario(scenario));
+
+        } catch (Exception e) {
+            fail("Exception not expected: " + e.getMessage());
+        }
+
+    }
+
+    @Test
+    public void testUpdateScenarioTestCase2(){
+        // Simula un token valido
+        when(validationToken.isTokenValid(any(HttpServletRequest.class))).thenReturn(true);
+
+        // Simula la decodifica del token e restituisce un metaID valido
+        when(jwtTokenUtil.getMetaIdFromToken(validationToken.getToken()))
+                .thenReturn(utente.getMetaId());
+
+        when(amministrazioneController.checkAdmin(any(String.class))).thenReturn(true);
+
+        scenario.setNome("ufficio");
+        try{
+            when(amministrazioneService.updateScenario(scenario, categoria.getId())).thenReturn(true);
+            // Chiamata al metodo da testare
+            testExpectedResult(CLIENT_ERROR_STATUS, sendRequestScenario(scenario));
+
+        } catch (Exception e) {
+            fail("Exception not expected: " + e.getMessage());
+        }
+
+    }
+
+    @Test
+    public void testUpdateScenarioTestCase3(){
+        // Simula un token valido
+        when(validationToken.isTokenValid(any(HttpServletRequest.class))).thenReturn(true);
+
+        // Simula la decodifica del token e restituisce un metaID valido
+        when(jwtTokenUtil.getMetaIdFromToken(validationToken.getToken()))
+                .thenReturn(utente.getMetaId());
+
+        when(amministrazioneController.checkAdmin(any(String.class))).thenReturn(true);
+
+        scenario.setNome("Ufficio");
+        scenario.setDescrizione("");
+        try{
+            when(amministrazioneService.updateScenario(scenario, categoria.getId())).thenReturn(true);
+            // Chiamata al metodo da testare
+            testExpectedResult(CLIENT_ERROR_STATUS, sendRequestScenario(scenario));
+
+        } catch (Exception e) {
+            fail("Exception not expected: " + e.getMessage());
+        }
+
+    }
+
+    @Test
+    public void testUpdateScenarioTestCase4(){
+        // Simula un token valido
+        when(validationToken.isTokenValid(any(HttpServletRequest.class))).thenReturn(true);
+
+        // Simula la decodifica del token e restituisce un metaID valido
+        when(jwtTokenUtil.getMetaIdFromToken(validationToken.getToken()))
+                .thenReturn(utente.getMetaId());
+
+        when(amministrazioneController.checkAdmin(any(String.class))).thenReturn(true);
+
+        scenario.setDescrizione(generateRandomString(255));
+        try{
+            when(amministrazioneService.updateScenario(scenario, categoria.getId())).thenReturn(true);
+            // Chiamata al metodo da testare
+            testExpectedResult(CLIENT_ERROR_STATUS, sendRequestScenario(scenario));
+
+        } catch (Exception e) {
+            fail("Exception not expected: " + e.getMessage());
+        }
+
+    }
+
+    @Test
+    public void testUpdateScenarioTestCase5(){
+        // Simula un token valido
+        when(validationToken.isTokenValid(any(HttpServletRequest.class))).thenReturn(true);
+
+        // Simula la decodifica del token e restituisce un metaID valido
+        when(jwtTokenUtil.getMetaIdFromToken(validationToken.getToken()))
+                .thenReturn(utente.getMetaId());
+
+        when(amministrazioneController.checkAdmin(any(String.class))).thenReturn(true);
+
+        scenario.setDescrizione("1Questo scenario rappresenta un ufficio di lavoro");
+
+        try{
+            when(amministrazioneService.updateScenario(scenario, categoria.getId())).thenReturn(true);
+            // Chiamata al metodo da testare
+            testExpectedResult(CLIENT_ERROR_STATUS, sendRequestScenario(scenario));
+
+        } catch (Exception e) {
+            fail("Exception not expected: " + e.getMessage());
+        }
+
+    }
+
+    private String generateRandomString(int length) {
+        StringBuilder randomString = new StringBuilder(length);
+
+        for (int i = 0; i < length; i++) {
+            int randomIndex = secureRandom.nextInt(UPPER_CASE_CHARS.length());
+            char randomChar = UPPER_CASE_CHARS.charAt(randomIndex);
+            randomString.append(randomChar);
+        }
+
+        return randomString.toString();
+    }
 
 }

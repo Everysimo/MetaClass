@@ -98,9 +98,7 @@ public class GestioneStanzaControl {
 
             String metaID = jwtTokenUtil.getMetaIdFromToken(validationToken.getToken());
 
-            if(!stanzaService.creaStanza(s,metaID)){
-                throw new ServerRuntimeException("errore nel salvataggio dell stanza");
-            }
+            stanzaService.creaStanza(s,metaID);
             return ResponseUtils.getResponseOk("Corretto");
 
 
@@ -284,7 +282,7 @@ public class GestioneStanzaControl {
      * @return
      */
     @PostMapping(value = "/accessoStanza")
-    public ResponseEntity<AccessResponse<Boolean>> richiestaAccessoStanza(@RequestBody String requestBody,
+    public ResponseEntity<AccessResponse<Long>> richiestaAccessoStanza(@RequestBody String requestBody,
                                                                           HttpServletRequest request) {
         try {
             if (!validationToken.isTokenValid(request)) {
@@ -311,13 +309,13 @@ public class GestioneStanzaControl {
 
         }catch (JsonProcessingException je) {
             return ResponseEntity.status(403)
-                    .body(new AccessResponse<>(false, "Errore durante la richiesta: il body della tua richiesta è vuoto", false));
+                    .body(new AccessResponse<>(-1L, "Errore durante la richiesta: il body della tua richiesta è vuoto", false));
         } catch (RuntimeException403 re) {
             return ResponseEntity.status(403)
-                    .body(new AccessResponse<>(false, "Errore durante la richiesta: "+re.getMessage(), false));
+                    .body(new AccessResponse<>(-1L, "Errore durante la richiesta: "+re.getMessage(), false));
         }catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new AccessResponse<>(false, "Errore durante la richiesta: " + e.getMessage(), false));
+                    .body(new AccessResponse<>(-1L, "Errore durante la richiesta: " + e.getMessage(), false));
         }
     }
 

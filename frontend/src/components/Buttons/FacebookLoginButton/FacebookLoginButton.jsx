@@ -97,13 +97,21 @@ export default class Facebook extends Component {
         try {
             const response = await fetch("http://localhost:8080/login", requestOptions);
             const responseData = await response.json();
-            console.log(responseData)
+
+            console.log("isAdmin from server:", responseData.isAdmin);
+
             const token = responseData.token;
+            const isAdmin = responseData.isAdmin || false; // Set default value if not present
+
+            console.log("isAdmin to set:", isAdmin);
+
             this.setState({
-                isAdmin: responseData.isAdmin
+                isAdmin: isAdmin,
             });
+
             sessionStorage.setItem("token", token);
-            sessionStorage.setItem("isAdmin", JSON.stringify(this.state.isAdmin));
+            sessionStorage.setItem("isAdmin", isAdmin);
+
         } catch (error) {
             console.error("Error:", error);
         }

@@ -28,7 +28,6 @@ import java.util.Map;
 public class GestioneUtenzaController {
 
     @Autowired
-    @Qualifier("GestioneUtenzaService")
     private GestioneUtenzaService utenzaService;
 
     @Autowired
@@ -152,17 +151,11 @@ public class GestioneUtenzaController {
 
             String metaID = jwtTokenUtil.getMetaIdFromToken(validationToken.getToken());
 
-            if(!utenzaService.modificaDatiUtente(metaID,params)) {
-                throw new ServerRuntimeException("Modifica Utente non effettuata");
-            }else{
-                return ResponseEntity.ok(new Response<>(true, "Utente modificato con successo"));
-            }
+            utenzaService.modificaDatiUtente(metaID,params);
+            return ResponseEntity.ok(new Response<>(true, "Utente modificato con successo"));
+
         }catch(RuntimeException403 e){
             return ResponseEntity.status(403).body(new Response<>(null, e.getMessage()));
-        } catch (ClientRuntimeException e) {
-            return ResponseEntity.status(400).body(new Response<>(null, e.getMessage()));
-        } catch (ServerRuntimeException e) {
-            return ResponseEntity.status(500).body(new Response<>(null, e.getMessage()));
         }
     }
 

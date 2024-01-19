@@ -1,10 +1,13 @@
 import React, { useState } from 'react';
 import {useParams} from "react-router-dom";
+import {faFileCircleXmark} from "@fortawesome/free-solid-svg-icons";
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 
-const Questionario = () => {
+const Questionario = (id) => {
     const [valutazioneString, setValutazione] = useState("");
     const { id: id_meeting } = useParams();
     const [errore, setErrore] = useState(null);
+    const [showModal, setShowModal] = useState(false);
 
     const handleValutazioneChange = (e) => {
         setValutazione(e.target.value)
@@ -58,21 +61,43 @@ const Questionario = () => {
         }
     }
 
+    const handleShow = () =>{
+        setShowModal(true);
+    }
+    const handleClose = () =>{
+        setShowModal(false);
+    }
+
     return (
         <>
-            <h2>Compila il Questionario</h2>
-                <label>
-                    Inserisci una valutazione da 1 a 5 inerente all'immersività nel meeting:
-                    <input
-                        type="number"
-                        min="1"
-                        max="5"
-                        value={valutazioneString}
-                        onChange={handleValutazioneChange}
-                    />
-                </label>
-                <button onClick={handleSubmit}>Compila</button>
-            {errore && <p style={{ color: 'red' }}>{errore}</p>}
+            <FontAwesomeIcon
+                icon={faFileCircleXmark}
+                size="2xl"
+                style={{ color: "#ff2600", cursor: "pointer" }}
+                onClick={handleShow} />
+            {showModal &&
+            <div className={"modal"}>
+                <div className={"modal-content"}>
+                    <span
+                        className={"close"}
+                        onClick={handleClose}
+                    >&times;</span>
+                    <h2>Compila il Questionario</h2>
+                    <label>
+                        Inserisci una valutazione da 1 a 5 inerente all'immersività nel meeting:
+                        <input
+                            type="number"
+                            min="1"
+                            max="5"
+                            value={valutazioneString}
+                            onChange={handleValutazioneChange}
+                        />
+                    </label>
+                    <button onClick={handleSubmit}>Compila</button>
+                    {errore && <p style={{ color: 'red' }}>{errore}</p>}
+                </div>
+            </div>
+            }
         </>
     );
 };
