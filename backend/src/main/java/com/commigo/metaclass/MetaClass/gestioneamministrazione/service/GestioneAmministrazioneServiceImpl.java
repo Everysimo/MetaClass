@@ -14,9 +14,15 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -48,6 +54,29 @@ public class GestioneAmministrazioneServiceImpl implements GestioneAmministrazio
     @Qualifier("StatoPartecipazioneRepository")
     private StatoPartecipazioneRepository statoPartecipazioneRepository;
 
+    private final Set<String> adminMetaIds = loadAdminMetaIdsFromFile();
+
+    /**
+     * Metodo che prende dal file "admins.txt" tutti i metaID degli admin
+     * @return
+     */
+    public Set<String> loadAdminMetaIdsFromFile() {
+        Set<String> adminIds = new HashSet<>();
+        try (BufferedReader br = new BufferedReader(new InputStreamReader(new ClassPathResource("admins.txt").getInputStream()))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                adminIds.add(line.trim());
+            }
+        } catch (IOException e) {
+            // Gestione eccezioni legate alla lettura del file (ad esempio FileNotFoundException)
+            e.printStackTrace();
+        }
+        return adminIds;
+    }
+
+    public boolean checkAdmin(String metaId) {
+        return adminMetaIds.contains(metaId);
+    }
 
     /**
      * Metodo che permette la modifica di una Categoria
@@ -70,24 +99,29 @@ public class GestioneAmministrazioneServiceImpl implements GestioneAmministrazio
      * @return valore boolean che identifica il successo dell'operazione
      */
     @Override
-    public boolean updateScenario(Scenario s, long IdCategoria) throws ServerRuntimeException {
+    public boolean updateScenario(Scenario s, long IdCategoria){
 
-        //gestione della categoria
-        Categoria cat;
-        if((cat = categoriaRepository.findById(IdCategoria))==null)
-            throw new ServerRuntimeException("categoria non valida");
+        try{
+            //gestione della categoria
+            Categoria cat;
+            if((cat = categoriaRepository.findById(IdCategoria))==null)
+                 throw new ServerRuntimeException("categoria non valida");
 
-        s.setCategoria(cat);
+            s.setCategoria(cat);
 
-        Immagine image = immagineRepository.save(new Immagine(s.getImage().getUrl()));
-        s.setImage(image);
+            Immagine image = immagineRepository.save(new Immagine(s.getImage().getUrl()));
+            s.setImage(image);
 
-        //getsione dello scenario
-        if((scenarioRepository.findByNome(s.getNome()))!=null)
-            throw new ServerRuntimeException("Il nome dello scenario"+s.getNome()+"già è in uso");
+            //getsione dello scenario
+            if((scenarioRepository.findByNome(s.getNome()))!=null)
+                 throw new ServerRuntimeException("Il nome dello scenario"+s.getNome()+"già è in uso");
 
-        scenarioRepository.save(s);
-        return true;
+            scenarioRepository.save(s);
+            return true;
+        }catch(ServerRuntimeException se){
+             se.printStackTrace();
+             return false;
+        }
     }
 
     /**

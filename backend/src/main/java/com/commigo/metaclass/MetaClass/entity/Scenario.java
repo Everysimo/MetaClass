@@ -40,7 +40,8 @@ public class Scenario {
     private String nome;
 
 
-    @NotNull(message = "La descrizione non può essere nulla")
+    @NotBlank (message = "La descrizione non puo' essere vuota")
+    @NotNull(message = "La descrizione non puo' essere nulla")
     @Size(min = MIN_LENGTH, max = MAX_LENGTH, message = "Lunghezza della descrizione non valida")
     @Pattern(regexp="^[A-Z][a-zA-Z0-9.,!?()'\"\\-\\s]+$",
             message = "Formato descrizione errato")

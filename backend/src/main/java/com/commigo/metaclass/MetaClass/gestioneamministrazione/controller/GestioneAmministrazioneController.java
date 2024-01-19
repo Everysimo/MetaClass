@@ -45,33 +45,13 @@ public class GestioneAmministrazioneController {
     @Autowired
     private GestioneStanzaControl stanzaControl;
 
-    private final Set<String> adminMetaIds = loadAdminMetaIdsFromFile();
-
-    /**
-     * Metodo che prende dal file "admins.txt" tutti i metaID degli admin
-     * @return
-     */
-    private Set<String> loadAdminMetaIdsFromFile() {
-        Set<String> adminIds = new HashSet<>();
-        try (BufferedReader br = new BufferedReader(new InputStreamReader(new ClassPathResource("admins.txt").getInputStream()))) {
-            String line;
-            while ((line = br.readLine()) != null) {
-                adminIds.add(line.trim());
-            }
-        } catch (IOException e) {
-            // Gestione eccezioni legate alla lettura del file (ad esempio FileNotFoundException)
-            e.printStackTrace();
-        }
-        return adminIds;
-    }
-
     /**
      *  confronta il metaID di un utente con quelli degli admin, per verificare se l'utente è un admin
      * @param metaId metaID che deve essere confrontato
      * @return
      */
     public boolean checkAdmin(String metaId){
-        return adminMetaIds.contains(metaId);
+        return gestioneamministrazione.checkAdmin(metaId); // chiamata al servizio
     }
 
     /**
@@ -207,8 +187,6 @@ public class GestioneAmministrazioneController {
 
         }catch(RuntimeException403 e){
             return ResponseEntity.status(403).body(new Response<>(false, e.getMessage()));
-        }catch (ServerRuntimeException e) {
-            return ResponseEntity.status(500).body(new Response<>(false, e.getMessage()));
         }
     }
 
