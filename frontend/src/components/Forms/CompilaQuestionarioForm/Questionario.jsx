@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import {useParams} from "react-router-dom";
 
 const Questionario = () => {
-    const [valutazione, setValutazione] = useState("");
+    const [valutazioneString, setValutazione] = useState("");
     const { id: id_meeting } = useParams();
     const [errore, setErrore] = useState(null);
 
@@ -17,8 +17,9 @@ const Questionario = () => {
         }
 
         console.log("sono nella funzione di invio")
-        console.log("valutazione:", valutazione)
+        console.log("valutazione:", valutazioneString)
 
+        const valutazione = parseInt(valutazioneString, 10);
         const requestOption = {
             method: 'POST',
             headers: {
@@ -49,7 +50,7 @@ const Questionario = () => {
 
     const handleSubmit = () => {
         console.log("hai schiacciato");
-        if (valutazione < 1 || valutazione > 5) {
+        if (valutazioneString < 1 || valutazioneString > 5) {
             setErrore('Il valore deve essere compreso tra 1 e 5');
         } else {
             setErrore(null); // Azzera l'errore se il valore è valido
@@ -66,7 +67,7 @@ const Questionario = () => {
                         type="number"
                         min="1"
                         max="5"
-                        value={valutazione}
+                        value={valutazioneString}
                         onChange={handleValutazioneChange}
                     />
                 </label>
