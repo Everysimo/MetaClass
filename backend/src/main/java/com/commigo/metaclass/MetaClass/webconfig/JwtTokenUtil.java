@@ -21,7 +21,7 @@ public class JwtTokenUtil {
 
     private Key secretKey;
 
-    @Value("${jwt.expiration}")
+    @Value("${jwt.expiration}000")
     private Long expiration;
 
     @PostConstruct

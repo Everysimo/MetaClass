@@ -52,7 +52,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ContextConfiguration(classes = GestioneStanzaControl.class)
 @ExtendWith(MockitoExtension.class)
 @SpringBootTest
-class GestioneMeetingControllerUnitTest {
+class GestioneStanzaControllerUnitTest {
 
     /**
      *  Un mock oggetto è un oggetto simulato che può essere programmato per rispondere in modo specifico a chiamate di
