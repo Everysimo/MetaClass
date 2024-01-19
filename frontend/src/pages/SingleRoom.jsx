@@ -80,6 +80,7 @@ export const SingleRoom = () => {
                         style={{ color: "#c70049" }}
                     />
                     <h1>Stanza {id_stanza}</h1>
+                    <h2></h2>
                     <h2>Meetings programmati</h2>
                     <MeetingList />
                     {!isOrg() && (
