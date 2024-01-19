@@ -196,23 +196,17 @@ export default class CreaScenario extends Component {
             this.props.onClose();
         }
     };
-    renderErrorPopup = () => {
-        return (
-            <div className={`error-popup ${this.state.isErrorPopupVisible ? '' : 'hidden'}`}>
-                {this.state.errorMessage}
-                <button onClick={this.handleErrorPopupClose}>Chiudi</button>
-            </div>
-        );
-    };
 
     render() {
         return (
-            <div>
-                {this.renderErrorPopup()}
-                <div className={`card ${this.state.isVisible ? '' : 'hidden'}`}>
-                    <button className="close-button" onClick={this.handleClose}>
-                        X
-                    </button>
+            <div className={"modal"}>
+                <div className={`modal-content ${this.state.isVisible ? '' : 'hidden'}`}>
+                    <span className="close" onClick={this.handleClose}>
+                        &times;
+                    </span>
+                    {this.state.errorMessage ? (
+                        <p>{this.state.errorMessage}</p>
+                    ) : (
                     <div className="card-content">
                         <label>
                             Nome:
@@ -253,12 +247,11 @@ export default class CreaScenario extends Component {
                                 ))}
                             </select>
                         </label>
-                        <div className="button-container">
-                            <button onClick={this.handleClear}>Cancella</button>
-                            <button onClick={() => this.callFunction()}>Invia</button>
-                        </div>
+                        <button onClick={this.handleClear}>Cancella</button>
+                        <button onClick={() => this.callFunction()}>Invia</button>
                         {this.state.error && <p style={{color: 'red'}}>{this.state.error}</p>}
                     </div>
+                    )}
                 </div>
             </div>
         );
