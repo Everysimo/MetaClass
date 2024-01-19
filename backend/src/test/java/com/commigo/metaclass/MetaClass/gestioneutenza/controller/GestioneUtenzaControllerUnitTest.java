@@ -268,5 +268,30 @@ class GestioneUtenzaControllerUnitTest {
 
     }
 
+    @Test
+    public void testSchedulingMeetingOnTestCase8() throws Exception {
+
+        requestData.put("dataDiNascita","12-12-2001");
+        when(validationToken.isTokenValid(any())).thenReturn(true);
+
+        testExpectedResult(CLIENT_ERROR_STATUS, sendRequestUtente());
+
+    }
+
+    @Test
+    public void testSchedulingMeetingOnTestCase9() throws Exception {
+
+        requestData.put("nome","Salvatore");
+        requestData.put("cognome","Alberti");
+        requestData.put("dataDiNascita","11/30/2001");
+        requestData.put("email","s.alberti1@studenti.unisa.it");
+        requestData.put("telefono","3365948795");
+
+        when(validationToken.isTokenValid(any())).thenReturn(true);
+
+        testExpectedResult(SUCCESSFUL_STATUS, sendRequestUtente());
+
+    }
+
 
 }
