@@ -68,6 +68,7 @@ export const ViewPreviousMeeting = () => {
                                     <FontAwesomeIcon icon={faFileCircleCheck} size="2xl" style={{ color: "#00f900" }} />
                                 )}
                                 </span>
+
                             );
                         })()}
                     </div>
