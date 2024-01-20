@@ -39,7 +39,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-
 @RunWith(SpringRunner.class)
 @ContextConfiguration(classes = GestioneUtenzaController.class)
 @ExtendWith(MockitoExtension.class)
@@ -47,251 +46,239 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ComponentScan(basePackages = "com.commigo.metaclass.MetaClass")
 @PrepareForTest({MapValidator.class})
 class GestioneUtenzaControllerUnitTest {
-    private final String API_URL = "/modifyUserData";
-    @InjectMocks
-    private GestioneUtenzaController gestioneUtenzaController;
-    @MockBean
-    private ValidationToken validationToken;
-    @MockBean
-    private JwtTokenUtil jwtTokenUtil;
+  private final String API_URL = "/modifyUserData";
+  @InjectMocks private GestioneUtenzaController gestioneUtenzaController;
+  @MockBean private ValidationToken validationToken;
+  @MockBean private JwtTokenUtil jwtTokenUtil;
 
-    @MockBean
-    private GestioneUtenzaService utenzaService;
+  @MockBean private GestioneUtenzaService utenzaService;
 
-    private Map<String, Object> requestData;
-    private Utente utente;
-    private HttpServletRequest request;
-    private static final int CLIENT_ERROR_STATUS = 400;
-    private static final int SUCCESSFUL_STATUS = 200;
+  private Map<String, Object> requestData;
+  private Utente utente;
+  private HttpServletRequest request;
+  private static final int CLIENT_ERROR_STATUS = 400;
+  private static final int SUCCESSFUL_STATUS = 200;
 
-    @BeforeEach
-    public void setUp() throws Exception {
-        utente = new Utente(1L, "Michele", "Pesce", "pescemichele@live.com",
-                "05/30/1993","M","7184488154978627", Utente.DEFAULT_TOKEN, true);
+  @BeforeEach
+  public void setUp() throws Exception {
+    utente =
+        new Utente(
+            1L,
+            "Michele",
+            "Pesce",
+            "pescemichele@live.com",
+            "05/30/1993",
+            "M",
+            "7184488154978627",
+            Utente.DEFAULT_TOKEN,
+            true);
 
-        requestData = new HashMap<>();
+    requestData = new HashMap<>();
+  }
 
-    }
+  private String JSONConvertitorUtente(Map<String, Object> utente) {
+    // Creazione del body della richiesta
+    // Converto l'istanza meeting in una stringa JSON accettabile del controller
+    ObjectMapper objectMapper = new ObjectMapper();
+    ObjectNode jsonNode = objectMapper.createObjectNode();
 
-    private String JSONConvertitorUtente(Map<String, Object> utente) {
-        // Creazione del body della richiesta
-        // Converto l'istanza meeting in una stringa JSON accettabile del controller
-        ObjectMapper objectMapper = new ObjectMapper();
-        ObjectNode jsonNode = objectMapper.createObjectNode();
+    for (Map.Entry<String, Object> entry : utente.entrySet()) {
+      String key = entry.getKey();
+      Object value = entry.getValue();
 
-        for (Map.Entry<String, Object> entry : utente.entrySet()) {
-            String key = entry.getKey();
-            Object value = entry.getValue();
-
-            // Aggiungo la coppia chiave-valore al JSON
-            if (value != null) {
-                // Aggiungo il valore solo se non è nullo
-                if (value instanceof String) {
-                    jsonNode.put(key, (String) value);
-                } else if (value instanceof Number) {
-                    jsonNode.put(key, (Short) value);
-                } else if (value instanceof Boolean) {
-                    jsonNode.put(key, (Boolean) value);
-                } else {
-                    // Se il tipo non è uno dei tipi primitivi gestiti da Jackson, converto a JSON usando Jackson
-                    jsonNode.set(key, objectMapper.valueToTree(value));
-                }
-            }
+      // Aggiungo la coppia chiave-valore al JSON
+      if (value != null) {
+        // Aggiungo il valore solo se non è nullo
+        if (value instanceof String) {
+          jsonNode.put(key, (String) value);
+        } else if (value instanceof Number) {
+          jsonNode.put(key, (Short) value);
+        } else if (value instanceof Boolean) {
+          jsonNode.put(key, (Boolean) value);
+        } else {
+          // Se il tipo non è uno dei tipi primitivi gestiti da Jackson, converto a JSON usando
+          // Jackson
+          jsonNode.set(key, objectMapper.valueToTree(value));
         }
-
-        return jsonNode.toString();
+      }
     }
 
-    /**
-     * metodo che prende un meeting e invia la richiesta al server
-     * @retrun ResultActions
-     * @throws Exception
-     */
-   private ResultActions sendRequestUtente() throws Exception {
+    return jsonNode.toString();
+  }
 
+  /**
+   * metodo che prende un meeting e invia la richiesta al server
+   *
+   * @retrun ResultActions
+   * @throws Exception
+   */
+  private ResultActions sendRequestUtente() throws Exception {
 
-        //formattamento della richiesta
-        MockHttpServletRequestBuilder requestBuilder =
-                MockMvcRequestBuilders.post(API_URL)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(JSONConvertitorUtente(requestData))     //metodo privato della classe
-                        .header("Authorization", "Bearer TODO");
+    // formattamento della richiesta
+    MockHttpServletRequestBuilder requestBuilder =
+        MockMvcRequestBuilders.post(API_URL)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(JSONConvertitorUtente(requestData)) // metodo privato della classe
+            .header("Authorization", "Bearer TODO");
 
-        //ritorno della risposta
-        return  MockMvcBuilders.standaloneSetup(gestioneUtenzaController)
-                .build()
-                .perform(requestBuilder);
+    // ritorno della risposta
+    return MockMvcBuilders.standaloneSetup(gestioneUtenzaController)
+        .build()
+        .perform(requestBuilder);
+  }
+
+  // metodo che produce una richiesta testa un errore 400 durante la richiesta
+  private void sendRequestClientFailureUtente() throws Exception {
+    // Formattamento della richiesta
+    MockHttpServletRequestBuilder requestBuilder =
+        MockMvcRequestBuilders.post(API_URL)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(JSONConvertitorUtente(requestData)) // Metodo privato della classe
+            .header("Authorization", "Bearer TODO");
+
+    try {
+      // Forza il metodo creaScheduling a lanciare un'eccezione ServerRuntimeException
+      doThrow(ClientRuntimeException.class).when(utenzaService.modificaDatiUtente(any(), any()));
+
+      // Esecuzione della richiesta e ritorno della risposta
+      MvcResult result =
+          MockMvcBuilders.standaloneSetup(gestioneUtenzaController)
+              .build()
+              .perform(requestBuilder)
+              .andReturn();
+
+      // Verifica del codice di stato
+      int statusCode = result.getResponse().getStatus();
+      assertThat(statusCode).isEqualTo(HttpStatus.BAD_REQUEST.value());
+
+    } finally {
+      // Ripristina il comportamento normale del metodo creaScheduling dopo il test
+      Mockito.reset(utenzaService);
     }
+  }
 
-    //metodo che produce una richiesta testa un errore 400 durante la richiesta
-    private void sendRequestClientFailureUtente() throws Exception {
-        // Formattamento della richiesta
-        MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders
-                .post(API_URL)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(JSONConvertitorUtente(requestData))  // Metodo privato della classe
-                .header("Authorization", "Bearer TODO");
+  private void testExpectedResult(int status, ResultActions actualPerformResult) throws Exception {
 
-        try {
-            // Forza il metodo creaScheduling a lanciare un'eccezione ServerRuntimeException
-            doThrow(ClientRuntimeException.class)
-                    .when(utenzaService.modificaDatiUtente(any(), any()));
+    MvcResult mvcResult = actualPerformResult.andReturn();
+    int resultStatus = mvcResult.getResponse().getStatus();
+    String responseContent = mvcResult.getResponse().getContentAsString();
 
-            // Esecuzione della richiesta e ritorno della risposta
-            MvcResult result = MockMvcBuilders
-                    .standaloneSetup(gestioneUtenzaController)
-                    .build()
-                    .perform(requestBuilder)
-                    .andReturn();
+    System.out.println("Actual Status: " + resultStatus);
+    System.out.println("Response Content: " + responseContent);
 
-            // Verifica del codice di stato
-            int statusCode = result.getResponse().getStatus();
-            assertThat(statusCode).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    if (status == CLIENT_ERROR_STATUS) actualPerformResult.andExpect(status().is4xxClientError());
+    else if (status == SUCCESSFUL_STATUS) actualPerformResult.andExpect(status().is2xxSuccessful());
+  }
 
-        } finally {
-            // Ripristina il comportamento normale del metodo creaScheduling dopo il test
-            Mockito.reset(utenzaService);
-        }
+  @Test
+  void testModifyUserDataOnSuccess() throws Exception {
+
+    // Mock your token validation result
+    when(validationToken.isTokenValid(any(HttpServletRequest.class))).thenReturn(true);
+    when(jwtTokenUtil.getMetaIdFromToken(validationToken.getToken()))
+        .thenReturn(utente.getMetaId()); // Mock your service method result
+    when(utenzaService.modificaDatiUtente(Mockito.anyString(), Mockito.anyMap())).thenReturn(true);
+
+    try {
+      // vedere i metodi private testExpectedResult e sendRequest
+      testExpectedResult(SUCCESSFUL_STATUS, sendRequestUtente());
+
+    } catch (Exception e) {
+      fail("Exception not expected: " + e.getMessage());
     }
+  }
 
+  @Test
+  public void testSchedulingMeetingOnTokenValidationFailed() throws Exception {
 
-    private void testExpectedResult(int status, ResultActions actualPerformResult) throws Exception {
+    when(validationToken.isTokenValid(any())).thenReturn(false);
 
-        MvcResult mvcResult = actualPerformResult.andReturn();
-        int resultStatus = mvcResult.getResponse().getStatus();
-        String responseContent = mvcResult.getResponse().getContentAsString();
+    testExpectedResult(CLIENT_ERROR_STATUS, sendRequestUtente());
+  }
 
-        System.out.println("Actual Status: " + resultStatus);
-        System.out.println("Response Content: " + responseContent);
+  @Test
+  public void testSchedulingMeetingOnTestCase1() throws Exception {
 
-        if(status==CLIENT_ERROR_STATUS)
-            actualPerformResult.andExpect(status().is4xxClientError());
-        else if(status==SUCCESSFUL_STATUS)
-            actualPerformResult.andExpect(status().is2xxSuccessful());
+    requestData.put("nome", "S");
+    when(validationToken.isTokenValid(any())).thenReturn(true);
 
-    }
+    testExpectedResult(CLIENT_ERROR_STATUS, sendRequestUtente());
+  }
 
-    @Test
-    void testModifyUserDataOnSuccess() throws Exception {
+  @Test
+  public void testSchedulingMeetingOnTestCase2() throws Exception {
 
-        // Mock your token validation result
-        when(validationToken.isTokenValid(any(HttpServletRequest.class))).thenReturn(true);
-        when(jwtTokenUtil.getMetaIdFromToken(validationToken.getToken())).thenReturn(utente.getMetaId()); // Mock your service method result
-        when(utenzaService.modificaDatiUtente(Mockito.anyString(), Mockito.anyMap())).thenReturn(true);
+    requestData.put("nome", "S4lvator3");
+    when(validationToken.isTokenValid(any())).thenReturn(true);
 
-        try{
-            //vedere i metodi private testExpectedResult e sendRequest
-            testExpectedResult(SUCCESSFUL_STATUS, sendRequestUtente());
+    testExpectedResult(CLIENT_ERROR_STATUS, sendRequestUtente());
+  }
 
-        } catch (Exception e) {
-            fail("Exception not expected: " + e.getMessage());
-        }
+  @Test
+  public void testSchedulingMeetingOnTestCase3() throws Exception {
 
-    }
+    requestData.put("cognome", "A");
 
-    @Test
-    public void testSchedulingMeetingOnTokenValidationFailed() throws Exception {
+    when(validationToken.isTokenValid(any())).thenReturn(true);
+    testExpectedResult(CLIENT_ERROR_STATUS, sendRequestUtente());
+  }
 
-        when(validationToken.isTokenValid(any())).thenReturn(false);
+  @Test
+  public void testSchedulingMeetingOnTestCase4() throws Exception {
 
-        testExpectedResult(CLIENT_ERROR_STATUS, sendRequestUtente());
+    requestData.put("cognome", "Alb3ert1");
+    when(validationToken.isTokenValid(any())).thenReturn(true);
 
-    }
+    testExpectedResult(CLIENT_ERROR_STATUS, sendRequestUtente());
+  }
 
-    @Test
-    public void testSchedulingMeetingOnTestCase1() throws Exception {
+  @Test
+  public void testSchedulingMeetingOnTestCase5() throws Exception {
 
-        requestData.put("nome","S");
-        when(validationToken.isTokenValid(any())).thenReturn(true);
+    requestData.put("email", "s.alberti1studenti.unisa.it");
+    when(validationToken.isTokenValid(any())).thenReturn(true);
 
-        testExpectedResult(CLIENT_ERROR_STATUS, sendRequestUtente());
+    testExpectedResult(CLIENT_ERROR_STATUS, sendRequestUtente());
+  }
 
-    }
+  @Test
+  public void testSchedulingMeetingOnTestCase6() throws Exception {
 
-    @Test
-    public void testSchedulingMeetingOnTestCase2() throws Exception {
+    requestData.put("telefono", "33659487");
+    when(validationToken.isTokenValid(any())).thenReturn(true);
 
-        requestData.put("nome","S4lvator3");
-        when(validationToken.isTokenValid(any())).thenReturn(true);
+    testExpectedResult(CLIENT_ERROR_STATUS, sendRequestUtente());
+  }
 
-        testExpectedResult(CLIENT_ERROR_STATUS, sendRequestUtente());
+  @Test
+  public void testSchedulingMeetingOnTestCase7() throws Exception {
 
-    }
+    requestData.put("telefono", "336agt9999");
+    when(validationToken.isTokenValid(any())).thenReturn(true);
 
-    @Test
-    public void testSchedulingMeetingOnTestCase3() throws Exception {
+    testExpectedResult(CLIENT_ERROR_STATUS, sendRequestUtente());
+  }
 
-        requestData.put("cognome","A");
+  @Test
+  public void testSchedulingMeetingOnTestCase8() throws Exception {
 
-        when(validationToken.isTokenValid(any())).thenReturn(true);
-        testExpectedResult(CLIENT_ERROR_STATUS, sendRequestUtente());
+    requestData.put("dataDiNascita", "12-12-2001");
+    when(validationToken.isTokenValid(any())).thenReturn(true);
 
-    }
+    testExpectedResult(CLIENT_ERROR_STATUS, sendRequestUtente());
+  }
 
-    @Test
-    public void testSchedulingMeetingOnTestCase4() throws Exception {
+  @Test
+  public void testSchedulingMeetingOnTestCase9() throws Exception {
 
-        requestData.put("cognome","Alb3ert1");
-        when(validationToken.isTokenValid(any())).thenReturn(true);
+    requestData.put("nome", "Salvatore");
+    requestData.put("cognome", "Alberti");
+    requestData.put("dataDiNascita", "11/30/2001");
+    requestData.put("email", "s.alberti1@studenti.unisa.it");
+    requestData.put("telefono", "3365948795");
 
-        testExpectedResult(CLIENT_ERROR_STATUS, sendRequestUtente());
+    when(validationToken.isTokenValid(any())).thenReturn(true);
 
-    }
-
-    @Test
-    public void testSchedulingMeetingOnTestCase5() throws Exception {
-
-        requestData.put("email","s.alberti1studenti.unisa.it");
-        when(validationToken.isTokenValid(any())).thenReturn(true);
-
-        testExpectedResult(CLIENT_ERROR_STATUS, sendRequestUtente());
-
-    }
-
-    @Test
-    public void testSchedulingMeetingOnTestCase6() throws Exception {
-
-        requestData.put("telefono","33659487");
-        when(validationToken.isTokenValid(any())).thenReturn(true);
-
-        testExpectedResult(CLIENT_ERROR_STATUS, sendRequestUtente());
-
-    }
-
-    @Test
-    public void testSchedulingMeetingOnTestCase7() throws Exception {
-
-        requestData.put("telefono","336agt9999");
-        when(validationToken.isTokenValid(any())).thenReturn(true);
-
-        testExpectedResult(CLIENT_ERROR_STATUS, sendRequestUtente());
-
-    }
-
-    @Test
-    public void testSchedulingMeetingOnTestCase8() throws Exception {
-
-        requestData.put("dataDiNascita","12-12-2001");
-        when(validationToken.isTokenValid(any())).thenReturn(true);
-
-        testExpectedResult(CLIENT_ERROR_STATUS, sendRequestUtente());
-
-    }
-
-    @Test
-    public void testSchedulingMeetingOnTestCase9() throws Exception {
-
-        requestData.put("nome","Salvatore");
-        requestData.put("cognome","Alberti");
-        requestData.put("dataDiNascita","11/30/2001");
-        requestData.put("email","s.alberti1@studenti.unisa.it");
-        requestData.put("telefono","3365948795");
-
-        when(validationToken.isTokenValid(any())).thenReturn(true);
-
-        testExpectedResult(SUCCESSFUL_STATUS, sendRequestUtente());
-
-    }
-
-
+    testExpectedResult(SUCCESSFUL_STATUS, sendRequestUtente());
+  }
 }

@@ -14,19 +14,15 @@ import static org.springframework.security.config.Customizer.withDefaults;
 @Configuration
 public class SecurityConfig {
 
-    @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http
-                .authorizeHttpRequests((authz) -> authz
-                        .anyRequest().permitAll()
-                ).csrf((csrf) -> csrf.disable())
-                .httpBasic(withDefaults())
-                .logout((logout) ->       //gestione automatica del logout
-                         logout.deleteCookies("jwtToken")
-                               .invalidateHttpSession(true)
-                                .clearAuthentication(true));
+  @Bean
+  public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    http.authorizeHttpRequests((authz) -> authz.anyRequest().permitAll())
+        .csrf((csrf) -> csrf.disable())
+        .httpBasic(withDefaults())
+        .logout(
+            (logout) -> // gestione automatica del logout
+            logout.deleteCookies("jwtToken").invalidateHttpSession(true).clearAuthentication(true));
 
-        return http.build();
-    }
-
+    return http.build();
+  }
 }

@@ -10,13 +10,15 @@ import com.commigo.metaclass.MetaClass.webconfig.ValidationToken;
 import java.util.List;
 import java.util.Map;
 
+public interface GestioneUtenzaService {
 
-public interface GestioneUtenzaService{
+  boolean loginMeta(Utente u) throws ServerRuntimeException;
 
-    boolean loginMeta(Utente u) throws ServerRuntimeException;
-    boolean modificaDatiUtente(String MetaID, Map<String, Object> params)throws RuntimeException403;
-    List<Stanza> getStanzeByUserId(String MetaId) throws ServerRuntimeException;
-    Utente getUtenteByUserId(String sessionID) throws DataNotFoundException;
-    boolean logoutMeta(String metaID, ValidationToken validationToken) throws ServerRuntimeException;
+  boolean modificaDatiUtente(String MetaID, Map<String, Object> params) throws RuntimeException403;
 
+  List<Stanza> getStanzeByUserId(String MetaId) throws ServerRuntimeException;
+
+  Utente getUtenteByUserId(String sessionID) throws DataNotFoundException;
+
+  boolean logoutMeta(String metaID, ValidationToken validationToken) throws ServerRuntimeException;
 }

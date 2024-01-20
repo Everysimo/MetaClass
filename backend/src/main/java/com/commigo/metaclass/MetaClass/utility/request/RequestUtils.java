@@ -6,11 +6,9 @@ import java.util.List;
 
 public class RequestUtils {
 
-    public static String errorsRequest(BindingResult result){
-        List<String> errors = result.getFieldErrors().stream()
-                .map(FieldError::getDefaultMessage)
-                .toList();
-        return String.join(", ", errors);
-    }
-
+  public static String errorsRequest(BindingResult result) {
+    List<String> errors =
+        result.getFieldErrors().stream().map(FieldError::getDefaultMessage).toList();
+    return String.join(", ", errors);
+  }
 }
