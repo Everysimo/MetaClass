@@ -13,32 +13,32 @@ import java.util.Map;
 
 public interface GestioneUtenzaService{
     /**
-     *
-     * @param u
-     * @return
+     * metodo che consente ad un utente di effettuare il login/registrazione
+     * @param u Utente che esegue il login/registrazione
+     * @return valore boolean che identifica l'esito dell'operazione
      * @throws ServerRuntimeException
      */
     boolean loginMeta(Utente u) throws ServerRuntimeException;
 
     /**
-     *
-     * @param MetaID
-     * @param params
-     * @return
+     * meotodo che consente la modifica dei dati personali di un determianto utente
+     * @param MetaID metaID dell'utente che intende modificare i suoi dati
+     * @param params nuovi dati dell'utente
+     * @return valore boolean che identifica l'esito dell'operazione
      * @throws RuntimeException403
      */
     boolean modificaDatiUtente(String MetaID, Map<String, Object> params)throws RuntimeException403;
 
     /**
-     *
-     * @param MetaId
-     * @return
+     * metodo che ritorna tutte le stanze di un utente
+     * @param MetaId metaID dell'utente
+     * @return lista di stanze di un determinato utente
      * @throws ServerRuntimeException
      */
     List<Stanza> getStanzeByUserId(String MetaId) throws ServerRuntimeException;
 
     /**
-     *
+     * ??
      * @param sessionID
      * @return
      * @throws DataNotFoundException

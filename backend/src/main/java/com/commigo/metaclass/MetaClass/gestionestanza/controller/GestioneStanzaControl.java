@@ -637,7 +637,7 @@ public class GestioneStanzaControl {
     }
 
     @PostMapping(value = "/unmutePartecipante/{IdStanza}/{IdUtente}")
-    public ResponseEntity<Response<Boolean>> UnPartecipante(@PathVariable Long IdStanza,
+    public ResponseEntity<Response<Boolean>> UnmutePartecipante(@PathVariable Long IdStanza,
                                                                   @PathVariable Long IdUtente,
                                                                   HttpServletRequest request) {
 

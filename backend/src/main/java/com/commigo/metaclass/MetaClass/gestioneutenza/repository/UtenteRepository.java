@@ -14,15 +14,15 @@ import java.util.Map;
 public interface UtenteRepository extends JpaRepository<Utente, Long> {
 
     /**
-     *
-     * @param idMeta
+     * metodo che consente la ricerca di un utente tramite un metaID
+     * @param idMeta metaID dell'utente da ricercare
      * @return
      */
     Utente findFirstByMetaId(String idMeta);
 
     /**
-     *
-     * @param id
+     * metodo che consente la ricerca di un utente tramite un id
+     * @param id id dell'utente dal ricercare
      * @return
      */
     Utente findUtenteById(long id);
@@ -31,9 +31,9 @@ public interface UtenteRepository extends JpaRepository<Utente, Long> {
     // 1 se tutto ok
     // 0 se non è ok
     /**
-     *
-     * @param SessionID
-     * @param attributes
+     * metodo che consente la modifica dei dati di un utente
+     * @param SessionID ??
+     * @param attributes i nuovi dati dell'utente
      * @return
      */
     @Modifying

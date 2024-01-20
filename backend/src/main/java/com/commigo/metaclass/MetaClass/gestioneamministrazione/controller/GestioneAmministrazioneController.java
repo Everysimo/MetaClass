@@ -112,8 +112,8 @@ public class GestioneAmministrazioneController {
 
 
     /**
-     * Metodo che gestisce la richiesta di modifica di una categoria da parte di un admin di sistema
-     * @param c Categoria che deve essere modificata
+     * Metodo che gestisce la richiesta di creazione di una categoria da parte di un admin di sistema
+     * @param c Categoria che deve essere creata
      * @param result Variabile che contiene tutti gli errori di validazione dell'oggetto categoria
      * @param request richiesta HTTP fornita dal client
      * @return un valore booleano che identifica la riuscita dell'operazione ed un messaggio che descrive l'esito di essa
@@ -154,8 +154,8 @@ public class GestioneAmministrazioneController {
     }
 
     /**
-     * Metodo che gestisce la richiesta di modificare uno scenario da  parte di un admin di sistema
-     * @param s Scenario che deve essere modificato
+     * Metodo che gestisce la richiesta di creazione uno scenario da  parte di un admin di sistema
+     * @param s Scenario che deve essere creato
      * @param result Variabile che contiene tutti gli errori di validazione dell'oggetto scenario
      * @param request richiesta HTTP fornita dal client
      * @return un valore booleano che identifica la riuscita dell'operazione ed un messaggio che descrive l'esito di essa
@@ -229,6 +229,11 @@ public class GestioneAmministrazioneController {
         }
     }
 
+    /**
+     * Metodo che permette la gestire la richiesta di visualizzazione di tutte le categorie
+     * @param request richiesta HTTP fornita dal client
+     * @return lista di categoria ed un messagggio che identifica l'esito dell'operazione
+     */
     @GetMapping(value = "visualizzaCategoria")
     public ResponseEntity<Response<List<Categoria>>> visualizzaCategorie(HttpServletRequest request) {
         List<Categoria> cats;
