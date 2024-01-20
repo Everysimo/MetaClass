@@ -2,12 +2,15 @@ package com.commigo.metaclass.MetaClass.gestionestanza.controller;
 
 import com.commigo.metaclass.MetaClass.entity.*;
 import com.commigo.metaclass.MetaClass.exceptions.CustomExceptionHandler;
+import com.commigo.metaclass.MetaClass.exceptions.RuntimeException403;
 import com.commigo.metaclass.MetaClass.exceptions.ServerRuntimeException;
 import com.commigo.metaclass.MetaClass.gestionemeeting.service.GestioneMeetingService;
 import com.commigo.metaclass.MetaClass.gestionestanza.repository.StanzaRepository;
 import com.commigo.metaclass.MetaClass.gestionestanza.service.GestioneStanzaService;
+import com.commigo.metaclass.MetaClass.utility.response.types.AccessResponse;
 import com.commigo.metaclass.MetaClass.webconfig.JwtTokenUtil;
 import com.commigo.metaclass.MetaClass.webconfig.ValidationToken;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -25,6 +28,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
@@ -80,15 +84,9 @@ class GestioneStanzaControllerUnitTest {
     private Immagine immagine;
     private Categoria categoria;
     private Scenario scenario;
-    private ValidatorFactory validatorFactory;
-    private Validator validator;
-    private BindingResult bindingResult;
     private DateTimeFormatter formatter;
-    private DateTimeFormatter notCorrectFormatter;
-    private FeedbackMeeting feedbackMeeting;
-    private Report report;
     private final String API_URL_CREASTANZA = "/creastanza";
-    private Integer valutazione;
+    private final String API_URL_ACCESOSTANZA = "/accessoStanza";
 
 
     /**
@@ -105,15 +103,6 @@ class GestioneStanzaControllerUnitTest {
         scenario = new Scenario(1L, "Lavoro1", "Scenario 1 per il lavoro", immagine, categoria);
         stanza = new Stanza(1L, "StanzaLavoro1", "Stanza 1 per il lavoro",
                 false, 500, scenario, "000001");
-        formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
-        notCorrectFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH,mm");
-        meeting = new Meeting(1L, "MeetingStanza4",
-                LocalDateTime.parse("2024-02-02 18:00",formatter),
-                LocalDateTime.parse("2024-02-02 20:00",formatter), false, scenario, stanza );
-
-        report = new Report(1L, 500, Duration.ZERO, 550, meeting, List.of(utente));
-
-        bindingResult = new BeanPropertyBindingResult(meeting, "meeting");
     }
 
     private String JSONConvertitorStanza(Stanza stanza){
@@ -156,7 +145,7 @@ class GestioneStanzaControllerUnitTest {
     }
 
     //metodo che produce una richiesta testa un errore 500 durante la richiesta
-    private void sendRequestServerFailureStanza(Stanza stanza) throws Exception {
+    private void sendRequestFailureAccessoStanza(Stanza stanza, Class<? extends Exception> exceptionClass, int status) throws Exception {
         // Formattamento della richiesta
         MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders
                 .post(API_URL_CREASTANZA)
@@ -166,7 +155,7 @@ class GestioneStanzaControllerUnitTest {
 
         try {
             // Forza il metodo creaStanza a lanciare un'eccezione ServerRuntimeException
-            doThrow(ServerRuntimeException.class)
+            doThrow(exceptionClass)
                     .when(stanzaService).creaStanza(any(), any());
 
             // Esecuzione della richiesta e ritorno della risposta
@@ -178,7 +167,37 @@ class GestioneStanzaControllerUnitTest {
 
             // Verifica del codice di stato
             int statusCode = result.getResponse().getStatus();
-            assertThat(statusCode).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
+            assertThat(statusCode).isEqualTo(status);
+
+        } finally {
+            // Ripristina il comportamento normale del metodo creaScheduling dopo il test
+            Mockito.reset(stanzaService);
+        }
+    }
+
+    private void sendRequestFailureCreaStanza(Stanza stanza, Class<? extends Exception> exceptionClass, int status) throws Exception {
+        // Formattamento della richiesta
+        MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders
+                .post(API_URL_CREASTANZA)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(JSONConvertitorStanza(stanza))  // Metodo privato della classe
+                .header("Authorization", "Bearer TODO");
+
+        try {
+            // Forza il metodo creaStanza a lanciare un'eccezione ServerRuntimeException
+            doThrow(exceptionClass)
+                    .when(stanzaService).creaStanza(any(), any());
+
+            // Esecuzione della richiesta e ritorno della risposta
+            MvcResult result = MockMvcBuilders
+                    .standaloneSetup(stanzaController)
+                    .build()
+                    .perform(requestBuilder)
+                    .andReturn();
+
+            // Verifica del codice di stato
+            int statusCode = result.getResponse().getStatus();
+            assertThat(statusCode).isEqualTo(status);
 
         } finally {
             // Ripristina il comportamento normale del metodo creaScheduling dopo il test
@@ -251,7 +270,23 @@ class GestioneStanzaControllerUnitTest {
                 .thenThrow(ServerRuntimeException.class);
 
         //vedere i metodi private testExpectedResult e sendRequest
-        sendRequestServerFailureStanza(stanza);
+        sendRequestFailureCreaStanza(stanza, ServerRuntimeException.class, 500);
+    }
+
+    @Test
+    public void testCreaStanzaFailure() throws Exception {
+
+        when(validationToken.isTokenValid(any())).thenReturn(true);
+
+        // Simula la decodifica del token e restituisce un metaID valido
+        when(jwtTokenUtil.getMetaIdFromToken(validationToken.getToken()))
+                .thenReturn(utente.getMetaId());
+
+        when(stanzaService.accessoStanza(stanza.getCodice(), utente.getMetaId()))
+                .thenThrow(ServerRuntimeException.class);
+
+        //vedere i metodi private testExpectedResult e sendRequest
+        sendRequestFailureCreaStanza(stanza, Exception.class, 500);
     }
 
     @Test
@@ -397,6 +432,179 @@ class GestioneStanzaControllerUnitTest {
         } catch (Exception e) {
             fail("Exception not expected: " + e.getMessage());
         }
+
+    }
+
+    private String JSONConvertitorCodice(String codice){
+        //CREAAZIONE DEL BODY DELLA RICHIESTA
+        //Converto l'istanza meeting in una stringa JSON accettabile del controller
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule());
+        ObjectNode jsonNode = objectMapper.createObjectNode();
+
+        // Aggiunta degli attributi uno per uno
+        jsonNode.put("codice", codice);
+
+        return jsonNode.toString();
+    }
+    /**
+     * testing accesso stanza
+     * per ogni test case vado a richiamare un metodo che valida delle stanze volontariamente
+     * errate per testare i messaggi di errori che vengono ritornati
+     * successivamente si controlla ogni istruzione del metodo
+     */
+    @Test
+    public void testRichiestaAccessoStanzaOnSuccess(){
+
+        // Simula un token valido
+        when(validationToken.isTokenValid(any(HttpServletRequest.class))).thenReturn(true);
+
+        // Simula la decodifica del token e restituisce un metaID valido
+        when(jwtTokenUtil.getMetaIdFromToken(validationToken.getToken()))
+                .thenReturn(utente.getMetaId());
+
+        try{
+            when(stanzaService.accessoStanza(any(), any()))
+                    .thenReturn(ResponseEntity.ok(any(AccessResponse.class)));
+
+            //vedere i metodi private testExpectedResult e sendRequest
+            testExpectedResult(SUCCESSFUL_STATUS, sendRequestStanza(stanza));
+
+        } catch (Exception e) {
+            fail("Exception not expected: " + e.getMessage());
+        }
+
+    }
+
+    private ResultActions sendRequestAccessoStanza(Stanza stanza) throws Exception {
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule());
+        ObjectNode jsonNode = objectMapper.createObjectNode();
+
+        // Aggiunta degli attributi uno per uno
+        jsonNode.put("codice", stanza.getCodice());
+        System.out.println(jsonNode.toString());
+        //formattamento della richiesta
+        MockHttpServletRequestBuilder requestBuilder =
+                MockMvcRequestBuilders.post(API_URL_ACCESOSTANZA)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(jsonNode.toString())     //metodo privato della classe
+                        .header("Authorization", "Bearer TODO");
+
+        //ritorno della risposta
+        return  MockMvcBuilders.standaloneSetup(stanzaController)
+                .build()
+                .perform(requestBuilder);
+    }
+
+    @Test
+    public void testAccessoStanzaOnTokenValidationFailed() throws Exception {
+
+        when(validationToken.isTokenValid(any())).thenReturn(false);
+
+        testExpectedResult(CLIENT_ERROR_STATUS, sendRequestAccessoStanza(stanza));
+
+    }
+
+    @Test
+    public void testAccessoStanzaOnJsonProcessingFailure() throws Exception {
+
+        when(validationToken.isTokenValid(any())).thenReturn(true);
+
+        // Simula la decodifica del token e restituisce un metaID valido
+        when(jwtTokenUtil.getMetaIdFromToken(validationToken.getToken()))
+                .thenReturn(utente.getMetaId());
+
+        when(stanzaService.accessoStanza(stanza.getCodice(), utente.getMetaId()))
+                .thenThrow(JsonProcessingException.class);
+
+        //vedere i metodi private testExpectedResult e sendRequest
+        sendRequestFailureAccessoStanza(stanza, JsonProcessingException.class, 403);
+    }
+
+    @Test
+    public void testAccessoStanzaOnServerFailure() throws Exception {
+
+        when(validationToken.isTokenValid(any())).thenReturn(true);
+
+        // Simula la decodifica del token e restituisce un metaID valido
+        when(jwtTokenUtil.getMetaIdFromToken(validationToken.getToken()))
+                .thenReturn(utente.getMetaId());
+
+        when(stanzaService.accessoStanza(stanza.getCodice(), utente.getMetaId()))
+                .thenThrow(ServerRuntimeException.class);
+
+        //vedere i metodi private testExpectedResult e sendRequest
+        sendRequestFailureAccessoStanza(stanza, ServerRuntimeException.class, 500);
+    }
+
+    @Test
+    public void testAccessoStanzaAttributeNotValid() throws Exception{
+
+        when(validationToken.isTokenValid(any())).thenReturn(true);
+
+        // Simula la decodifica del token e restituisce un metaID valido
+        when(jwtTokenUtil.getMetaIdFromToken(validationToken.getToken()))
+                .thenReturn(utente.getMetaId());
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule());
+        ObjectNode jsonNode = objectMapper.createObjectNode();
+
+        // Aggiunta degli attributi uno per uno
+        jsonNode.put("code", 654321);
+
+        MockHttpServletRequestBuilder requestBuilder =
+                MockMvcRequestBuilders.post(API_URL_ACCESOSTANZA)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(jsonNode.toString())
+                        .header("Authorization", "Bearer TODO");
+
+        //ritorno della risposta
+        ResultActions ra = MockMvcBuilders.standaloneSetup(stanzaController)
+                .build()
+                .perform(requestBuilder);
+
+        testExpectedResult(CLIENT_ERROR_STATUS, ra);
+    }
+
+    @Test
+    public void testAccessoStanzaCodeisTextual() throws Exception{
+        when(validationToken.isTokenValid(any())).thenReturn(true);
+
+        // Simula la decodifica del token e restituisce un metaID valido
+        when(jwtTokenUtil.getMetaIdFromToken(validationToken.getToken()))
+                .thenReturn(utente.getMetaId());
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule());
+        ObjectNode jsonNode = objectMapper.createObjectNode();
+
+        // Aggiunta degli attributi uno per uno
+        jsonNode.put("codice", true);
+
+        MockHttpServletRequestBuilder requestBuilder =
+                MockMvcRequestBuilders.post(API_URL_ACCESOSTANZA)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(jsonNode.toString())
+                        .header("Authorization", "Bearer TODO");
+
+        //ritorno della risposta
+        ResultActions ra = MockMvcBuilders.standaloneSetup(stanzaController)
+                .build()
+                .perform(requestBuilder);
+
+        testExpectedResult(CLIENT_ERROR_STATUS, ra);
+    }
+
+    @Test
+    public void testAccessoStanzaOnTestCase1() throws Exception {
+
+        when(validationToken.isTokenValid(any())).thenReturn(true);
+
+        stanza.setCodice("1234");
+        testExpectedResult(CLIENT_ERROR_STATUS, sendRequestAccessoStanza(stanza));
 
     }
 }

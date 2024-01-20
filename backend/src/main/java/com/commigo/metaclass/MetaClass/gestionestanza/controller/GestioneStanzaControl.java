@@ -313,7 +313,7 @@ public class GestioneStanzaControl {
         } catch (RuntimeException403 re) {
             return ResponseEntity.status(403)
                     .body(new AccessResponse<>(-1L, "Errore durante la richiesta: "+re.getMessage(), false));
-        }catch (Exception e) {
+        }catch (ServerRuntimeException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(new AccessResponse<>(-1L, "Errore durante la richiesta: " + e.getMessage(), false));
         }

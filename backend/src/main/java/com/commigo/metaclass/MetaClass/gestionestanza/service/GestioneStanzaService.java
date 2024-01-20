@@ -21,7 +21,7 @@ public interface GestioneStanzaService
      * @return
      * @throws Exception
      */
-    ResponseEntity<AccessResponse<Long>> accessoStanza(String codiceStanza, String id_utente) throws Exception;
+    ResponseEntity<AccessResponse<Long>> accessoStanza(String codiceStanza, String id_utente) throws ServerRuntimeException, RuntimeException403;
 
     /**
      *
