@@ -26,7 +26,11 @@ const CreaCategoria = (props) => {
     const sendDataToServer = async () => {
         const { nome, descrizione } = formData;
 
-        // Validazione: Assicurati che idCategoria sia >= 0
+        if (nome.trim() === '' || descrizione.trim() === '') {
+            setErrorMessage('I campi Nome e Descrizione non possono essere vuoti');
+            return;
+        }
+
 
         const dataToSend = {
             nome,
@@ -61,6 +65,8 @@ const CreaCategoria = (props) => {
             setLoading(false);
         }
     };
+
+
 
     const callFunction = () => {
         setSuccessMessage('');
