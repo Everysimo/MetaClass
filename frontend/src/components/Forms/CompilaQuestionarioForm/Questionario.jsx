@@ -4,22 +4,44 @@ import {faCheck, faFileCircleXmark} from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 const Questionario = (props) => {
-    const [valutazione, setValutazione] = useState(0);
+    //const [valutazione, setValutazione] = useState(0);
     const [errore, setErrore] = useState(null);
     const [showModal, setShowModal] = useState(false);
     const [showSuccessPopup, setShowSuccessPopup] = useState(false);
     const [id_meeting, setId] = useState(props.id_meeting);
+
+    const [state, setState] = useState({
+        immersionLevel: "",
+        motionSickness: "",
+    });
 
     useEffect(() => {
         if (showSuccessPopup) {
         }
     }, [showSuccessPopup]);
 
-    const handleValutazioneChange = (value) => {
-        setValutazione(value);
+
+    const handleImmersionChange = (e) => {
+        const newValue = parseInt(e.target.value, 10);
+        setState(prevState => ({ ...prevState, immersionLevel: newValue }));
+        console.log("dato di immersione:", newValue);
     };
 
+    const handleSicknessChange = (e) => {
+        const newValue = parseInt(e.target.value, 10);
+        setState(prevState => ({ ...prevState, motionSickness: newValue }));
+        console.log("dato di sickness:", newValue);
+    };
+
+
     const sendDataToServer = async () => {
+
+        const { immersionLevel, motionSickness,  } = state;
+
+        const dataToSend = {immersionLevel, motionSickness}
+
+        console.log("dei dati:", dataToSend);
+
         if (errore) {
             console.error('Valutazione non valida:', errore);
         }
@@ -30,10 +52,11 @@ const Questionario = (props) => {
                 'Content-Type': 'application/json',
                 'Authorization': 'Bearer ' + sessionStorage.getItem("token")
             },
-            body: JSON.stringify({ valutazione }),
+            body: JSON.stringify({ dataToSend }),
         };
 
         try {
+            console.log("data to send", dataToSend)
             const response = await fetch(`http://localhost:8080/compilaQuestionario/${id_meeting}`, requestOption);
             const responseData = await response.json();
 
@@ -54,13 +77,14 @@ const Questionario = (props) => {
     };
 
     const handleSubmit = () => {
-        console.log("hai schiacciato");
+        /*console.log("hai schiacciato");
         if (valutazione < 1 || valutazione > 5) {
             setErrore('Il valore deve essere compreso tra 1 e 5');
         } else {
             setErrore(null); // Azzera l'errore se il valore è valido
             sendDataToServer();
-        }
+        }*/
+        sendDataToServer()
     };
 
     const handleShow = () => {
@@ -97,12 +121,12 @@ const Questionario = (props) => {
                         <p style={{fontSize: "14px", textAlign: "center"}}>Livello di immersività (1 a 5)</p>
                         <div className="dots-container">
                             {[1, 2, 3, 4, 5].map((value) => (
-                                <label key={value} className={`dot ${value === valutazione ? 'active' : ''}`}>
+                                <label key={value} className={`dot ${value === state.immersionLevel ? 'active' : ''}`}>
                                     <input
                                         type="radio"
-                                        name="valutazione"
+                                        name="immersionLevel"
                                         value={value}
-                                        onChange={() => handleValutazioneChange(value)}
+                                        onChange={handleImmersionChange}
                                     />
                                 </label>
                             ))}
@@ -110,12 +134,12 @@ const Questionario = (props) => {
                         <p style={{fontSize: "14px", textAlign: "center"}}>Livello motion sickness (1 a 5)</p>
                         <div className="dots-container">
                             {[1, 2, 3, 4, 5].map((value) => (
-                                <label key={value} className={`dot ${value === valutazione ? 'active' : ''}`}>
+                                <label key={value} className={`dot ${value === state.motionSickness ? 'active' : ''}`}>
                                     <input
                                         type="radio"
-                                        name="valutazione"
+                                        name="motionSickness"
                                         value={value}
-                                        onChange={() => handleValutazioneChange(value)}
+                                        onChange={handleSicknessChange}
                                     />
                                 </label>
                             ))}
