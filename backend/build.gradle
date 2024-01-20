@@ -6,6 +6,7 @@ plugins {
 	id 'jacoco'
 }
 
+
 group = 'com.commigo.metaclass'
 version = '0.0.1-SNAPSHOT'
 
@@ -15,25 +16,38 @@ java {
 
 repositories {
 	mavenCentral()
-}
-
-apply plugin: 'checkstyle'
-checkstyle {
-	toolVersion = '6.4.1'
-	sourceSets = [sourceSets.main]
-	configFile = rootProject.file("config/checkstyle/google_checks.xml")
-	showViolations = true
-	ignoreFailures = true
-}
-checkstyleTest {
-	enabled = false
-}
-tasks.withType(Checkstyle) {
-	reports {
-		html.destination rootProject.file("config/checkstyle/checkstyle.html")
+	maven {
+		url 'https://dl.bintray.com/bordertech/buildtools'
 	}
 }
 
+
+checkstyle {
+	// Configura le regole Checkstyle (puoi personalizzarle secondo le tue esigenze)
+	toolVersion = "8.48"
+	sourceSets = [sourceSets.main]
+	configFile = rootProject.file("config/checkstyle/google_checks.xml")
+	showViolations = true
+	ignoreFailures = false
+}
+
+
+configurations {
+	badger
+}
+
+
+task generateBadges {
+	dependsOn 'checkstyleMain'
+	doLast {
+		ant {
+			taskdef(name: 'badger', classname: 'com.github.bordertech.buildtools', classpath: configurations.badger.asPath)
+			badger(skip: project.hasProperty('badges.skip') ? project.badges.skip : false,
+					outputDir: 'target/site/badges',
+					inputFile: 'target/checkstyle-result.xml')
+		}
+	}
+}
 
 
 dependencies {
@@ -54,6 +68,10 @@ dependencies {
 	implementation 'org.pmml4s:pmml4s_2.12:0.9.12'
 	implementation 'org.jpmml:pmml-evaluator:1.5.6'
 	implementation 'org.jpmml:pmml-evaluator-extension:1.5.6'
+
+	checkstyle 'com.puppycrawl.tools:checkstyle:10.9.1'
+	badger 'com.github.bordertech.buildtools:badger:1.0.0'
+
 
 	implementation 'javax.xml.bind:jaxb-api:2.3.1'
 	implementation 'com.sun.xml.bind:jaxb-core:2.3.0.1'
