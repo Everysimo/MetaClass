@@ -1,9 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 import '../PopUpStyles.css';
-import {wait} from "@testing-library/user-event/dist/utils";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faDoorOpen} from "@fortawesome/free-solid-svg-icons";
+import {faCheck, faDoorOpen} from "@fortawesome/free-solid-svg-icons";
 import {useNavigate} from "react-router-dom";
 
 const AccediStanza = () => {
@@ -145,7 +143,7 @@ const AccediStanza = () => {
                             className={"close"}
                             onClick={handleCloseSuccesPopUp}
                         >&times;</span>
-                        <p>Accesso alla stanza con successo</p>
+                        <p>Accesso alla stanza con successo <FontAwesomeIcon icon={faCheck} size="2xl" style={{color: "#63E6BE",}} /></p>
                     </div>
                 </div>
             )}

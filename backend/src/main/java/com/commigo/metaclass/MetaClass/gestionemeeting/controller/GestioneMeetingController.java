@@ -9,6 +9,7 @@ import com.commigo.metaclass.MetaClass.utility.response.types.Response;
 import com.commigo.metaclass.MetaClass.webconfig.JwtTokenUtil;
 import com.commigo.metaclass.MetaClass.webconfig.ValidationToken;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
@@ -307,7 +308,7 @@ public class GestioneMeetingController {
     @PostMapping("/compilaQuestionario/{id_meeting}")
     public ResponseEntity<Response<Boolean>> compilaQuestionario(@RequestBody String JSONvalue,
                                                                  @PathVariable Long id_meeting,
-                                                                 HttpServletRequest request) throws Exception{
+                                                                 HttpServletRequest request) {
 
         try {
             //controllo token
@@ -317,22 +318,34 @@ public class GestioneMeetingController {
 
             ObjectMapper objectMapper = new ObjectMapper();
             JsonNode jsonNode = objectMapper.readTree(JSONvalue);
-            JsonNode valutazioneNode = jsonNode.get("valutazione");
+            JsonNode valutazioneNode = jsonNode.get("immersionLevel");
+            JsonNode motionSicknessNode = jsonNode.get("motionSickness");
 
+            //validazione del livello di immersività
             int value;
             if(valutazioneNode.isNull())
-                throw new RuntimeException403("inserire 'valutazione' come attributo");
+                throw new RuntimeException403("inserire 'immersionLevel' come nome dell'attributo");
             if(!valutazioneNode.isInt())
-                throw new RuntimeException403("inserire un valore intero [1,5]");
+                throw new RuntimeException403("inserire un valore di immersivita' intero [1,5]");
             value = valutazioneNode.asInt();
-            //controllo della valutazione
             if(value<1 || value>5){
-                throw new RuntimeException403("valore non valido");
+                throw new RuntimeException403("valore di immersivita' non valido");
+            }
+
+            //validazione motionsickness
+            int motionSickness;
+            if(motionSicknessNode.isNull())
+                throw new RuntimeException403("inserire 'motionSickness' come nome dell'attributo");
+            if(!motionSicknessNode.isInt())
+                throw new RuntimeException403("inserire un valore di motionSickness intero [1,10]");
+            motionSickness = motionSicknessNode.asInt();
+            if(motionSickness<1 || motionSickness>10){
+                throw new RuntimeException403("valore di motionSickness non valido");
             }
 
             String metaID = jwtTokenUtil.getMetaIdFromToken(validationToken.getToken());
 
-            meetingService.compilaQuestionario(value, metaID, id_meeting);
+            meetingService.compilaQuestionario(value,motionSickness, metaID, id_meeting);
 
             return ResponseEntity.ok(new Response<>
                     (true,"questionario compilato con successo"));
@@ -343,6 +356,10 @@ public class GestioneMeetingController {
         }catch (ServerRuntimeException se) {
             return ResponseEntity.status(500)
                     .body(new Response<>(null, se.getMessage()));
+        } catch (JsonProcessingException e) {
+            return ResponseEntity.status(403)
+                    .body(new Response<>(null, "'valutazione' o altri attributi non sono " +
+                            "disponibili: (immersionLevel,motionSickness) "));
         }
     }
 

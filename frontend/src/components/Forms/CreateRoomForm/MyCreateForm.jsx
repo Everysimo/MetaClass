@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import '../PopUpStyles.css';
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faCirclePlus} from "@fortawesome/free-solid-svg-icons";
+import {faCheck, faCirclePlus} from "@fortawesome/free-solid-svg-icons";
 const MyCreateForm = () => {
     const [showCreateFormModal, setShowCreateFormModal] = useState(false);
 
@@ -299,7 +299,7 @@ const MyCreateForm = () => {
                             className={"close"}
                             onClick={handleCloseSuccesPopUp}
                         >&times;</span>
-                        <p>Stanza creata con successo</p>
+                        <p>Stanza creata con successo <FontAwesomeIcon icon={faCheck} size="2xl" style={{color: "#63E6BE",}} /></p>
                     </div>
                 </div>
             )}

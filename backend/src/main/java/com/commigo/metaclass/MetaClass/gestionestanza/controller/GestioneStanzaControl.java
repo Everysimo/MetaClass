@@ -304,8 +304,12 @@ public class GestioneStanzaControl {
                 throw new RuntimeException403("l'attributo deve essere una stringa");
 
             String codiceStanza = codiceNode.asText();
+            System.out.println(codiceStanza.length());
+            if(codiceStanza.length()!=6)
+                throw new RuntimeException403("il codice deve essere un numero di 6 cifre");
 
-            return ResponseEntity.ok(stanzaService.accessoStanza(codiceStanza, metaID).getBody());
+            ResponseEntity<AccessResponse<Long>> resp = ResponseEntity.ok(stanzaService.accessoStanza(codiceStanza, metaID).getBody());
+            return resp;
 
         }catch (JsonProcessingException je) {
             return ResponseEntity.status(403)
@@ -313,7 +317,7 @@ public class GestioneStanzaControl {
         } catch (RuntimeException403 re) {
             return ResponseEntity.status(403)
                     .body(new AccessResponse<>(-1L, "Errore durante la richiesta: "+re.getMessage(), false));
-        }catch (Exception e) {
+        }catch (ServerRuntimeException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(new AccessResponse<>(-1L, "Errore durante la richiesta: " + e.getMessage(), false));
         }
@@ -633,7 +637,7 @@ public class GestioneStanzaControl {
     }
 
     @PostMapping(value = "/unmutePartecipante/{IdStanza}/{IdUtente}")
-    public ResponseEntity<Response<Boolean>> UnPartecipante(@PathVariable Long IdStanza,
+    public ResponseEntity<Response<Boolean>> UnmutePartecipante(@PathVariable Long IdStanza,
                                                                   @PathVariable Long IdUtente,
                                                                   HttpServletRequest request) {
 

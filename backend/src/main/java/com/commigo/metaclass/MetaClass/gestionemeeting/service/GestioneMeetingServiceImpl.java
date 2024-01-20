@@ -248,7 +248,7 @@ public class GestioneMeetingServiceImpl implements GestioneMeetingService{
     }
 
     /**
-     * metodo che permette di temrminare un meeting precedentemente avviato
+     * metodo che permette di terminare un meeting precedentemente avviato
      * @param metaID metaID
      * @param id_meeting
      * @return
@@ -331,10 +331,10 @@ public class GestioneMeetingServiceImpl implements GestioneMeetingService{
     }
 
     /**
-     *
-     * @param metaID
-     * @param id_meeting
-     * @return
+     * metodo che consente ad un utente di uscire da un meeting
+     * @param metaID metaID dell'utente che deve uscire dal meeting
+     * @param id_meeting id del meeting da cui l'utente ha intenzione di uscire
+     * @return valore boolean che identifica l'esito dell'operazione
      * @throws ServerRuntimeException
      * @throws RuntimeException403
      */
@@ -377,9 +377,9 @@ public class GestioneMeetingServiceImpl implements GestioneMeetingService{
     }
 
     /**
-     *
-     * @param idStanza
-     * @return
+     * metodo che consente di visualizzare la lista dei meeting schedulati all'interno della stanza
+     * @param idStanza id della stanza di cui vogliamo visualizzare i meeting schedulati
+     * @return lista di meeting schedulati all'interno della stanza selezionata
      */
     @Override
     public ResponseEntity<Response<List<Meeting>>> visualizzaSchedulingMeeting(Long idStanza) {
@@ -399,9 +399,9 @@ public class GestioneMeetingServiceImpl implements GestioneMeetingService{
     }
 
     /**
-     *
-     * @param metaId
-     * @return
+     * metodo che consente di visualizzare i questionari di un determinato utente
+     * @param metaId metaId dell'utente che deve visualizzare i meeting
+     * @return lista di meeting di cui l'utente possiede un questionari
      * @throws ServerRuntimeException
      * @throws RuntimeException403
      */
@@ -427,9 +427,9 @@ public class GestioneMeetingServiceImpl implements GestioneMeetingService{
     }
 
     /**
-     *
-     * @param metaId
-     * @return
+     * metodo che consente la visualizzazione di tutti i meeting a cui ha già partecipato un determinato utente
+     * @param metaId metaID dell'utente che ha partecipato ai meeting
+     * @return lista di tutti i meeting a cui l'utente ha già partecipato
      * @throws ServerRuntimeException
      * @throws RuntimeException403
      */
@@ -452,16 +452,17 @@ public class GestioneMeetingServiceImpl implements GestioneMeetingService{
     }
 
     /**
-     *
-     * @param value
-     * @param metaId
-     * @param id_meeting
-     * @return
+     * metodo che consente la compilazione di un questionario da parte di un determinato utente
+     * @param value la valutazione dello scenario inserita dall'utente all'interno del questionario
+     * @param motionSickness livello di nausea dopo l'uscita dal meeting
+     * @param metaId metaID dell'utente che compila il questionario
+     * @param id_meeting id del meeting a cui fa riferimento il questionario
+     * @return valore boolean che identifica l'esito dell'operazione
      * @throws ServerRuntimeException
      * @throws RuntimeException403
      */
     @Override
-    public boolean compilaQuestionario(Integer value, String metaId, Long id_meeting) throws ServerRuntimeException, RuntimeException403 {
+    public boolean compilaQuestionario(Integer value, Integer motionSickness, String metaId, Long id_meeting) throws ServerRuntimeException, RuntimeException403 {
 
         Utente u;
         if((u=utenteRepository.findFirstByMetaId(metaId))==null)
@@ -483,6 +484,10 @@ public class GestioneMeetingServiceImpl implements GestioneMeetingService{
 
         //determino che il questionario è salvato
         fm.setCompiledQuestionario(true);
+        //aggiungo il livello di immersività e il motionSickness
+        fm.setImmersionLevel(value);
+        fm.setMotionSickness(motionSickness);
+
         feedbackMeetingRepository.save(fm);
 
         //se non è compilato allora procedo con la compilazione
@@ -500,10 +505,6 @@ public class GestioneMeetingServiceImpl implements GestioneMeetingService{
         sc.setMedia_valutazione(newMedia);
         sc.setNum_voti(num_voti+1);
         scenarioRepository.save(sc);
-
-        //riempimento dataset
-
-        //gestioneStimaMeetingService.addUtenteInDataset(u,fm.getTempo_totale(),value);
 
         return true;
     }

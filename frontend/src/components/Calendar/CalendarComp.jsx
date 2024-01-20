@@ -5,7 +5,8 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { MultiInputDateTimeRangeField } from '@mui/x-date-pickers-pro/MultiInputDateTimeRangeField';
 import './CalendarComp.css';
 import axios from 'axios';
-import { MessagePopup } from '../Forms/ErrorHandlePopup/MessagePopup'; // Import the MessagePopup component
+import {faCheck} from "@fortawesome/free-solid-svg-icons";
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome"; // Import the MessagePopup component
 
 const CalendarComp = () => {
     const [showModal, setShowModal] = useState(false);
@@ -76,7 +77,7 @@ const CalendarComp = () => {
                         &times;
                     </span>
                     {successMessage ? (
-                        <p>{successMessage}</p>
+                        <p>{successMessage} <FontAwesomeIcon icon={faCheck} size="2xl" style={{color: "#63E6BE",}} /></p>
                     ) : (
                         <LocalizationProvider
                             dateAdapter={AdapterDayjs}
