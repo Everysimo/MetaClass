@@ -1,4 +1,5 @@
 package com.commigo.metaclass.MetaClass.webconfig;
+
 import com.commigo.metaclass.MetaClass.gestioneutenza.repository.UtenteRepository;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -18,45 +19,41 @@ import java.util.Date;
 @AllArgsConstructor
 public class JwtTokenUtil {
 
+  private Key secretKey;
 
-    private Key secretKey;
+  @Value("${jwt.expiration}000")
+  private Long expiration;
 
-    @Value("${jwt.expiration}000")
-    private Long expiration;
+  @PostConstruct
+  public void init() {
+    // Inizializza la chiave segreta al momento della creazione del bean
+    secretKey = Keys.secretKeyFor(SignatureAlgorithm.HS512);
+  }
 
-    @PostConstruct
-    public void init() {
-        // Inizializza la chiave segreta al momento della creazione del bean
-        secretKey = Keys.secretKeyFor(SignatureAlgorithm.HS512);
+  public String generateToken(String metaID) {
+    Date now = new Date();
+    Date expiryDate = new Date(now.getTime() + expiration);
+
+    return Jwts.builder()
+        .setSubject(metaID)
+        .setIssuedAt(now)
+        .setExpiration(expiryDate)
+        .signWith(SignatureAlgorithm.HS512, secretKey)
+        .compact();
+  }
+
+  public String getMetaIdFromToken(String token) {
+    Claims claims = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody();
+
+    return claims.getSubject();
+  }
+
+  public boolean validateToken(String token) {
+    try {
+      Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token);
+      return true;
+    } catch (Exception e) {
+      return false;
     }
-
-    public String generateToken(String metaID) {
-        Date now = new Date();
-        Date expiryDate = new Date(now.getTime() + expiration);
-
-        return Jwts.builder()
-                .setSubject(metaID)
-                .setIssuedAt(now)
-                .setExpiration(expiryDate)
-                .signWith(SignatureAlgorithm.HS512, secretKey)
-                .compact();
-    }
-
-    public String getMetaIdFromToken(String token) {
-        Claims claims = Jwts.parser()
-                .setSigningKey(secretKey)
-                .parseClaimsJws(token)
-                .getBody();
-
-        return claims.getSubject();
-    }
-
-    public boolean validateToken(String token) {
-        try {
-            Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token);
-            return true;
-        } catch (Exception e) {
-            return false;
-        }
-    }
+  }
 }

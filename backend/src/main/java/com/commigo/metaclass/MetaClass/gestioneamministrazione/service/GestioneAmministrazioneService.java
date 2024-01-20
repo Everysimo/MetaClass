@@ -10,10 +10,15 @@ import java.util.List;
 
 public interface GestioneAmministrazioneService {
 
-    boolean updateCategoria(Categoria c);
-    boolean updateScenario(Scenario s, long IdCategoria);
-    List<Stanza> getStanze();
-    boolean deleteBanToUser(Long idUtente, Long idStanza) throws RuntimeException403;
-    boolean checkAdmin(String metaId);
-    List<Categoria> getCategorie();
+  boolean updateCategoria(Categoria c);
+
+  boolean updateScenario(Scenario s, long IdCategoria);
+
+  List<Stanza> getStanze();
+
+  boolean deleteBanToUser(Long idUtente, Long idStanza) throws RuntimeException403;
+
+  boolean checkAdmin(String metaId);
+
+  List<Categoria> getCategorie();
 }

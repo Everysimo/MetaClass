@@ -13,141 +13,120 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
 
-
 @Entity
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class Stanza {
 
-    /**
-     * Costante per valore intero di 2.
-     */
-    public static final int MIN_NAME_LENGTH = 2;
+  /** Costante per valore intero di 2. */
+  public static final int MIN_NAME_LENGTH = 2;
 
-    /**
-     * Costante per valore intero di 254.
-     */
-    public static final int MAX_NAME_LENGTH = 254;
+  /** Costante per valore intero di 254. */
+  public static final int MAX_NAME_LENGTH = 254;
 
-    /**
-     * Costante per valore intero di 254.
-     */
-    public static final int MAX_DESCR_LENGTH = 254;
+  /** Costante per valore intero di 254. */
+  public static final int MAX_DESCR_LENGTH = 254;
 
-    /**
-     * ID della stanza
-     */
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+  /** ID della stanza */
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private long id;
 
-    /**
-     * Nome della Stanza
-     */
-    @NotNull(message = "Il nome non può essere nullo")
-    @Column(length = MAX_NAME_LENGTH)
-    @Size(min = MIN_NAME_LENGTH,
-            max = MAX_NAME_LENGTH,
-            message = "Lunghezza nome errata")
-    @Pattern(regexp = "^[A-Z][a-zA-Z0-9\\s]*$",
-            message = "Formato nome errato")
-    @NotBlank(message = "Il nome non può essere vuoto")
-    private String nome;
+  /** Nome della Stanza */
+  @NotNull(message = "Il nome non può essere nullo")
+  @Column(length = MAX_NAME_LENGTH)
+  @Size(min = MIN_NAME_LENGTH, max = MAX_NAME_LENGTH, message = "Lunghezza nome errata")
+  @Pattern(regexp = "^[A-Z][a-zA-Z0-9\\s]*$", message = "Formato nome errato")
+  @NotBlank(message = "Il nome non può essere vuoto")
+  private String nome;
 
-    /**
-     * Codice della Stanza
-     */
+  /** Codice della Stanza */
+  @Column(length = MAX_NAME_LENGTH, unique = true)
+  @Size(min = 6, max = 6, message = "Lunghezza codice_stanza errato")
+  @Pattern(regexp = "^[0-9]*$", message = "Formato codice_stanza errato")
+  private String codice;
 
-    @Column(length = MAX_NAME_LENGTH, unique = true)
-    @Size(min = 6,
-            max = 6,
-            message = "Lunghezza codice_stanza errato")
-    @Pattern(regexp = "^[0-9]*$",
-            message = "Formato codice_stanza errato")
-    private String codice;
+  /** Descrizione della Stanza */
+  @NotNull(message = "La descrizione della stanza non può essere nulla")
+  @Column(length = MAX_DESCR_LENGTH)
+  @Size(min = MIN_NAME_LENGTH, max = MAX_DESCR_LENGTH, message = "Lunghezza descrizione errata")
+  @Pattern(regexp = "^[A-Z][a-zA-Z0-9.,!?()'\"\\-\\s]*$", message = "Formato descrizione errata")
+  @NotBlank(message = "La descrizione non può essere vuota")
+  private String descrizione;
 
-    /**
-     * Descrizione della Stanza
-     */
-    @NotNull(message = "La descrizione della stanza non può essere nulla")
-    @Column(length = MAX_DESCR_LENGTH)
-    @Size(min = MIN_NAME_LENGTH,
-            max = MAX_DESCR_LENGTH,
-            message = "Lunghezza descrizione errata")
-    @Pattern(regexp = "^[A-Z][a-zA-Z0-9.,!?()'\"\\-\\s]*$",
-            message = "Formato descrizione errata")
-    @NotBlank(message = "La descrizione non può essere vuota")
-    private String descrizione;
+  /** Tipo di Accesso alla Stanza, ovvero la stanza è pubblica (1) o privata (0) */
+  @NotNull(message = "Il tipo di accesso non può essere nullo")
+  private boolean tipo_Accesso;
 
-    /**
-     * Tipo di Accesso alla Stanza, ovvero la stanza è pubblica (1) o privata (0)
-     */
-    @NotNull(message = "Il tipo di accesso non può essere nullo")
-    private boolean tipo_Accesso;
+  /** Identifica il numero massimo di posti nella stanza */
+  @NotNull(message = "Il numero massimo di posti non può essere nullo")
+  @Min(value = 1, message = "Il valore del  parametro non deve essere inferiore ad 1")
+  @Max(value = 999, message = "Il valore del  parametro non deve superare 999")
+  private int max_Posti;
 
-    /**
-     * Identifica il numero massimo di posti nella stanza
-     */
-    @NotNull(message = "Il numero massimo di posti non può essere nullo")
-    @Min(value = 1, message = "Il valore del  parametro non deve essere inferiore ad 1")
-    @Max(value = 999, message = "Il valore del  parametro non deve superare 999")
-    private int max_Posti;
+  /** Chiave Esterna sullo Scenario */
+  @NotNull(message = "Lo scenario non può essere nullo")
+  @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.REFRESH})
+  @JoinColumn(name = "id_scenario")
+  private Scenario scenario;
 
-    /**
-     * Chiave Esterna sullo Scenario
-     */
-    @NotNull(message = "Lo scenario non può essere nullo")
-    @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.REFRESH})
-    @JoinColumn(name = "id_scenario")
-    private Scenario scenario;
+  @Column(name = "Data_Creazione", updatable = false)
+  @CreationTimestamp
+  private LocalDateTime data_Creazione;
 
-    @Column(name = "Data_Creazione", updatable = false)
-    @CreationTimestamp
-    private LocalDateTime data_Creazione;
+  @Column(name = "Data_Aggiornamento")
+  @UpdateTimestamp
+  private LocalDateTime data_Aggiornamento;
 
-    @Column(name = "Data_Aggiornamento")
-    @UpdateTimestamp
-    private LocalDateTime data_Aggiornamento;
+  @JsonCreator
+  public Stanza(
+      @JsonProperty("nome") String nome,
+      @JsonProperty("descrizione") String descrizione,
+      @JsonProperty("tipoAccesso") boolean tipoAccesso,
+      @JsonProperty("maxPosti") Object maxPosti,
+      @JsonProperty("id_scenario") Long id_scenario)
+      throws MismatchJsonProperty {
 
-    @JsonCreator
-    public Stanza(@JsonProperty("nome") String nome,
-                  @JsonProperty("descrizione") String descrizione,
-                  @JsonProperty("tipoAccesso") boolean tipoAccesso,
-                  @JsonProperty("maxPosti") Object maxPosti,
-                  @JsonProperty("id_scenario") Long id_scenario) throws MismatchJsonProperty {
-
-        if (nome == null || descrizione == null || id_scenario == null) {
-            throw new MismatchJsonProperty("gli attributi non sono corretti");
-        }
-
-        if (maxPosti instanceof Integer) {
-            this.max_Posti = (int) maxPosti;
-        } else {
-            throw new MismatchJsonProperty("maxPosti non è un intero");
-        }
-
-        this.nome = nome;
-        this.descrizione = descrizione;
-        this.tipo_Accesso = tipoAccesso;
-
-        //aggiunta dello scenario
-        this.scenario = new Scenario();
-        this.scenario.setId(id_scenario);
+    if (nome == null || descrizione == null || id_scenario == null) {
+      throw new MismatchJsonProperty("gli attributi non sono corretti");
     }
 
-    public Stanza(Long id, String nome, String descrizione, boolean tipoAccesso, int maxPosti, Scenario scenario, String codice) throws MismatchJsonProperty {
-
-        if (nome == null || descrizione == null) {
-            throw new MismatchJsonProperty("gli attributi non sono corretti");
-        }
-
-        this.nome = nome;
-        this.descrizione = descrizione;
-        this.tipo_Accesso = tipoAccesso;
-        this.max_Posti = (maxPosti > 0) ? maxPosti : 1;
-        this.codice = codice;
-        //aggiunta dello scenario
-        this.scenario = scenario;
+    if (maxPosti instanceof Integer) {
+      this.max_Posti = (int) maxPosti;
+    } else {
+      throw new MismatchJsonProperty("maxPosti non è un intero");
     }
+
+    this.nome = nome;
+    this.descrizione = descrizione;
+    this.tipo_Accesso = tipoAccesso;
+
+    // aggiunta dello scenario
+    this.scenario = new Scenario();
+    this.scenario.setId(id_scenario);
+  }
+
+  public Stanza(
+      Long id,
+      String nome,
+      String descrizione,
+      boolean tipoAccesso,
+      int maxPosti,
+      Scenario scenario,
+      String codice)
+      throws MismatchJsonProperty {
+
+    if (nome == null || descrizione == null) {
+      throw new MismatchJsonProperty("gli attributi non sono corretti");
+    }
+
+    this.nome = nome;
+    this.descrizione = descrizione;
+    this.tipo_Accesso = tipoAccesso;
+    this.max_Posti = (maxPosti > 0) ? maxPosti : 1;
+    this.codice = codice;
+    // aggiunta dello scenario
+    this.scenario = scenario;
+  }
 }

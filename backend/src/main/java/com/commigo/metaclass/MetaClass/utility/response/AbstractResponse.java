@@ -9,8 +9,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public abstract class AbstractResponse<Type>
-{
-    private Type value;
-    String message;
+public abstract class AbstractResponse<Type> {
+  private Type value;
+  String message;
 }
