@@ -12,8 +12,10 @@ const AccediStanza = () => {
     const [errorMessage, setErrorMessage] = useState("");
     const [formReset, setFormReset] = useState(false);
     const [displayOKButton, setDisplayOKButton] = useState(false);
-
+    const [showSuccessPopup, setShowSuccessPopup] = useState(false);
+    const [responseValue, setresponseValue] = useState(null);
     const navigate = useNavigate();
+
 
     const handleShowModal = () => {
         setShowModal(true);
@@ -68,9 +70,12 @@ const AccediStanza = () => {
             }
             if(responseData.value>0)
             {
-                setErrorMessage(responseData.message);
                 setDisplayOKButton(true);
-                navigate(`/SingleRoom/${responseData.value}`);
+
+                setresponseValue(responseData.value)
+
+                handleCloseModal()
+                setShowSuccessPopup(true)
             }
         }
         catch (error) {
@@ -86,6 +91,15 @@ const AccediStanza = () => {
             setFormReset(false);
         }
     }, [formReset]);
+
+    const handleCloseSuccesPopUp = () => {
+        setTimeout(() => {
+            // Simuliamo il reindirizzamento dopo 2 secondi
+            setShowSuccessPopup(false);
+            // Aggiungi le azioni specifiche per il reindirizzamento
+            navigate(`/SingleRoom/${responseValue}`);
+        }, 1000);
+    };
 
     return (
         <>
@@ -117,10 +131,21 @@ const AccediStanza = () => {
                                 min={0}
                             />
                         </label>
-                        {errorMessage && <p>{errorMessage}</p>}
+                        {errorMessage && <p> {errorMessage}</p>}
                         {displayOKButton && <button onClick={resetForm}>OK</button>}
                         {!displayOKButton && <button onClick={resetForm}>Cancella</button>}
                         {!displayOKButton && <button onClick={sendDataToServer}>Invia</button>}
+                    </div>
+                </div>
+            )}
+            {showSuccessPopup && (
+                <div className={"modal"}>
+                    <div className={"modal-content"}>
+                        <span
+                            className={"close"}
+                            onClick={handleCloseSuccesPopUp}
+                        >&times;</span>
+                        <p>Accesso alla stanza con successo</p>
                     </div>
                 </div>
             )}
