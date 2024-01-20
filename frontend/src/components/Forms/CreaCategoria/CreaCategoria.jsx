@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import '../PopUpStyles.css';
 import { wait } from "@testing-library/user-event/dist/utils";
+import {faCheck} from "@fortawesome/free-solid-svg-icons";
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 
 const CreaCategoria = (props) => {
     const [formData, setFormData] = useState({
@@ -95,7 +97,7 @@ const CreaCategoria = (props) => {
                     ) : (
                         <>
                             {successMessage ? (
-                                <p>{successMessage}</p>
+                                <p>{successMessage} <FontAwesomeIcon icon={faCheck} size="2xl" style={{color: "#63E6BE",}} /></p>
                             ) : errorMessage ? (
                                 <p>{errorMessage}</p>
                             ) : (
