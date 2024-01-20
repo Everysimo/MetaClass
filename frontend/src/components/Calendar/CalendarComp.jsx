@@ -5,7 +5,7 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { MultiInputDateTimeRangeField } from '@mui/x-date-pickers-pro/MultiInputDateTimeRangeField';
 import './CalendarComp.css';
 import axios from 'axios';
-import {faCheck} from "@fortawesome/free-solid-svg-icons";
+import {faCheck, faRobot} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome"; // Import the MessagePopup component
 
 const CalendarComp = () => {
@@ -95,6 +95,8 @@ const CalendarComp = () => {
                                     className="inputField"
                                     style={{maxWidth: "100%", margin:"20px"}}
                                 />
+                                <FontAwesomeIcon icon={faRobot} size="2xl" style={{color: "#c70049", margin: "10px"}} />
+                                <p style={{fontSize: "14px"}}>Stima fatta con il modulo di IA</p>
                                 <MultiInputDateTimeRangeField
                                     value={selectedDateTimeRange}
                                     onChange={handleDateTimeRangeChange}

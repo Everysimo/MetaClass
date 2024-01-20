@@ -5,14 +5,12 @@ import '../css/index.css';
 import '../css/LoggedHome.css';
 import { MyHeader } from '../components/Layout/Header/Header';
 import { MyFooter } from "../components/Layout/Footer/Footer";
-import LogoutButton from "../components/Buttons/LogoutButton/logoutButton";
 import { useNavigate } from 'react-router-dom';
 import CreaCategoria from "../components/Forms/CreaCategoria/CreaCategoria";
 import CreaScenario from "../components/Forms/CreaScenarioForm/CreaScenario";
-import ModificaScenario from "../components/Forms/CreaScenarioForm/ModificaScenario";
 import AccediStanza from "../components/Forms/enterRoomForm/accediStanza";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faCalendarDays, faUser} from "@fortawesome/free-solid-svg-icons";
+import {faCalendarDays, faImage, faList, faUser} from "@fortawesome/free-solid-svg-icons";
 import RoomList from "../components/Lists/RoomList/RoomList";
 import MyCreateForm from "../components/Forms/CreateRoomForm/MyCreateForm";
 
@@ -103,6 +101,7 @@ export const LoggedInHome = () => {
                                         closeAllComponents();
                                         setIsVisibleCat(prevVisibility => !prevVisibility)
                                     }}>
+                                    <FontAwesomeIcon icon={faList} size="2xl" style={{color: "#c70049",}} />
                                     <h2>Crea Categoria</h2>
                                     <p
                                         style={{fontSize: "14px", textAlign: "center",}}
@@ -116,25 +115,13 @@ export const LoggedInHome = () => {
                                         closeAllComponents();
                                         setIsVisibleScen(prevVisibility => !prevVisibility)
                                     }}>
+                                    <FontAwesomeIcon icon={faImage} size="2xl" style={{color: "#c70049",}} />
                                     <h2>Crea Scenario</h2>
                                     <p
                                         style={{fontSize: "14px", textAlign: "center",}}
                                     >Funzione amministratore per creare un nuovo scenario</p>
                                 </div>
                                 {isVisibleScen && <CreaScenario onClose={() => setIsVisibleScen(false)}/>}
-
-                                <div
-                                    className={"transWhiteBg"}
-                                    onClick={() => {
-                                        closeAllComponents();
-                                        setIsVisibleModScen(prevVisibility => !prevVisibility)
-                                    }}>
-                                    <h2>Modifica Scenario</h2>
-                                    <p
-                                        style={{fontSize: "14px", textAlign: "center",}}
-                                    >Funzione amministratore per modificare uno scenario</p>
-                                </div>
-                                {isVisibleModScen && <ModificaScenario onClose={() => setIsVisibleModScen(false)}/>}
                             </>
                         }
                     </div>

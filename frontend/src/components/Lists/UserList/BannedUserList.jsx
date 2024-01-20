@@ -1,12 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 
-const BannedUserList = () => {
+const BannedUserList = ({id_stanza}) => {
     const [userList, setUserList] = useState([]);
     const [selectedUserId, setSelectedUserId] = useState(null);
-
-    const { id: id_stanza } = useParams();
-    console.log('idStanza', id_stanza);
+    const [showModal, setShowModal] = useState(false);
     const id_stanza_int = parseInt(id_stanza, 10);
     useEffect(() => {
         fetchBannedUserList();
@@ -53,36 +51,42 @@ const BannedUserList = () => {
                 'Authorization': 'Bearer ' + sessionStorage.getItem("token")
             },
         };
-
         try {
             const response = await fetch(`http://localhost:8080/admin/annullaBan/${id_stanza}/${idutente}`, requestOption);
-
             if (!response.ok) {
                 throw new Error('Errore nella richiesta di revocare il ban');
             }
-
             const data = await response.json();
             console.log('data:', data);
-
-
         } catch (error) {
             console.error('Errore durante la revoca del ban:', error);
         }
-
-
         console.log(`Revoca ban per l'utente }`);
     };
 
     return (
-        <div>
-            <h2>Utenti Bannati:</h2>
-            {userList && userList.map((user) => (
-                <div key={user.id} className="user-card">
-                    <span>{`${user.nome} ${user.cognome}`}</span>
-                    <button onClick={() => handleRevocaBanButton(user.id)}>Revoca Ban Utente</button>
+        <>
+            <div className={'modal'}>
+                <div className={'modal-content'}>
+                    <span
+                        className={'close'}
+                    >
+                        &times;
+                    </span>
+                    <h2>Utenti Bannati:</h2>
+                    {userList && userList.map((user) => (
+                        <div key={user.id} className="user-card">
+                            <span>{`${user.nome} ${user.cognome}`}</span>
+                            <button
+                                onClick={() => handleRevocaBanButton(user.id)}
+                            >
+                                Revoca Ban Utente
+                            </button>
+                        </div>
+                    ))}
                 </div>
-            ))}
-        </div>
+            </div>
+        </>
     );
 };
 

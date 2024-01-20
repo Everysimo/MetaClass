@@ -11,6 +11,7 @@ import AvviaMeeting from "../components/Buttons/GestioneMeetingButtons/AvviaMeet
 import MyModifyForm from "../components/Forms/ModifyRoomForm/MyModifyForm";
 import MeetingList from "../components/Calendar/CalendarViewer";
 import RequestSection from "../components/Forms/AccessRequest/RequestSection";
+import SelectScenario from "../components/Forms/SelectNewScenario/SelectScenario";
 
 export const SingleRoom = () => {
     const navigate = useNavigate();
@@ -123,22 +124,15 @@ export const SingleRoom = () => {
                         <>
                             <div className={"masterDiv"}>
                                 <div className={"childDiv"}>
-                                    <h2>Schedula un nuovo meeting</h2>
                                     <CalendarComp/>
-                                </div>
-                                <div className={"childDiv"}>
                                     <MyModifyForm/>
-                                    <button onClick={handleGoToChangeScenario}>
-                                        Modifica lo scenario della stanza
-                                    </button>
+                                    <SelectScenario Id_stanza = {id_stanza}/>
                                     <RequestSection id_stanza = {id_stanza} />
                                     <button onClick={handleGoToBannedUserList}>
                                         Visualizza Lista Utenti Bannati
                                     </button>
+                                    <AvviaMeeting id_meeting={id_stanza}/>
                                 </div>
-                            </div>
-                            <div className={"masterDiv"}>
-                                <AvviaMeeting id_meeting={id_stanza}/>
                             </div>
                         </>
                     )}
