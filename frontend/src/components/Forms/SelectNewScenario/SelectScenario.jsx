@@ -10,8 +10,17 @@ const ScenarioPage = () => {
     const [selectedScenario, setSelectedScenario] = useState(null);
     const [array, setArray] = useState([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [showModal, setShowModal] = useState(false);
 
     const {id: Id_stanza} = useParams();
+
+    const handleShowModal = () => {
+        setShowModal(true);
+    };
+    const handleCloseModal = () => {
+        setShowModal(false);
+    };
+
 
     useEffect(() => {
         fetchScenarios();
@@ -49,12 +58,12 @@ const ScenarioPage = () => {
 
     const handleSelectScenario = (scenario) => {
         setSelectedScenario(scenario);
-        setIsModalOpen(true);
+        setShowModal(true)
     };
 
     const handleConfirmSelection = () => {
         console.log('Selezione confermata:', selectedScenario);
-        setIsModalOpen(false);
+        setShowModal(false);
         //console.log("l'id settato:", selectedScenario.id)
         setIdScenario(selectedScenario.id)
         console.log("ecco l'id dello scenario", id_scenario)
@@ -62,10 +71,6 @@ const ScenarioPage = () => {
         sendDataToServer();
     };
 
-    const handleCancelSelection = () => {
-        setSelectedScenario(null);
-        setIsModalOpen(false);
-    };
 
     const sendDataToServer = async () => {
 
@@ -103,30 +108,32 @@ const ScenarioPage = () => {
                 <h3>ecco l'id: {Id_stanza}</h3>
             {array.map((scenario) => (
                 <div key={scenario.id} className="card">
-                    <h3>{scenario.nome}</h3>
-                    <h3>{scenario.id}</h3>
+                    <h3>Nome:{scenario.nome}</h3>
+                    {scenario.image && scenario.image.url && (
+                        <img src={scenario.image.url} alt={`Immagine di ${scenario.nome}`} />
+                    )}
                     <p>{scenario.descrizione}</p>
                     <button onClick={() => handleSelectScenario(scenario)}>Scegli</button>
                 </div>
             ))}
-            <Modal
-                isOpen={isModalOpen}
-                onRequestClose={() => setIsModalOpen(false)}
-                isCentered
-                size={'xs'}
-                contentLabel="Conferma Selezione"
-                className={'Modal'}
-            >
-                {selectedScenario && (
-                    <div className={'modal-box'}>
-                        <h2>Conferma la selezione</h2>
-                        <p>Nome: {selectedScenario.nome}</p>
-                        <p>Descrizione: {selectedScenario.descrizione}</p>
-                        <button onClick={handleConfirmSelection}>Conferma</button>
-                        <button onClick={handleCancelSelection}>Annulla</button>
+                {showModal && (
+                    <div className={'modal'}>
+                        <div className="modal-content">
+                            {/* Add a close button inside the modal */}
+                                <span
+                                    className="close"
+                                    onClick={handleCloseModal}>
+                                &times;
+
+                                </span>
+                            <h2>Conferma la selezione</h2>
+                            <p>Nome: {selectedScenario.nome}</p>
+                            <p>Descrizione: {selectedScenario.descrizione}</p>
+                            <button onClick={handleConfirmSelection}>Conferma</button>
+                        </div>
                     </div>
                 )}
-            </Modal>
+
         </div>
     );
 };
