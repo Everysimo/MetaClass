@@ -74,10 +74,19 @@ public class GestioneAmministrazioneServiceImpl implements GestioneAmministrazio
         return adminIds;
     }
 
+    /**
+     * confronta il metaID di un utente con quelli degli admin, per verificare se l'utente è un admin
+     * @param metaId metaId che deve essere confrontato
+     * @return
+     */
     public boolean checkAdmin(String metaId) {
         return adminMetaIds.contains(metaId);
     }
 
+    /**
+     * Metodo che ritona la lista di tutte le categorie
+     * @return lista di categorie
+     */
     @Override
     public List<Categoria> getCategorie() {
         return categoriaRepository.findAll();

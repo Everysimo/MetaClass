@@ -37,10 +37,10 @@ public class GestioneUtenzaController {
     private ValidationToken validationToken;
 
     /**
-     *
-     * @param u
-     * @param response
-     * @param result
+     * metodo che gestisce la richeista di login/registrazione da parte di un utente
+     * @param u utente che effettua il login/registrazione
+     * @param response utilizzata per gestire i cookie gestendo un token
+     * @param result contiene tutti i messaggi di errore contenuti nella richiesta
      * @return
      */
     @PostMapping(value = "/login")
@@ -80,8 +80,8 @@ public class GestioneUtenzaController {
 
     /**
      *
-     * @param request
-     * @param response
+     * @param request richiesta HTTP fornita dal client
+     * @param response utilizzata per gestire i cookie gestendo un token
      * @return
      */
     @PostMapping("/Manuallogout")
@@ -132,9 +132,9 @@ public class GestioneUtenzaController {
     }
 
     /**
-     *
-     * @param params
-     * @param request
+     * metodo che consente la modifica dei dati dell'utente
+     * @param params nuovi dati dell'utente
+     * @param request richiesta HTTP fornita dal client
      * @return
      */
     @PostMapping(value = "/modifyUserData")
@@ -160,8 +160,8 @@ public class GestioneUtenzaController {
     }
 
     /**
-     *
-     * @param request
+     * metodo che consente di gestire la richiesta di visualizzazione di tutte le stanze dell'utente
+     * @param request richiesta HTTP fornita dal client
      * @return
      */
     @GetMapping(value = "/visualizzaStanze")
@@ -193,8 +193,8 @@ public class GestioneUtenzaController {
 
 
     /**
-     *
-     * @param request
+     * metodo che consente di gestire la richiesta di visualizzazione dei dati utente dell'utente
+     * @param request richiesta HTTP fornita dal client
      * @return
      */
     @GetMapping(value = "/userDetails")

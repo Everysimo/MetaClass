@@ -57,7 +57,4 @@ public interface MeetingRepository extends JpaRepository<Meeting, Long> {
      * @return Lista di meeting schedulati all'iterno della stanza
      */
     List<Meeting> findMeetingByStanza(Stanza stanza);
-
-    void deleteMeetingsByStanza(Stanza stanza);
-
 }
