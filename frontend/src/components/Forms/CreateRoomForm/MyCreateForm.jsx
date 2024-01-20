@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import '../PopUpStyles.css';
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faCirclePlus} from "@fortawesome/free-solid-svg-icons";
+import {faCheck, faCirclePlus} from "@fortawesome/free-solid-svg-icons";
 const MyCreateForm = () => {
     const [showCreateFormModal, setShowCreateFormModal] = useState(false);
+
+    const [showSuccessPopup, setShowSuccessPopup] = useState(false);
+
     const handleShowCreateForm = () => {
         setShowCreateFormModal(true);
     };
@@ -11,6 +14,7 @@ const MyCreateForm = () => {
     const handleCloseCreateFormModal = () => {
         setShowCreateFormModal(false);
     };
+
     const [state, setState] = useState({
         nome: "",
         descrizione: "",
@@ -70,7 +74,7 @@ const MyCreateForm = () => {
     };
 
     const handleMAXChange = (e) => {
-        setState(prevState => ({ ...prevState, maxPosti: e.target.value }));
+        setState(prevState => ({ ...prevState, maxPosti: parseInt(e.target.value, 10) }));
     };
 
     const handleScenarioChange = (e) => {
@@ -111,7 +115,19 @@ const MyCreateForm = () => {
             console.log("la stringa json:", JSON.stringify(dataToSend));
             const response = await fetch('http://localhost:8080/creastanza', requestOption);
             const responseData = await response.json();
+
             console.log("Risposta dal server:", responseData);
+
+            if (response.ok) {
+                console.log('Valutazione inviata con successo!');
+                // Chiudi il modal
+                handleCloseCreateFormModal();
+                // Mostra il pop-up di successo
+                setShowSuccessPopup(true);
+
+            } else {
+                console.error('Errore durante l\'invio della valutazione al backend');
+            }
         } catch (error) {
             console.error('ERRORE:', error);
         }
@@ -143,7 +159,7 @@ const MyCreateForm = () => {
         } else if (state.descrizione.length < 2 || state.descrizione.length > 254) {
             setState(prevState => ({
                 ...prevState,
-                error: 'Lunghezza descrizione errata'
+                error: 'Lunghezza descrizione errata, deve essere compresa tra 2 e 254'
             }));
             return;
         }
@@ -177,6 +193,15 @@ const MyCreateForm = () => {
         setState(prevState => ({ ...prevState, error: null }));
         sendDataToServer();
         console.log("dati del form", state)
+    };
+
+    const handleCloseSuccesPopUp = () => {
+        setTimeout(() => {
+            // Simuliamo il reindirizzamento dopo 2 secondi
+            setShowSuccessPopup(false);
+            // Aggiungi le azioni specifiche per il reindirizzamento
+            window.location.replace(window.location.pathname);
+        }, 1000);
     };
 
     return (
@@ -264,6 +289,17 @@ const MyCreateForm = () => {
                             Create
                         </button>
                         {state.error && <p style={{color: 'red'}}>{state.error}</p>}
+                    </div>
+                </div>
+            )}
+            {showSuccessPopup && (
+                <div className={"modal"}>
+                    <div className={"modal-content"}>
+                        <span
+                            className={"close"}
+                            onClick={handleCloseSuccesPopUp}
+                        >&times;</span>
+                        <p>Stanza creata con successo <FontAwesomeIcon icon={faCheck} size="2xl" style={{color: "#63E6BE",}} /></p>
                     </div>
                 </div>
             )}

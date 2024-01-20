@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import '../PopUpStyles.css';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faUserPen } from "@fortawesome/free-solid-svg-icons";
+import {faCheck, faUserPen} from "@fortawesome/free-solid-svg-icons";
 
 const EditUserDetails = ({ userDetails, setUserDetails }) => {
     const [showModal, setShowModal] = useState(false);
@@ -112,7 +112,7 @@ const EditUserDetails = ({ userDetails, setUserDetails }) => {
                     <div className="modal-content">
                         <span className="close" onClick={handleCloseModal}>&times;</span>
                         {successMessage ? (
-                            <p className="success-message">{successMessage}</p>
+                            <p className="success-message">{successMessage} <FontAwesomeIcon icon={faCheck} size="2xl" style={{color: "#63E6BE",}} /></p>
                         ) : (
                             <form onSubmit={handleSubmit}>
                                 {/* Editable fields */}

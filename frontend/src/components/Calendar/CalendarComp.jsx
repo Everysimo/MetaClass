@@ -5,16 +5,18 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { MultiInputDateTimeRangeField } from '@mui/x-date-pickers-pro/MultiInputDateTimeRangeField';
 import './CalendarComp.css';
 import axios from 'axios';
-import { MessagePopup } from '../Forms/ErrorHandlePopup/MessagePopup'; // Import the MessagePopup component
+import {faCheck} from "@fortawesome/free-solid-svg-icons";
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome"; // Import the MessagePopup component
 
 const CalendarComp = () => {
+    const [showModal, setShowModal] = useState(false);
+    const [name, setName] = useState('');
+    const [successMessage, setSuccessMessage] = useState('');
+    const [errorMessage, setErrorMessage] = useState('');
     const [selectedDateTimeRange, setSelectedDateTimeRange] = useState([
         dayjs('2024-01-12T15:30'),
         dayjs('2024-01-12T18:30'),
     ]);
-    const [name, setName] = useState('');
-    const [showMessagePopup, setShowMessagePopup] = useState(false);
-    const [popupMessage, setPopupMessage] = useState('');
 
     const handleDateTimeRangeChange = (newDateTimeRange) => {
         setSelectedDateTimeRange(newDateTimeRange);
@@ -47,58 +49,71 @@ const CalendarComp = () => {
                     },
                 }
             );
-            setPopupMessage(response.data.message);
-            setShowMessagePopup(true);
+            setSuccessMessage(response.data.message);
         } catch (error) {
-            console.error('Error:', error);
-            setPopupMessage(error.error || 'An error occurred');
-            setShowMessagePopup(true);
+            console.error('Error:', error.response.data.message);
+            setErrorMessage(error.response.data.message || 'An error occurred');
         }
     };
 
-    const handleClosePopup = () => {
-        setShowMessagePopup(false);
-    };
 
-    useEffect(() => {
-        // Cleanup and reset state when the component unmounts
-        return () => {
-            setShowMessagePopup(false);
-            setPopupMessage('');
-        };
-    }, []);
-
+    const handleShow = () =>{
+        setShowModal(true);
+    }
+    const handleClose = () =>{
+        setShowModal(false);
+        setSuccessMessage('');
+        setErrorMessage('');
+    }
     return (
-        <LocalizationProvider
-            dateAdapter={AdapterDayjs}
-            dateFormats={{
-                // Set the default input format for the date
-                input: 'DD/MM/YYYY',
-            }}
-        >
-            <div className="dateTimePickerContainer">
-                <input
-                    type="text"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    placeholder="Enter name"
-                    className="inputField"
-                />
-                <MultiInputDateTimeRangeField
-                    value={selectedDateTimeRange}
-                    onChange={handleDateTimeRangeChange}
-                    ampm={false}
-                    className="dateTimePicker"
-                />
-            </div>
-            <button onClick={handleSubmit} id="submitBtn">
-                Submit
-            </button>
-
-            {showMessagePopup && (
-                <MessagePopup message={popupMessage} onClose={handleClosePopup} />
-            )}
-        </LocalizationProvider>
+        <>
+        <button onClick={handleShow}>
+            Schedula meeting
+        </button>
+            {showModal &&
+                <div className={"modal"}>
+                <div className={"modal-content"} style={{maxWidth: "400px", padding: "20px"}}>
+                    <span className={"close"} onClick={handleClose}>
+                        &times;
+                    </span>
+                    {successMessage ? (
+                        <p>{successMessage} <FontAwesomeIcon icon={faCheck} size="2xl" style={{color: "#63E6BE",}} /></p>
+                    ) : (
+                        <LocalizationProvider
+                            dateAdapter={AdapterDayjs}
+                            dateFormats={{
+                                // Set the default input format for the date
+                                input: 'DD/MM/YYYY',
+                            }}
+                        >
+                            <div className="dateTimePickerContainer">
+                                <input
+                                    type="text"
+                                    value={name}
+                                    onChange={(e) => setName(e.target.value)}
+                                    placeholder="Enter name"
+                                    className="inputField"
+                                    style={{maxWidth: "100%", margin:"20px"}}
+                                />
+                                <MultiInputDateTimeRangeField
+                                    value={selectedDateTimeRange}
+                                    onChange={handleDateTimeRangeChange}
+                                    ampm={false}
+                                    className="dateTimePicker"
+                                />
+                            </div>
+                            <button onClick={handleSubmit} id="submitBtn">
+                                Submit
+                            </button>
+                            {errorMessage && (
+                                <p>{errorMessage}</p>
+                            )}
+                        </LocalizationProvider>
+                        )}
+                    </div>
+                </div>
+                }
+        </>
     );
 };
 

@@ -101,3 +101,15 @@ select {
     cursor: inherit;
     line-height: inherit;
 }
+.dots-container {
+    display: flex;
+    justify-content: center;
+}
+
+.dot {
+    border-radius: 50%;
+    justify-content: center;
+    background-color: transparent;
+    margin: 5px;
+    cursor: pointer;
+}
