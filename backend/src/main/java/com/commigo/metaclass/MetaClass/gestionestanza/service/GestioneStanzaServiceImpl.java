@@ -5,7 +5,6 @@ import com.commigo.metaclass.MetaClass.exceptions.RuntimeException401;
 import com.commigo.metaclass.MetaClass.exceptions.RuntimeException403;
 import com.commigo.metaclass.MetaClass.exceptions.ServerRuntimeException;
 import com.commigo.metaclass.MetaClass.gestioneamministrazione.repository.ScenarioRepository;
-import com.commigo.metaclass.MetaClass.gestionemeeting.repository.MeetingRepository;
 import com.commigo.metaclass.MetaClass.gestionestanza.repository.RuoloRepository;
 import com.commigo.metaclass.MetaClass.gestionestanza.repository.StanzaRepository;
 import com.commigo.metaclass.MetaClass.gestionestanza.repository.StatoPartecipazioneRepository;
@@ -37,7 +36,6 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService {
     private final StanzaRepository stanzaRepository;
     private final UtenteRepository utenteRepository;
     private final ScenarioRepository scenarioRepository;
-    private final MeetingRepository meetingRepository;
 
     @Autowired
     private ValidationToken validationToken;
@@ -46,9 +44,10 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService {
     private JwtTokenUtil jwtTokenUtil;
 
     /**
-     * @param codiceStanza
-     * @param id_utente
-     * @return
+     * metodo che permette ad un utente di accedere ad una determinata stanza
+     * @param codiceStanza codice della stanza a cui l'utente vuole accedere
+     * @param id_utente id dell'utente che deve accedere alla stanza
+     * @return un valore long che identifica la riuscita dell'operazione ed un messaggio che descrive l'esito di essa
      * @throws Exception
      */
     @Override
@@ -86,11 +85,11 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService {
     }
 
     /**
-     *
-     * @param IdStanza
-     * @param metaId
-     * @param IdUtente
-     * @return
+     * metodo che permette di bannare un utente generico all'interno di una specifica stanza
+     * @param IdStanza id della stanza da cui si vuole bannare l'utente
+     * @param metaId metaID dell'utente che vuole effettuare il ban
+     * @param IdUtente id dell'utente che deve essere bannato
+     * @return valore boolean che identifica la riuscita dell'operazione ed un messaggio che descrive l'esito di essa
      * @throws ServerRuntimeException
      * @throws RuntimeException403
      */
@@ -125,11 +124,11 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService {
     }
 
     /**
-     *
-     * @param IdStanza
-     * @param metaId
-     * @param IdUtente
-     * @return
+     * metodo che permette di bannare un organizzatore all'interno di una specifica stanza
+     * @param IdStanza id della stanza da cui si vuole bannare l'organizzatore
+     * @param metaId metaID dell'utente che vuole effettuare il ban
+     * @param IdUtente id dell'organizzatore che deve essere bannato
+     * @return valore boolean che identifica la riuscita dell'operazione ed un messaggio che descrive l'esito di essa
      * @throws ServerRuntimeException
      * @throws RuntimeException403
      */
@@ -185,11 +184,11 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService {
     }
 
     /**
-     *
-     * @param IdStanza
-     * @param metaId
-     * @param IdUtente
-     * @return
+     * metodo che permette di bannare un partecipante all'interno di una specifica stanza
+     * @param IdStanza id della stanza da cui si vuole bannare il partecipante
+     * @param metaId metaID dell'utente che vuole effettuare il ban
+     * @param IdUtente id del parteciapante che deve essere bannato
+     * @return valore boolean che identifica la riuscita dell'operazione ed un messaggio che descrive l'esito di essa
      * @throws ServerRuntimeException
      * @throws RuntimeException403
      */
@@ -242,10 +241,10 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService {
     }
 
     /**
-     *
-     * @param s
-     * @param metaID
-     * @return
+     * metodo che permette la creazione di una stanza
+     * @param s stanza che deve essere creata
+     * @param metaID metaID dell'utente che intende creare la stanza
+     * @return valore boolean che identifica la riuscita dell'operazione ed un messaggio che descrive l'esito di essa
      * @throws Exception
      */
     @Override
@@ -283,11 +282,11 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService {
     }
 
     /**
-     *
-     * @param id_Uogm
-     * @param id_og
-     * @param id_stanza
-     * @return
+     * metodo che permette di effettuare il downgrade del ruolo di un utente
+     * @param id_Uogm id dell'utente che deve effettuare il downgrade dell'organizzatore
+     * @param id_og id dell'organizzatore a cui deve essere effettuato il downgrade
+     * @param id_stanza id della stanza su cui vuole essere il downgrade
+     * @return valore boolean che identifica la riuscita dell'operazione ed un messaggio che descrive l'esito di essa
      * @throws ServerRuntimeException
      * @throws RuntimeException403
      */
@@ -352,10 +351,10 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService {
     }
 
     /**
-     *
-     * @param metaID
-     * @param id_stanza
-     * @return
+     * metodo che permette l'eliminazione di una stanza
+     * @param metaID metaID dell'utente che vuole eliminare una stanza
+     * @param id_stanza id della stanza che deve essere eliminata
+     * @return valore boolean che identifica la riuscita dell'operazione ed un messaggio che descrive l'esito di essa
      */
     @Override
     public Response<Boolean> deleteRoom(String metaID, Long id_stanza) {
@@ -379,12 +378,12 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService {
     }
 
     /**
-     *
-     * @param metaID
-     * @param idUtente
-     * @param idStanza
-     * @param scelta
-     * @return
+     * metodo che permette la gestione dell'accesso di un utente ad una stanza
+     * @param metaID metaId dell'utente che deve gestire l'accesso alla stanza di un altro utente
+     * @param idUtente id dell'utente che vuole accedere alla stanza
+     * @param idStanza id della stanza acui l'utente vuole accedere
+     * @param scelta valore booleano che identifica la scelta sull'accesso alla stanza da parte dell'organizzatore
+     * @return valore boolean che identifica la riuscita dell'operazione ed un messaggio che descrive l'esito di essa
      */
     @Override
     public ResponseEntity<Response<Boolean>> gestioneAccesso(String metaID, Long idUtente, Long idStanza, boolean scelta) {
@@ -418,11 +417,11 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService {
     }
 
     /**
-     *
-     * @param metaID
-     * @param IdStanza
-     * @param IdUtente
-     * @return
+     * meotodo che permette di seleziare un parteciapante all'interno di una stanza
+     * @param metaID metaID dell'utente che vuole silenziare un partecipante all'interno della stanza
+     * @param IdStanza id della stanza in cui si vuole silenziare un partecipante
+     * @param IdUtente id dell'utente che si vuole silenziare all'interno della stanza
+     * @return valore boolean che identifica la riuscita dell'operazione ed un messaggio che descrive l'esito di essa
      */
     @Override
     public ResponseEntity<Response<Boolean>> SilenziaPartecipante(String metaID, Long IdStanza, Long IdUtente) {
@@ -455,9 +454,9 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService {
     }
 
     /**
-     *
-     * @param params
-     * @param id
+     * metodo che consente la modifica dei dati della stanza
+     * @param params nuovi dati della stanza
+     * @param id id della stanza da modificare
      * @return
      * @throws RuntimeException403
      * @throws RuntimeException401
@@ -487,9 +486,9 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService {
     }
 
     /**
-     *
-     * @param id
-     * @return
+     * metodo che permette la visualizzazione di lo scenario in uso all'interno di una stanza
+     * @param id id della stanza di cui si vuole visualizzare lo scenario in uso
+     * @return scenario in uso in una stanza ed un messaggio che descrive l'esito dell'operazione
      */
     @Override
     public ResponseEntity<Response<Scenario>> findStanza(Long id) {
@@ -506,11 +505,11 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService {
     }
 
     /**
-     *
-     * @param id_Uogm
-     * @param id_og
-     * @param id_stanza
-     * @return
+     * metodo che permette di effettuare l'upgrade di un partecipante in organizzatore all'interno di una stanza
+     * @param id_Uogm id dell'utente che vuole effettuare l'upgrade
+     * @param id_og id dell'utente su cui verrà effettuato l'upgradde
+     * @param id_stanza id della stanza in cui l'utente diventerà organizzatore
+     * @return valore boolean che identifica la riuscita dell'operazione ed un messaggio che descrive l'esito di essa
      * @throws ServerRuntimeException
      * @throws RuntimeException403
      */
@@ -576,9 +575,9 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService {
     }
 
     /**
-     *
-     * @param Id
-     * @return
+     * metodo che permette la visualizzazione di tutti gli utenti all'interno di una specifica stanza
+     * @param Id id della stanza di cui vogliamo visualizzare gli utenti al suo interno
+     * @return lista di utenti all'interno della stanza specificata ed un messaggio che descrive l'esito dell'operazione
      */
     @Override
     public ResponseEntity<Response<List<Utente>>> visualizzaUtentiInStanza(Long Id) {
@@ -599,9 +598,9 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService {
     }
 
     /**
-     *
-     * @param Id
-     * @return
+     * metodo che permette la visualizzazione degli utenti bannatiall'interno di una stanza
+     * @param Id id della stanza di cui si vogliono visualizzare gli utenti bannati
+     * @return lista di utenti bannati all'interno della stanza selezionata ed un messaggio che descrive l'esito dell'operazione
      */
     @Override
     public ResponseEntity<Response<List<Utente>>> visualizzaUtentiBannatiInStanza(Long Id) {
@@ -622,10 +621,10 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService {
     }
 
     /**
-     *
-     * @param Id
-     * @param metaID
-     * @return
+     * metodo che permette la visualizzazione degli utenti in attesa all'interno di una stanza
+     * @param Id id della stanza di cui vogliamo visualizzare gli utenti in attesa
+     * @param metaID metaID dell'utente che vuole visualizzare gli utenti in attesa
+     * @return lista di utenti in attesa all'interno di una stanza ed un messaggio che descrive l'esito dell'operazione
      */
     @Override
     public ResponseEntity<Response<List<Utente>>> visualizzaUtentiInAttesaInStanza(Long Id, String metaID) {
@@ -655,11 +654,11 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService {
     }
 
     /**
-     *
-     * @param metaID
-     * @param idScenario
-     * @param idStanza
-     * @return
+     * metodo che permette la modifica dellos cenario in uso all'itnerno di una stanza
+     * @param metaID metaID dell'utente che vuole effettuare la modifica dello scenario all'interno della stanza
+     * @param idScenario id del nuovo scenario
+     * @param idStanza id della stanza
+     * @return valore boolean che identifica la riuscita dell'operazione ed un messaggio che descrive l'esito di essa
      */
     @Override
     public ResponseEntity<Response<Boolean>> modificaScenario(String metaID, Long idScenario, Long idStanza) {
@@ -696,12 +695,12 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService {
     }
 
     /**
-     *
-     * @param metaID
-     * @param idStanza
-     * @param idUtente
-     * @param nome
-     * @return
+     * metodo che permette la modifica del nome all'interno di una stanza di uno specifico partecipante
+     * @param metaID metaID dell'utente che vuole effettuare la modifica del nome
+     * @param idStanza id della stanza in cui si vuole modificare il nome
+     * @param idUtente id dell'utente a cui viene modificato il nome all'itnerno della stanza
+     * @param nome nuovo nome dell'utente
+     * @return valore boolean che identifica la riuscita dell'operazione ed un messaggio che descrive l'esito di essa
      */
     @Override
     public ResponseEntity<Response<Boolean>> modificaNomePartecipante(String metaID, Long idStanza, Long idUtente, String nome){
@@ -735,11 +734,11 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService {
     }
 
     /**
-     *
-     * @param metaID
-     * @param idStanza
-     * @param idUtente
-     * @return
+     * metodo che permette di kickare un partecipante da una stanza
+     * @param metaID metaID dell'utente che vuole effettuare il kick del partecipante
+     * @param idStanza id della stanza dal quale deve essere kickato l'utente
+     * @param idUtente id dell'utente che deve essere keckato
+     * @return valore boolean che identifica la riuscita dell'operazione ed un messaggio che descrive l'esito di essa
      */
     @Override
     public ResponseEntity<Response<Boolean>> kickPartecipante(String metaID, Long idStanza, Long idUtente){
@@ -771,10 +770,10 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService {
     }
 
     /**
-    *
-     * @param metaID
-     * @param idStanza
-     * @return
+     * meotodo che permette di visualizzare il ruolo dell'utente all'interno di una stanza
+     * @param metaID metaID dell'utente che vuole visualizzare il proprio ruolo
+     * @param idStanza id della stanza
+     * @return il ruolo del'utente all'interno della stanza
     */
     @Override
     public Ruolo getRuoloByUserAndStanzaID(String metaID, Long idStanza) throws ServerRuntimeException, RuntimeException403 {
@@ -800,8 +799,9 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService {
     }
 
      /**
-     * @param Id
-     * @return
+      * metodo che consente di visualizzare una determinata stanza
+     * @param Id id della stanza da visualizzare
+     * @return la stanza che si vuole visualizzare
      */
     @Override
     public Stanza visualizzaStanza(Long Id) {
@@ -811,13 +811,20 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService {
 
 
     /**
-     *
-     * @return
+     * metodo che consente di visualizzare tutti gli scenari
+     * @return lista di scenari presenti sul DB
      */
     public List<Scenario> getAllScenari() {
         return scenarioRepository.findAll();
     }
 
+    /**
+     * meotodo che consente ad un organizzatore di smutare un partecipante all'interno di una stanza
+     * @param metaID metaID dell'utente che desidera effettuare l'operazione
+     * @param IdStanza id della stanza su cui si vuole effettuare l'oeprazione
+     * @param IdUtente id dell'utente per cui si vuole effettuare l'operazione
+     * @return valore boolean che identifica la riuscita dell'operazione ed un messaggio che descrive l'esito di essa
+     */
     public ResponseEntity<Response<Boolean>> UnmutePartecipante(String metaID, Long IdStanza, Long IdUtente){
 
         Utente og = utenteRepository.findFirstByMetaId(metaID);

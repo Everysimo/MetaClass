@@ -49,9 +49,9 @@ public class GestioneStimaMeetingServiceImpl implements GestioneStimaMeetingServ
 
 
    /**
-    *
-    * @param id_stanza
-    * @return
+    * metodo che permette di visualizzare la durata di un meeting
+    * @param id_stanza id della stanza
+    * @return valore double
     * @throws RuntimeException403
     * @throws ServerRuntimeException
     */

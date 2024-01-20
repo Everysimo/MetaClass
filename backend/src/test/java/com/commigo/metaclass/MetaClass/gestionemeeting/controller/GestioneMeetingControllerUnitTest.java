@@ -420,6 +420,7 @@ class GestioneMeetingControllerUnitTest {
     public void testCompilazioneQuestionarioOnSuccess(){
 
         valutazione = 5;
+        motionSickness=3;
         // Simula un token valido
         when(validationToken.isTokenValid(any(HttpServletRequest.class))).thenReturn(true);
 
@@ -468,9 +469,44 @@ class GestioneMeetingControllerUnitTest {
     }
 
     @Test
+    public void testCompilazioneQuestionarioOnFailureMotionSicknessNotInsert(){
+
+        valutazione = 5;
+        motionSickness = null;
+        // Simula un token valido
+        when(validationToken.isTokenValid(any(HttpServletRequest.class))).thenReturn(true);
+
+        try{
+            //vedere i metodi private testExpectedResult e sendRequest
+            testExpectedResult(CLIENT_ERROR_STATUS, sendRequestQuestionario());
+
+        } catch (Exception e) {
+            fail("Exception not expected: " + e.getMessage());
+        }
+    }
+
+    @Test
     public void testCompilazioneQuestionarioOnTestCase1(){
 
+        motionSickness = 5;
         valutazione = -1;
+        // Simula un token valido
+        when(validationToken.isTokenValid(any(HttpServletRequest.class))).thenReturn(true);
+
+        try{
+
+            //vedere i metodi private testExpectedResult e sendRequest
+            testExpectedResult(CLIENT_ERROR_STATUS, sendRequestQuestionario());
+
+        } catch (Exception e) {
+            fail("Exception not expected: " + e.getMessage());
+        }
+    }
+
+    @Test
+    public void testCompilazioneQuestionarioOnTestCase7(){
+
+        valutazione = 6;
         // Simula un token valido
         when(validationToken.isTokenValid(any(HttpServletRequest.class))).thenReturn(true);
 
@@ -487,8 +523,7 @@ class GestioneMeetingControllerUnitTest {
     @Test
     public void testCompilazioneQuestionarioOnTestCase2(){
 
-        valutazione = 5;
-        String json = "{\"motionSickness\":\"5\",\"immersionLevel\":\"b\"}";
+        String json = "{\"motionSickness\":5,\"immersionLevel\":\"b\"}";
         System.out.println(json);
         // Simula un token valido
         when(validationToken.isTokenValid(any(HttpServletRequest.class))).thenReturn(true);
@@ -520,7 +555,26 @@ class GestioneMeetingControllerUnitTest {
     @Test
     public void testCompilazioneQuestionarioOnTestCase3(){
 
+        valutazione = 5;
         motionSickness = 11;
+        // Simula un token valido
+        when(validationToken.isTokenValid(any(HttpServletRequest.class))).thenReturn(true);
+
+        try{
+
+            //vedere i metodi private testExpectedResult e sendRequest
+            testExpectedResult(CLIENT_ERROR_STATUS, sendRequestQuestionario());
+
+        } catch (Exception e) {
+            fail("Exception not expected: " + e.getMessage());
+        }
+    }
+
+    @Test
+    public void testCompilazioneQuestionarioOnTestCase6(){
+
+        valutazione = 5;
+        motionSickness = -1;
         // Simula un token valido
         when(validationToken.isTokenValid(any(HttpServletRequest.class))).thenReturn(true);
 
@@ -568,7 +622,7 @@ class GestioneMeetingControllerUnitTest {
     @Test
     public void testCompilazioneQuestionarioOnTestCase5(){
 
-        motionSickness = 10;
+        motionSickness = 1;
         valutazione = 5;
         // Simula un token valido
         when(validationToken.isTokenValid(any(HttpServletRequest.class))).thenReturn(true);
@@ -589,91 +643,39 @@ class GestioneMeetingControllerUnitTest {
         valutazione = 5;
         when(validationToken.isTokenValid(any())).thenReturn(true);
 
-        when(meetingService.compilaQuestionario(valutazione,10,utente.getMetaId(), meeting.getId()))
+        when(meetingService.compilaQuestionario(valutazione,motionSickness,utente.getMetaId(), meeting.getId()))
                 .thenThrow(ServerRuntimeException.class);
 
         //vedere i metodi private testExpectedResult e sendRequest
-        sendRequestServerFailureQuestionario(ServerRuntimeException.class);
+        sendRequestServerFailureQuestionario(ServerRuntimeException.class, 500);
     }
 
     @Test
-    public void testCompilaQuestionarioOnJSONFailure() throws Exception {
-
-        //CREAZIONE DEL BODY DELLA RICHIESTA
-        //Converto l'istanza meeting in una stringa JSON accettabile del controller
-        ObjectMapper objectMapper = new ObjectMapper();
-        ObjectNode jsonNode = objectMapper.createObjectNode();
-
-        // Aggiunta degli attributi uno per uno
-        jsonNode.put("validazione", 7);
-        jsonNode.put("immersionLevel", 3);
-
-        // Simula un token valido
+    public void testCompilazioneQuestionarioOnJSONFailure() {
+        motionSickness = 10;
+        String json = "{motionSickness:b,immersionLevel:5}";
         when(validationToken.isTokenValid(any(HttpServletRequest.class))).thenReturn(true);
 
-        try{
-
-            //formattamento della richiesta
+        try {
+            // Formattazione della richiesta
             MockHttpServletRequestBuilder requestBuilder =
                     MockMvcRequestBuilders.post(API_URL_Compilazione)
                             .contentType(MediaType.APPLICATION_JSON)
-                            .content(jsonNode.toString())
+                            .content(json)  // Invio della stringa JSON vuota
                             .header("Authorization", "Bearer TODO");
 
-            //ritorno della risposta
+            // Ritorno della risposta
             ResultActions ra = MockMvcBuilders.standaloneSetup(meetingController)
                     .build()
                     .perform(requestBuilder);
 
-            testExpectedResult(CLIENT_ERROR_STATUS,ra);
-
-
+            testExpectedResult(CLIENT_ERROR_STATUS, ra);
 
         } catch (Exception e) {
             fail("Exception not expected: " + e.getMessage());
         }
     }
 
-    @Test
-    public void testCompilaQuestionarioOnJSONFailure2() throws Exception {
-
-
-
-        //CREAZIONE DEL BODY DELLA RICHIESTA
-        //Converto l'istanza meeting in una stringa JSON accettabile del controller
-        ObjectMapper objectMapper = new ObjectMapper();
-        ObjectNode jsonNode = objectMapper.createObjectNode();
-
-        // Aggiunta degli attributi uno per uno
-        jsonNode.put("validazione", 7);
-        jsonNode.put("immersionLevel","");
-        jsonNode.put("motionSickness", 3);
-        // Simula un token valido
-        when(validationToken.isTokenValid(any(HttpServletRequest.class))).thenReturn(true);
-
-        try{
-
-
-            //formattamento della richiesta
-            MockHttpServletRequestBuilder requestBuilder =
-                    MockMvcRequestBuilders.post(API_URL_Compilazione)
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(jsonNode.toString())
-                            .header("Authorization", "Bearer TODO");
-
-            //ritorno della risposta
-            ResultActions ra = MockMvcBuilders.standaloneSetup(meetingController)
-                    .build()
-                    .perform(requestBuilder);
-
-            testExpectedResult(CLIENT_ERROR_STATUS,ra);
-
-
-
-        } catch (Exception e) {
-            fail("Exception not expected: " + e.getMessage());
-        }
-    }
 
 
     private String JSONConvertitorQuestionario(){
@@ -710,7 +712,7 @@ class GestioneMeetingControllerUnitTest {
                 .perform(requestBuilder);
     }
 
-    private void sendRequestServerFailureQuestionario(Class<? extends Exception> exceptionClass) throws Exception {
+    private void sendRequestServerFailureQuestionario(Class<? extends Exception> exceptionClass, int status) throws Exception {
         // Formattamento della richiesta
         MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders
                 .post(API_URL_Compilazione)
@@ -732,7 +734,7 @@ class GestioneMeetingControllerUnitTest {
 
             // Verifica del codice di stato
             int statusCode = result.getResponse().getStatus();
-            assertThat(statusCode).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
+            assertThat(statusCode).isEqualTo(status);
 
         } finally {
             // Ripristina il comportamento normale del metodo creaScheduling dopo il test

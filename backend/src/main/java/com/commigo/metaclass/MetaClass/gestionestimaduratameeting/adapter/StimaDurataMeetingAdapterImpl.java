@@ -37,11 +37,17 @@ public class StimaDurataMeetingAdapterImpl implements StimaDurataMeetingAdapter{
 
     /**
      * questo metodo serve per aggiungere le informazioni di un utente nel dataset
-     *
-     * @param u
+     * @param u utente di cui si vogliono aggiungere le informazioni all'interno del dataset
      * @param durata
      */
 
+    /**
+     * metodo che permette di aggiungere le informazioni di un utente nel dataset
+     * @param u utente di cui si vogliono aggiungere le informazioni all'interno del dataset
+     * @param durata
+     * @param immersionLevel
+     * @throws ServerRuntimeException
+     */
     @Override
     public void addUtenteInDataset(Utente u, Duration durata, int immersionLevel) throws ServerRuntimeException {
         try (FileWriter fileWriter = new FileWriter("data.csv", true);
@@ -69,6 +75,12 @@ public class StimaDurataMeetingAdapterImpl implements StimaDurataMeetingAdapter{
         }
     }
 
+    /**
+     *
+     * @param filePath
+     * @return
+     * @throws ServerRuntimeException
+     */
     private static String prelevaUltimoUserId(String filePath) throws ServerRuntimeException {
         try (FileReader fileReader = new FileReader(filePath);
              CSVParser csvParser = CSVFormat.DEFAULT.withHeader().parse(fileReader)) {

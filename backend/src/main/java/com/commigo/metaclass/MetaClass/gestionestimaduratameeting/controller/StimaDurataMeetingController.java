@@ -24,9 +24,9 @@ public class StimaDurataMeetingController {
     private GestioneStimaMeetingService gestioneStimaMeetingService;
 
     /**
-     *
-     * @param id_stanza
-     * @param request
+     * meotdo che permette di gestire la richiesta di visualizzazione della stima della durata di unn meeting
+     * @param id_stanza id della stanza in cui deve essere schedulato il meeting
+     * @param request richiesta HTTP fornita dal client
      * @return
      */
     @GetMapping(value="/stimaMeeting/{id_stanza}")

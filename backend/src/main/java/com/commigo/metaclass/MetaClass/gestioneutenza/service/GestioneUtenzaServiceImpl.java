@@ -45,7 +45,7 @@ public class GestioneUtenzaServiceImpl implements GestioneUtenzaService{
     private final Set<String> adminMetaIds = loadAdminMetaIdsFromFile();
 
     /**
-     *
+     * metodo che carica il metaID di un utente admin all'interno del file che conteine tutti i metaID degli admin
      * @return
      */
     private Set<String> loadAdminMetaIdsFromFile() {
@@ -63,9 +63,9 @@ public class GestioneUtenzaServiceImpl implements GestioneUtenzaService{
     }
 
     /**
-     *
-     * @param u
-     * @return
+     * metodo che consente ad un utente di effettuare il login/registrazione
+     * @param u Utente che esegue il login/registrazione
+     * @return valore boolean che identifica l'esito dell'operazione
      * @throws ServerRuntimeException
      */
     @Override
@@ -90,10 +90,10 @@ public class GestioneUtenzaServiceImpl implements GestioneUtenzaService{
     }
 
     /**
-     *
-     * @param MetaID
-     * @param params
-     * @return
+     * metodo che consente la modifica dei dati personali di un determianto utente
+     * @param MetaID metaID dell'utente che intende modificare i suoi dati
+     * @param params nuovi dati dell'utente
+     * @return valore boolean che identifica l'esito dell'operazione
      * @throws RuntimeException403
      */
     @Override
@@ -111,9 +111,9 @@ public class GestioneUtenzaServiceImpl implements GestioneUtenzaService{
     }
 
     /**
-     *
-     * @param MetaId
-     * @return
+     * metodo che ritorna tutte le stanze di un utente
+     * @param MetaId metaID dell'utente
+     * @return lista di stanze di un determinato utente
      * @throws ServerRuntimeException
      */
     @Override
@@ -136,9 +136,9 @@ public class GestioneUtenzaServiceImpl implements GestioneUtenzaService{
     }
 
     /**
-     *
-     * @param sessionID
-     * @return
+     * metodo che permette di visualizzare un utente in base al suo metaID
+     * @param sessionID metaID dell'utente che si desidera visualizzare
+     * @return l'utente che si vuole visualizzare
      * @throws DataNotFoundException
      */
     @Override
@@ -153,10 +153,10 @@ public class GestioneUtenzaServiceImpl implements GestioneUtenzaService{
 
 
     /**
-     *
-     * @param metaID
-     * @param validationToken
-     * @return
+     * metodo che permette ad un utente loggato di effettuare il logout
+     * @param metaID metaID dell'utente che desidera effettuare il logout
+     * @param validationToken token assegnato all'utente in fase di login
+     * @return valore boolean che identifica la riuscita dell'operazione
      * @throws ServerRuntimeException
      */
     @Override

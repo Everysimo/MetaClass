@@ -44,10 +44,10 @@ public class GestioneStanzaControl {
     /**
      * metodo che gestisce la richiesta di ban di un utente all'interno di una stanza
      *
-     * @param IdStanza
-     * @param IdUtente
-     * @param request
-     * @return
+     * @param IdStanza id della stanza da cui si vuole bannare l'utente
+     * @param IdUtente id dell'utente da bannare
+     * @param request richiesta HTTP fornita dal client
+     * @return  un valore booleano che identifica la riuscita dell'operazione ed un messaggio che descrive l'esito di essa
      *
      */
     @PostMapping(value = "/banUtente/{IdStanza}/{IdUtente}")
@@ -75,11 +75,11 @@ public class GestioneStanzaControl {
     }
 
     /**
-     *
-     * @param s
-     * @param result
-     * @param request
-     * @return
+     * metodo che permette di gestire la richiesta di creazione di una stanza
+     * @param s Stanza che deve essere creata
+     * @param result varaibile che conteine tutti gli errori di validazione della classe Stanza
+     * @param request richiesta HTTP fornita dal client
+     * @return  un valore booleano che identifica la riuscita dell'operazione ed un messaggio che descrive l'esito di essa
      */
     @PostMapping(value = "/creastanza")
     public ResponseEntity<Response<Boolean>> creaStanza(@Valid @RequestBody Stanza s,
@@ -114,11 +114,11 @@ public class GestioneStanzaControl {
     }
 
     /**
-     *
-     * @param IdStanza
-     * @param IdUtente
-     * @param request
-     * @return
+     * metodo che permette di gestire la richiesta di downgrade di un organizzatore all'interno di una specifica stanza
+     * @param IdStanza id della stanza in cui si vuole effettuare il downgrade dell'organizzatore
+     * @param IdUtente id dell'organizzatore a cui deve essere effettuato il downgrade
+     * @param request richiesta HTTP fornita dal client
+     * @return  un valore booleano che identifica la riuscita dell'operazione ed un messaggio che descrive l'esito di essa
      */
     @PostMapping(value = "/declassaOrganizzatore/{IdStanza}/{IdUtente}")
     public ResponseEntity<Response<Boolean>> declassaOrganizzatore(@PathVariable Long IdStanza,
@@ -143,10 +143,10 @@ public class GestioneStanzaControl {
     }
 
     /**
-     *
-     * @param Id
-     * @param request
-     * @return
+     * metodo che premette di gestire la richiesta di eliminazione di una specifica stanza
+     * @param Id id della stanza che deve essere eliminata
+     * @param request richiesta HTTP fornita dal client
+     * @return  un valore booleano che identifica la riuscita dell'operazione ed un messaggio che descrive l'esito di essa
      */
     @PostMapping(value = "/eliminaStanza/{Id}")
     public ResponseEntity<Response<Boolean>> eliminaStanza(@PathVariable Long Id, HttpServletRequest request) {
@@ -169,12 +169,12 @@ public class GestioneStanzaControl {
     }
 
     /**
-     *
-     * @param idStanza
-     * @param idUtente
-     * @param scelta
-     * @param request
-     * @return
+     * metodo che permette di gestire la richiesta di gestione dell'accesso di un determinato utente all'interno di una specifica stanza
+     * @param idStanza id della stanza in cui si deve gestire l'accesso dell'utente
+     * @param idUtente id dell'utente di cui si deve gestire l'accesso
+     * @param scelta variabile che identifica la scelta dell'organizzatore sulla gestione dell'accesso alla stanza
+     * @param request richiesta HTTP fornita dal client
+     * @return  un valore booleano che identifica la riuscita dell'operazione ed un messaggio che descrive l'esito di essa
      */
     @PostMapping(value = "/gestioneAccessi/{idStanza}/{idUtente}")
     public ResponseEntity<Response<Boolean>> gestioneAccessi(@PathVariable Long idStanza,
@@ -204,11 +204,11 @@ public class GestioneStanzaControl {
 
 
     /**
-     *
-     * @param Id
-     * @param params
-     * @param request
-     * @return
+     * metodo che permette di gestire di richiesta di modifica dei dati di una stanza
+     * @param Id id della stanza di cui bisogna midificare i dati
+     * @param params nuovi dati dellas tanza
+     * @param request richiesta HTTP fornita dal client
+     * @return  un valore booleano che identifica la riuscita dell'operazione ed un messaggio che descrive l'esito di essa
      */
     @PostMapping(value = "/modifyRoomData/{Id}")
     public ResponseEntity<Response<Boolean>> modifyRoomData(@PathVariable Long Id,
@@ -247,11 +247,11 @@ public class GestioneStanzaControl {
     }
 
     /**
-     *
-     * @param IdStanza
-     * @param IdUtente
-     * @param request
-     * @return
+     * metodo che permette di gestire la richiesta di promoziione di un utente ad organizzatore all'interno di una specifica stanza
+     * @param IdStanza id della stanza in cui si vuole promuovere l'utente
+     * @param IdUtente id dell'utente che deve essere promosso ad organizzatore
+     * @param request richiesta HTTP fornita dal client
+     * @return  un valore booleano che identifica la riuscita dell'operazione ed un messaggio che descrive l'esito di essa
      */
     @PostMapping(value = "/promuoviOrganizzatore/{IdStanza}/{IdUtente}")
     public ResponseEntity<Response<Boolean>> promuoviOrganizzatore(@PathVariable Long IdStanza,
@@ -276,10 +276,10 @@ public class GestioneStanzaControl {
     }
 
     /**
-     *
-     * @param requestBody
-     * @param request
-     * @return
+     * metodo che permette di gestire la richiesta di accesso ad una determinata sta da parte di un utente
+     * @param requestBody codice della stanza a cui l'utente vuole fare accesso
+     * @param request richiesta HTTP fornita dal client
+     * @return  un valore intero che identifica la riuscita dell'operazione ed un messaggio che descrive l'esito di essa
      */
     @PostMapping(value = "/accessoStanza")
     public ResponseEntity<AccessResponse<Long>> richiestaAccessoStanza(@RequestBody String requestBody,
@@ -324,10 +324,10 @@ public class GestioneStanzaControl {
     }
 
     /**
-     *
-     * @param Id
-     * @param request
-     * @return
+     * metodo che permette di gestire la richiesta di visualizzazione di tutti gli utenti bannati all'interno di una stanza
+     * @param Id id della stanza di cui vogliono visualizzare tutti gli utenti bannati
+     * @param request richiesta HTTP fornita dal client
+     * @return lista degli utenti bannati ed un messaggio che descrive l'esito dell'operazione
      * @throws RuntimeException403
      */
     public ResponseEntity<Response<List<Utente>>> visualizzaUtentiBannatiInStanza(@PathVariable Long Id, HttpServletRequest request) throws RuntimeException403 {
@@ -345,10 +345,10 @@ public class GestioneStanzaControl {
     }
 
     /**
-     *
-     * @param Id
-     * @param request
-     * @return
+     * metoodo che permette di gestire la richiesta di visualizzazione di tutti gli utenti all'interno di una specifica stanza
+     * @param Id id della stanza di sui si vogliono visualizzare gli utenti
+     * @param request richiesta HTTP fornita dal client
+     * @return lista degli utenti presenti nella stanza ed un messaggio che descrive l'esito dell'operazione
      * @throws RuntimeException403
      */
     @PostMapping(value = "/visualizzaUtentiInStanza/{Id}")
@@ -368,10 +368,10 @@ public class GestioneStanzaControl {
 
 
     /**
-     *
-     * @param Id
-     * @param request
-     * @return
+     * metoodo che permette di gestire la richiesta di visualizzazione degli utenti in attesa di una specifica stanza
+     * @param Id id della stanza di sui si vogliono visualizzare gli utenti in attesa
+     * @param request richiesta HTTP fornita dal client
+     * @return lista degli utenti in attesa nella stanza ed un messaggio che descrive l'esito dell'operazione
      * @throws RuntimeException403
      */
     @PostMapping(value = "/visualizzaUtentiInAttesaInStanza/{Id}")
@@ -391,10 +391,10 @@ public class GestioneStanzaControl {
     }
 
     /**
-     *
-     * @param Id
-     * @param request
-     * @return
+     * metodo che permette di gestire la richiesta di visualizzazione di una stanza
+     * @param Id id della stanza da visualizzare
+     * @param request richiesta HTTP fornita dal client
+     * @return stanza da visualizzare ed un messaggio che descrive l'esito dell'operazione
      */
     @PostMapping(value = "/visualizzaStanza/{Id}")
     public ResponseEntity<Response<Stanza>> visualizzaStanza(@PathVariable Long Id,
@@ -423,9 +423,9 @@ public class GestioneStanzaControl {
     }
 
     /**
-     *
-     * @param request
-     * @return
+     * metodo che permette di gestire la richiesta di visualizzazione di tutti gli scenari
+     * @param request richiesta HTTP fornita dal client
+     * @return lista di tutti gli scenari ed un messaggio che descrive l'esito dell'operazione
      */
     @GetMapping(value = "/visualizzaScenari")
     public ResponseEntity<Response<List<Scenario>>> visualizzaScenari(HttpServletRequest request) {
@@ -455,10 +455,10 @@ public class GestioneStanzaControl {
     }
 
     /**
-     *
-     * @param Id
-     * @param request
-     * @return
+     * metodo che permette di gestire la richiesta di visualizzazione dello scenario in uso in una determinata stanza
+     * @param Id id della stanza di cui si vuole visualizzare lo scenario
+     * @param request richiesta HTTP fornita dal client
+     * @return scenario in uso nella stanza ed un messaggio che descrive l'esito dell'operazione
      */
     @PostMapping(value = "/visualizzaScenarioStanza/{Id}")
     public ResponseEntity<Response<Scenario>> visualizzaScenarioStanza(@PathVariable Long Id,
@@ -482,11 +482,11 @@ public class GestioneStanzaControl {
     }
 
     /**
-     *
-     * @param Id_stanza
-     * @param Id_scenario
-     * @param request
-     * @return
+     * metodo che permette di gestire la richiesta di modifica di uno scenario di una determinata stanza
+     * @param Id_stanza id della stanza di cui vogliamo modificare lo scenario
+     * @param Id_scenario id del nuovo scenario da impostare nella stanza
+     * @param request richiesta HTTP fornita dal client
+     * @return valore booleano che identifica la riuscita dell'operazione ed un messaggio che descrive l'esito di essa
      */
     @PostMapping(value = "/modificaScenario/{Id_stanza}/{Id_scenario}")
     public ResponseEntity<Response<Boolean>> modificaScenario(@PathVariable Long Id_stanza,
@@ -511,12 +511,12 @@ public class GestioneStanzaControl {
     }
 
     /**
-     *
-     * @param IdStanza
-     * @param IdUtente
-     * @param nome
-     * @param request
-     * @return
+     * metodo che permette di gestire la richiesta di modifica del nome all'interno di una determinata stanza di uno specifico utente
+     * @param IdStanza id della stanza in cui vogliamo modificare il nome dell'utente
+     * @param IdUtente id dell'utente a cui va modificato il nome all'interno della stanza
+     * @param nome il nuovo nome da assegnare all'utente all'interno della stanza
+     * @param request richiesta HTTP fornita dal client
+     * @return valore booleano che identifica la riuscita dell'operazione ed un messaggio che descrive l'esito di essa
      */
     @PostMapping(value = "/modificaNomePartecipante/{IdStanza}/{IdUtente}")
     public ResponseEntity<Response<Boolean>> modificaNomePartecipante(@PathVariable Long IdStanza,
@@ -547,11 +547,11 @@ public class GestioneStanzaControl {
     }
 
     /**
-     *
-     * @param IdStanza
-     * @param IdUtente
-     * @param request
-     * @return
+     * metodo che permette di gestire la richiesta di kick di un partecipante da una determinata stanza
+     * @param IdStanza id della stanza da cui vogliamo kickare un utente
+     * @param IdUtente id dell'utente da kickare
+     * @param request richiesta HTTP fornita dal client
+     * @return valore booleano che identifica la riuscita dell'operazione ed un messaggio che descrive l'esito di essa
      */
     @PostMapping(value = "/kickarePartecipante/{IdStanza}/{IdUtente}")
     public ResponseEntity<Response<Boolean>> kickPartecipante(@PathVariable Long IdStanza,
@@ -577,10 +577,10 @@ public class GestioneStanzaControl {
     }
 
     /**
-     *
-     * @param id_stanza
-     * @param request
-     * @return
+     * metodo che permette di gestire la richiesta di visualizzazione del ruolo dell' utente all'interno di una specifica stanza
+     * @param id_stanza id della stanza
+     * @param request richiesta HTTP fornita dal client
+     * @return ruolo dell'utente all'interno della stanza ed un messaggio che descrive l'esito dell'operazione
      */
     @PostMapping(value = "/getRuolo/{id_stanza}")
     public ResponseEntity<Response<Ruolo>> getRuoloByUserAndByStanza(@PathVariable Long id_stanza,
@@ -607,11 +607,11 @@ public class GestioneStanzaControl {
     }
 
     /**
-     *
-     * @param IdStanza
-     * @param IdUtente
-     * @param request
-     * @return
+     * metodo che permette di gestire la richiesta di silenziare un determinato utente all'interno di una specifica stanza
+     * @param IdStanza id della stanza in cui si vuole silenziare il partecipante
+     * @param IdUtente id del partecipante che si vuole silenziare
+     * @param request richiesta HTTP fornita dal client
+     * @return valore booleano che identifica la riuscita dell'operaizone ed un messaggio che descrive l'esito dei essa
      */
     @PostMapping(value = "/silenziarePartecipante/{IdStanza}/{IdUtente}")
     public ResponseEntity<Response<Boolean>> SilenziaPartecipante(@PathVariable Long IdStanza,
@@ -635,7 +635,13 @@ public class GestioneStanzaControl {
             return ResponseEntity.status(500).body(new Response<>(null, "Errore durante l'operazione"));
         }
     }
-
+    /**
+     * metodo che permette di gestire la richiesta di smutare un determinato utente all'interno di una specifica stanza
+     * @param IdStanza id della stanza in cui si vuole smutare il partecipante
+     * @param IdUtente id del partecipante che si vuole smutare
+     * @param request richiesta HTTP fornita dal client
+     * @return valore booleano che identifica la riuscita dell'operaizone ed un messaggio che descrive l'esito dei essa
+     */
     @PostMapping(value = "/unmutePartecipante/{IdStanza}/{IdUtente}")
     public ResponseEntity<Response<Boolean>> UnmutePartecipante(@PathVariable Long IdStanza,
                                                                   @PathVariable Long IdUtente,
