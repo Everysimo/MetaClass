@@ -148,15 +148,15 @@ class GestioneStanzaControllerUnitTest {
     private void sendRequestFailureAccessoStanza(Stanza stanza, Class<? extends Exception> exceptionClass, int status) throws Exception {
         // Formattamento della richiesta
         MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders
-                .post(API_URL_CREASTANZA)
+                .post(API_URL_ACCESOSTANZA)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(JSONConvertitorStanza(stanza))  // Metodo privato della classe
+                .content(JSONConvertitorCodice(stanza.getCodice()))  // Metodo privato della classe
                 .header("Authorization", "Bearer TODO");
 
         try {
             // Forza il metodo creaStanza a lanciare un'eccezione ServerRuntimeException
             doThrow(exceptionClass)
-                    .when(stanzaService).creaStanza(any(), any());
+                    .when(stanzaService).accessoStanza(any(), any());
 
             // Esecuzione della richiesta e ritorno della risposta
             MvcResult result = MockMvcBuilders
@@ -516,11 +516,24 @@ class GestioneStanzaControllerUnitTest {
         when(jwtTokenUtil.getMetaIdFromToken(validationToken.getToken()))
                 .thenReturn(utente.getMetaId());
 
-        when(stanzaService.accessoStanza(stanza.getCodice(), utente.getMetaId()))
-                .thenThrow(JsonProcessingException.class);
+        when(stanzaService.accessoStanza(any(), any()))
+                .thenReturn(ResponseEntity.ok(any(AccessResponse.class)));
 
-        //vedere i metodi private testExpectedResult e sendRequest
-        sendRequestFailureAccessoStanza(stanza, JsonProcessingException.class, 403);
+        String str = "aaaaaa";
+        //formattamento della richiesta
+        MockHttpServletRequestBuilder requestBuilder =
+                MockMvcRequestBuilders.post(API_URL_ACCESOSTANZA)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(str)     //metodo privato della classe
+                        .header("Authorization", "Bearer TODO");
+
+        //ritorno della risposta
+        ResultActions ra = MockMvcBuilders.standaloneSetup(stanzaController)
+                .build()
+                .perform(requestBuilder);
+
+        testExpectedResult(CLIENT_ERROR_STATUS,ra);
+
     }
 
     @Test
@@ -604,7 +617,25 @@ class GestioneStanzaControllerUnitTest {
         when(validationToken.isTokenValid(any())).thenReturn(true);
 
         stanza.setCodice("1234");
+
+        when(stanzaService.accessoStanza(any(), any()))
+                .thenReturn(ResponseEntity.ok(any(AccessResponse.class)));
+
         testExpectedResult(CLIENT_ERROR_STATUS, sendRequestAccessoStanza(stanza));
+
+    }
+
+    @Test
+    public void testAccessoStanzaOnTestCase2() throws Exception {
+
+        when(validationToken.isTokenValid(any())).thenReturn(true);
+
+        stanza.setCodice("123456");
+
+        when(stanzaService.accessoStanza(any(), any()))
+                .thenReturn(ResponseEntity.ok(any(AccessResponse.class)));
+
+        testExpectedResult(SUCCESSFUL_STATUS, sendRequestAccessoStanza(stanza));
 
     }
 }
