@@ -1,127 +1,103 @@
-import React, { Component } from 'react';
+import React, { useState, useEffect } from 'react';
 import '../PopUpStyles.css';
 import { wait } from "@testing-library/user-event/dist/utils";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faCheck } from "@fortawesome/free-solid-svg-icons";
 
-export default class CreaScenario extends Component {
-    state = {
-        nome: "",
-        descrizione: "",
-        url_immagine: "",
-        id_categoria: 0,
-        selectedCategoria: '',
-        isVisible: true,
-        isErrorPopupVisible: false,
-        errorMessage: "",
-        array: []
+const CreaScenario = (props) => {
+    const [nome, setNome] = useState("");
+    const [descrizione, setDescrizione] = useState("");
+    const [url_immagine, setUrlImmagine] = useState("");
+    const [id_categoria, setIdCategoria] = useState(0);
+    const [selectedCategoria, setSelectedCategoria] = useState('');
+    const [isVisible, setIsVisible] = useState(true);
+    const [isErrorPopupVisible, setIsErrorPopupVisible] = useState(false);
+    const [errorMessage, setErrorMessage] = useState("");
+    const [array, setArray] = useState([]);
+    const [showCreateFormModal, setShowCreateFormModal] = useState(true);
+    const [showSuccessPopUp, setShowSuccessPopUp] = useState(false);
+
+
+
+    useEffect(() => {
+        fetchCategoria();
+    }, []);
+
+    const handleShowCreateForm = () => {
+        setShowCreateFormModal(true);
     };
-    //funzione per richiamare la funzione per prelevare gli scenari dal backend
-    componentDidMount() {
-        // Chiamata alla funzione per recuperare l'array di scenari
-        this.fetchCategoria();
-    }
-    fetchCategoria = async () => {
-        const requestOption1 = {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + sessionStorage.getItem("token")
-            },
-        };
+
+    const handleCloseCreateFormModal = () => {
+        setShowCreateFormModal(false);
+    };
+
+    const requestOption1 = {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + sessionStorage.getItem("token")
+        },
+    };
+    const fetchCategoria = async () => {
         try {
-            const response = await fetch('http://localhost:8080/admin/visualizzaCategoria',requestOption1);
+            const response = await fetch('http://localhost:8080/admin/visualizzaCategoria', requestOption1);
             console.log(response.statusMessage);
 
             if (!response.ok) {
-                throw new Error('Errore nel recupero delllle Categorie.');
+                throw new Error('Errore nel recupero delle Categorie.');
             }
-            //mi vado a salvare la stringa json in una const
+
+
             const data = await response.json();
-            console.log('data:', data)
+            console.log('data con categoria:', data)
 
-            //IMPORTANTE -> QUESTO E' IL METODO PER CONVERTIRE L'ARRAY
-            this.setState({array: data.value})
-            console.log("array:", this.state.array);
-
-            //questo lo faccio per vedere se riesco a stamparmi un parametro dell'array(uno tra nome, descrizione, id, media...)
-            this.state.array.forEach((parametro, indice) => {
-                const descr = parametro.descrizione;
-                console.log(`Descrizione ${indice + 1}: ${descr}`);
-            });
+            setArray(data.value);
+            console.log('array con categoria:', data.value);
 
         } catch (error) {
             console.error('Errore durante il recupero delle Categorie:', error.message);
         }
     };
 
-
-
-
-    handleNameChange = (e) => {
+    const handleNameChange = (e) => {
         const inputValue = e.target.value;
-
-        //prima lettera grande
         const capitalizedInput = inputValue.charAt(0).toUpperCase() + inputValue.slice(1);
-        this.setState({ nome: capitalizedInput, error: null });
-
+        setNome(capitalizedInput);
     };
-    handleCategoriaChange = (e) => {
-        // mi salvo la variabile scelta in una const
+
+    const handleCategoriaChange = (e) => {
         const selectedCategoriaName = e.target.value;
-        console.log('Valore selezionato:', selectedCategoriaName);
-
-        // setto la mia variabile selectedCategoria con il valore scelto
-        this.setState({ selectedCategoria: selectedCategoriaName });
-
-        // richiamo una funzione per prelevare dal nome scelto, l'id corrispondente
-        this.findCategoriaByName(selectedCategoriaName);
+        setSelectedCategoria(selectedCategoriaName);
+        findCategoriaByName(selectedCategoriaName);
     };
 
-    findCategoriaByName = (nome) => {
-
-        const { selectedCategoria, array } = this.state;
-        console.log("in funziione find->", nome)
-
-        //scorre l'array, e cerca quella entry nell'array che ha quel nome
+    const findCategoriaByName = (nome) => {
         const foundCategoria = array.find((scenario) => scenario.nome === nome);
 
-        //se l'ha trovata sarà true, => allora mi salva sia la posizione in cui l'ha trovata e sia l'id stesso
         if (foundCategoria) {
-            const positionInArray = array.indexOf(foundCategoria);
             const selectedCategoriaId = foundCategoria.id;
-            console.log(`Nome dello scenario trovato: ${selectedCategoria}, ID: ${selectedCategoriaId}, Posizione nell'array: ${positionInArray}`);
-
-            // setto lo stato della mia var id_scenario con l'id che è stato scelto
-            this.setState({id_categoria: selectedCategoriaId});
-
+            setIdCategoria(selectedCategoriaId);
         } else {
             console.error(`Categoria non trovata per il nome: ${selectedCategoria}`);
         }
     };
 
-
-
-    handleDescChange = (e) => {
+    const handleDescChange = (e) => {
         const inputValue = e.target.value;
-
         const capitalizedInput = inputValue.charAt(0).toUpperCase() + inputValue.slice(1);
-        this.setState({ descrizione: capitalizedInput, error: null });
-    };
-    handleImmageChange = (e) => {
-        this.setState({ url_immagine: e.target.value });
+        setDescrizione(capitalizedInput);
     };
 
-    handleErrorPopupClose = () => {
-        this.setState({
-            isErrorPopupVisible: false,
-            errorMessage: "",
-        });
+    const handleImageChange = (e) => {
+        setUrlImmagine(e.target.value);
     };
 
-    sendDataToServer = async () => {
-        const { nome, descrizione, url_immagine, id_categoria } = this.state;
+    const handleErrorPopupClose = () => {
+        setIsErrorPopupVisible(false);
+        setErrorMessage("");
+    };
 
-        // Validazione: Assicurati che idCategoria sia >= 0
-
+    const sendDataToServer = async () => {
         const dataToSend = {
             nome,
             descrizione,
@@ -139,121 +115,156 @@ export default class CreaScenario extends Component {
         };
 
         try {
-            console.log("la stringa json:", JSON.stringify(dataToSend));
+            console.log("datatosend", dataToSend)
             const response = await fetch('http://localhost:8080/admin/updateScenario', requestOption);
             const responseData = await response.json();
+
+            if (response.ok) {
+                console.log('Valutazione inviata con successo!');
+
+                handleCloseCreateFormModal();
+                setShowSuccessPopUp(true);
+
+            } else {
+                console.error('Errore durante l\'invio della valutazione al backend');
+            }
             console.log("Risposta dal server:", responseData);
         } catch (error) {
             console.error('ERRORE:', error);
         }
     };
 
-    callFunction = () => {
-
-        //CONTROLLI DA TRASFORMARE IN POP UP
-        if (this.state.nome.trim() === '' || this.state.nome.length < 2) {
-            this.setState({ error: 'Il campo nome non può essere vuoto o minore di 2 caratteri' });
+    const callFunction = () => {
+        if (nome.trim() === '' || nome.length < 2) {
+            setErrorMessage('Il campo nome non può essere vuoto o minore di 2 caratteri');
+            setIsErrorPopupVisible(true);
             return;
         }
 
-        if (this.state.descrizione.trim() === '') {
-            this.setState({error: 'Il campo descrizione non può essere vuoto'});
+        if (descrizione.trim() === '') {
+            setErrorMessage('Il campo descrizione non può essere vuoto');
+            setIsErrorPopupVisible(true);
             return;
-        }else if(this.state.descrizione.length < 2 || this.state.descrizione.length > 254) {
-            this.setState({error: 'Lunghezza descrizione errata'});
+        } else if (descrizione.length < 2 || descrizione.length > 254) {
+            setErrorMessage('Lunghezza descrizione errata');
+            setIsErrorPopupVisible(true);
             return;
-        }else if(!isNaN(this.state.descrizione.charAt(0))) {
-            this.setState({ error: 'Errore durante la richiesta, formato Nome errato' });
-            return;
-        }
-        //controllo scenario
-        if (!this.state.selectedCategoria) {
-            this.setState({ selectedCategoria: '', error: 'Errore, Selezione Categoria errata' });
+        } else if (!isNaN(descrizione.charAt(0))) {
+            setErrorMessage('Errore durante la richiesta, formato Nome errato');
+            setIsErrorPopupVisible(true);
             return;
         }
 
-        this.setState({ error: null });
-        this.sendDataToServer();
-        console.log("dati del form", this.state);
+        if (url_immagine.trim() === '') {
+            setErrorMessage('Il campo path immagine non può essere vuoto');
+            setIsErrorPopupVisible(true);
+            return;
+        }
+
+        if (!selectedCategoria) {
+            setSelectedCategoria('');
+            setErrorMessage('Errore, Selezione Categoria errata');
+            setIsErrorPopupVisible(true);
+            return;
+        }
+
+        setErrorMessage(null);
+        sendDataToServer();
+        console.log("dati del form", { nome, descrizione, url_immagine, id_categoria });
         wait(100);
-        this.handleClear();
+        handleClear();
     };
 
-    handleClear = () => {
-        this.setState({
-            nome: '',
-            descrizione: '',
-            url_immagine: '',
-            id_categoria: 0,
-        });
+    const handleClear = () => {
+        setNome('');
+        setDescrizione('');
+        setUrlImmagine('');
+        setIdCategoria(0);
     };
-    handleClose = () => {
-        // Nascondi la card impostando isVisible su false
-        this.setState({ isVisible: false });
 
-        // Chiama la funzione di chiusura ricevuta come prop
-        if (this.props.onClose) {
-            this.props.onClose();
+    const handleClose = () => {
+        setIsVisible(false);
+        if (props.onClose) {
+            props.onClose();
         }
     };
 
-    render() {
-        return (
+    const handleCloseSuccessPopUp = () => {
+        setShowSuccessPopUp(false);
+        window.location.replace(window.location.pathname);
+    };
+
+    return (
+        <>
+            <div
+                className={"transWhiteBg"}
+                onClick={handleShowCreateForm}>
+            </div>
+            {showCreateFormModal && (
             <div className={"modal"}>
-                <div className={`modal-content ${this.state.isVisible ? '' : 'hidden'}`}>
-                    <span className="close" onClick={this.handleClose}>
-                        &times;
-                    </span>
-                    {this.state.errorMessage ? (
-                        <p>{this.state.errorMessage}</p>
-                    ) : (
-                    <div className="card-content">
-                        <label>
-                            Nome:
-                            <input
-                                type="text"
-                                name="nome"
-                                value={this.state.nome}
-                                onChange={this.handleNameChange}
-                            />
-                        </label>
-                        <label>
-                            Descrizione:
-                            <input
-                                type="text"
-                                name="descrizione"
-                                value={this.state.descrizione}
-                                onChange={this.handleDescChange}
-                            />
-                        </label>
-                        <label>
-                            Immagine:
-                            <input
-                                type="text"
-                                name="immagine"
-                                value={this.state.url_immagine}
-                                onChange={this.handleImmageChange}
-                            />
-                        </label>
-                        <label>
-                            <p className={'textp'}>Seleziona una categoria</p>
-                            <select className={'select-field'} value={this.state.selectedCategoria}
-                                    onChange={this.handleCategoriaChange}>
-                                <option value="" disabled>Seleziona una categoria</option>
-                                {this.state.array.map((valore) => (
-                                    <option key={valore.id} value={valore.nome}>
-                                        {valore.nome}
-                                    </option>
-                                ))}
-                            </select>
-                        </label>
-                        <button onClick={this.handleClear}>Cancella</button>
-                        <button onClick={() => this.callFunction()}>Invia</button>
-                        {this.state.error && <p style={{color: 'red'}}>{this.state.error}</p>}
-                    </div>
-                    )}
+                <div className={`modal-content`}>
+                    <span className="close" onClick={handleClose}>&times;</span>
+
+                        <div className="card-content">
+                            <label>
+                                Nome:
+                                <input
+                                    type="text"
+                                    name="nome"
+                                    placeholder='Inserisci Nome'
+                                    value={nome}
+                                    onChange={handleNameChange}
+                                />
+                            </label>
+                            <label>
+                                Descrizione:
+                                <input
+                                    type="text"
+                                    name="descrizione"
+                                    placeholder='Inserisci Descrizione'
+                                    value={descrizione}
+                                    onChange={handleDescChange}
+                                />
+                            </label>
+                            <label>
+                                Immagine:
+                                <input
+                                    type="text"
+                                    name="immagine"
+                                    placeholder='Inserisci path'
+                                    value={url_immagine}
+                                    onChange={handleImageChange}
+                                />
+                            </label>
+                            <label>
+                                <p className={'textp'}>Seleziona una categoria</p>
+                                <select className={'select-field'} value={selectedCategoria}
+                                        onChange={handleCategoriaChange}>
+                                    <option value="" disabled>Seleziona una categoria</option>
+                                    {Array.isArray(array) && array.map((valore) => (
+                                        <option key={valore.id} value={valore.nome}>
+                                            {valore.nome}
+                                        </option>
+                                    ))}
+                                </select>
+                            </label>
+                            <button onClick={handleClear}>Cancella</button>
+                            <button onClick={callFunction}>Invia</button>
+                            {errorMessage && <p style={{ color: 'red' }}>{errorMessage}</p>}
+                        </div>
                 </div>
             </div>
-        );
-    };
-}
+                    )}
+            {showSuccessPopUp && (
+                <div className={"modal"}>
+                    <div className={"modal-content"}>
+                        <span className={"close"} onClick={handleCloseSuccessPopUp}>&times;</span>
+                        <p>Scenario creato con successo <FontAwesomeIcon icon={faCheck} size="2xl" style={{ color: "#63E6BE" }} /></p>
+                    </div>
+                </div>
+            )}
+    </>
+    );
+};
+
+export default CreaScenario;
