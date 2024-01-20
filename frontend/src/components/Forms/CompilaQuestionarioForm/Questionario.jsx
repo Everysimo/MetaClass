@@ -8,7 +8,7 @@ const Questionario = (props) => {
     const [errore, setErrore] = useState(null);
     const [showModal, setShowModal] = useState(false);
     const [showSuccessPopup, setShowSuccessPopup] = useState(false);
-    const [id_meeting, setId] = useState(props.id_meeting);
+    const [id_meeting] = useState(props.id_meeting);
 
     const [state, setState] = useState({
         immersionLevel: "",
@@ -40,50 +40,42 @@ const Questionario = (props) => {
 
         const dataToSend = {immersionLevel, motionSickness}
 
-        console.log("dei dati:", dataToSend);
-
-        if (errore) {
-            console.error('Valutazione non valida:', errore);
+        if(dataToSend.immersionLevel === "" || dataToSend.motionSickness === ""){
+            setErrore('devi compilare tutti i dati!');
         }
+        else {
 
-        const requestOption = {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + sessionStorage.getItem("token")
-            },
-            body: JSON.stringify({ dataToSend }),
-        };
+            const requestOption = {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + sessionStorage.getItem("token")
+                }
+            };
 
-        try {
-            console.log("data to send", dataToSend)
-            const response = await fetch(`http://localhost:8080/compilaQuestionario/${id_meeting}`, requestOption);
-            const responseData = await response.json();
+            try {
+                console.log("data to send", dataToSend)
+                const response = await fetch(`http://localhost:8080/stimaMeeting/${id_meeting}`, requestOption);
+                const responseData = await response.json();
 
-            console.log("Risposta dal server:", responseData);
+                console.log("Risposta dal server:", responseData);
 
-            if (response.ok) {
-                console.log('Valutazione inviata con successo!');
-                // Chiudi il modal
-                handleClose();
-                // Mostra il pop-up di successo
-                setShowSuccessPopup(true);
-            } else {
-                console.error('Errore durante l\'invio della valutazione al backend');
+                if (response.ok) {
+                    console.log('Valutazione inviata con successo!');
+                    // Chiudi il modal
+                    handleClose();
+                    // Mostra il pop-up di successo
+                    setShowSuccessPopup(true);
+                } else {
+                    console.error('Errore durante l\'invio della valutazione al backend');
+                }
+            } catch (error) {
+                console.error('Errore nella richiesta fetch:', error);
             }
-        } catch (error) {
-            console.error('Errore nella richiesta fetch:', error);
         }
     };
 
     const handleSubmit = () => {
-        /*console.log("hai schiacciato");
-        if (valutazione < 1 || valutazione > 5) {
-            setErrore('Il valore deve essere compreso tra 1 e 5');
-        } else {
-            setErrore(null); // Azzera l'errore se il valore è valido
-            sendDataToServer();
-        }*/
         sendDataToServer()
     };
 

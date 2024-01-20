@@ -15,6 +15,7 @@ const ScenarioPage = () => {
 
     useEffect(() => {
         fetchScenarios();
+        // eslint-disable-next-line
     }, []);
 
     const requestOption = {

@@ -1,7 +1,7 @@
 import {MyHeader} from "../components/Layout/Header/Header";
 import {MyFooter} from "../components/Layout/Footer/Footer";
 import React from "react";
-import SelectScenario from "../components/Buttons/SelectNewScenarioButton/SelectScenario";
+import SelectScenario from "../components/Forms/SelectNewScenario/SelectScenario";
 
 export const SelezionaScenario = () => {
 
