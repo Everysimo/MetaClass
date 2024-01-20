@@ -90,7 +90,7 @@ public class GestioneUtenzaServiceImpl implements GestioneUtenzaService{
     }
 
     /**
-     * meotodo che consente la modifica dei dati personali di un determianto utente
+     * metodo che consente la modifica dei dati personali di un determianto utente
      * @param MetaID metaID dell'utente che intende modificare i suoi dati
      * @param params nuovi dati dell'utente
      * @return valore boolean che identifica l'esito dell'operazione
