@@ -16,7 +16,7 @@ const CreaScenario = (props) => {
     const [array, setArray] = useState([]);
     const [showCreateFormModal, setShowCreateFormModal] = useState(true);
     const [showSuccessPopUp, setShowSuccessPopUp] = useState(false);
-
+    const [selectedFile, setSelectedFile] = useState("")
 
 
     useEffect(() => {
@@ -89,7 +89,12 @@ const CreaScenario = (props) => {
     };
 
     const handleImageChange = (e) => {
-        setUrlImmagine(e.target.value);
+        setSelectedFile(e.target.files[0])
+
+        if (selectedFile) {
+            // Qui puoi gestire il file selezionato, ad esempio, leggere il nome del file o eseguire altre operazioni necessarie
+            console.log("Nome del file:", selectedFile.name);
+        }
     };
 
     const handleErrorPopupClose = () => {
@@ -98,6 +103,8 @@ const CreaScenario = (props) => {
     };
 
     const sendDataToServer = async () => {
+        const url_immagine = '/'+selectedFile.name;
+
         const dataToSend = {
             nome,
             descrizione,
@@ -155,8 +162,8 @@ const CreaScenario = (props) => {
             return;
         }
 
-        if (url_immagine.trim() === '') {
-            setErrorMessage('Il campo path immagine non può essere vuoto');
+        if (!selectedFile) {
+            setErrorMessage('Errore: immagine non selezionata');
             setIsErrorPopupVisible(true);
             return;
         }
@@ -229,10 +236,9 @@ const CreaScenario = (props) => {
                             <label>
                                 Immagine:
                                 <input
-                                    type="text"
+                                    type="file"
                                     name="immagine"
-                                    placeholder='Inserisci path'
-                                    value={url_immagine}
+                                    accept="image/*"  // specifica il tipo di file che gli utenti possono selezionare, in questo caso, immagini
                                     onChange={handleImageChange}
                                 />
                             </label>
