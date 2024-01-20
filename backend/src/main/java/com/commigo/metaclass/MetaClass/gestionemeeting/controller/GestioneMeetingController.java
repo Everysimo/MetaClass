@@ -303,7 +303,7 @@ public class GestioneMeetingController {
      * @param JSONvalue Valori inseriti dall'utente all'interno del questionario
      * @param id_meeting id del metting a cui fa riferimento il questionario
      * @param request richiesta HTTP fornita dal client
-     * @returnun unvalore booleano che identifica la riuscita dell'operazione ed un messaggio che descrive l'esito di essa
+     * @return un valore booleano che identifica la riuscita dell'operazione ed un messaggio che descrive l'esito di essa
      */
     @PostMapping("/compilaQuestionario/{id_meeting}")
     public ResponseEntity<Response<Boolean>> compilaQuestionario(@RequestBody String JSONvalue,

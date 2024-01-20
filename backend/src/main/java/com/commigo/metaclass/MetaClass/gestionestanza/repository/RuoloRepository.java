@@ -8,9 +8,9 @@ import org.springframework.stereotype.Repository;
 public interface RuoloRepository extends JpaRepository<Ruolo, Long> {
 
     /**
-     *
-     * @param nome
-     * @return
+     * metodo che permette di ricercare un ruolo sulla base di un nome
+     * @param nome nome su cui si bassa la ricerca
+     * @return ruolo con il nome inserito
      */
     Ruolo findByNome(String nome);
 

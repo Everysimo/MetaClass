@@ -14,22 +14,22 @@ import java.util.Map;
 public interface StanzaRepository extends JpaRepository<Stanza, Long> {
 
     /**
-     *
-     * @param codice
-     * @return
+     * metodo che permette la ricerca di una stanza in base al suo codice
+     * @param codice codice su cui si base la ricerca
+     * @return stanza con il codice inserito
      */
     Stanza findStanzaByCodice(String codice);
 
     /**
-     *
-     * @param id
-     * @return
+     * metodo che permette la ricerca di una stanza in base ad un id
+     * @param id id su cui si basa la ricerca
+     * @return stanza con l'id inserito
      */
     Stanza findStanzaById(long id);
 
     /**
-     *
-     * @return
+     * meotodo che permette la ricerca dell'ultima stanza creata
+     * @return l'id dell'ultima stanza inserita
      */
     @Query("SELECT s.id FROM Stanza s ORDER BY s.id DESC LIMIT 1")
     Long findIdUltimaTupla();
@@ -38,10 +38,10 @@ public interface StanzaRepository extends JpaRepository<Stanza, Long> {
     // 1 se tutto ok
     // 0 se non è ok
     /**
-     *
-     * @param Id
-     * @param attributes
-     * @return
+     * metodo che permette di modificare i dati di una stanza
+     * @param Id id della stanza da modificare
+     * @param attributes i nuovi dati della stanza
+     * @return il numero di colonne modificate
      */
     @Modifying
     @Transactional
