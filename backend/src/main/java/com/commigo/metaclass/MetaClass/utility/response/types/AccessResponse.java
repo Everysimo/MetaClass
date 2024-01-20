@@ -10,14 +10,12 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class AccessResponse<Type> extends AbstractResponse<Type>
-{
+public class AccessResponse<Type> extends AbstractResponse<Type> {
 
-    private boolean isInAttesa;
+  private boolean isInAttesa;
 
-    public AccessResponse(Type value, String message, boolean isInAttesa)
-    {
-        super(value,message);
-        this.isInAttesa = isInAttesa;
-    }
+  public AccessResponse(Type value, String message, boolean isInAttesa) {
+    super(value, message);
+    this.isInAttesa = isInAttesa;
+  }
 }

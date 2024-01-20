@@ -13,7 +13,6 @@ import java.io.Serializable;
 @NoArgsConstructor
 public class StatoPartecipazioneId implements Serializable {
 
-    private Utente utente;
-    private Stanza stanza;
-
+  private Utente utente;
+  private Stanza stanza;
 }

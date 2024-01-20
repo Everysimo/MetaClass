@@ -10,9 +10,6 @@ import java.util.List;
 
 public interface StimaDurataMeetingAdapter {
 
-    public void addUtenteInDataset(Utente u, Duration durata, int immersionLevel) throws ServerRuntimeException;
-
+  public void addUtenteInDataset(Utente u, Duration durata, int immersionLevel)
+      throws ServerRuntimeException;
 }
-
-
-

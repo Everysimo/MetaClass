@@ -13,7 +13,6 @@ import java.io.Serializable;
 @AllArgsConstructor
 public class UtenteInMeetingID implements Serializable {
 
-     private Utente utente;
-     private Meeting meeting;
-
+  private Utente utente;
+  private Meeting meeting;
 }

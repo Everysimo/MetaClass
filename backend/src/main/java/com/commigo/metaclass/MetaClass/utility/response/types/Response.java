@@ -6,12 +6,9 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class Response<Type> extends AbstractResponse<Type>
-{
+public class Response<Type> extends AbstractResponse<Type> {
 
-    public Response(Type value,String message)
-    {
-        super(value,message);
-    }
-
+  public Response(Type value, String message) {
+    super(value, message);
+  }
 }

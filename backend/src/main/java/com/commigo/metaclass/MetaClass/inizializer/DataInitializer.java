@@ -66,7 +66,7 @@ public class DataInitializer implements CommandLineRunner {
 
         //Aggiunta Utente - Michele è amministratore - Francesco utente semplice
             Utente u1 = utenteRepository.save(new Utente(1L, "Michele", "Pesce", "pescemichele@live.com", "05/30/1993","M","7184488154978627", Utente.DEFAULT_TOKEN, true));
-            Utente u2 = utenteRepository.save(new Utente(2L, "Francesco", "Gatto", "francescogatto2001@gmail.com", "11/01/2001","M","7179258205463811", Utente.DEFAULT_TOKEN, true));
+            Utente u2 = utenteRepository.save(new Utente(2L, "Francesco", "Gatto", "francescogatto2001@gmail.com", "11/01/2001","M","7179258205463811", Utente.DEFAULT_TOKEN, false));
             Utente u3 = utenteRepository.save(new Utente(3L, "Giorgio", "Castelluccio", "giorgio_castelluccio@outlook.it", "10/10/2010","M","7168367147841000", Utente.DEFAULT_TOKEN, false));
             Utente u4 = utenteRepository.save(new Utente(4L, "Domenico", "Cavaliere", "d.cavaliere13@studenti.unisa.it", "01/16/2002","M","2564108403764347", Utente.DEFAULT_TOKEN, false));
             Utente u5 = utenteRepository.save(new Utente(5L, "Carmine", "Detta", "carminedetta02@gmail.com", "08/11/2002","M","725841336137765", Utente.DEFAULT_TOKEN, true));
