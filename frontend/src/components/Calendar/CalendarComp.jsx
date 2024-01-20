@@ -92,7 +92,7 @@ const CalendarComp = () => {
                                     onChange={(e) => setName(e.target.value)}
                                     placeholder="Enter name"
                                     className="inputField"
-                                    style={{maxWidth: "430px", margin:"20px"}}
+                                    style={{maxWidth: "100%", margin:"20px"}}
                                 />
                                 <MultiInputDateTimeRangeField
                                     value={selectedDateTimeRange}
