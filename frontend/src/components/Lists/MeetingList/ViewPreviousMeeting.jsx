@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { MeetingsToValidate } from "./MeetingsToValidate";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faFileCircleCheck, faFileCircleXmark } from "@fortawesome/free-solid-svg-icons";
+import { faFileCircleCheck } from "@fortawesome/free-solid-svg-icons";
 import Questionario from "../../Forms/CompilaQuestionarioForm/Questionario";
 
 export const ViewPreviousMeeting = () => {
@@ -11,6 +11,7 @@ export const ViewPreviousMeeting = () => {
     useEffect(() => {
         // Fetch meetingsArray from visualizzaMeetingPrecedenti
         fetchPreviousMeeting();
+        // eslint-disable-next-line
     }, []);
 
 
@@ -56,10 +57,10 @@ export const ViewPreviousMeeting = () => {
                         <span className={"table-cell"}>{meeting.inizio}</span>
                         <span className={"table-cell"}>{meeting.fine}</span>
                         <span className={"table-cell"}>{meeting.id_stanza.id}</span>
-
                         {/* Check if the current element is present in anotherArray.arrayMeeting */}
                         {(() => {
-                            const isIdPresent = arrayMeeting.some(anotherMeeting => anotherMeeting.id === meeting.id);
+                            const isIdPresent = arrayMeeting.some(
+                                anotherMeeting => anotherMeeting.id === meeting.id);
                             return (
                                 <span className={"table-cell"}>
                                 {isIdPresent ? (
@@ -68,7 +69,6 @@ export const ViewPreviousMeeting = () => {
                                     <FontAwesomeIcon icon={faFileCircleCheck} size="2xl" style={{ color: "#00f900" }} />
                                 )}
                                 </span>
-
                             );
                         })()}
                     </div>

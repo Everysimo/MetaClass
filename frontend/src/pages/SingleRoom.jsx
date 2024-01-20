@@ -10,6 +10,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import AvviaMeeting from "../components/Buttons/GestioneMeetingButtons/AvviaMeeting";
 import MyModifyForm from "../components/Forms/ModifyRoomForm/MyModifyForm";
 import MeetingList from "../components/Calendar/CalendarViewer";
+import RequestSection from "../components/Forms/AccessRequest/RequestSection";
 
 export const SingleRoom = () => {
     const navigate = useNavigate();
@@ -21,6 +22,7 @@ export const SingleRoom = () => {
 
     useEffect(() => {
         fetchSingleRoom();
+        // eslint-disable-next-line
     }, []);
 
     const requestOption = {
@@ -87,9 +89,6 @@ export const SingleRoom = () => {
     const handleGoToChangeScenario = () => {
         navigate(`/changescenario/${id_stanza}`);
     };
-    const handleGoToAccessManagement = () => {
-        navigate(`/accessManagement/${id_stanza}`);
-    };
 
     const handleGoToBannedUserList = () => {
         navigate(`/bannedUserList/${id_stanza}`);
@@ -132,9 +131,7 @@ export const SingleRoom = () => {
                                     <button onClick={handleGoToChangeScenario}>
                                         Modifica lo scenario della stanza
                                     </button>
-                                    <button onClick={handleGoToAccessManagement}>
-                                        Gestione degli accessi
-                                    </button>
+                                    <RequestSection id_stanza = {id_stanza} />
                                     <button onClick={handleGoToBannedUserList}>
                                         Visualizza Lista Utenti Bannati
                                     </button>
