@@ -15,7 +15,39 @@ export const SingleRoom = () => {
     const navigate = useNavigate();
     const { id: id_stanza } = useParams();
     const [role, setRole] = useState("Partecipante"); // Default role value
+    const [stanzaSingola, setStanzaSingola] = useState("");
+
     sessionStorage.setItem("idStanza", id_stanza);
+
+    useEffect(() => {
+        fetchSingleRoom();
+    }, []);
+
+    const requestOption = {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + sessionStorage.getItem("token")
+        },
+    };
+    const fetchSingleRoom = async() => {
+        try {
+            const response = await fetch(`http://localhost:8080/visualizzaStanza/${id_stanza}`, requestOption);
+
+            if (!response.ok) {
+                throw new Error('Errore nel recupero degli scenari.');
+            }
+
+            const data = await response.json();
+
+            setStanzaSingola(data.value);
+            console.log("Stanza singola;", data.value)
+
+
+        } catch (error) {
+            console.error('Errore durante il recupero degli scenari:', error.message);
+        }
+    };
 
     useEffect(() => {
         const fetchDataAndResize = async () => {
@@ -77,21 +109,26 @@ export const SingleRoom = () => {
                     <FontAwesomeIcon
                         icon={faChalkboardUser}
                         size="4x"
-                        style={{ color: "#c70049" }}
+                        style={{color: "#c70049"}}
                     />
                     <h1>Stanza {id_stanza}</h1>
-                    <h2></h2>
+                    <div style={{ border: '2px solid #ccc', borderRadius: '8px', padding: '10px', boxShadow: '0 0 10px rgba(0, 0, 0, 0.1)' }}>
+                        <h2>CODICE STANZA: {stanzaSingola.codice}</h2>
+                        <h4>
+                            SCENARIO SELEZIONATO: {stanzaSingola && stanzaSingola.scenario && stanzaSingola.scenario.nome}
+                        </h4>
+                    </div>
                     <h2>Meetings programmati</h2>
-                    <MeetingList />
+                    <MeetingList/>
                     {!isOrg() && (
                         <>
                             <div className={"masterDiv"}>
                                 <div className={"childDiv"}>
                                     <h2>Schedula un nuovo meeting</h2>
-                                    <CalendarComp />
+                                    <CalendarComp/>
                                 </div>
                                 <div className={"childDiv"}>
-                                    <MyModifyForm />
+                                    <MyModifyForm/>
                                     <button onClick={handleGoToChangeScenario}>
                                         Modifica lo scenario della stanza
                                     </button>
@@ -104,14 +141,14 @@ export const SingleRoom = () => {
                                 </div>
                             </div>
                             <div className={"masterDiv"}>
-                                <AvviaMeeting id_meeting={id_stanza} />
+                                <AvviaMeeting id_meeting={id_stanza}/>
                             </div>
                         </>
                     )}
                 </section>
                 <aside className="side-nav">
                     <div className={"childDiv"}>
-                        <UserListInRoom />
+                    <UserListInRoom />
                     </div>
                 </aside>
             </main>

@@ -164,7 +164,7 @@ public class DataInitializer implements CommandLineRunner {
                         LocalDateTime.parse("2024-02-03 19:00",formatter),false));
         FeedbackMeeting feed3 = feedbackMeetingRepository.save(
                 new FeedbackMeeting(u4,m1,rep1,Duration.ofMinutes(30),
-                        LocalDateTime.parse("2024-02-03 19:00",formatter),true));
+                        LocalDateTime.parse("2024-02-03 19:00",formatter),false));
         FeedbackMeeting feed4 = feedbackMeetingRepository.save(
                 new FeedbackMeeting(u5,m1,rep1,Duration.ofMinutes(30),
                         LocalDateTime.parse("2024-02-03 19:00",formatter),false));
