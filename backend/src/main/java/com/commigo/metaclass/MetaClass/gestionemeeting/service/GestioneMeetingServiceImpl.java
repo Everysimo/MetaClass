@@ -454,6 +454,7 @@ public class GestioneMeetingServiceImpl implements GestioneMeetingService{
     /**
      * metodo che consente la compilazione di un questionario da parte di un determinato utente
      * @param value la valutazione dello scenario inserita dall'utente all'interno del questionario
+     * @param motionSickness livello di nausea dopo l'uscita dal meeting
      * @param metaId metaID dell'utente che compila il questionario
      * @param id_meeting id del meeting a cui fa riferimento il questionario
      * @return valore boolean che identifica l'esito dell'operazione
@@ -461,7 +462,7 @@ public class GestioneMeetingServiceImpl implements GestioneMeetingService{
      * @throws RuntimeException403
      */
     @Override
-    public boolean compilaQuestionario(Integer value, String metaId, Long id_meeting) throws ServerRuntimeException, RuntimeException403 {
+    public boolean compilaQuestionario(Integer value, Integer motionSickness, String metaId, Long id_meeting) throws ServerRuntimeException, RuntimeException403 {
 
         Utente u;
         if((u=utenteRepository.findFirstByMetaId(metaId))==null)
@@ -483,6 +484,10 @@ public class GestioneMeetingServiceImpl implements GestioneMeetingService{
 
         //determino che il questionario è salvato
         fm.setCompiledQuestionario(true);
+        //aggiungo il livello di immersività e il motionSickness
+        fm.setImmersionLevel(value);
+        fm.setMotionSickness(motionSickness);
+
         feedbackMeetingRepository.save(fm);
 
         //se non è compilato allora procedo con la compilazione
@@ -500,10 +505,6 @@ public class GestioneMeetingServiceImpl implements GestioneMeetingService{
         sc.setMedia_valutazione(newMedia);
         sc.setNum_voti(num_voti+1);
         scenarioRepository.save(sc);
-
-        //riempimento dataset
-
-        //gestioneStimaMeetingService.addUtenteInDataset(u,fm.getTempo_totale(),value);
 
         return true;
     }

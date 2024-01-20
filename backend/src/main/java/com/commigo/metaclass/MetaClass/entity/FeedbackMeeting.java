@@ -1,6 +1,8 @@
 package com.commigo.metaclass.MetaClass.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -60,6 +62,18 @@ public class FeedbackMeeting {
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Report report;
 
+    @Column(name = "immersionLevel")
+    @NotNull(message = "Il livello di immersività non può essere mai nullo")
+    @Min(value = 1, message = "Il livello di immersività non può essere inferiore a 1")
+    @Max(value = 5, message = "Il livello di immersività non può essere superiore a 5")
+    private int immersionLevel;
+
+    @Column(name = "motionSickness")
+    @NotNull(message = "Il motionSickness non può essere mai nullo")
+    @Min(value = 1, message = "Il motionSickness non può essere inferiore a 1")
+    @Max(value = 10, message = "Il motionSickness non può essere superiore a 10")
+    private int motionSickness;
+
     @NotNull(message = "il questionario non può essere nullo")
     private boolean compiledQuestionario;
 
@@ -71,6 +85,8 @@ public class FeedbackMeeting {
          this.tempo_totale = Duration.ZERO;
          this.dataUltimoAccesso = LocalDateTime.now();
          this.compiledQuestionario = false;
+         this.motionSickness = 1;
+         this.immersionLevel = 1;
     }
 
     public FeedbackMeeting(Utente utente, Meeting meeting, Report report, Duration tempo_totale, LocalDateTime ultimo, boolean compiled){
@@ -80,6 +96,8 @@ public class FeedbackMeeting {
         this.tempo_totale = tempo_totale;
         this.dataUltimoAccesso = ultimo;
         this.compiledQuestionario = compiled;
+        this.motionSickness = 1;
+        this.immersionLevel = 1;
     }
 
 }
