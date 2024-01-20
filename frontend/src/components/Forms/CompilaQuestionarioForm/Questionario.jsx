@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import '../PopUpStyles.css';
-import { faFileCircleXmark } from "@fortawesome/free-solid-svg-icons";
+import {faCheck, faFileCircleXmark} from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 const Questionario = (props) => {
@@ -132,7 +132,7 @@ const Questionario = (props) => {
                             className={"close"}
                             onClick={handleCloseSuccessPopup}
                         >&times;</span>
-                        <p>Questionario compilato con successo</p>
+                        <p>Questionario compilato con successo <FontAwesomeIcon icon={faCheck} size="2xl" style={{color: "#63E6BE",}} /></p>
                     </div>
                 </div>
             )}

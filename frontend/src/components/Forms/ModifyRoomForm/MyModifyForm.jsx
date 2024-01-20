@@ -1,6 +1,8 @@
 import React, {useEffect, useState} from 'react';
 import '../PopUpStyles.css';
 import {useParams} from "react-router-dom";
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {faCheck} from "@fortawesome/free-solid-svg-icons";
 
 const MyModifyForm = () => {
     const [showModal, setShowModal] = useState(false);
@@ -125,7 +127,7 @@ const MyModifyForm = () => {
                     <div className="modal-content">
                         <span className="close" onClick={handleCloseModal}>&times;</span>
                         {message ? (
-                            <p>{message}</p>
+                            <p >{message} <FontAwesomeIcon icon={faCheck} size="2xl" style={{color: "#63E6BE",}} /></p>
                         ) : (
                         <div className={"childDiv"}>
                             <p className={'textp'}>Inserisci Nuovo Nome:</p>
