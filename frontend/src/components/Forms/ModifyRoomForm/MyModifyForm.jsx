@@ -5,7 +5,7 @@ import {useParams} from "react-router-dom";
 const MyModifyForm = () => {
     const [showModal, setShowModal] = useState(false);
     const [formData, setFormData] = useState({});
-    const [successMessage, setSuccessMessage] = useState('');
+    const [message, setMessage] = useState('');
     const [formReset, setFormReset] = useState(false); // State for form reset
     const { id: id_stanza } = useParams();
 
@@ -14,7 +14,7 @@ const MyModifyForm = () => {
         nome: "",
         descrizione: "",
         tipoAccesso: '',
-        maxPosti: '',
+        max_Posti: '',
     });
 
     const handleCloseModal = () => {
@@ -25,7 +25,7 @@ const MyModifyForm = () => {
     useEffect(() => {
         if (formReset) {
             setFormData({}); // Reset form data
-            setSuccessMessage(''); // Reset success message
+            setMessage(''); // Reset success message
             setFormReset(false); // Reset formReset state
         }
     }, [formReset]);
@@ -43,7 +43,7 @@ const MyModifyForm = () => {
     };
 
     const handleMAXChange = (e) => {
-        setState({ ...state, maxPosti: e.target.value });
+        setState(prevState => ({ ...prevState, maxPosti: parseInt(e.target.value, 10) }));
     };
 
     /*funzioni per eliminare la stanza*/
@@ -65,6 +65,7 @@ const MyModifyForm = () => {
             const response = await fetch(`http://localhost:8080/eliminaStanza/${id_stanza}`, requestOption);
             const responseData = await response.json();
             console.log("Risposta del server:", responseData);
+            setMessage(responseData.message);
         } catch (error) {
             console.error('Errore:', error);
         }
@@ -72,7 +73,7 @@ const MyModifyForm = () => {
 
     const sendDataModifyRoom = async () => {
 
-        const {nome, descrizione, tipoAccesso, maxPosti} = state;
+        const {nome, descrizione, tipoAccesso, max_Posti} = state;
         const dataToSend = {};
 
         // Aggiungi solo i campi non vuoti all'oggetto dataToSend
@@ -85,13 +86,13 @@ const MyModifyForm = () => {
         if (tipoAccesso) {
             dataToSend.tipoAccesso = tipoAccesso;
         }
-        if (maxPosti) {
-            dataToSend.maxPosti = maxPosti;
+        if (max_Posti) {
+            dataToSend.max_Posti = max_Posti;
         }
 
         // Verifica se l'oggetto dataToSend è vuoto
         if (Object.keys(dataToSend).length === 0) {
-            console.error('Nessun dato da inviare.');
+            setMessage('Nessun dato da inviare.');
             return;
         }
 
@@ -105,12 +106,12 @@ const MyModifyForm = () => {
         };
 
         try {
-            console.log("la stringa json:", JSON.stringify(dataToSend));
+            console.log("la stringa json:", dataToSend);
 
             const response = await fetch(`http://localhost:8080/modifyRoomData/${id_stanza}`, requestOption);
 
             const responseData = await response.json();
-            console.log("Risposta dal server:", responseData);
+            setMessage(responseData.message);
         } catch (error) {
             console.error('ERRORE:', error);
         }
@@ -123,6 +124,9 @@ const MyModifyForm = () => {
                 <div className="modal">
                     <div className="modal-content">
                         <span className="close" onClick={handleCloseModal}>&times;</span>
+                        {message ? (
+                            <p>{message}</p>
+                        ) : (
                         <div className={"childDiv"}>
                             <p className={'textp'}>Inserisci Nuovo Nome:</p>
                             <input
@@ -173,7 +177,7 @@ const MyModifyForm = () => {
                             >
                                 Salva
                             </button>
-                        </div>
+                        </div>)}
                     </div>
                 </div>
             )}
