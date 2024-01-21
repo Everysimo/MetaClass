@@ -38,9 +38,11 @@ html, body{
 }
 @keyframes fade {
     0%{
+        filter: blur(5px);
         opacity: 0;
     }
     100%{
+        filter: blur(0);
         opacity: 0.8;
     }
 }
@@ -63,12 +65,14 @@ html, body{
 }
 @keyframes slideIn {
     0%{
+        filter: blur(5px);
         opacity: 0;
-        left: -800px;
+        transform: translateX(-100%);
     }
     100%{
+        filter: blur(0);
         opacity: 1;
-        left: 0;
+        transform: translateX(0);
     }
 }
 .text h2
