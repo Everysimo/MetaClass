@@ -17,9 +17,9 @@ export default function UnloggedHome(){
                 </video>
                 <div className="overlay"></div>
                 <div className="text">
-                <h2>metaclass </h2>
-                    <h3>a doorway to the future</h3>
-                    <p>
+                    <h2 className={"textCont"}>metaclass </h2>
+                    <h3 className={"textCont"}>a doorway to the future</h3>
+                    <p className={"textCont"}>
                         Nato da un piccolo progetto universitario, il nostro obiettivo è
                         quello di offrire un portale organizzativo per la nostra VR app!
                     </p>
