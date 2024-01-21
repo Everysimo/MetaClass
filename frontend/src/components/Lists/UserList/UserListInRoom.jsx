@@ -278,7 +278,7 @@ const UserListInRoom = () => {
         try {
             console.log('fetch call effettuata ');
             const response = await fetch(
-                `http://localhost:8080/declassaOrganizzatore/{IdStanza}/{IdUtente}`,
+                `http://localhost:8080/declassaOrganizzatore/${id_stanza}/${selectedUserId}`,
                 requestOption
             );
             console.log('Fetch call completed');

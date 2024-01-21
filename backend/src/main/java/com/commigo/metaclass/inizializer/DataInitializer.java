@@ -143,7 +143,7 @@ public class DataInitializer implements CommandLineRunner {
                 "M",
                 "2564108403764347",
                 Utente.DEFAULT_TOKEN,
-                false));
+                true));
     Utente u5 =
         utenteRepository.save(
             new Utente(
@@ -213,6 +213,9 @@ public class DataInitializer implements CommandLineRunner {
     Stanza s4 =
         stanzaRepository.save(
             new Stanza(4L, "StanzaCarmine1", "Stanza 1 per il Carmine", true, 50, sc3, "000004"));
+    Stanza s5 =
+            stanzaRepository.save(
+                    new Stanza(5L, "StanzaDomenico1", "Stanza 1 per il domenico", true, 50, sc3, "000005"));
 
     // Aggiunta dello StatoPartecipazione
     // SE VIENE INSERITO UN ORGANIZZATORE_MASTER BANNATO ALLORA DA ERRORE
@@ -329,6 +332,40 @@ public class DataInitializer implements CommandLineRunner {
             false,
             "Domenico",
             false));
+
+
+
+
+    statoPartecipazioneRepository.save(
+            new StatoPartecipazione(
+                    s5,
+                    u1,
+                    ruoloRepository.findByNome(Ruolo.ORGANIZZATORE),
+                    false,
+                    false,
+                    "Michele",
+                    false));
+    statoPartecipazioneRepository.save(
+            new StatoPartecipazione(
+                    s5,
+                    u2,
+                    ruoloRepository.findByNome(Ruolo.PARTECIPANTE),
+                    true,
+                    false,
+                    "Francesco",
+                    true));
+    statoPartecipazioneRepository.save(
+            new StatoPartecipazione(
+                    s5, u3, ruoloRepository.findByNome(Ruolo.PARTECIPANTE), false, false, "Giorgio", false));
+    statoPartecipazioneRepository.save(
+            new StatoPartecipazione(
+                    s5,
+                    u4,
+                    ruoloRepository.findByNome(ORGANIZZATORE_MASTER),
+                    false,
+                    false,
+                    "Domenico",
+                    false));
 
     // Aggiunta meeting
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
