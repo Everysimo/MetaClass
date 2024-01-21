@@ -1,6 +1,5 @@
 package com.commigo.metaclass.gestionestanza.controller;
 
-import com.commigo.metaclass.MetaClass.entity.*;
 import com.commigo.metaclass.entity.*;
 import com.commigo.metaclass.exceptions.CustomExceptionHandler;
 import com.commigo.metaclass.exceptions.ServerRuntimeException;
@@ -106,8 +105,8 @@ class GestioneStanzaControllerUnitTest {
     // Aggiunta degli attributi uno per uno
     jsonNode.put("nome", stanza.getNome());
     jsonNode.put("descrizione", stanza.getDescrizione());
-    jsonNode.put("tipoAccesso", stanza.isTipo_Accesso());
-    jsonNode.put("maxPosti", stanza.getMax_Posti());
+    jsonNode.put("tipoAccesso", stanza.isTipoAccesso());
+    jsonNode.put("maxPosti", stanza.getMaxPosti());
     jsonNode.put("id_scenario", stanza.getScenario().getId());
 
     return jsonNode.toString();
@@ -219,10 +218,10 @@ class GestioneStanzaControllerUnitTest {
     when(validationToken.isTokenValid(any(HttpServletRequest.class))).thenReturn(true);
     // Simula la decodifica del token e restituisce un metaId valido
     when(jwtTokenUtil.getmetaIdFromToken(validationToken.getToken()))
-        .thenReturn(utente.getmetaId());
+        .thenReturn(utente.getMetaId());
 
     try {
-      when(stanzaService.creaStanza(stanza, utente.getmetaId())).thenReturn(true);
+      when(stanzaService.creaStanza(stanza, utente.getMetaId())).thenReturn(true);
 
       // vedere i metodi private testExpectedResult e sendRequest
       testExpectedResult(SUCCESSFUL_STATUS, sendRequestStanza(stanza));
@@ -246,9 +245,9 @@ class GestioneStanzaControllerUnitTest {
 
     // Simula la decodifica del token e restituisce un metaId valido
     when(jwtTokenUtil.getmetaIdFromToken(validationToken.getToken()))
-        .thenReturn(utente.getmetaId());
+        .thenReturn(utente.getMetaId());
 
-    when(stanzaService.creaStanza(stanza, utente.getmetaId()))
+    when(stanzaService.creaStanza(stanza, utente.getMetaId()))
         .thenThrow(ServerRuntimeException.class);
 
     // vedere i metodi private testExpectedResult e sendRequest
@@ -262,9 +261,9 @@ class GestioneStanzaControllerUnitTest {
 
     // Simula la decodifica del token e restituisce un metaId valido
     when(jwtTokenUtil.getmetaIdFromToken(validationToken.getToken()))
-        .thenReturn(utente.getmetaId());
+        .thenReturn(utente.getMetaId());
 
-    when(stanzaService.accessoStanza(stanza.getCodice(), utente.getmetaId()))
+    when(stanzaService.accessoStanza(stanza.getCodice(), utente.getMetaId()))
         .thenThrow(ServerRuntimeException.class);
 
     // vedere i metodi private testExpectedResult e sendRequest
@@ -321,7 +320,7 @@ class GestioneStanzaControllerUnitTest {
 
     when(validationToken.isTokenValid(any())).thenReturn(true);
 
-    stanza.setMax_Posti(0);
+    stanza.setMaxPosti(0);
     testExpectedResult(CLIENT_ERROR_STATUS, sendRequestStanza(stanza));
   }
 
@@ -330,7 +329,7 @@ class GestioneStanzaControllerUnitTest {
 
     when(validationToken.isTokenValid(any())).thenReturn(true);
 
-    stanza.setMax_Posti(1000);
+    stanza.setMaxPosti(1000);
     testExpectedResult(CLIENT_ERROR_STATUS, sendRequestStanza(stanza));
   }
 
@@ -349,7 +348,7 @@ class GestioneStanzaControllerUnitTest {
       // Aggiunta degli attributi uno per uno
       jsonNode.put("nome", stanza.getNome());
       jsonNode.put("descrizione", stanza.getDescrizione());
-      jsonNode.put("tipoAccesso", stanza.isTipo_Accesso());
+      jsonNode.put("tipoAccesso", stanza.isTipoAccesso());
       jsonNode.put("maxPosti", "A");
       jsonNode.put("id_scenario", stanza.getScenario().getId());
 
@@ -386,8 +385,8 @@ class GestioneStanzaControllerUnitTest {
       // Aggiunta degli attributi uno per uno
       jsonNode.put("nome", stanza.getNome());
       jsonNode.put("descrizione", stanza.getDescrizione());
-      jsonNode.put("tipoAccesso", stanza.isTipo_Accesso());
-      jsonNode.put("maxPosti", stanza.getMax_Posti());
+      jsonNode.put("tipoAccesso", stanza.isTipoAccesso());
+      jsonNode.put("maxPosti", stanza.getMaxPosti());
       jsonNode.put("id_scenario", (JsonNode) null);
 
       // formattamento della richiesta
@@ -434,7 +433,7 @@ class GestioneStanzaControllerUnitTest {
 
     // Simula la decodifica del token e restituisce un metaId valido
     when(jwtTokenUtil.getmetaIdFromToken(validationToken.getToken()))
-        .thenReturn(utente.getmetaId());
+        .thenReturn(utente.getMetaId());
 
     try {
       when(stanzaService.accessoStanza(any(), any()))
@@ -483,7 +482,7 @@ class GestioneStanzaControllerUnitTest {
 
     // Simula la decodifica del token e restituisce un metaId valido
     when(jwtTokenUtil.getmetaIdFromToken(validationToken.getToken()))
-        .thenReturn(utente.getmetaId());
+        .thenReturn(utente.getMetaId());
 
     when(stanzaService.accessoStanza(any(), any()))
         .thenReturn(ResponseEntity.ok(any(AccessResponse.class)));
@@ -510,9 +509,9 @@ class GestioneStanzaControllerUnitTest {
 
     // Simula la decodifica del token e restituisce un metaId valido
     when(jwtTokenUtil.getmetaIdFromToken(validationToken.getToken()))
-        .thenReturn(utente.getmetaId());
+        .thenReturn(utente.getMetaId());
 
-    when(stanzaService.accessoStanza(stanza.getCodice(), utente.getmetaId()))
+    when(stanzaService.accessoStanza(stanza.getCodice(), utente.getMetaId()))
         .thenThrow(ServerRuntimeException.class);
 
     // vedere i metodi private testExpectedResult e sendRequest
@@ -526,7 +525,7 @@ class GestioneStanzaControllerUnitTest {
 
     // Simula la decodifica del token e restituisce un metaId valido
     when(jwtTokenUtil.getmetaIdFromToken(validationToken.getToken()))
-        .thenReturn(utente.getmetaId());
+        .thenReturn(utente.getMetaId());
 
     ObjectMapper objectMapper = new ObjectMapper();
     objectMapper.registerModule(new JavaTimeModule());
@@ -554,7 +553,7 @@ class GestioneStanzaControllerUnitTest {
 
     // Simula la decodifica del token e restituisce un metaId valido
     when(jwtTokenUtil.getmetaIdFromToken(validationToken.getToken()))
-        .thenReturn(utente.getmetaId());
+        .thenReturn(utente.getMetaId());
 
     ObjectMapper objectMapper = new ObjectMapper();
     objectMapper.registerModule(new JavaTimeModule());

@@ -176,7 +176,7 @@ class GestioneUtenzaControllerUnitTest {
     // Mock your token validation result
     when(validationToken.isTokenValid(any(HttpServletRequest.class))).thenReturn(true);
     when(jwtTokenUtil.getmetaIdFromToken(validationToken.getToken()))
-        .thenReturn(utente.getmetaId()); // Mock your service method result
+        .thenReturn(utente.getMetaId()); // Mock your service method result
     when(utenzaService.modificaDatiUtente(Mockito.anyString(), Mockito.anyMap())).thenReturn(true);
 
     try {

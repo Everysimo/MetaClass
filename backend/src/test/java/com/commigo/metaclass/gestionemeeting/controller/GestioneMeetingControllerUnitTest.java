@@ -1,6 +1,5 @@
 package com.commigo.metaclass.gestionemeeting.controller;
 
-import com.commigo.metaclass.MetaClass.entity.*;
 import com.commigo.metaclass.entity.*;
 import com.commigo.metaclass.exceptions.ServerRuntimeException;
 import com.commigo.metaclass.gestionemeeting.service.GestioneMeetingService;

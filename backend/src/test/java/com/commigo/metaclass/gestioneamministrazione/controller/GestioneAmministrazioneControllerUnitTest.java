@@ -1,6 +1,5 @@
 package com.commigo.metaclass.gestioneamministrazione.controller;
 
-import com.commigo.metaclass.MetaClass.entity.*;
 import com.commigo.metaclass.entity.Categoria;
 import com.commigo.metaclass.entity.Immagine;
 import com.commigo.metaclass.entity.Scenario;
@@ -197,7 +196,7 @@ class GestioneAmministrazioneControllerUnitTest {
 
     // Simula la decodifica del token e restituisce un metaId valido
     when(jwtTokenUtil.getmetaIdFromToken(validationToken.getToken()))
-        .thenReturn(utente.getmetaId());
+        .thenReturn(utente.getMetaId());
 
     when(amministrazioneController.checkAdmin(any(String.class))).thenReturn(true);
 
@@ -219,7 +218,7 @@ class GestioneAmministrazioneControllerUnitTest {
 
     // Simula la decodifica del token e restituisce un metaId valido
     when(jwtTokenUtil.getmetaIdFromToken(validationToken.getToken()))
-        .thenReturn(utente.getmetaId());
+        .thenReturn(utente.getMetaId());
 
     when(amministrazioneController.checkAdmin(any(String.class))).thenReturn(false);
 
@@ -248,7 +247,7 @@ class GestioneAmministrazioneControllerUnitTest {
 
     // Simula la decodifica del token e restituisce un metaId valido
     when(jwtTokenUtil.getmetaIdFromToken(validationToken.getToken()))
-        .thenReturn(utente.getmetaId());
+        .thenReturn(utente.getMetaId());
 
     when(amministrazioneController.checkAdmin(any(String.class))).thenReturn(true);
 
@@ -270,7 +269,7 @@ class GestioneAmministrazioneControllerUnitTest {
 
     // Simula la decodifica del token e restituisce un metaId valido
     when(jwtTokenUtil.getmetaIdFromToken(validationToken.getToken()))
-        .thenReturn(utente.getmetaId());
+        .thenReturn(utente.getMetaId());
 
     when(amministrazioneController.checkAdmin(any(String.class))).thenReturn(true);
 
@@ -292,7 +291,7 @@ class GestioneAmministrazioneControllerUnitTest {
 
     // Simula la decodifica del token e restituisce un metaId valido
     when(jwtTokenUtil.getmetaIdFromToken(validationToken.getToken()))
-        .thenReturn(utente.getmetaId());
+        .thenReturn(utente.getMetaId());
 
     when(amministrazioneController.checkAdmin(any(String.class))).thenReturn(true);
 
@@ -315,7 +314,7 @@ class GestioneAmministrazioneControllerUnitTest {
 
     // Simula la decodifica del token e restituisce un metaId valido
     when(jwtTokenUtil.getmetaIdFromToken(validationToken.getToken()))
-        .thenReturn(utente.getmetaId());
+        .thenReturn(utente.getMetaId());
 
     when(amministrazioneController.checkAdmin(any(String.class))).thenReturn(true);
 
@@ -337,7 +336,7 @@ class GestioneAmministrazioneControllerUnitTest {
 
     // Simula la decodifica del token e restituisce un metaId valido
     when(jwtTokenUtil.getmetaIdFromToken(validationToken.getToken()))
-        .thenReturn(utente.getmetaId());
+        .thenReturn(utente.getMetaId());
 
     when(amministrazioneController.checkAdmin(any(String.class))).thenReturn(true);
 
