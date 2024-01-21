@@ -1,0 +1,116 @@
+/* Modal styles */
+.modal {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: fixed;
+    top: 10%;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+}
+
+.modal-content {
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    min-width: 50%;
+    max-width: 700px;
+    div{
+        padding: 0;
+        box-shadow: none;
+        .textp{
+            font-size: small;
+        }
+    }
+}
+
+.close {
+    cursor: pointer;
+    float: right;
+    font-size: 20px;
+    font-weight: bold;
+    color: #333;
+}
+
+/* Input styles */
+.textarea-field,
+input[type="text"],
+input[type="date"],
+input[type="number"]{
+    width: 100%;
+    padding: 10px;
+    margin: 8px 0;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    /* Additional styles */
+    background-color: white;
+    color: #333;
+    font-size: 16px;
+    /* Adjust appearance for different browsers */
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    text-align: left;
+}
+
+.textarea-field:focus,
+input[type="text"]:focus,
+input[type="date"]:focus,
+input[type="number"]:focus{
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+}
+
+/* Style date picker arrow */
+input[type="date"]::-webkit-calendar-picker-indicator {
+    filter: invert(0.3); /* Adjust the color of the calendar icon */
+    cursor: pointer;
+}
+
+/* Placeholder styles for date input */
+input[type="date"]::-webkit-datetime-edit-fields-wrapper::after {
+    content: attr(placeholder);
+    color: #999; /* Placeholder text color */
+    text-align: left;
+}
+
+/* Hide the default placeholder */
+input[type="date"]::-webkit-datetime-edit-fields-wrapper {
+    color: #999;
+    text-align: left;
+}
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+select {
+    appearance: none;
+    background-color: transparent;
+    border: 1px solid #cccccc;
+    padding: 0 1em 0 0;
+    margin: 8px 0;
+    width: 100%;
+    height: 30px;
+    font-family: inherit;
+    font-size: inherit;
+    cursor: inherit;
+    line-height: inherit;
+}
+.dots-container {
+    display: flex;
+    justify-content: center;
+}
+
+.dot {
+    border-radius: 50%;
+    justify-content: center;
+    background-color: transparent;
+    margin: 5px;
+    cursor: pointer;
+}

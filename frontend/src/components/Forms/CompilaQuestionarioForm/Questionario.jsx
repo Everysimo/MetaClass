@@ -79,8 +79,16 @@ const Questionario = (props) => {
     };
 
     const handleSubmit = () => {
+        if (state.immersion === ''){
+            setErrore('Il campo Immersion non può essere vuoto.');
+            return;
+        }
+        if (state.motion === ''){
+            setErrore('Il campo Motion non può essere vuoto.');
+            return;
+        }
 
-        sendDataToServer()
+            sendDataToServer()
     };
 
     const handleShow = () => {
