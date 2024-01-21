@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { MyHeader } from "../components/Layout/Header/Header";
 import { MyFooter } from "../components/Layout/Footer/Footer";
 import { useNavigate, useParams } from "react-router-dom";
-import CalendarComp from "../components/Calendar/CalendarComp";
+import CalendarComp from "../components/Forms/ScheduleMeetingForm/CalendarComp";
 import { checkRole } from "../functions/checkRole";
 import UserListInRoom from "../components/Lists/UserList/UserListInRoom";
 import { faChalkboardUser } from "@fortawesome/free-solid-svg-icons";

@@ -1,9 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import Modal from 'react-modal';
-
-import './SelectScenario.css';
 import {useParams} from "react-router-dom";
-Modal.setAppElement('#root');
 
 const ScenarioPage = () => {
     const [id_scenario, setIdScenario] = useState()
@@ -64,7 +60,6 @@ const ScenarioPage = () => {
 
     const handleCancelSelection = () => {
         setSelectedScenario(null);
-        setIsModalOpen(false);
     };
 
     const sendDataToServer = async () => {
@@ -97,37 +92,57 @@ const ScenarioPage = () => {
         }
     };
 
+    const handleOpen =()=>{
+        setIsModalOpen(true);
+    }
+    const handleClose=()=>{
+        setIsModalOpen(false);
+    }
     return (
-        <div>
-            <h2>Scegli uno scenario</h2>
-                <h3>ecco l'id: {Id_stanza}</h3>
-            {array.map((scenario) => (
-                <div key={scenario.id} className="card">
-                    <h3>{scenario.nome}</h3>
-                    <h3>{scenario.id}</h3>
-                    <p>{scenario.descrizione}</p>
-                    <button onClick={() => handleSelectScenario(scenario)}>Scegli</button>
-                </div>
-            ))}
-            <Modal
-                isOpen={isModalOpen}
-                onRequestClose={() => setIsModalOpen(false)}
-                isCentered
-                size={'xs'}
-                contentLabel="Conferma Selezione"
-                className={'Modal'}
-            >
-                {selectedScenario && (
-                    <div className={'modal-box'}>
-                        <h2>Conferma la selezione</h2>
-                        <p>Nome: {selectedScenario.nome}</p>
-                        <p>Descrizione: {selectedScenario.descrizione}</p>
-                        <button onClick={handleConfirmSelection}>Conferma</button>
-                        <button onClick={handleCancelSelection}>Annulla</button>
+        <>
+        <button
+            onClick={handleOpen}
+        >
+            Modifica scenario
+        </button>
+            {isModalOpen &&
+                <div className={"modal"}>
+                    <div className={"modal-content"}>
+                        <span
+                            className={"close"}
+                            onClick={handleClose}
+                        >
+                            &times;
+                        </span>
+                        {selectedScenario ? (
+                            <div className={"masterDiv"}>
+                                <div className={'childDiv'}>
+                                    <h2>Conferma la selezione</h2>
+                                    <p>Nome: {selectedScenario.nome}</p>
+                                    <p>Descrizione: {selectedScenario.descrizione}</p>
+                                    <button onClick={handleConfirmSelection}>Conferma</button>
+                                    <button onClick={handleCancelSelection}>Annulla</button>
+                                </div>
+                            </div>
+                        ) : (
+                            <>
+                                <h2>Scegli uno scenario</h2>
+                                <div className={"masterDiv"}>
+                                    {array.map((scenario) => (
+                                        <div key={scenario.id} className="childDiv">
+                                            <h3>{scenario.nome}</h3>
+                                            <h3>{scenario.id}</h3>
+                                            <p>{scenario.descrizione}</p>
+                                            <button onClick={() => handleSelectScenario(scenario)}>Scegli</button>
+                                        </div>
+                                    ))}
+                                </div>
+                            </>
+                        )}
                     </div>
-                )}
-            </Modal>
-        </div>
+                </div>
+            }
+        </>
     );
 };
 
