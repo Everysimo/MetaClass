@@ -3,6 +3,7 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DateCalendar } from '@mui/x-date-pickers/DateCalendar';
 import dayjs from 'dayjs';
+import './CalendarViewer.css';
 import { MeetingListInRoom } from '../Lists/MeetingList/MeetingList'
 
 export default function BasicDateCalendar() {
@@ -24,12 +25,12 @@ export default function BasicDateCalendar() {
     };
 
     return (
-        <div className={"masterDiv whiteBg fitCont"}>
+        <div className={"master whiteBg fitCont"}>
             <LocalizationProvider dateAdapter={AdapterDayjs}>
                 <DateCalendar onChange={handleDateChange} />
             </LocalizationProvider>
             {(
-            <div className={"childDiv"}>
+            <div className={"child list"}>
                 <MeetingListInRoom formattedDate={getDateRepresentation(selectedDate)} />
             </div>
             )}

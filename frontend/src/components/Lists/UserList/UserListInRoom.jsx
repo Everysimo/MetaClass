@@ -1,9 +1,9 @@
 import { useParams } from "react-router-dom";
 import React, { useEffect, useState } from "react";
-import './UserList.css'
-import './PopUpStyles.css';
+import './UserList.css';
+import '../../Forms/PopUpStyles.css';
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faAlignCenter, faCheck} from "@fortawesome/free-solid-svg-icons";
+import {faAlignCenter} from "@fortawesome/free-solid-svg-icons";
 
 const UserListInRoom = () => {
     const [userList, setUserList] = useState([]);

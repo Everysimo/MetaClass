@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import {wait} from "@testing-library/user-event/dist/utils";
 
-const BannedUserList = ({id_stanza}) => {
+const BannedUserList = ({ id_stanza }) => {
     const [userList, setUserList] = useState([]);
-    const [selectedUserId, setSelectedUserId] = useState(null);
+    const [message, setMessage] = useState('');
     const [showModal, setShowModal] = useState(false);
     const id_stanza_int = parseInt(id_stanza, 10);
+    const isAdmin = sessionStorage.getItem('isAdmin');
+
     useEffect(() => {
         fetchBannedUserList();
     }, []);
@@ -31,8 +33,6 @@ const BannedUserList = ({id_stanza}) => {
 
             setUserList(data.value);
             console.log('lista utenti:', userList);
-
-
         } catch (error) {
             console.error('Errore durante il recupero della lista di utenti:', error);
         }
@@ -42,8 +42,8 @@ const BannedUserList = ({id_stanza}) => {
         console.log("idUtente qui:", idutente)
         handleRevocaBan(idutente);
     }
-    const handleRevocaBan = async (idutente) => {
 
+    const handleRevocaBan = async (idutente) => {
         const requestOption = {
             method: 'POST',
             headers: {
@@ -58,36 +58,61 @@ const BannedUserList = ({id_stanza}) => {
             }
             const data = await response.json();
             console.log('data:', data);
+            setMessage(data.message);
         } catch (error) {
             console.error('Errore durante la revoca del ban:', error);
         }
-        console.log(`Revoca ban per l'utente }`);
+        console.log(`Revoca ban per l'utente`);
     };
 
-    return (
-        <>
-            <div className={'modal'}>
-                <div className={'modal-content'}>
-                    <span
-                        className={'close'}
-                    >
-                        &times;
-                    </span>
-                    <h2>Utenti Bannati:</h2>
-                    {userList && userList.map((user) => (
-                        <div key={user.id} className="user-card">
-                            <span>{`${user.nome} ${user.cognome}`}</span>
-                            <button
-                                onClick={() => handleRevocaBanButton(user.id)}
-                            >
-                                Revoca Ban Utente
-                            </button>
+    const show=()=>{
+        setShowModal(true);
+    }
+    const close=()=>{
+        setShowModal(false);
+        setMessage('');
+    }
+    const checkAdm = () => {
+        console.log('isAdmin: ', isAdmin);
+        return isAdmin === "true";
+    }
+
+    if (checkAdm()) {
+        return (
+            <>
+                <button onClick={show}>
+                    Utenti bannati
+                </button>
+                {showModal &&
+                    <div className={'modal'}>
+                        <div className={'modal-content'}>
+                            <span className={'close'} onClick={close}>
+                              &times;
+                            </span>
+                            {message ? (
+                                <p>{message}</p>
+                                ) : (
+                                    <>
+                            <h2>Utenti Bannati:</h2>
+                            {userList && userList.map((user) => (
+                                <div key={user.id} className="user-card">
+                                    <span>{`${user.nome} ${user.cognome}`}</span>
+                                    <button
+                                        onClick={() => handleRevocaBanButton(user.id)}
+                                    >
+                                        Revoca Ban Utente
+                                    </button>
+                                </div>
+                            ))}
+                                    </>)}
                         </div>
-                    ))}
-                </div>
-            </div>
-        </>
-    );
+                    </div>
+                }
+            </>
+        );
+    } else {
+        return null;
+    }
 };
 
 export default BannedUserList;

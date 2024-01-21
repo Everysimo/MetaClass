@@ -12,6 +12,7 @@ import MyModifyForm from "../components/Forms/ModifyRoomForm/MyModifyForm";
 import MeetingList from "../components/Calendar/CalendarViewer";
 import RequestSection from "../components/Forms/AccessRequest/RequestSection";
 import SelectScenario from "../components/Forms/SelectNewScenario/SelectScenario";
+import BannedUserList from "../components/Lists/UserList/BannedUserList";
 
 export const SingleRoom = () => {
     const navigate = useNavigate();
@@ -129,10 +130,7 @@ export const SingleRoom = () => {
                                 <MyModifyForm/>
                                 <SelectScenario Id_stanza = {id_stanza}/>
                                 <RequestSection id_stanza = {id_stanza} />
-                                <button onClick={handleGoToBannedUserList}>
-                                    Visualizza Lista Utenti Bannati
-                                </button>
-                                <AvviaMeeting id_meeting={id_stanza}/>
+                                <BannedUserList id_stanza={id_stanza} />
                             </div>
                         </>
                     )}
