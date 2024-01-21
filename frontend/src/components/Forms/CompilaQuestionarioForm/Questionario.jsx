@@ -79,8 +79,13 @@ const Questionario = (props) => {
     };
 
     const handleSubmit = () => {
-
-        sendDataToServer()
+        if (state.immersion === '' || state.motion === ''){
+            setErrore('I campi non possono essere vuoti.');
+            return;
+        }
+        else{
+            sendDataToServer();
+        }
     };
 
     const handleShow = () => {

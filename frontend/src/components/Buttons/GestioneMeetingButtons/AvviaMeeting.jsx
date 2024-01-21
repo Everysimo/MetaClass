@@ -9,7 +9,6 @@ export default class AvviaMeeting extends Component {
         isVisible: true,
         isErrorPopupVisible: false,
         errorMessage: "",
-
     };
 
     sendDataToServer = async () => {

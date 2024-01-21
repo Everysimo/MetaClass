@@ -1,6 +1,7 @@
 import { useParams } from "react-router-dom";
 import React, { useEffect, useState } from "react";
 import './UserList.css';
+import '../../Forms/PopUpStyles.css';
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faAlignCenter} from "@fortawesome/free-solid-svg-icons";
 
@@ -10,6 +11,10 @@ const UserListInRoom = () => {
     const [newName, setNewName] = useState("");
     const [selectedUserId, setSelectedUserId] = useState(null);
     const [showButtonsMap, setShowButtonsMap] = useState({});
+    const [showChangeNameModal, setChangeNameModal] = useState(false)
+    const [errore, setErrore] = useState(null);
+    const [showSuccessPopup, setShowSuccessPopup] = useState(false);
+    const [message, setMessage] = useState('');
 
     const { id: id_stanza } = useParams();
 
@@ -41,6 +46,8 @@ const UserListInRoom = () => {
                 throw new Error('Errore nella richiesta');
             }
             const data = await response.json();
+            console.log("utenti in stanza", data.value)
+
             setUserList(data.value);
         } catch (error) {
             console.error('Errore durante il recupero della lista di utenti:', error);
@@ -50,11 +57,22 @@ const UserListInRoom = () => {
     const handleChangeNameButton = (idutente) => {
         console.log("idutente", idutente);
         setSelectedUserId(idutente);
-        setPopupOpen(true);
+        setChangeNameModal(true);
     }
+
 
     //da aggiustare il fatto del popup
     const handleChangeName = async () => {
+
+        if (newName === '') {
+            // Stringa vuota, genero un errore
+            setErrore('Il nome non può essere vuoto.');
+            return;
+        }
+
+        // Pulisco l'errore se la stringa è valida
+        setErrore(null);
+
         console.log("newname", newName)
         const nome = newName;
 
@@ -67,7 +85,7 @@ const UserListInRoom = () => {
             body: JSON.stringify({ nome })
         };
         try {
-            console.log("stringa json:",requestOption )
+            console.log("stringa json:", requestOption )
             const response = await fetch(
                 `http://localhost:8080/modificaNomePartecipante/${id_stanza}/${selectedUserId}`,
                 requestOption
@@ -75,8 +93,21 @@ const UserListInRoom = () => {
             if (!response.ok) {
                 throw new Error('Errore nella richiesta di cambio nome');
             }
-            const data = await response.json();
-            console.log('data:', data);
+
+            if (response.ok) {
+                const data = await response.json();
+                console.log('data:', data);
+                console.log('Nome inviata con successo!');
+                // Chiudi il modal
+                handleCloseChangeNamePopUp();
+                setMessage(data.message)
+                // Mostra il pop-up di successo
+                setShowSuccessPopup(true);
+
+            } else {
+                console.error('Errore durante l\'invio della valutazione al backend');
+            }
+
         } catch (error) {
             console.error('Errore durante la modifica del nome:', error);
         }
@@ -84,10 +115,9 @@ const UserListInRoom = () => {
 
     const handleKickUserButton = (idutente) => {
         console.log("idutente", idutente);
-        setSelectedUserId(idutente);
-        handleKickUser();
+        handleKickUser(idutente);
     }
-    const handleKickUser = async () => {
+    const handleKickUser = async (idutente) => {
         const requestOption = {
             method: 'POST',
             headers: {
@@ -96,15 +126,24 @@ const UserListInRoom = () => {
             },
         };
         try {
+            console.log("idutentemanuale", idutente)
             const response = await fetch(
-                `http://localhost:8080/kickarePartecipante/${id_stanza}/${selectedUserId}`,
+                `http://localhost:8080/kickarePartecipante/${id_stanza}/${idutente}`,
                 requestOption
             );
             if (!response.ok) {
                 throw new Error('Errore nella richiesta di kickare partecipante');
             }
-            const data = await response.json();
-            console.log('data:', data);
+
+            if(response.ok){
+                const data = await response.json();
+                console.log('data:', data);
+
+                setMessage(data.message)
+
+                setShowSuccessPopup(true);
+            }
+
         } catch (error) {
             console.error('Errore durante il kick dell\'utente:', error);
         }
@@ -130,8 +169,16 @@ const UserListInRoom = () => {
             if (!response.ok) {
                 throw new Error('Errore nella richiesta di silenziare partecipante');
             }
-            const data = await response.json();
-            console.log('data:', data);
+
+            if(response.ok){
+                const data = await response.json();
+                console.log('data:', data);
+
+                setMessage(data.message)
+
+                setShowSuccessPopup(true);
+            }
+
         } catch (error) {
             console.error('Errore durante la richiesta di silenziare il partecipante:', error);
         }
@@ -247,12 +294,26 @@ const UserListInRoom = () => {
         }
     };
 
+    const handleCloseChangeNamePopUp = () => {
+        setChangeNameModal(false);
+    }
+    const handleCloseSuccesPopUp = ()=> {
+        setTimeout(() => {
+            // Simuliamo il reindirizzamento dopo 2 secondi
+            setShowSuccessPopup(false);
+            // Aggiungi le azioni specifiche per il reindirizzamento
+            window.location.replace(window.location.pathname);
+        }, 1000);
+    };
+
+
     return (
         <div>
             <h2>Utenti In Stanza:</h2>
             {userList && userList.map((user) => (
                 <div key={user.id} className="user-card">
                     <span>Nome: {`${user.nome} ${user.cognome}`}</span>
+                    <span>Nome In Stanza: {''}</span>
                     <span>Email: {`${user.email}`}</span>
                     <button onClick={() => toggleButtons(user.id)}>
                         Options <FontAwesomeIcon icon={faAlignCenter} style={{color: "#ffffff",}} />
@@ -267,11 +328,13 @@ const UserListInRoom = () => {
                     </div>
                 </div>
             ))}
-
-            {/* Popup Modale */}
-            {isPopupOpen && (
-                <div className="popup-container">
-                    <div className="popup">
+            {showChangeNameModal && (
+                <div className="modal">
+                    <div className="modal-content">
+                        <span
+                            className={"close"}
+                            onClick={handleCloseChangeNamePopUp}
+                        >&times;</span>
                         <label>
                             Nuovo Nome:
                             <input
@@ -281,7 +344,18 @@ const UserListInRoom = () => {
                             />
                         </label>
                         <button onClick={handleChangeName}>Conferma</button>
-                        <button onClick={() => setPopupOpen(false)}>Annulla</button>
+                        {errore && <p style={{ color: 'red' }}>{errore}</p>}
+                    </div>
+                </div>
+            )}
+            {showSuccessPopup && (
+                <div className={"modal"}>
+                    <div className={"modal-content"}>
+                        <span
+                            className={"close"}
+                            onClick={handleCloseSuccesPopUp}
+                        >&times;</span>
+                        <h3>{message}</h3>
                     </div>
                 </div>
             )}

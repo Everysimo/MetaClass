@@ -1,15 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import Modal from 'react-modal';
-
-import './SelectScenario.css';
 import {useParams} from "react-router-dom";
-Modal.setAppElement('#root');
 
 const ScenarioPage = () => {
     const [id_scenario, setIdScenario] = useState()
     const [selectedScenario, setSelectedScenario] = useState(null);
     const [array, setArray] = useState([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [message, setMessage] = useState('');
 
     const {id: Id_stanza} = useParams();
 
@@ -53,25 +50,16 @@ const ScenarioPage = () => {
     };
 
     const handleConfirmSelection = () => {
-        console.log('Selezione confermata:', selectedScenario);
-        setIsModalOpen(false);
-        //console.log("l'id settato:", selectedScenario.id)
         setIdScenario(selectedScenario.id)
-        console.log("ecco l'id dello scenario", id_scenario)
-        console.log("ecco l'id della stanza", Id_stanza)
         sendDataToServer();
     };
 
     const handleCancelSelection = () => {
         setSelectedScenario(null);
-        setIsModalOpen(false);
+        setMessage('');
     };
 
     const sendDataToServer = async () => {
-
-    console.log("selected scenario id", selectedScenario.id)
-        console.log("selected stanza id", Id_stanza)
-
         const dataTosend = {
                 id_scenario: parseInt(selectedScenario.id, 10), // converti a numero intero
                 idStanza: parseInt(Id_stanza, 10) // converti a numero intero
@@ -88,46 +76,71 @@ const ScenarioPage = () => {
         };
 
         try {
-            console.log("la stringa json:", JSON.stringify(dataTosend));
-            const response = await fetch(`http://localhost:8080/admin/updateScenario/${encodeURIComponent(dataTosend.idStanza)}/${encodeURIComponent(dataTosend.id_scenario)}`, requestOption);
+            console.log("la stringa json:", dataTosend);
+            const response = await fetch(`http://localhost:8080/modificaScenario/${encodeURIComponent(dataTosend.idStanza)}/${encodeURIComponent(dataTosend.id_scenario)}`, requestOption);
             const responseData = await response.json();
-            console.log("Risposta dal server:", responseData);
+            setMessage(responseData.message);
         } catch (error) {
             console.error('ERRORE:', error);
         }
     };
 
+    const handleOpen =()=>{
+        setIsModalOpen(true);
+    }
+    const handleClose=()=>{
+        setIsModalOpen(false);
+        setSelectedScenario(null);
+        setMessage('');
+    }
     return (
-        <div>
-            <h2>Scegli uno scenario</h2>
-                <h3>ecco l'id: {Id_stanza}</h3>
-            {array.map((scenario) => (
-                <div key={scenario.id} className="card">
-                    <h3>{scenario.nome}</h3>
-                    <h3>{scenario.id}</h3>
-                    <p>{scenario.descrizione}</p>
-                    <button onClick={() => handleSelectScenario(scenario)}>Scegli</button>
-                </div>
-            ))}
-            <Modal
-                isOpen={isModalOpen}
-                onRequestClose={() => setIsModalOpen(false)}
-                isCentered
-                size={'xs'}
-                contentLabel="Conferma Selezione"
-                className={'Modal'}
-            >
-                {selectedScenario && (
-                    <div className={'modal-box'}>
-                        <h2>Conferma la selezione</h2>
-                        <p>Nome: {selectedScenario.nome}</p>
-                        <p>Descrizione: {selectedScenario.descrizione}</p>
-                        <button onClick={handleConfirmSelection}>Conferma</button>
-                        <button onClick={handleCancelSelection}>Annulla</button>
+        <>
+        <button
+            onClick={handleOpen}
+        >
+            Modifica scenario
+        </button>
+            {isModalOpen &&
+                <div className={"modal"}>
+                    <div className={"modal-content"}>
+                        <span
+                            className={"close"}
+                            onClick={handleClose}
+                        >
+                            &times;
+                        </span>
+                        {message ? (
+                            <p>{message}</p>
+                        ) : (
+                            selectedScenario ? (
+                                <div className={"masterDiv"}>
+                                    <div className={'childDiv'}>
+                                        <h2>Conferma la selezione</h2>
+                                        <p>Nome: {selectedScenario.nome}</p>
+                                        <p>Descrizione: {selectedScenario.descrizione}</p>
+                                        <button onClick={handleConfirmSelection}>Conferma</button>
+                                        <button onClick={handleCancelSelection}>Annulla</button>
+                                    </div>
+                                </div>
+                            ) : (
+                            <>
+                                <h2>Scegli uno scenario</h2>
+                                <div className={"masterDiv"}>
+                                    {array.map((scenario) => (
+                                        <div key={scenario.id} className="childDiv">
+                                            <h3>{scenario.nome}</h3>
+                                            <h3>{scenario.id}</h3>
+                                            <p>{scenario.descrizione}</p>
+                                            <button onClick={() => handleSelectScenario(scenario)}>Scegli</button>
+                                        </div>
+                                    ))}
+                                </div>
+                            </>
+                        ))}
                     </div>
-                )}
-            </Modal>
-        </div>
+                </div>
+            }
+        </>
     );
 };
 

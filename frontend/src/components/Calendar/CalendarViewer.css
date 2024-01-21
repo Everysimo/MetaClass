@@ -1,0 +1,13 @@
+.master{
+    display: flex;
+}
+
+.child{
+    flex-direction: column;
+    text-align: center;
+}
+
+.list{
+    min-width: 300px;
+    padding: 5px;
+}

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { MyHeader } from "../components/Layout/Header/Header";
 import { MyFooter } from "../components/Layout/Footer/Footer";
 import { useNavigate, useParams } from "react-router-dom";
-import CalendarComp from "../components/Calendar/CalendarComp";
+import CalendarComp from "../components/Forms/ScheduleMeetingForm/CalendarComp";
 import { checkRole } from "../functions/checkRole";
 import UserListInRoom from "../components/Lists/UserList/UserListInRoom";
 import { faChalkboardUser } from "@fortawesome/free-solid-svg-icons";
@@ -11,6 +11,8 @@ import AvviaMeeting from "../components/Buttons/GestioneMeetingButtons/AvviaMeet
 import MyModifyForm from "../components/Forms/ModifyRoomForm/MyModifyForm";
 import MeetingList from "../components/Calendar/CalendarViewer";
 import RequestSection from "../components/Forms/AccessRequest/RequestSection";
+import SelectScenario from "../components/Forms/SelectNewScenario/SelectScenario";
+import BannedUserList from "../components/Lists/UserList/BannedUserList";
 
 export const SingleRoom = () => {
     const navigate = useNavigate();
@@ -118,30 +120,21 @@ export const SingleRoom = () => {
                         </h4>
                     </div>
                     <h2>Meetings programmati</h2>
+                    <div className={"masterDiv"}>
                     <MeetingList/>
                     {!isOrg() && (
                         <>
-                            <div className={"masterDiv"}>
-                                <div className={"childDiv"}>
-                                    <h2>Schedula un nuovo meeting</h2>
-                                    <CalendarComp/>
-                                </div>
-                                <div className={"childDiv"}>
-                                    <MyModifyForm/>
-                                    <button onClick={handleGoToChangeScenario}>
-                                        Modifica lo scenario della stanza
-                                    </button>
-                                    <RequestSection id_stanza = {id_stanza} />
-                                    <button onClick={handleGoToBannedUserList}>
-                                        Visualizza Lista Utenti Bannati
-                                    </button>
-                                </div>
-                            </div>
-                            <div className={"masterDiv"}>
-                                <AvviaMeeting id_meeting={id_stanza}/>
+                            <div className={"childDiv"}>
+                                <h2>Funzioni organizzatore:</h2>
+                                <CalendarComp/>
+                                <MyModifyForm/>
+                                <SelectScenario Id_stanza = {id_stanza}/>
+                                <RequestSection id_stanza = {id_stanza} />
+                                <BannedUserList id_stanza={id_stanza} />
                             </div>
                         </>
                     )}
+                    </div>
                 </section>
                 <aside className="side-nav">
                     <div className={"childDiv"}>

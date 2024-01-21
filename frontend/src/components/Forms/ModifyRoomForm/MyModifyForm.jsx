@@ -127,7 +127,7 @@ const MyModifyForm = () => {
                     <div className="modal-content">
                         <span className="close" onClick={handleCloseModal}>&times;</span>
                         {message ? (
-                            <p >{message} <FontAwesomeIcon icon={faCheck} size="2xl" style={{color: "#63E6BE",}} /></p>
+                            <p >{message}</p>
                         ) : (
                         <div className={"childDiv"}>
                             <p className={'textp'}>Inserisci Nuovo Nome:</p>
