@@ -230,13 +230,13 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService {
       Long idStanza, String metaId, Long idUtente)
       throws ServerRuntimeException, RuntimeException403 {
     // controllo organizzatore master
-    Utente user = utenteRepository.findFirstBymetaId(metaId);
-    if (user == null) {
+    Utente userOgm = utenteRepository.findFirstBymetaId(metaId);
+    if (userOgm == null) {
       throw new ServerRuntimeException("errore nella ricerca dell'organizzatore master");
     }
 
     // controllo organizzatore da bannare
-    user = utenteRepository.findUtenteById(idUtente);
+    Utente user = utenteRepository.findUtenteById(idUtente);
     if (user == null) {
       throw new RuntimeException403("utente non trovato");
     }
@@ -353,13 +353,13 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService {
       throws ServerRuntimeException, RuntimeException403 {
 
     // controllo organizzatore master
-    Utente user = utenteRepository.findFirstBymetaId(idUogm);
-    if (user == null) {
+    Utente userOgm = utenteRepository.findFirstBymetaId(idUogm);
+    if (userOgm == null) {
       throw new ServerRuntimeException("errore nella ricerca dell'organizzatore master");
     }
 
     // controllo utente da promuovere
-    user = utenteRepository.findUtenteById(idog);
+    Utente user = utenteRepository.findUtenteById(idog);
     if (user == null) {
       throw new RuntimeException403("utente non trovato");
     }
@@ -372,7 +372,7 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService {
 
     // controllo dell'accesso dell'organizzatore master nella stanza
     StatoPartecipazione statoOgm =
-        statoPartecipazioneRepository.findStatoPartecipazioneByUtenteAndStanza(user, stanza);
+        statoPartecipazioneRepository.findStatoPartecipazioneByUtenteAndStanza(userOgm, stanza);
     if (statoOgm == null) {
       throw new ServerRuntimeException(
           "l'organizzatore master sembra " + "non aver acceduto alla stanza");
