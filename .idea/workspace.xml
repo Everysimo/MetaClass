@@ -5,10 +5,79 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="7b24a0b4-b04f-40f4-b6e7-08bf6f75d1cf" name="Changes" comment="fix(backend): testStartUp">
-      <change beforePath="$PROJECT_DIR$/.idea/jarRepositories.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/jarRepositories.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/backend/build.gradle" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/gradle.properties" beforeDir="false" afterPath="$PROJECT_DIR$/backend/gradle.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/commigo/metaclass/MetaClass/MetaClassApplication.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/commigo/metaclass/MetaClassApplication.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/commigo/metaclass/MetaClass/TestStartUp.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/commigo/metaclass/TestStartUp.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/commigo/metaclass/MetaClass/entity/Categoria.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/commigo/metaclass/entity/Categoria.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/commigo/metaclass/MetaClass/entity/FeedbackMeeting.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/commigo/metaclass/entity/FeedbackMeeting.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/commigo/metaclass/MetaClass/entity/Immagine.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/commigo/metaclass/entity/Immagine.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/commigo/metaclass/MetaClass/entity/Meeting.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/commigo/metaclass/entity/Meeting.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/commigo/metaclass/MetaClass/entity/Report.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/commigo/metaclass/entity/Report.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/commigo/metaclass/MetaClass/entity/Ruolo.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/commigo/metaclass/entity/Ruolo.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/commigo/metaclass/MetaClass/entity/Scenario.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/commigo/metaclass/entity/Scenario.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/commigo/metaclass/MetaClass/entity/Stanza.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/commigo/metaclass/entity/Stanza.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/commigo/metaclass/MetaClass/entity/StatoPartecipazione.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/commigo/metaclass/entity/StatoPartecipazione.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/commigo/metaclass/MetaClass/entity/Utente.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/commigo/metaclass/entity/Utente.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/commigo/metaclass/MetaClass/entity/UtenteInMeeting.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/commigo/metaclass/entity/UtenteInMeeting.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/commigo/metaclass/MetaClass/exceptions/ClientRuntimeException.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/commigo/metaclass/exceptions/ClientRuntimeException.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/commigo/metaclass/MetaClass/exceptions/CustomExceptionHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/commigo/metaclass/exceptions/CustomExceptionHandler.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/commigo/metaclass/MetaClass/exceptions/DataFormatException.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/commigo/metaclass/exceptions/DataFormatException.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/commigo/metaclass/MetaClass/exceptions/DataNotFoundException.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/commigo/metaclass/exceptions/DataNotFoundException.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/commigo/metaclass/MetaClass/exceptions/MismatchJsonProperty.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/commigo/metaclass/exceptions/MismatchJsonProperty.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/commigo/metaclass/MetaClass/exceptions/RuntimeException401.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/commigo/metaclass/exceptions/RuntimeException401.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/commigo/metaclass/MetaClass/exceptions/RuntimeException403.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/commigo/metaclass/exceptions/RuntimeException403.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/commigo/metaclass/MetaClass/exceptions/ServerRuntimeException.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/commigo/metaclass/exceptions/ServerRuntimeException.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/commigo/metaclass/MetaClass/gestioneamministrazione/controller/GestioneAmministrazioneController.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/commigo/metaclass/gestioneamministrazione/controller/GestioneAmministrazioneController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/commigo/metaclass/MetaClass/gestioneamministrazione/repository/CategoriaRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/commigo/metaclass/gestioneamministrazione/repository/CategoriaRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/commigo/metaclass/MetaClass/gestioneamministrazione/repository/ImmagineRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/commigo/metaclass/gestioneamministrazione/repository/ImmagineRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/commigo/metaclass/MetaClass/gestioneamministrazione/repository/ScenarioRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/commigo/metaclass/gestioneamministrazione/repository/ScenarioRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/commigo/metaclass/MetaClass/gestioneamministrazione/service/GestioneAmministrazioneService.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/commigo/metaclass/gestioneamministrazione/service/GestioneAmministrazioneService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/commigo/metaclass/MetaClass/gestioneamministrazione/service/GestioneAmministrazioneServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/commigo/metaclass/gestioneamministrazione/service/GestioneAmministrazioneServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/commigo/metaclass/MetaClass/gestionemeeting/controller/GestioneMeetingController.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/commigo/metaclass/gestionemeeting/controller/GestioneMeetingController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/commigo/metaclass/MetaClass/gestionemeeting/repository/FeedbackMeetingRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/commigo/metaclass/gestionemeeting/repository/FeedbackMeetingRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/commigo/metaclass/MetaClass/gestionemeeting/repository/MeetingRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/commigo/metaclass/gestionemeeting/repository/MeetingRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/commigo/metaclass/MetaClass/gestionemeeting/repository/ReportRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/commigo/metaclass/gestionemeeting/repository/ReportRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/commigo/metaclass/MetaClass/gestionemeeting/repository/UtenteInMeetingRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/commigo/metaclass/gestionemeeting/repository/UtenteInMeetingRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/commigo/metaclass/MetaClass/gestionemeeting/service/GestioneMeetingService.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/commigo/metaclass/gestionemeeting/service/GestioneMeetingService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/commigo/metaclass/MetaClass/gestionemeeting/service/GestioneMeetingServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/commigo/metaclass/gestionemeeting/service/GestioneMeetingServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/commigo/metaclass/MetaClass/gestionestanza/controller/GestioneStanzaControl.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/commigo/metaclass/gestionestanza/controller/GestioneStanzaControl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/commigo/metaclass/MetaClass/gestionestanza/repository/RuoloRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/commigo/metaclass/gestionestanza/repository/RuoloRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/commigo/metaclass/MetaClass/gestionestanza/repository/StanzaRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/commigo/metaclass/gestionestanza/repository/StanzaRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/commigo/metaclass/MetaClass/gestionestanza/repository/StatoPartecipazioneRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/commigo/metaclass/gestionestanza/repository/StatoPartecipazioneRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/commigo/metaclass/MetaClass/gestionestanza/service/GestioneStanzaService.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/commigo/metaclass/gestionestanza/service/GestioneStanzaService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/commigo/metaclass/MetaClass/gestionestanza/service/GestioneStanzaServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/commigo/metaclass/gestionestanza/service/GestioneStanzaServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/commigo/metaclass/MetaClass/gestionestimaduratameeting/adapter/StimaDurataMeetingAdapter.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/commigo/metaclass/gestionestimaduratameeting/adapter/StimaDurataMeetingAdapter.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/commigo/metaclass/MetaClass/gestionestimaduratameeting/adapter/StimaDurataMeetingAdapterImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/commigo/metaclass/gestionestimaduratameeting/adapter/StimaDurataMeetingAdapterImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/commigo/metaclass/MetaClass/gestionestimaduratameeting/controller/StimaDurataMeetingController.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/commigo/metaclass/gestionestimaduratameeting/controller/StimaDurataMeetingController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/commigo/metaclass/MetaClass/gestionestimaduratameeting/service/GestioneStimaMeetingService.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/commigo/metaclass/gestionestimaduratameeting/service/GestioneStimaMeetingService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/commigo/metaclass/MetaClass/gestionestimaduratameeting/service/GestioneStimaMeetingServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/commigo/metaclass/gestionestimaduratameeting/service/GestioneStimaMeetingServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/commigo/metaclass/MetaClass/gestioneutenza/controller/GestioneUtenzaController.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/commigo/metaclass/gestioneutenza/controller/GestioneUtenzaController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/commigo/metaclass/MetaClass/gestioneutenza/repository/UtenteRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/commigo/metaclass/gestioneutenza/repository/UtenteRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/commigo/metaclass/MetaClass/gestioneutenza/service/GestioneUtenzaService.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/commigo/metaclass/gestioneutenza/service/GestioneUtenzaService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/commigo/metaclass/MetaClass/gestioneutenza/service/GestioneUtenzaServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/commigo/metaclass/gestioneutenza/service/GestioneUtenzaServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/commigo/metaclass/MetaClass/inizializer/DataInitializer.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/commigo/metaclass/inizializer/DataInitializer.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/commigo/metaclass/MetaClass/utility/MapValidator.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/commigo/metaclass/utility/MapValidator.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/commigo/metaclass/MetaClass/utility/multipleid/StatoPartecipazioneId.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/commigo/metaclass/utility/multipleid/StatoPartecipazioneId.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/commigo/metaclass/MetaClass/utility/multipleid/UtenteInMeetingID.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/commigo/metaclass/utility/multipleid/UtenteInMeetingId.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/commigo/metaclass/MetaClass/utility/request/RequestUtils.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/commigo/metaclass/utility/request/RequestUtils.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/commigo/metaclass/MetaClass/utility/response/AbstractResponse.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/commigo/metaclass/utility/response/AbstractResponse.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/commigo/metaclass/MetaClass/utility/response/ResponseUtils.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/commigo/metaclass/utility/response/ResponseUtils.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/commigo/metaclass/MetaClass/utility/response/types/AccessResponse.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/commigo/metaclass/utility/response/types/AccessResponse.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/commigo/metaclass/MetaClass/utility/response/types/LoginResponse.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/commigo/metaclass/utility/response/types/LoginResponse.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/commigo/metaclass/MetaClass/utility/response/types/Response.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/commigo/metaclass/utility/response/types/Response.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/commigo/metaclass/MetaClass/webconfig/FilterCors.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/commigo/metaclass/webconfig/FilterCors.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/commigo/metaclass/MetaClass/webconfig/JwtTokenUtil.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/commigo/metaclass/webconfig/JwtTokenUtil.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/commigo/metaclass/MetaClass/webconfig/SecurityConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/commigo/metaclass/webconfig/SecurityConfig.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/commigo/metaclass/MetaClass/webconfig/ValidationToken.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/commigo/metaclass/webconfig/ValidationToken.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/resources/application.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/test/java/com/commigo/metaclass/MetaClass/MetaClassApplicationTests.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/test/java/com/commigo/metaclass/MetaClassApplicationTests.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/test/java/com/commigo/metaclass/MetaClass/gestioneamministrazione/controller/GestioneAmministrazioneControllerUnitTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/test/java/com/commigo/metaclass/gestioneamministrazione/controller/GestioneAmministrazioneControllerUnitTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/test/java/com/commigo/metaclass/MetaClass/gestionemeeting/controller/GestioneMeetingControllerUnitTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/test/java/com/commigo/metaclass/gestionemeeting/controller/GestioneMeetingControllerUnitTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/test/java/com/commigo/metaclass/MetaClass/gestionestanza/controller/GestioneStanzaControllerUnitTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/test/java/com/commigo/metaclass/gestionestanza/controller/GestioneStanzaControllerUnitTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/test/java/com/commigo/metaclass/MetaClass/gestioneutenza/controller/GestioneUtenzaControllerUnitTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/test/java/com/commigo/metaclass/gestioneutenza/controller/GestioneUtenzaControllerUnitTest.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -64,37 +133,40 @@
   &quot;associatedIndex&quot;: 8
 }</component>
   <component name="ProjectId" id="2a7fJrnNvnBiWRp594pt8bHenra" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "Gradle.Build backend.executor": "Run",
-    "Gradle.backend [dependencies].executor": "Run",
-    "Gradle.backend [generateBadges].executor": "Run",
-    "RequestMappingsPanelOrder0": "0",
-    "RequestMappingsPanelOrder1": "1",
-    "RequestMappingsPanelWidth0": "75",
-    "RequestMappingsPanelWidth1": "75",
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "Spring Boot.MetaClassApplication.executor": "Run",
-    "jdk.selected.JAVA_MODULE": "19",
-    "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "C:/Users/Everysimo/Documents/Intellij_Projects/MetaClass",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "project.structure.last.edited": "Project",
-    "project.structure.proportion": "0.15",
-    "project.structure.side.proportion": "0.2",
-    "settings.editor.selected.configurable": "project.propVCSSupport.Mappings",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Gradle.Build backend.executor&quot;: &quot;Run&quot;,
+    &quot;Gradle.backend [dependencies].executor&quot;: &quot;Run&quot;,
+    &quot;Gradle.backend [generateBadges].executor&quot;: &quot;Run&quot;,
+    &quot;RequestMappingsPanelOrder0&quot;: &quot;0&quot;,
+    &quot;RequestMappingsPanelOrder1&quot;: &quot;1&quot;,
+    &quot;RequestMappingsPanelWidth0&quot;: &quot;75&quot;,
+    &quot;RequestMappingsPanelWidth1&quot;: &quot;75&quot;,
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;Spring Boot.MetaClassApplication.executor&quot;: &quot;Run&quot;,
+    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;jdk.selected.JAVA_MODULE&quot;: &quot;19&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/Everysimo/Documents/Intellij_Projects/MetaClass&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;project.structure.last.edited&quot;: &quot;Project&quot;,
+    &quot;project.structure.proportion&quot;: &quot;0.15&quot;,
+    &quot;project.structure.side.proportion&quot;: &quot;0.2&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.keymap&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="C:\Users\Everysimo\Documents\Intellij_Projects\MetaClass\backend\src\main\resources" />
@@ -104,7 +176,7 @@
       <recent name="C:\Users\Everysimo\Documents\Intellij_Projects\MetaClass\backend\config\checkstyle" />
     </key>
   </component>
-  <component name="RunManager" selected="Gradle.backend [generateBadges]">
+  <component name="RunManager" selected="Spring Boot.MetaClassApplication">
     <configuration name="backend [dependencies]" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
       <ExternalSystemSettings>
         <option name="executionName" />
@@ -163,7 +235,7 @@
       </method>
     </configuration>
     <configuration name="MetaClassApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
-      <module name="MetaClass.main" />
+      <module name="com.commigo.metaclass.MetaClass.main" />
       <option name="SPRING_BOOT_MAIN_CLASS" value="com.commigo.metaclass.MetaClass.MetaClassApplication" />
       <method v="2">
         <option name="Make" enabled="true" />
@@ -207,6 +279,12 @@
       <workItem from="1705715233807" duration="927000" />
       <workItem from="1705764586066" duration="2955000" />
       <workItem from="1705767648208" duration="3020000" />
+      <workItem from="1705777797378" duration="161000" />
+      <workItem from="1705779647170" duration="181000" />
+      <workItem from="1705779889775" duration="1060000" />
+      <workItem from="1705780963027" duration="2046000" />
+      <workItem from="1705784036025" duration="612000" />
+      <workItem from="1705834173366" duration="15452000" />
     </task>
     <task id="LOCAL-00001" summary="fix: project structure">
       <option name="closed" value="true" />
