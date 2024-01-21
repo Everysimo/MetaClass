@@ -43,7 +43,7 @@ public interface StanzaRepository extends JpaRepository<Stanza, Long> {
   /**
    * metodo che permette di modificare i dati di una stanza
    *
-   * @param Id id della stanza da modificare
+   * @param id id della stanza da modificare
    * @param attributes i nuovi dati della stanza
    * @return il numero di colonne modificate
    */
@@ -54,9 +54,9 @@ public interface StanzaRepository extends JpaRepository<Stanza, Long> {
           + "stanza.nome = COALESCE(:#{#attributes['nome']}, stanza.nome), "
           + "stanza.codice = COALESCE(:#{#attributes['codice']}, stanza.codice), "
           + "stanza.descrizione = COALESCE(:#{#attributes['descrizione']}, stanza.descrizione), "
-          + "stanza.tipo_Accesso = COALESCE(:#{#attributes['tipo_Accesso']}, stanza.tipo_Accesso), "
-          + "stanza.max_Posti = COALESCE(:#{#attributes['max_Posti']}, stanza.max_Posti), "
+          + "stanza.tipoAccesso = COALESCE(:#{#attributes['tipo_Accesso']}, stanza.tipoAccesso), "
+          + "stanza.maxPosti = COALESCE(:#{#attributes['max_Posti']}, stanza.maxPosti), "
           + "stanza.scenario.id = COALESCE(:#{#attributes['id_scenario']}, stanza.scenario.id) "
           + "WHERE stanza.id = :Id")
-  int updateAttributes(@Param("Id") Long Id, @Param("attributes") Map<String, Object> attributes);
+  int updateAttributes(@Param("Id") Long id, @Param("attributes") Map<String, Object> attributes);
 }
