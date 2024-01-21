@@ -119,23 +119,24 @@ export const SingleRoom = () => {
                         </h4>
                     </div>
                     <h2>Meetings programmati</h2>
+                    <div className={"masterDiv"}>
                     <MeetingList/>
                     {!isOrg() && (
                         <>
-                            <div className={"masterDiv"}>
-                                <div className={"childDiv"}>
-                                    <CalendarComp/>
-                                    <MyModifyForm/>
-                                    <SelectScenario Id_stanza = {id_stanza}/>
-                                    <RequestSection id_stanza = {id_stanza} />
-                                    <button onClick={handleGoToBannedUserList}>
-                                        Visualizza Lista Utenti Bannati
-                                    </button>
-                                    <AvviaMeeting id_meeting={id_stanza}/>
-                                </div>
+                            <div className={"childDiv"}>
+                                <h2>Funzioni organizzatore:</h2>
+                                <CalendarComp/>
+                                <MyModifyForm/>
+                                <SelectScenario Id_stanza = {id_stanza}/>
+                                <RequestSection id_stanza = {id_stanza} />
+                                <button onClick={handleGoToBannedUserList}>
+                                    Visualizza Lista Utenti Bannati
+                                </button>
+                                <AvviaMeeting id_meeting={id_stanza}/>
                             </div>
                         </>
                     )}
+                    </div>
                 </section>
                 <aside className="side-nav">
                     <div className={"childDiv"}>

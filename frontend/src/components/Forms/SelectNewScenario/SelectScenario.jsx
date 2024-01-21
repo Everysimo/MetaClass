@@ -6,6 +6,7 @@ const ScenarioPage = () => {
     const [selectedScenario, setSelectedScenario] = useState(null);
     const [array, setArray] = useState([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [message, setMessage] = useState('');
 
     const {id: Id_stanza} = useParams();
 
@@ -49,24 +50,16 @@ const ScenarioPage = () => {
     };
 
     const handleConfirmSelection = () => {
-        console.log('Selezione confermata:', selectedScenario);
-        setIsModalOpen(false);
-        //console.log("l'id settato:", selectedScenario.id)
         setIdScenario(selectedScenario.id)
-        console.log("ecco l'id dello scenario", id_scenario)
-        console.log("ecco l'id della stanza", Id_stanza)
         sendDataToServer();
     };
 
     const handleCancelSelection = () => {
         setSelectedScenario(null);
+        setMessage('');
     };
 
     const sendDataToServer = async () => {
-
-    console.log("selected scenario id", selectedScenario.id)
-        console.log("selected stanza id", Id_stanza)
-
         const dataTosend = {
                 id_scenario: parseInt(selectedScenario.id, 10), // converti a numero intero
                 idStanza: parseInt(Id_stanza, 10) // converti a numero intero
@@ -83,10 +76,10 @@ const ScenarioPage = () => {
         };
 
         try {
-            console.log("la stringa json:", JSON.stringify(dataTosend));
-            const response = await fetch(`http://localhost:8080/admin/updateScenario/${encodeURIComponent(dataTosend.idStanza)}/${encodeURIComponent(dataTosend.id_scenario)}`, requestOption);
+            console.log("la stringa json:", dataTosend);
+            const response = await fetch(`http://localhost:8080/modificaScenario/${encodeURIComponent(dataTosend.idStanza)}/${encodeURIComponent(dataTosend.id_scenario)}`, requestOption);
             const responseData = await response.json();
-            console.log("Risposta dal server:", responseData);
+            setMessage(responseData.message);
         } catch (error) {
             console.error('ERRORE:', error);
         }
@@ -97,6 +90,8 @@ const ScenarioPage = () => {
     }
     const handleClose=()=>{
         setIsModalOpen(false);
+        setSelectedScenario(null);
+        setMessage('');
     }
     return (
         <>
@@ -114,17 +109,20 @@ const ScenarioPage = () => {
                         >
                             &times;
                         </span>
-                        {selectedScenario ? (
-                            <div className={"masterDiv"}>
-                                <div className={'childDiv'}>
-                                    <h2>Conferma la selezione</h2>
-                                    <p>Nome: {selectedScenario.nome}</p>
-                                    <p>Descrizione: {selectedScenario.descrizione}</p>
-                                    <button onClick={handleConfirmSelection}>Conferma</button>
-                                    <button onClick={handleCancelSelection}>Annulla</button>
-                                </div>
-                            </div>
+                        {message ? (
+                            <p>{message}</p>
                         ) : (
+                            selectedScenario ? (
+                                <div className={"masterDiv"}>
+                                    <div className={'childDiv'}>
+                                        <h2>Conferma la selezione</h2>
+                                        <p>Nome: {selectedScenario.nome}</p>
+                                        <p>Descrizione: {selectedScenario.descrizione}</p>
+                                        <button onClick={handleConfirmSelection}>Conferma</button>
+                                        <button onClick={handleCancelSelection}>Annulla</button>
+                                    </div>
+                                </div>
+                            ) : (
                             <>
                                 <h2>Scegli uno scenario</h2>
                                 <div className={"masterDiv"}>
@@ -138,7 +136,7 @@ const ScenarioPage = () => {
                                     ))}
                                 </div>
                             </>
-                        )}
+                        ))}
                     </div>
                 </div>
             }
