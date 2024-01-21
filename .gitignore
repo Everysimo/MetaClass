@@ -4,7 +4,6 @@
 !**backend/src/main/**/build/
 !**backend/src/test/**/build/
 backend/.gradle/
-backend/build/
 !backend/build/reports/
 backend/HELP.md
 backend/gradle.properties
