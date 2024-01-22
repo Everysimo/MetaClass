@@ -3,11 +3,12 @@ import axios from "axios";
 export const checkRole = async (id_stanza) => {
     try {
         const token = sessionStorage.getItem('token');
+        const idStanza = id_stanza;
         if (!token) {
             throw new Error('Token not found');
         }
 
-        const response = await axios.post(`http://localhost:8080/getRuolo/${id_stanza}`, null, {
+        const response = await axios.post(`http://localhost:8080/getRuolo/${idStanza}`, null, {
             headers: {
                 'Authorization': 'Bearer ' + token,
                 'Content-Type': 'application/json'
@@ -32,3 +33,11 @@ export const checkRole = async (id_stanza) => {
         throw new Error('Failed to fetch user details');
     }
 };
+
+export const checkOrg = async (id_stanza) => {
+    const fetchedRole = await checkRole(id_stanza);
+    if(fetchedRole === "Organizzatore" || fetchedRole === "Organizzatore_Master")
+        return true;
+    else
+        return false;
+}

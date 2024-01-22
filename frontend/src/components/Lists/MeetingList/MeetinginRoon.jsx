@@ -33,8 +33,9 @@ const MeetingListRoom = () => {
 
     const fetchMeetingList = async () => {
         try {
+            const idStanza = id_stanza;
             const response = await fetch(
-                `http://localhost:8080/visualizzaSchedulingMeeting/${id_stanza}`,
+                `http://localhost:8080/visualizzaSchedulingMeeting/${idStanza}`,
                 requestOption
             );
             if (!response.ok) {

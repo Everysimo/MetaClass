@@ -22,7 +22,12 @@ const BannedUserList = ({ id_stanza }) => {
 
     const fetchBannedUserList = async () => {
         try {
-            const response = await fetch(`http://localhost:8080/admin/visualizzaUtentiBannatiInStanza/${id_stanza_int}`, requestOption);
+            const idStanza = id_stanza_int;
+            const response = await fetch(
+                `http://localhost:8080/admin/visualizzaUtentiBannatiInStanza/
+                ${idStanza}`,
+                requestOption
+            );
 
             if (!response.ok) {
                 throw new Error('Errore nella richiesta');

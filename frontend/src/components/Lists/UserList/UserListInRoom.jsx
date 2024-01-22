@@ -4,6 +4,7 @@ import './UserList.css';
 import '../../Forms/PopUpStyles.css';
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faAlignCenter} from "@fortawesome/free-solid-svg-icons";
+import {checkOrg} from "./checkRoleInRoom";
 
 const UserListInRoom = () => {
     const [userList, setUserList] = useState([]);
@@ -17,6 +18,7 @@ const UserListInRoom = () => {
     const [message, setMessage] = useState('');
 
     const { id: id_stanza } = useParams();
+    const role = checkOrg(id_stanza);
 
     useEffect(() => { fetchUserList(); }, []);
 
@@ -297,6 +299,7 @@ const UserListInRoom = () => {
     const handleCloseChangeNamePopUp = () => {
         setChangeNameModal(false);
     }
+
     const handleCloseSuccesPopUp = ()=> {
         setTimeout(() => {
             // Simuliamo il reindirizzamento dopo 2 secondi
@@ -315,21 +318,25 @@ const UserListInRoom = () => {
                     <span>Nome: {`${user.nome} ${user.cognome}`}</span>
                     <span>Nome In Stanza: {''}</span>
                     <span>Email: {`${user.email}`}</span>
-                    <button onClick={() => toggleButtons(user.id)}>
-                        Options <FontAwesomeIcon icon={faAlignCenter} style={{color: "#ffffff",}} />
-                    </button>
-                    <div className={`options-container${showButtonsMap[user.id] ? ' open' : ''}`}>
-                        <button onClick={() => handleChangeNameButton(user.id)}>Cambia Nome</button>
-                        <button onClick={() => handleKickUserButton(user.id)}>Kicka Partecipante</button>
-                        <button onClick={() => handleSilenziaUserButton(user.id)}>Silenzia Partecipante</button>
-                        <button onClick={() => handlePromotionButton(user.id)}>Promuovi</button>
-                        <button onClick={() => handleBanUserButton(user.id)}>Banna Partecipante</button>
-                        <button onClick={() => handleDeclassifyButton(user.id)}>Declassa</button> {/*Non Funziona*/}
-                    </div>
+                    {checkOrg(id_stanza) &&
+                        <>
+                            <button onClick={() => toggleButtons(user.id)}>
+                                Options <FontAwesomeIcon icon={faAlignCenter} style={{color: "#ffffff",}} />
+                            </button>
+                            <div className={`options-container${showButtonsMap[user.id] ? ' open' : ''}`}>
+                                <button onClick={() => handleChangeNameButton(user.id)}>Cambia Nome</button>
+                                <button onClick={() => handleKickUserButton(user.id)}>Kicka Partecipante</button>
+                                <button onClick={() => handleSilenziaUserButton(user.id)}>Silenzia Partecipante</button>
+                                <button onClick={() => handlePromotionButton(user.id)}>Promuovi</button>
+                                <button onClick={() => handleBanUserButton(user.id)}>Banna Partecipante</button>
+                                <button onClick={() => handleDeclassifyButton(user.id)}>Declassa</button> {/*Non Funziona*/}
+                            </div>
+                        </>
+                    }
                 </div>
             ))}
             {showChangeNameModal && (
-                <div className="modal">
+                <div className="modal" style={{zIndex: "9"}}>
                     <div className="modal-content">
                         <span
                             className={"close"}
@@ -349,7 +356,7 @@ const UserListInRoom = () => {
                 </div>
             )}
             {showSuccessPopup && (
-                <div className={"modal"}>
+                <div className={"modal"} style={{zIndex: "9"}}>
                     <div className={"modal-content"}>
                         <span
                             className={"close"}
