@@ -12,6 +12,7 @@ import MeetingList from "../components/Calendar/CalendarViewer";
 import RequestSection from "../components/Forms/AccessRequest/RequestSection";
 import SelectScenario from "../components/Forms/SelectNewScenario/SelectScenario";
 import BannedUserList from "../components/Lists/UserList/BannedUserList";
+import MeetingListRoom from "../components/Lists/MeetingList/MeetinginRoon";
 export const SingleRoom = () => {
     const { id: id_stanza } = useParams();
     const [role, setRole] = useState("Partecipante"); // Default role value
@@ -121,6 +122,7 @@ export const SingleRoom = () => {
                                 <SelectScenario Id_stanza = {id_stanza}/>
                                 <RequestSection id_stanza = {id_stanza} />
                                 <BannedUserList id_stanza={id_stanza} />
+                                <MeetingListRoom/>
                             </div>
                         </>
                     )}
