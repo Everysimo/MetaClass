@@ -12,6 +12,7 @@ import MeetingList from "../components/Calendar/CalendarViewer";
 import RequestSection from "../components/Forms/AccessRequest/RequestSection";
 import SelectScenario from "../components/Forms/SelectNewScenario/SelectScenario";
 import BannedUserList from "../components/Lists/UserList/BannedUserList";
+import MeetinginRoon from "../components/Lists/MeetingList/MeetinginRoon";
 export const SingleRoom = () => {
     const { id: id_stanza } = useParams();
     const [role, setRole] = useState("Partecipante"); // Default role value
@@ -128,6 +129,7 @@ export const SingleRoom = () => {
                 <aside className="side-nav">
                     <div className={"childDiv"}>
                         <UserListInRoom />
+                        <MeetinginRoon />
                     </div>
                 </aside>
             </main>
