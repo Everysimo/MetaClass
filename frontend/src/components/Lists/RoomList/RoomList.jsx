@@ -81,7 +81,7 @@ const RoomList = () => {
                         {orgStatus[room.id] && (
                             <FontAwesomeIcon
                                 icon={faCrown}
-                                size="2xl"
+                                size="lg"
                                 style={{ color: '#FFD43B' }}
                             />
                         )}
