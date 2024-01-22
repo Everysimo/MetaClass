@@ -76,21 +76,21 @@ const RoomList = () => {
         <>
             {array.map((room, index) => (
                 <div key={index} className={'user-card'}>
+                    {orgStatus[room.id] && (
+                        <FontAwesomeIcon
+                            icon={faCrown}
+                            size="lg"
+                            style={{ color: '#FFD43B' }}
+                        />
+                    )}
                     <h4>
-                        Stanza: {room.nome}{' '}
-                        {orgStatus[room.id] && (
-                            <FontAwesomeIcon
-                                icon={faCrown}
-                                size="lg"
-                                style={{ color: '#FFD43B' }}
-                            />
-                        )}
+                        Stanza: {room.nome}
                     </h4>
                     {/* inserisci gli altri dati di cui hai bisogno */}
                     <button>
                         <Link
                             to={`/SingleRoom/${room.id}`}
-                            style={{ textDecoration: 'none', color: 'inherit' }}
+                            style={{ textDecoration: 'none', color: 'inherit'}}
                         >
                             Vai alla pagina della stanza
                         </Link>
