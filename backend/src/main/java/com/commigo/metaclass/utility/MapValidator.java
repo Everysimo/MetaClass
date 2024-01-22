@@ -1,5 +1,6 @@
 package com.commigo.metaclass.utility;
 
+import com.commigo.metaclass.entity.Meeting;
 import com.commigo.metaclass.entity.Stanza;
 import com.commigo.metaclass.entity.Utente;
 import com.commigo.metaclass.exceptions.ClientRuntimeException;
@@ -116,6 +117,36 @@ public class MapValidator {
             "Errore nella richiesta: L'attributo '"
                 + attributeName
                 + "' ha un valore che non rispetta il suo tipo di dato");
+      }
+    }
+    return true;
+  }
+
+  public static boolean meetingValidate(Map<String, Object> params) throws ClientRuntimeException {
+
+    for (Map.Entry<String, Object> entry : params.entrySet()) {
+      String attributeName = entry.getKey();
+      Object attributeValue = entry.getValue();
+
+      try {
+        Set<ConstraintViolation<Meeting>> violations =
+                validator.validateValue(Meeting.class, attributeName, attributeValue);
+
+        if (!violations.isEmpty()) {
+          // Handle validation errors for the specific attribute
+          throw new ClientRuntimeException(
+                  "Errore nella richiesta: " + violations.iterator().next().getMessage());
+        }
+      } catch (IllegalArgumentException e) {
+        throw new ClientRuntimeException(
+                "Errore nella richiesta: L'attributo '"
+                        + attributeName
+                        + "' non è presente nell'entità Stanza");
+      } catch (ValidationException ve) {
+        throw new ClientRuntimeException(
+                "Errore nella richiesta: L'attributo '"
+                        + attributeName
+                        + "' ha un valore che non rispetta il suo tipo di dato");
       }
     }
     return true;
