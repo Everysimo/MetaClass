@@ -307,7 +307,7 @@ const UserListInRoom = () => {
                     {user.role &&
                         <>
                             <button onClick={() => toggleButtons(user.id)}>
-                                Options <FontAwesomeIcon icon={faAlignCenter} style={{ color: "#ffffff", }} />
+                                Opzioni <FontAwesomeIcon icon={faAlignCenter} style={{ color: "#ffffff", }} />
                             </button>
                             <div className={`options-container${showButtonsMap[user.id] ? ' open' : ''}`}>
                                 <button onClick={() => handleChangeNameButton(user.id)}>Cambia Nome</button>
