@@ -72,11 +72,14 @@ const UserListInRoom = () => {
             return;
         }
 
+        const capitalizedNewName = newName.charAt(0).toUpperCase() + newName.slice(1);
         // Pulisco l'errore se la stringa è valida
         setErrore(null);
 
         console.log("newname", newName)
-        const nome = newName;
+
+        const nome =  capitalizedNewName;
+
 
         const requestOption = {
             method: 'POST',
@@ -87,7 +90,7 @@ const UserListInRoom = () => {
             body: JSON.stringify({ nome })
         };
         try {
-            console.log("stringa json:", requestOption )
+            console.log("stringa json:", nome )
             const response = await fetch(
                 `http://localhost:8080/modificaNomePartecipante/${id_stanza}/${selectedUserId}`,
                 requestOption
