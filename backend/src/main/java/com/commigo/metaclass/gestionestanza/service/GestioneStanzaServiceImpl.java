@@ -990,7 +990,7 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService {
    * @return il ruolo del'utente all'interno della stanza
    */
   @Override
-  public Ruolo getRuoloByUserAndStanzaId(String metaId, Long idStanza)
+  public StatoPartecipazione getStatoByUserAndStanzaId(String metaId, Long idStanza)
       throws ServerRuntimeException, RuntimeException403 {
 
     Utente u;
@@ -1008,16 +1008,7 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService {
       throw new RuntimeException403("L'utente non ha acceduto alla stanza");
     }
 
-    if (sp.getRuolo().getNome().equalsIgnoreCase(Ruolo.PARTECIPANTE)) {
-      if (sp.isBannato()) {
-        throw new RuntimeException403("Utente bannato dalla stanza");
-      }
-      if (sp.isInAttesa()) {
-        throw new RuntimeException403("Utente in attesa di entrare in stanza");
-      }
-    }
-
-    return sp.getRuolo();
+    return sp;
   }
 
   /**
