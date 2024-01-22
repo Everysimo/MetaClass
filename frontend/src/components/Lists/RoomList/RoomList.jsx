@@ -26,7 +26,10 @@ class RoomList extends Component {
         };
 
         try {
-            const response = await fetch('http://localhost:8080/visualizzaStanze', requestOption);
+            const response = await fetch(
+                'http://localhost:8080/visualizzaStanze',
+                requestOption
+            );
 
             if (!response.ok) {
                 throw new Error('Errore nel recupero degli scenari.');

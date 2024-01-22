@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
-import {faChalkboardUser, faPlay} from "@fortawesome/free-solid-svg-icons";
+import {faPlay} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {wait} from "@testing-library/user-event/dist/utils";
 
 export default class AvviaMeeting extends Component {
     state = {

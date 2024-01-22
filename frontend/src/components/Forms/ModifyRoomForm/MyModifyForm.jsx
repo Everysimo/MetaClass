@@ -64,7 +64,8 @@ const MyModifyForm = () => {
         };
 
         try {
-            const response = await fetch(`http://localhost:8080/eliminaStanza/${id_stanza}`, requestOption);
+            const idStanza = id_stanza;
+            const response = await fetch(`http://localhost:8080/eliminaStanza/${idStanza}`, requestOption);
             const responseData = await response.json();
             console.log("Risposta del server:", responseData);
             setMessage(responseData.message);

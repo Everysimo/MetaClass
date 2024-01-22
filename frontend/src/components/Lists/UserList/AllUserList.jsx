@@ -21,7 +21,8 @@ const AllUserList = () => {
 
     const fetchUserList = async () => {
         try {
-            const response = await fetch(`http://localhost:8080/visualizzaUtentiInStanza/${id_stanza}`, requestOption);
+            const idStanza = id_stanza;
+            const response = await fetch(`http://localhost:8080/visualizzaUtentiInStanza/${idStanza}`, requestOption);
 
             if (!response.ok) {
                 throw new Error('Errore nella richiesta');
