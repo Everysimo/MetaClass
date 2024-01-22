@@ -132,9 +132,9 @@ const Questionario = (props) => {
                                 </label>
                             ))}
                         </div>
-                        <p style={{fontSize: "14px", textAlign: "center"}}>Livello motion sickness (1 a 5)</p>
+                        <p style={{fontSize: "14px", textAlign: "center"}}>Livello motion sickness (1 a 10)</p>
                         <div className="dots-container">
-                            {[1, 2, 3, 4, 5].map((value) => (
+                            {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((value) => (
                                 <label key={value} className={`dot ${value === state.motion ? 'active' : ''}`}>
                                     <input
                                         type="radio"
