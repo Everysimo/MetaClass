@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import dayjs from 'dayjs';  // Import dayjs
 import './MeetingList.css';
 import AvviaMeeting from "../../Buttons/GestioneMeetingButtons/AvviaMeeting";
+import TerminaMeeting from "../../Buttons/GestioneMeetingButtons/TerminaMeeting";
 export const MeetingListInRoom = ({ formattedDate }) => {
     const [meetingList, setMeetingList] = useState([]);
     const [showModal, setShowModal] = useState(false);
@@ -51,22 +52,29 @@ export const MeetingListInRoom = ({ formattedDate }) => {
                 if (dayjs(meeting.inizio).format('YYYY-DD-MM') === formattedDate) {
                     return (
                         <>
-                        <div
-                            key={meeting.id}
-                            className="meeting"
-                            onClick={handleOpen}
-                        >
-                            <span>Nome: {`${meeting.nome} `}</span>
-                            {/* Format meeting.inizio in 'YYYY-DD-MM' */}
-                            <span>Inizio: {`${dayjs(meeting.inizio).format('YYYY-DD-MM')} `}</span>
-                        </div>
-                        {showModal &&
-                            <div className={'modal'}>
+                            <div
+                                key={meeting.id}
+                                className="meeting"
+                                onClick={handleOpen}
+                            >
+                                <span>Nome: {`${meeting.nome} `}</span>
+                                <span>Stato: {`${meeting.avviato ? 'Meeting Attivo' : 'Meeting Inattivo'} `}</span>
+                                {/* Format meeting.inizio in 'YYYY-DD-MM' */}
+                                <span>Inizio: {`${dayjs(meeting.inizio).format('YYYY-DD-MM')} `}</span>
+                            </div>
+                            {showModal &&
+                                <div className={'modal'}>
                                 <div className={'modal-content'}>
                                     <span className={'close'} onClick={handleClose}>
                                         &times;
                                     </span>
-                                    <AvviaMeeting id_meeting = {meeting.id}/>
+                                    {meeting.avviato ? (
+                                        // Se meeting.avviato è true, mostra il pulsante "Termina Meeting"
+                                        <TerminaMeeting id_meeting={meeting.id}/>
+                                    ) : (
+                                        // Se meeting.avviato è false, mostra il pulsante "Avvia Meeting"
+                                        <AvviaMeeting id_meeting={meeting.id}/>
+                                    )}
                                 </div>
                             </div>
                         }
