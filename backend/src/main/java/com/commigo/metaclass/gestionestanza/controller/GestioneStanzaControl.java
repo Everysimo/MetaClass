@@ -1,9 +1,6 @@
 package com.commigo.metaclass.gestionestanza.controller;
 
-import com.commigo.metaclass.entity.Ruolo;
-import com.commigo.metaclass.entity.Scenario;
-import com.commigo.metaclass.entity.Stanza;
-import com.commigo.metaclass.entity.Utente;
+import com.commigo.metaclass.entity.*;
 import com.commigo.metaclass.exceptions.ClientRuntimeException;
 import com.commigo.metaclass.exceptions.RuntimeException401;
 import com.commigo.metaclass.exceptions.RuntimeException403;
@@ -629,6 +626,40 @@ public class GestioneStanzaControl {
         throw new ServerRuntimeException("errore nel recapito del ruolo");
       } else {
         return ResponseEntity.ok(new Response<>(r, "ruolo recapitato con successo"));
+      }
+
+    } catch (ServerRuntimeException | RuntimeException403 e) {
+
+      // Gestisci le eccezioni e restituisci una risposta appropriata
+      int statusCode = (e instanceof ServerRuntimeException) ? 500 : 403;
+      return ResponseEntity.status(statusCode)
+          .body(new Response<>(null, "Errore durante l'operazione: " + e.getMessage()));
+    }
+  }
+
+  /**
+   * Metodo per prelevare lo stato partecipazione dell'utente
+   *
+   * @param idStanza id della stanza
+   * @param request richiesta http
+   * @return ritorna una risposta con lo stato partecipazione dell'utente
+   */
+  @PostMapping(value = "/getStatopartecipazione/{idStanza}")
+  public ResponseEntity<Response<StatoPartecipazione>> getStatoPartecipazione(
+      @PathVariable Long idStanza, HttpServletRequest request) {
+    try {
+
+      if (!validationToken.isTokenValid(request)) {
+        throw new RuntimeException403("Token non valido");
+      }
+
+      String metaid = jwtTokenUtil.getmetaIdFromToken(validationToken.getToken());
+
+      StatoPartecipazione sp = stanzaService.getStatoPartecipazione(metaid, idStanza);
+      if (sp == null) {
+        throw new ServerRuntimeException("errore nel recapito del ruolo");
+      } else {
+        return ResponseEntity.ok(new Response<>(sp, "ruolo recapitato con successo"));
       }
 
     } catch (ServerRuntimeException | RuntimeException403 e) {
