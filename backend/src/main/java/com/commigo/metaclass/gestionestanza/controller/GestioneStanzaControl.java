@@ -1,6 +1,9 @@
 package com.commigo.metaclass.gestionestanza.controller;
 
-import com.commigo.metaclass.entity.*;
+import com.commigo.metaclass.entity.Ruolo;
+import com.commigo.metaclass.entity.Scenario;
+import com.commigo.metaclass.entity.Stanza;
+import com.commigo.metaclass.entity.Utente;
 import com.commigo.metaclass.exceptions.ClientRuntimeException;
 import com.commigo.metaclass.exceptions.RuntimeException401;
 import com.commigo.metaclass.exceptions.RuntimeException403;
@@ -611,7 +614,7 @@ public class GestioneStanzaControl {
    *     dell'operazione
    */
   @PostMapping(value = "/getRuolo/{idStanza}")
-  public ResponseEntity<Response<StatoPartecipazione>> getRuoloByUserAndByStanza(
+  public ResponseEntity<Response<Ruolo>> getRuoloByUserAndByStanza(
       @PathVariable Long idStanza, HttpServletRequest request) {
     try {
 
@@ -621,11 +624,11 @@ public class GestioneStanzaControl {
 
       String metaid = jwtTokenUtil.getmetaIdFromToken(validationToken.getToken());
 
-      StatoPartecipazione sp = stanzaService.getStatoByUserAndStanzaId(metaid, idStanza);
-      if (sp == null) {
-        throw new ServerRuntimeException("errore nel recapito dello stato partecipazione");
+      Ruolo r = stanzaService.getRuoloByUserAndStanzaId(metaid, idStanza);
+      if (r == null) {
+        throw new ServerRuntimeException("errore nel recapito del ruolo");
       } else {
-        return ResponseEntity.ok(new Response<>(sp, "ruolo recapitato con successo"));
+        return ResponseEntity.ok(new Response<>(r, "ruolo recapitato con successo"));
       }
 
     } catch (ServerRuntimeException | RuntimeException403 e) {
