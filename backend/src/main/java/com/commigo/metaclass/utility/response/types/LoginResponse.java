@@ -17,10 +17,10 @@ public class LoginResponse<T> extends AbstractResponse<T> {
   /**
    * Costruttore.
    *
-   * @param value
-   * @param message
-   * @param token
-   * @param isAdmin
+   * @param value valore da restituire
+   * @param message messagio da restituire
+   * @param token token da restituire
+   * @param isAdmin booleano da restituire
    */
   public LoginResponse(T value, String message, String token, Boolean isAdmin) {
     super(value, message);

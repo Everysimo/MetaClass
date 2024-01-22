@@ -11,7 +11,8 @@ import jakarta.validation.Validator;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
-import java.util.*;
+import java.util.Map;
+import java.util.Set;
 import lombok.NoArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -24,11 +25,11 @@ public class MapValidator {
       Validation.buildDefaultValidatorFactory().getValidator();
 
   /**
-   * Validatore di stanza.
+   * Validatore stanza.
    *
-   * @param params
-   * @return
-   * @throws ClientRuntimeException
+   * @param params mappa con i dati stanza.
+   * @return conferma validazione
+   * @throws RuntimeException403 eccezione di errori nella richiesta.
    */
   public static boolean stanzaValidate(Map<String, Object> params) throws ClientRuntimeException {
 
@@ -63,9 +64,9 @@ public class MapValidator {
   /**
    * Validatore utente.
    *
-   * @param params
-   * @return
-   * @throws RuntimeException403
+   * @param params mappa con i dati utente.
+   * @return conferma validazione
+   * @throws RuntimeException403 eccezione di errori nella richiesta.
    */
   public static boolean utenteValidate(Map<String, Object> params) throws RuntimeException403 {
 
@@ -84,14 +85,15 @@ public class MapValidator {
             // Creare un DateTimeFormatter per il formato di output
             DateTimeFormatter formatterOutput = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
-            // Formattare la data di output nel nuovo formato
+            // Formattare la data di uscita nel nuovo formato
             String outputDate = data.format(formatterOutput);
 
             params.put(attributeName, outputDate);
 
           } catch (DateTimeParseException e) {
             throw new RuntimeException403(
-                "Errore nella richiesta: Formato della data di nascita non valido. Formato richiesto: MM/dd/yyyy");
+                "Errore nella richiesta: Formato della data di nascita non valido. "
+                    + "Formato richiesto: MM/dd/yyyy");
           }
         } else {
           Set<ConstraintViolation<Utente>> violations =

@@ -22,9 +22,9 @@ import com.commigo.metaclass.gestionestimaduratameeting.service.GestioneStimaMee
 import com.commigo.metaclass.gestioneutenza.repository.UtenteRepository;
 import com.commigo.metaclass.utility.response.types.Response;
 import jakarta.transaction.Transactional;
-import java.util.List;
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -426,11 +426,11 @@ public class GestioneMeetingServiceImpl implements GestioneMeetingService {
   }
 
   /**
-   * metodo che consente la visualizzazione di tutti i meeting a cui ha già partecipato un
-   * determinato utente
+   * Metodo che consente la visualizzazione di tutti i meeting a cui ha già partecipato un
+   * determinato utente.
    *
-   * @param metaId metaId dell'utente che ha partecipato ai meeting
-   * @return lista di tutti i meeting a cui l'utente ha già partecipato
+   * @param metaId metaId dell'utente che ha partecipato ai meeting.
+   * @return lista di tutti i meeting a cui l'utente ha già partecipato.
    */
   @Override
   public List<Meeting> getMeetingPrecedenti(String metaId)
@@ -453,7 +453,7 @@ public class GestioneMeetingServiceImpl implements GestioneMeetingService {
   }
 
   /**
-   * metodo che consente la compilazione di un questionario da parte di un determinato utente
+   * Metodo che consente la compilazione di un questionario da parte di un determinato utente.
    *
    * @param value la valutazione dello scenario inserita dall'utente all'interno del questionario
    * @param motionSickness livello di nausea dopo l'uscita dal meeting
@@ -503,14 +503,14 @@ public class GestioneMeetingServiceImpl implements GestioneMeetingService {
 
     // prelevo media e numero dei voti
     float media = sc.getMediaValutazione();
-    int num_voti = sc.getNumVoti();
+    int numVoti = sc.getNumVoti();
 
     // calcolo media
-    float newMedia = ((media * num_voti) + value) / (num_voti + 1);
+    float newMedia = ((media * numVoti) + value) / (numVoti + 1);
 
     // inserimento della media nello scenario
     sc.setMediaValutazione(newMedia);
-    sc.setNumVoti(num_voti + 1);
+    sc.setNumVoti(numVoti + 1);
     scenarioRepository.save(sc);
 
     return true;

@@ -198,10 +198,10 @@ public class GestioneStanzaControl {
 
       ObjectMapper objectMapper = new ObjectMapper();
       JsonNode jsonNode = objectMapper.readTree(scelta);
-      boolean Newscelta = jsonNode.get("scelta").asBoolean();
+      boolean newScelta = jsonNode.get("scelta").asBoolean();
 
       String metaid = jwtTokenUtil.getmetaIdFromToken(validationToken.getToken());
-      return stanzaService.gestioneAccesso(metaid, idUtente, idStanza, Newscelta);
+      return stanzaService.gestioneAccesso(metaid, idUtente, idStanza, newScelta);
 
     } catch (RuntimeException403 re) {
       return ResponseEntity.status(403)
@@ -302,16 +302,15 @@ public class GestioneStanzaControl {
         throw new RuntimeException403("Token non valido");
       }
 
-      String metaid = jwtTokenUtil.getmetaIdFromToken(validationToken.getToken());
-
       ObjectMapper objectMapper = new ObjectMapper();
       JsonNode jsonNode = objectMapper.readTree(requestBody);
       JsonNode codiceNode = jsonNode.get("codice");
 
       // controllo se il codice è null
-      if (codiceNode == null)
+      if (codiceNode == null) {
         throw new RuntimeException403(
             "l'attributo deve essere nominato 'codice' e non diversamente");
+      }
 
       // controllo se l'attributo è testuale
       if (!codiceNode.isTextual()) {
@@ -324,7 +323,8 @@ public class GestioneStanzaControl {
         throw new RuntimeException403("il codice deve essere un numero di 6 cifre");
       }
 
-      return ResponseEntity.ok(stanzaService.accessoStanza(codiceStanza, metaid).getBody());
+      String metaId = jwtTokenUtil.getmetaIdFromToken(validationToken.getToken());
+      return ResponseEntity.ok(stanzaService.accessoStanza(codiceStanza, metaId).getBody());
 
     } catch (JsonProcessingException je) {
       return ResponseEntity.status(403)
@@ -507,15 +507,15 @@ public class GestioneStanzaControl {
    * metodo che permette di gestire la richiesta di modifica di uno scenario di una determinata
    * stanza.
    *
-   * @param id_stanza id della stanza di cui vogliamo modificare lo scenario
-   * @param id_scenario id del nuovo scenario da impostare nella stanza
+   * @param idStanza id della stanza di cui vogliamo modificare lo scenario
+   * @param idScenario id del nuovo scenario da impostare nella stanza
    * @param request richiesta HTTP fornita dal client
    * @return valore booleano che identifica la riuscita dell'operazione ed un messaggio che descrive
    *     l'esito di essa
    */
-  @PostMapping(value = "/modificaScenario/{id_stanza}/{id_scenario}")
+  @PostMapping(value = "/modificaScenario/{idStanza}/{idScenario}")
   public ResponseEntity<Response<Boolean>> modificaScenario(
-      @PathVariable Long id_stanza, @PathVariable Long id_scenario, HttpServletRequest request) {
+      @PathVariable Long idStanza, @PathVariable Long idScenario, HttpServletRequest request) {
     try {
 
       if (!validationToken.isTokenValid(request)) {
@@ -523,7 +523,7 @@ public class GestioneStanzaControl {
       }
 
       String metaid = jwtTokenUtil.getmetaIdFromToken(validationToken.getToken());
-      return stanzaService.modificaScenario(metaid, id_scenario, id_stanza);
+      return stanzaService.modificaScenario(metaid, idScenario, idStanza);
 
     } catch (RuntimeException403 e) {
       e.printStackTrace();
@@ -561,15 +561,13 @@ public class GestioneStanzaControl {
 
       ObjectMapper objectMapper = new ObjectMapper();
       JsonNode jsonNode = objectMapper.readTree(nome);
-      String NuovoNome = jsonNode.get("nome").asText();
+      String nuovoNome = jsonNode.get("nome").asText();
 
-      return stanzaService.modificaNomePartecipante(metaid, idStanza, idUtente, NuovoNome);
+      return stanzaService.modificaNomePartecipante(metaid, idStanza, idUtente, nuovoNome);
 
     } catch (RuntimeException403 e) {
-      e.printStackTrace();
       return ResponseEntity.status(403).body(new Response<>(null, "Errore nell'operazione"));
     } catch (Exception e) {
-      e.printStackTrace();
       return ResponseEntity.status(500).body(new Response<>(null, "Errore durante l'operazione"));
     }
   }
@@ -610,14 +608,14 @@ public class GestioneStanzaControl {
    * metodo che permette di gestire la richiesta di visualizzazione del ruolo dell' utente
    * all'interno di una specifica stanza.
    *
-   * @param id_stanza id della stanza
+   * @param idStanza id della stanza
    * @param request richiesta HTTP fornita dal client
    * @return ruolo dell'utente all'interno della stanza ed un messaggio che descrive l'esito
    *     dell'operazione
    */
-  @PostMapping(value = "/getRuolo/{id_stanza}")
+  @PostMapping(value = "/getRuolo/{idStanza}")
   public ResponseEntity<Response<Ruolo>> getRuoloByUserAndByStanza(
-      @PathVariable Long id_stanza, HttpServletRequest request) {
+      @PathVariable Long idStanza, HttpServletRequest request) {
     try {
 
       if (!validationToken.isTokenValid(request)) {
@@ -626,7 +624,7 @@ public class GestioneStanzaControl {
 
       String metaid = jwtTokenUtil.getmetaIdFromToken(validationToken.getToken());
 
-      Ruolo r = stanzaService.getRuoloByUserAndStanzaID(metaid, id_stanza);
+      Ruolo r = stanzaService.getRuoloByUserAndStanzaId(metaid, idStanza);
       if (r == null) {
         throw new ServerRuntimeException("errore nel recapito del ruolo");
       } else {
@@ -653,7 +651,7 @@ public class GestioneStanzaControl {
    *     l'esito dei essa
    */
   @PostMapping(value = "/silenziarePartecipante/{idStanza}/{idUtente}")
-  public ResponseEntity<Response<Boolean>> SilenziaPartecipante(
+  public ResponseEntity<Response<Boolean>> silenziaPartecipante(
       @PathVariable Long idStanza, @PathVariable Long idUtente, HttpServletRequest request) {
 
     try {
@@ -663,13 +661,11 @@ public class GestioneStanzaControl {
 
       String metaid = jwtTokenUtil.getmetaIdFromToken(validationToken.getToken());
 
-      return stanzaService.SilenziaPartecipante(metaid, idStanza, idUtente);
+      return stanzaService.silenziaPartecipante(metaid, idStanza, idUtente);
 
     } catch (RuntimeException403 e) {
-      e.printStackTrace();
       return ResponseEntity.status(403).body(new Response<>(null, "Errore nell'operazione"));
     } catch (Exception e) {
-      e.printStackTrace();
       return ResponseEntity.status(500).body(new Response<>(null, "Errore durante l'operazione"));
     }
   }
@@ -685,7 +681,7 @@ public class GestioneStanzaControl {
    *     l'esito dei essa
    */
   @PostMapping(value = "/unmutePartecipante/{idStanza}/{idUtente}")
-  public ResponseEntity<Response<Boolean>> UnmutePartecipante(
+  public ResponseEntity<Response<Boolean>> unmutePartecipante(
       @PathVariable Long idStanza, @PathVariable Long idUtente, HttpServletRequest request) {
 
     try {
@@ -698,10 +694,8 @@ public class GestioneStanzaControl {
       return stanzaService.unmutePartecipante(metaid, idStanza, idUtente);
 
     } catch (RuntimeException403 e) {
-      e.printStackTrace();
       return ResponseEntity.status(403).body(new Response<>(null, "Errore nell'operazione"));
     } catch (Exception e) {
-      e.printStackTrace();
       return ResponseEntity.status(500).body(new Response<>(null, "Errore durante l'operazione"));
     }
   }

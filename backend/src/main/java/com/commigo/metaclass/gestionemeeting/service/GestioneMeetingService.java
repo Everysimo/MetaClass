@@ -4,10 +4,10 @@ import com.commigo.metaclass.entity.Meeting;
 import com.commigo.metaclass.exceptions.RuntimeException403;
 import com.commigo.metaclass.exceptions.ServerRuntimeException;
 import com.commigo.metaclass.utility.response.types.Response;
+import java.util.List;
 import org.springframework.http.ResponseEntity;
 
-import java.util.List;
-
+/** Interfaccia che offre servizi legati ai meetings. */
 public interface GestioneMeetingService {
 
   public boolean creaScheduling(Meeting meeting, String metaId)

@@ -85,6 +85,9 @@ public class StatoPartecipazione implements Serializable {
   @UpdateTimestamp
   private LocalDateTime dataAggiornamento;
 
+  /**
+   * Metodo che controlla il ruolo di admin.
+   */
   public void checkRule() {
     try {
       if (this.utente.isAdmin() && this.isBannato) {
@@ -113,14 +116,14 @@ public class StatoPartecipazione implements Serializable {
   /**
    * Costruttore.
    *
-   * @param stanza
-   * @param utente
-   * @param ruolo
-   * @param isInAttesa
-   * @param isBannato
-   * @param nomeInStanza
-   * @param isSilenziato
-   * @throws TransactionSystemException
+   * @param stanza Istanza della stanza.
+   * @param utente Istanza dell'utente.
+   * @param ruolo Istanza del ruolo.
+   * @param isInAttesa Verifica se l'utente è in attesa di entrare in stanza.
+   * @param isBannato Verifica se all'utente è vietato l'accesso.
+   * @param nomeInStanza Nome dell'utente nella stanza.
+   * @param isSilenziato Verifica se l'utente è silenziato.
+   * @throws TransactionSystemException Eccezione se la transazione non è stata effettuata.
    */
   public StatoPartecipazione(
       Stanza stanza,

@@ -9,11 +9,11 @@ import com.commigo.metaclass.exceptions.RuntimeException403;
 import com.commigo.metaclass.exceptions.ServerRuntimeException;
 import com.commigo.metaclass.utility.response.types.AccessResponse;
 import com.commigo.metaclass.utility.response.types.Response;
-import org.springframework.http.ResponseEntity;
-
 import java.util.List;
 import java.util.Map;
+import org.springframework.http.ResponseEntity;
 
+/** Interfaccia che offre servizi legati alle stanze. */
 public interface GestioneStanzaService {
 
   ResponseEntity<AccessResponse<Long>> accessoStanza(String codiceStanza, String idUtente)
@@ -60,13 +60,13 @@ public interface GestioneStanzaService {
 
   ResponseEntity<Response<Boolean>> kickPartecipante(String metaId, Long idStanza, Long idUtente);
 
-  Ruolo getRuoloByUserAndStanzaID(String metaId, Long idStanza)
+  Ruolo getRuoloByUserAndStanzaId(String metaId, Long idStanza)
       throws ServerRuntimeException, RuntimeException403;
 
   ResponseEntity<Response<Boolean>> gestioneAccesso(
       String metaId, Long idUtente, Long idStanza, boolean scelta);
 
-  ResponseEntity<Response<Boolean>> SilenziaPartecipante(
+  ResponseEntity<Response<Boolean>> silenziaPartecipante(
       String metaId, Long idStanza, Long idUtente);
 
   ResponseEntity<Response<Boolean>> unmutePartecipante(String metaId, Long idStanza, Long idUtente);

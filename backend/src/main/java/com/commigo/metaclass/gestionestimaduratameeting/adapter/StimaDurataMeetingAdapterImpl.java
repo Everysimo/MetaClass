@@ -20,19 +20,12 @@ import org.springframework.stereotype.Service;
 public class StimaDurataMeetingAdapterImpl implements StimaDurataMeetingAdapter {
 
   /**
-   * questo metodo serve per aggiungere le informazioni di un utente nel dataset
+   * Metodo che permette di aggiungere le informazioni di un utente nel dataset.
    *
-   * @param u utente di cui si vogliono aggiungere le informazioni all'interno del dataset
-   * @param durata
-   */
-
-  /**
-   * metodo che permette di aggiungere le informazioni di un utente nel dataset
-   *
-   * @param u utente di cui si vogliono aggiungere le informazioni all'interno del dataset
-   * @param durata
-   * @param immersionLevel
-   * @throws ServerRuntimeException
+   * @param u utente di cui si vogliono aggiungere le informazioni all'interno del dataset.
+   * @param durata Durata dell'utente nel meeting.
+   * @param immersionLevel Livello di quanto è stato immerso l'utente nel meeting.
+   * @throws ServerRuntimeException Eccezione generata per errori del server.
    */
   @Override
   public void addUtenteInDataset(Utente u, Duration durata, int immersionLevel)
@@ -65,9 +58,11 @@ public class StimaDurataMeetingAdapterImpl implements StimaDurataMeetingAdapter 
   }
 
   /**
-   * @param filePath
-   * @return
-   * @throws ServerRuntimeException
+   * Metodo per prelevare l'ultima stringa del file 'data.cvs'.
+   *
+   * @param filePath path del file.
+   * @return Ultimo record del file.
+   * @throws ServerRuntimeException Eccezione generata per errori del server.
    */
   private static String prelevaUltimoUserId(String filePath) throws ServerRuntimeException {
     try (FileReader fileReader = new FileReader(filePath);
