@@ -17,7 +17,7 @@ export const checkRole = async (id_stanza) => {
         console.log('Response data:', response.data); // Log the received data
 
         if (response.status === 200) {
-            const role = response.data.value.ruolo.nome; // Assuming the role is in 'value' field
+            const role = response.data.value.nome; // Assuming the role is in 'value' field
             if (role) {
                 return role;
             } else {
@@ -34,7 +34,5 @@ export const checkRole = async (id_stanza) => {
 
 export const checkOrg = async (id_stanza) => {
     const fetchedRole = await checkRole(id_stanza);
-    console.log(fetchedRole);
-    console.log(fetchedRole === "Organizzatore_Master");
-    return fetchedRole === "Organizzatore_Master";
+    return fetchedRole === "Organizzatore_Master" || fetchedRole === "Organizzatore";
 }
