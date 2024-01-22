@@ -86,7 +86,8 @@ const EditUserDetails = ({ userDetails, setUserDetails }) => {
 
     const handleCloseModal = () => {
         setShowModal(false);
-        setFormReset(true); // Set form reset to true when modal is closed
+        setFormReset(true);// Set form reset to true when modal is closed
+
     };
 
     useEffect(() => {

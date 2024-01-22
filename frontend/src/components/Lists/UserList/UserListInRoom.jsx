@@ -192,13 +192,13 @@ const UserListInRoom = () => {
     const handlePromotionButton = (idutente) => {
         console.log(idutente);
         setSelectedUserId(idutente);
-        handlePromotion();
+        handlePromotion(idutente);
     };
 
-    const handlePromotion = async () => {
-        console.log('Before fetch call:', id_stanza, selectedUserId);
+    const handlePromotion = async (idutente) => {
+        console.log('Before fetch call:', id_stanza, idutente);
 
-        if (!id_stanza || !selectedUserId) {
+        if (!id_stanza || !idutente) {
             console.error('Invalid id_stanza or selectedUserId');
             return;
         }
@@ -214,13 +214,22 @@ const UserListInRoom = () => {
         try {
             console.log('About to make fetch call');
             const response = await fetch(
-                `http://localhost:8080/promuoviOrganizzatore/${idStanza}/${selectedUserId}`,
+                `http://localhost:8080/promuoviOrganizzatore/${idStanza}/${idutente}`,
                 requestOption
             );
             console.log('Fetch call completed');
             console.log(response);
             if (!response.ok) {
                 throw new Error('Error in promoting the user');
+            }
+
+            if(response.ok){
+                const data = await response.json();
+                console.log('data:', data);
+
+                setMessage(data.message)
+
+                setShowSuccessPopup(true);
             }
 
             const data = await response.json();
@@ -233,9 +242,9 @@ const UserListInRoom = () => {
     const handleBanUserButton = (idutente) => {
         console.log("idutente", idutente);
         setSelectedUserId(idutente);
-        handleBanUser();
+        handleBanUser(idutente);
     }
-    const handleBanUser = async () => {
+    const handleBanUser = async (idutente) => {
         const requestOption = {
             method: 'POST',
             headers: {
@@ -245,14 +254,24 @@ const UserListInRoom = () => {
         };
         try {
             const response = await fetch(
-                `http://localhost:8080/banUtente/${idStanza}/${selectedUserId}`,
+                `http://localhost:8080/banUtente/${idStanza}/${idutente}`,
                 requestOption
             );
             if (!response.ok) {
+                console.log(response)
                 throw new Error('Errore nella richiesta di Bannare il partecipante');
             }
-            const data = await response.json();
-            console.log('data:', data);
+
+
+            if(response.ok){
+                const data = await response.json();
+                console.log('data:', data);
+
+                setMessage(data.message)
+
+                setShowSuccessPopup(true);
+            }
+
         } catch (error) {
             console.error('Errore durante il ban dell\'utente:', error);
         }
@@ -261,13 +280,13 @@ const UserListInRoom = () => {
     const handleDeclassifyButton = (idutente) => {
         console.log(idutente);
         setSelectedUserId(idutente);
-        handleDeclassify();
+        handleDeclassify(idutente);
     };
 
-    const handleDeclassify = async () => {
-        console.log('Before fetch call:', id_stanza, selectedUserId);
+    const handleDeclassify = async (idutente) => {
+        console.log('Before fetch call:', id_stanza, idutente);
 
-        if (!id_stanza || !selectedUserId) {
+        if (!id_stanza || !idutente) {
             console.error('Invalid id_stanza or selectedUserId');
             return;
         }
@@ -283,13 +302,22 @@ const UserListInRoom = () => {
         try {
             console.log('fetch call effettuata ');
             const response = await fetch(
-                `http://localhost:8080/declassaOrganizzatore/${idStanza}/${selectedUserId}`,
+                `http://localhost:8080/declassaOrganizzatore/${idStanza}/${idutente}`,
                 requestOption
             );
             console.log('Fetch call completed');
             console.log(response);
             if (!response.ok) {
                 throw new Error('Errore nella richiesta di declassare');
+            }
+
+            if(response.ok){
+                const data = await response.json();
+                console.log('data:', data);
+
+                setMessage(data.message)
+
+                setShowSuccessPopup(true);
             }
 
             const data = await response.json();
@@ -326,7 +354,6 @@ const UserListInRoom = () => {
             {userList && userList.map((user) => (
                 <div key={user.id} className="user-card">
                     <span>Nome: {`${user.nome} ${user.cognome}`}</span>
-                    <span>Nome In Stanza: {''}</span>
                     <span>Email: {`${user.email}`}</span>
                     {checkOrg(id_stanza) &&
                         <>
