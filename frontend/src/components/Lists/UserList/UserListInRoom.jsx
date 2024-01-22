@@ -2,27 +2,27 @@ import { useParams } from "react-router-dom";
 import React, { useEffect, useState } from "react";
 import './UserList.css';
 import '../../Forms/PopUpStyles.css';
-import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faAlignCenter} from "@fortawesome/free-solid-svg-icons";
-import {checkRole} from "../../../functions/checkRole";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faAlignCenter } from "@fortawesome/free-solid-svg-icons";
+import { checkRole } from "../../../functions/checkRole";
 
 const UserListInRoom = () => {
     const [userList, setUserList] = useState([]);
-    const [isPopupOpen, setPopupOpen] = useState(false);
-    const [newName, setNewName] = useState("");
-    const [selectedUserId, setSelectedUserId] = useState(null);
     const [showButtonsMap, setShowButtonsMap] = useState({});
-    const [showChangeNameModal, setChangeNameModal] = useState(false)
+    const [showChangeNameModal, setChangeNameModal] = useState(false);
     const [errore, setErrore] = useState(null);
     const [showSuccessPopup, setShowSuccessPopup] = useState(false);
     const [message, setMessage] = useState('');
+    const [newName, setNewName] = useState("");
+    const [selectedUserId, setSelectedUserId] = useState(null);
 
     const { id: id_stanza } = useParams();
     const idStanza = id_stanza;
 
-    useEffect(() => { fetchUserList(); }, []);
+    useEffect(() => {
+        fetchUserList();
+    }, []);
 
-    // Function to toggle button visibility for a specific user card
     const toggleButtons = (userId) => {
         setShowButtonsMap(prevState => ({
             ...prevState,
@@ -44,42 +44,42 @@ const UserListInRoom = () => {
                 `http://localhost:8080/visualizzaUtentiInStanza/${idStanza}`,
                 requestOption
             );
+
             if (!response.ok) {
                 throw new Error('Errore nella richiesta');
             }
-            const data = await response.json();
-            console.log("utenti in stanza", data.value)
 
+            const data = await response.json();
             setUserList(data.value);
+
+            const rolesPromises = data.value.map(user => checkOrg(id_stanza, user.id));
+            const roles = await Promise.all(rolesPromises);
+
+            setUserList(prevUserList => prevUserList.map((user, index) => ({
+                ...user,
+                role: roles[index],
+            })));
+
         } catch (error) {
             console.error('Errore durante il recupero della lista di utenti:', error);
         }
     }
 
     const handleChangeNameButton = (idutente) => {
-        console.log("idutente", idutente);
         setSelectedUserId(idutente);
         setChangeNameModal(true);
     }
 
-
-    //da aggiustare il fatto del popup
     const handleChangeName = async () => {
-
         if (newName === '') {
-            // Stringa vuota, genero un errore
             setErrore('Il nome non può essere vuoto.');
             return;
         }
 
         const capitalizedNewName = newName.charAt(0).toUpperCase() + newName.slice(1);
-        // Pulisco l'errore se la stringa è valida
         setErrore(null);
 
-        console.log("newname", newName)
-
-        const nome =  capitalizedNewName;
-
+        const nome = capitalizedNewName;
 
         const requestOption = {
             method: 'POST',
@@ -90,7 +90,6 @@ const UserListInRoom = () => {
             body: JSON.stringify({ nome })
         };
         try {
-            console.log("stringa json:", nome )
             const response = await fetch(
                 `http://localhost:8080/modificaNomePartecipante/${id_stanza}/${selectedUserId}`,
                 requestOption
@@ -101,12 +100,8 @@ const UserListInRoom = () => {
 
             if (response.ok) {
                 const data = await response.json();
-                console.log('data:', data);
-                console.log('Nome inviata con successo!');
-                // Chiudi il modal
                 handleCloseChangeNamePopUp();
                 setMessage(data.message)
-                // Mostra il pop-up di successo
                 setShowSuccessPopup(true);
 
             } else {
@@ -119,9 +114,9 @@ const UserListInRoom = () => {
     }
 
     const handleKickUserButton = (idutente) => {
-        console.log("idutente", idutente);
         handleKickUser(idutente);
     }
+
     const handleKickUser = async (idutente) => {
         const requestOption = {
             method: 'POST',
@@ -131,7 +126,6 @@ const UserListInRoom = () => {
             },
         };
         try {
-            console.log("idutentemanuale", idutente)
             const response = await fetch(
                 `http://localhost:8080/kickarePartecipante/${id_stanza}/${idutente}`,
                 requestOption
@@ -142,10 +136,7 @@ const UserListInRoom = () => {
 
             if(response.ok){
                 const data = await response.json();
-                console.log('data:', data);
-
                 setMessage(data.message)
-
                 setShowSuccessPopup(true);
             }
 
@@ -155,9 +146,9 @@ const UserListInRoom = () => {
     }
 
     const handleSilenziaUserButton = (idutente) => {
-        console.log("idutente", idutente);
         handleSilenziaUser(idutente);
     }
+
     const handleSilenziaUser = async (idutente) => {
         const requestOption = {
             method: 'POST',
@@ -177,10 +168,7 @@ const UserListInRoom = () => {
 
             if(response.ok){
                 const data = await response.json();
-                console.log('data:', data);
-
                 setMessage(data.message)
-
                 setShowSuccessPopup(true);
             }
 
@@ -190,14 +178,11 @@ const UserListInRoom = () => {
     }
 
     const handlePromotionButton = (idutente) => {
-        console.log(idutente);
         setSelectedUserId(idutente);
         handlePromotion();
     };
 
     const handlePromotion = async () => {
-        console.log('Before fetch call:', id_stanza, selectedUserId);
-
         if (!id_stanza || !selectedUserId) {
             console.error('Invalid id_stanza or selectedUserId');
             return;
@@ -212,13 +197,10 @@ const UserListInRoom = () => {
         };
 
         try {
-            console.log('About to make fetch call');
             const response = await fetch(
                 `http://localhost:8080/promuoviOrganizzatore/${idStanza}/${selectedUserId}`,
                 requestOption
             );
-            console.log('Fetch call completed');
-            console.log(response);
             if (!response.ok) {
                 throw new Error('Error in promoting the user');
             }
@@ -231,10 +213,10 @@ const UserListInRoom = () => {
     };
 
     const handleBanUserButton = (idutente) => {
-        console.log("idutente", idutente);
         setSelectedUserId(idutente);
         handleBanUser();
     }
+
     const handleBanUser = async () => {
         const requestOption = {
             method: 'POST',
@@ -259,14 +241,11 @@ const UserListInRoom = () => {
     }
 
     const handleDeclassifyButton = (idutente) => {
-        console.log(idutente);
         setSelectedUserId(idutente);
         handleDeclassify();
     };
 
     const handleDeclassify = async () => {
-        console.log('Before fetch call:', id_stanza, selectedUserId);
-
         if (!id_stanza || !selectedUserId) {
             console.error('Invalid id_stanza or selectedUserId');
             return;
@@ -281,13 +260,10 @@ const UserListInRoom = () => {
         };
 
         try {
-            console.log('fetch call effettuata ');
             const response = await fetch(
                 `http://localhost:8080/declassaOrganizzatore/${idStanza}/${selectedUserId}`,
                 requestOption
             );
-            console.log('Fetch call completed');
-            console.log(response);
             if (!response.ok) {
                 throw new Error('Errore nella richiesta di declassare');
             }
@@ -305,19 +281,19 @@ const UserListInRoom = () => {
 
     const handleCloseSuccesPopUp = ()=> {
         setTimeout(() => {
-            // Simuliamo il reindirizzamento dopo 2 secondi
             setShowSuccessPopup(false);
-            // Aggiungi le azioni specifiche per il reindirizzamento
             window.location.replace(window.location.pathname);
         }, 1000);
     };
 
-    const checkOrg = async (id_stanza) => {
-        const fetchedRole = await checkRole(id_stanza);
-        if(fetchedRole === "Organizzatore" || fetchedRole === "Organizzatore_Master")
-            return true;
-        else
+    const checkOrg = async (id_stanza, userId) => {
+        try {
+            const fetchedRole = await checkRole(id_stanza, userId);
+            return fetchedRole === "Organizzatore" || fetchedRole === "Organizzatore_Master";
+        } catch (error) {
+            console.error(error);
             return false;
+        }
     }
 
     return (
@@ -328,10 +304,10 @@ const UserListInRoom = () => {
                     <span>Nome: {`${user.nome} ${user.cognome}`}</span>
                     <span>Nome In Stanza: {''}</span>
                     <span>Email: {`${user.email}`}</span>
-                    {checkOrg(id_stanza) &&
+                    {user.role &&
                         <>
                             <button onClick={() => toggleButtons(user.id)}>
-                                Options <FontAwesomeIcon icon={faAlignCenter} style={{color: "#ffffff",}} />
+                                Options <FontAwesomeIcon icon={faAlignCenter} style={{ color: "#ffffff", }} />
                             </button>
                             <div className={`options-container${showButtonsMap[user.id] ? ' open' : ''}`}>
                                 <button onClick={() => handleChangeNameButton(user.id)}>Cambia Nome</button>
@@ -339,14 +315,14 @@ const UserListInRoom = () => {
                                 <button onClick={() => handleSilenziaUserButton(user.id)}>Silenzia Partecipante</button>
                                 <button onClick={() => handlePromotionButton(user.id)}>Promuovi</button>
                                 <button onClick={() => handleBanUserButton(user.id)}>Banna Partecipante</button>
-                                <button onClick={() => handleDeclassifyButton(user.id)}>Declassa</button> {/*Non Funziona*/}
+                                <button onClick={() => handleDeclassifyButton(user.id)}>Declassa</button>
                             </div>
                         </>
                     }
                 </div>
             ))}
             {showChangeNameModal && (
-                <div className="modal" style={{zIndex: "9"}}>
+                <div className="modal" style={{ zIndex: "9" }}>
                     <div className="modal-content">
                         <span
                             className={"close"}
@@ -366,7 +342,7 @@ const UserListInRoom = () => {
                 </div>
             )}
             {showSuccessPopup && (
-                <div className={"modal"} style={{zIndex: "9"}}>
+                <div className={"modal"} style={{ zIndex: "9" }}>
                     <div className={"modal-content"}>
                         <span
                             className={"close"}
