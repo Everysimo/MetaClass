@@ -391,6 +391,16 @@ public class DataInitializer implements CommandLineRunner {
                 false,
                 sc1,
                 s4));
+    Meeting m3 =
+            meetingRepository.save(
+                    new Meeting(
+                            3L,
+                            "MeetingStanza5",
+                            LocalDateTime.parse("2024-02-03 18:00", formatter),
+                            LocalDateTime.parse("2024-02-03 20:00", formatter),
+                            false,
+                            sc1,
+                            s5));
 
     // Aggiunta Utente in meeting
     utenteInMeetingRepository.save(new UtenteInMeeting(u5, m1, true));

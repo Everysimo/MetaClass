@@ -13,6 +13,7 @@ import MeetingList from "../components/Calendar/CalendarViewer";
 import RequestSection from "../components/Forms/AccessRequest/RequestSection";
 import SelectScenario from "../components/Forms/SelectNewScenario/SelectScenario";
 import BannedUserList from "../components/Lists/UserList/BannedUserList";
+import MeetingListRoom from "../components/Lists/MeetingList/MeetinginRoon";
 
 export const SingleRoom = () => {
     const navigate = useNavigate();
@@ -139,6 +140,7 @@ export const SingleRoom = () => {
                 <aside className="side-nav">
                     <div className={"childDiv"}>
                     <UserListInRoom />
+                        <MeetingListRoom/>
                     </div>
                 </aside>
             </main>
