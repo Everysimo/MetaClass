@@ -135,7 +135,10 @@ public class GestioneUtenzaServiceImpl implements GestioneUtenzaService {
         throw new ServerRuntimeException("Errore nella ricerca delle stanze");
       } else {
         // Estrai gli attributi 'stanza' dalla lista 'stati' e messi in una nuova lista
-        return stati.stream().map(StatoPartecipazione::getStanza).collect(Collectors.toList());
+        return stati.stream()
+            .filter(stato -> !stato.isBannato() && !stato.isInAttesa())
+            .map(StatoPartecipazione::getStanza)
+            .collect(Collectors.toList());
       }
     }
   }
