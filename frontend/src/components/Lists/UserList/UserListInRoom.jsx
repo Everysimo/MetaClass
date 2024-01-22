@@ -4,7 +4,7 @@ import './UserList.css';
 import '../../Forms/PopUpStyles.css';
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faAlignCenter} from "@fortawesome/free-solid-svg-icons";
-import {checkOrg} from "./checkRoleInRoom";
+import {checkRole} from "../../../functions/checkRole";
 
 const UserListInRoom = () => {
     const [userList, setUserList] = useState([]);
@@ -18,7 +18,7 @@ const UserListInRoom = () => {
     const [message, setMessage] = useState('');
 
     const { id: id_stanza } = useParams();
-    const role = checkOrg(id_stanza);
+    const idStanza = id_stanza;
 
     useEffect(() => { fetchUserList(); }, []);
 
@@ -41,7 +41,7 @@ const UserListInRoom = () => {
     const fetchUserList = async () => {
         try {
             const response = await fetch(
-                `http://localhost:8080/visualizzaUtentiInStanza/${id_stanza}`,
+                `http://localhost:8080/visualizzaUtentiInStanza/${idStanza}`,
                 requestOption
             );
             if (!response.ok) {
@@ -165,7 +165,7 @@ const UserListInRoom = () => {
         };
         try {
             const response = await fetch(
-                `http://localhost:8080/silenziarePartecipante/${id_stanza}/${idutente}`,
+                `http://localhost:8080/silenziarePartecipante/${idStanza}/${idutente}`,
                 requestOption
             );
             if (!response.ok) {
@@ -211,7 +211,7 @@ const UserListInRoom = () => {
         try {
             console.log('About to make fetch call');
             const response = await fetch(
-                `http://localhost:8080/promuoviOrganizzatore/${id_stanza}/${selectedUserId}`,
+                `http://localhost:8080/promuoviOrganizzatore/${idStanza}/${selectedUserId}`,
                 requestOption
             );
             console.log('Fetch call completed');
@@ -242,7 +242,7 @@ const UserListInRoom = () => {
         };
         try {
             const response = await fetch(
-                `http://localhost:8080/banUtente/${id_stanza}/${selectedUserId}`,
+                `http://localhost:8080/banUtente/${idStanza}/${selectedUserId}`,
                 requestOption
             );
             if (!response.ok) {
@@ -280,7 +280,7 @@ const UserListInRoom = () => {
         try {
             console.log('fetch call effettuata ');
             const response = await fetch(
-                `http://localhost:8080/declassaOrganizzatore/${id_stanza}/${selectedUserId}`,
+                `http://localhost:8080/declassaOrganizzatore/${idStanza}/${selectedUserId}`,
                 requestOption
             );
             console.log('Fetch call completed');
@@ -309,6 +309,13 @@ const UserListInRoom = () => {
         }, 1000);
     };
 
+    const checkOrg = async (id_stanza) => {
+        const fetchedRole = await checkRole(id_stanza);
+        if(fetchedRole === "Organizzatore" || fetchedRole === "Organizzatore_Master")
+            return true;
+        else
+            return false;
+    }
 
     return (
         <div>

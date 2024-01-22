@@ -1,75 +1,104 @@
-import React, { Component } from 'react';
-import {Link} from "react-router-dom";
+import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
+import { checkOrg } from '../../../functions/checkRole';
+import { faCrown } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-class RoomList extends Component {
+const RoomList = () => {
+    const [array, setArray] = useState([]);
+    const [orgStatus, setOrgStatus] = useState({});
 
-    constructor(props) {
-        super(props);
-        this.state = {
-            array: [],
+    useEffect(() => {
+        const fetchElencoStanze = async () => {
+            const requestOption = {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: 'Bearer ' + sessionStorage.getItem('token'),
+                },
+            };
+
+            try {
+                const response = await fetch(
+                    'http://localhost:8080/visualizzaStanze',
+                    requestOption
+                );
+
+                if (!response.ok) {
+                    throw new Error('Errore nel recupero degli scenari.');
+                }
+
+                const data = await response.json();
+                console.log("eccoli i dati delle stanze:", data);
+
+                setArray(data.value);
+                console.log("nell'array:", array);
+
+                const orgStatusData = {};
+                data.value.forEach((param) => {
+                    const idStanza = param.id;
+                    orgStatusData[idStanza] = false; // Default value, you might want to set it to true or false based on your logic
+                });
+
+                setOrgStatus(orgStatusData);
+            } catch (error) {
+                console.error(
+                    'Errore durante il recupero degli scenari:',
+                    error.message
+                );
+            }
         };
-    }
 
-    componentDidMount() {
-        this.fetchElencoStanze();
+        fetchElencoStanze();
+    }, []); // Empty dependency array means this effect runs once after the first render
 
-    }
+    useEffect(() => {
+        const fetchOrgStatus = async () => {
+            const orgStatusData = {};
 
-    fetchElencoStanze = async () => {
-
-        const requestOption = {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-                Authorization: 'Bearer ' + sessionStorage.getItem('token'),
-            },
-        };
-
-        try {
-            const response = await fetch(
-                'http://localhost:8080/visualizzaStanze',
-                requestOption
-            );
-
-            if (!response.ok) {
-                throw new Error('Errore nel recupero degli scenari.');
+            for (const room of array) {
+                try {
+                    const role = await checkOrg(room.id);
+                    orgStatusData[room.id] = role === true;
+                } catch (error) {
+                    console.error(error);
+                    orgStatusData[room.id] = false; // or handle error based on your logic
+                }
             }
 
-            const data = await response.json();
-            console.log("eccoli i dati delle stanze:", data);
+            setOrgStatus(orgStatusData);
+        };
 
-            this.setState({ array: data.value });
-            console.log("nell'array:", this.state.array);
+        fetchOrgStatus();
+    }, [array]); // Only run when the array state is updated
 
-            this.state.array.forEach((param, indice) => {
-                const nome = param.nome;
-                console.log(`nome ${indice + 1}: ${nome}`);
-            });
-        } catch (error) {
-            console.error('Errore durante il recupero degli scenari:', error.message);
-        }
-    };
-
-    render() {
-        return (
-            <>
-                {this.state.array.map((room, index) => (
-                    <div key={index} className={"user-card"}>
-                        <h4>Stanza: {room.nome}</h4>
-                        {/* inserisci gli altri dati di cui hai bisogno */}
-                        <button>
-                            <Link
-                                to={`/SingleRoom/${room.id}`}
-                                style={{textDecoration: 'none', color: 'inherit'}}
-                            >
-                                Vai alla pagina della stanza
-                            </Link>
-                        </button>
-                    </div>
-                ))}
-            </>
-        );
-    }
-}
+    return (
+        <>
+            {array.map((room, index) => (
+                <div key={index} className={'user-card'}>
+                    <h4>
+                        Stanza: {room.nome}{' '}
+                        {orgStatus[room.id] && (
+                            <FontAwesomeIcon
+                                icon={faCrown}
+                                size="2xl"
+                                style={{ color: '#FFD43B' }}
+                            />
+                        )}
+                    </h4>
+                    {/* inserisci gli altri dati di cui hai bisogno */}
+                    <button>
+                        <Link
+                            to={`/SingleRoom/${room.id}`}
+                            style={{ textDecoration: 'none', color: 'inherit' }}
+                        >
+                            Vai alla pagina della stanza
+                        </Link>
+                    </button>
+                </div>
+            ))}
+        </>
+    );
+};
 
 export default RoomList;

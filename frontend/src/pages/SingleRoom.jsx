@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { MyHeader } from "../components/Layout/Header/Header";
 import { MyFooter } from "../components/Layout/Footer/Footer";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import CalendarComp from "../components/Forms/ScheduleMeetingForm/CalendarComp";
 import { checkRole } from "../functions/checkRole";
 import UserListInRoom from "../components/Lists/UserList/UserListInRoom";
@@ -12,7 +12,10 @@ import MeetingList from "../components/Calendar/CalendarViewer";
 import RequestSection from "../components/Forms/AccessRequest/RequestSection";
 import SelectScenario from "../components/Forms/SelectNewScenario/SelectScenario";
 import BannedUserList from "../components/Lists/UserList/BannedUserList";
+import MeetingListRoom from "../components/Lists/MeetingList/MeetinginRoon";
+
 export const SingleRoom = () => {
+    const navigate = useNavigate();
     const { id: id_stanza } = useParams();
     const [role, setRole] = useState("Partecipante"); // Default role value
     const [stanzaSingola, setStanzaSingola] = useState("");
@@ -33,8 +36,7 @@ export const SingleRoom = () => {
     };
     const fetchSingleRoom = async() => {
         try {
-            const idStanza = id_stanza;
-            const response = await fetch(`http://localhost:8080/visualizzaStanza/${idStanza}`, requestOption);
+            const response = await fetch(`http://localhost:8080/visualizzaStanza/${id_stanza}`, requestOption);
 
             if (!response.ok) {
                 throw new Error('Errore nel recupero degli scenari.');
@@ -84,6 +86,14 @@ export const SingleRoom = () => {
             const mainHeight = window.getComputedStyle(mainSection).height;
             sideNav.style.maxHeight = mainHeight;
         }
+    };
+
+    const handleGoToChangeScenario = () => {
+        navigate(`/changescenario/${id_stanza}`);
+    };
+
+    const handleGoToBannedUserList = () => {
+        navigate(`/bannedUserList/${id_stanza}`);
     };
 
     const isOrg = () => {
