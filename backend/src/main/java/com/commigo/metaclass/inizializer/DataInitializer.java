@@ -369,6 +369,15 @@ public class DataInitializer implements CommandLineRunner {
             false,
             "Domenico",
             false));
+    statoPartecipazioneRepository.save(
+            new StatoPartecipazione(
+                    s5,
+                    u5,
+                    ruoloRepository.findByNome(Ruolo.PARTECIPANTE),
+                    false,
+                    false,
+                    "Carmine",
+                    false));
 
     // Aggiunta meeting
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
