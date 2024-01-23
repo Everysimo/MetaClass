@@ -180,11 +180,24 @@ public class MapValidator {
       throw new ClientRuntimeException(
           "Errore nella richiesta: inizio deve essere minore di fine o viceversa");
     }
+    if (isBeforeOfNow(dates.get(0))) {
+      throw new ClientRuntimeException(
+          "Errore nella richiesta: inizio è precedente alla data odierna");
+    }
+    if (isBeforeOfNow(dates.get(1))) {
+      throw new ClientRuntimeException(
+          "Errore nella richiesta: fine è precedente alla data odierna");
+    }
     return true;
   }
 
   private static boolean isStartDateBeforeEndDate(List<LocalDateTime> dates) {
     // La validazione sarà passata solo se la data di inizio è precedente a quella di fine
     return dates.get(0) == null || dates.get(1) == null || !dates.get(0).isBefore(dates.get(1));
+  }
+
+  private static boolean isBeforeOfNow(LocalDateTime data) {
+    // La validazione sarà passata solo se la data di inizio è precedente a quella di fine
+    return data.isBefore(LocalDateTime.now());
   }
 }
