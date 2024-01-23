@@ -79,6 +79,7 @@ const Questionario = (props) => {
     };
 
     const handleSubmit = () => {
+        console.log("----", state.immersion, state.motion)
         if (state.immersion === '' || state.motion === ''){
             setErrore('I campi non possono essere vuoti.');
             return;
