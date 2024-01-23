@@ -145,6 +145,7 @@ public class MapValidator {
 
           try {
             dates.add(LocalDateTime.parse((CharSequence) attributeValue, formatter));
+            System.out.println(dates.get(0));
           } catch (DateTimeParseException e) {
             throw new ClientRuntimeException(
                 "Errore nella richiesta: L'attributo '"
@@ -153,11 +154,6 @@ public class MapValidator {
           }
 
         } else {
-          // controllo l'ordine delle date
-          if (!isStartDateBeforeEndDate(dates)) {
-            throw new ClientRuntimeException(
-                "Errore nella richiesta: inizio deve essere minore di fine o viceversa");
-          }
           Set<ConstraintViolation<Meeting>> violations =
               validator.validateValue(Meeting.class, attributeName, attributeValue);
 
@@ -179,11 +175,16 @@ public class MapValidator {
                 + "' ha un valore che non rispetta il suo tipo di dato");
       }
     }
+    // controllo l'ordine delle date
+    if (isStartDateBeforeEndDate(dates)) {
+      throw new ClientRuntimeException(
+          "Errore nella richiesta: inizio deve essere minore di fine o viceversa");
+    }
     return true;
   }
 
   private static boolean isStartDateBeforeEndDate(List<LocalDateTime> dates) {
     // La validazione sarà passata solo se la data di inizio è precedente a quella di fine
-    return dates.get(0) == null || dates.get(1) == null || dates.get(0).isBefore(dates.get(1));
+    return dates.get(0) == null || dates.get(1) == null || !dates.get(0).isBefore(dates.get(1));
   }
 }
