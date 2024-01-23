@@ -16,14 +16,14 @@ public interface GestioneStanzaService {
   ResponseEntity<AccessResponse<Long>> accessoStanza(String codiceStanza, String idUtente)
       throws ServerRuntimeException, RuntimeException403;
 
-  ResponseEntity<Response<Boolean>> banPartecipante(Long idStanza, String metaId, Long idUtente)
-      throws ServerRuntimeException, RuntimeException403;
+  public ResponseEntity<Response<Boolean>> banPartecipante(StatoPartecipazione statoUser)
+      throws ServerRuntimeException;
 
   ResponseEntity<Response<Boolean>> banUtente(Long idStanza, String metaId, Long idUtente)
       throws ServerRuntimeException, RuntimeException403;
 
-  ResponseEntity<Response<Boolean>> banOrganizzatore(Long idStanza, String metaId, Long idUtente)
-      throws ServerRuntimeException, RuntimeException403;
+  public ResponseEntity<Response<Boolean>> banOrganizzatore(StatoPartecipazione statoUser)
+      throws ServerRuntimeException;
 
   boolean creaStanza(Stanza s, String metaId) throws Exception;
 
