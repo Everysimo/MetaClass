@@ -17,8 +17,7 @@ export const checkRole = async (id_stanza) => {
         console.log('Response data:', response.data); // Log the received data
 
         if (response.status === 200) {
-            const role = response.data.value; // Assuming the role is in 'value' field
-            console.log(role);
+            const role = response.data.value.nome; // Assuming the role is in 'value' field
             if (role) {
                 return role;
             } else {
@@ -32,3 +31,8 @@ export const checkRole = async (id_stanza) => {
         throw new Error('Failed to fetch user details');
     }
 };
+
+export const checkOrg = async (id_stanza) => {
+    const fetchedRole = await checkRole(id_stanza);
+    return fetchedRole === "Organizzatore_Master" || fetchedRole === "Organizzatore";
+}

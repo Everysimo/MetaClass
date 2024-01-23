@@ -2,19 +2,19 @@ package com.commigo.metaclass.gestionestanza.repository;
 
 import com.commigo.metaclass.entity.Stanza;
 import jakarta.transaction.Transactional;
+import java.util.Map;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.util.Map;
-
+/** Repository della stanza per gestire transazioni con i dati persistenti. */
 @Repository("StanzaRepository")
 public interface StanzaRepository extends JpaRepository<Stanza, Long> {
 
   /**
-   * metodo che permette la ricerca di una stanza in base al suo codice
+   * Metodo che permette la ricerca di una stanza in base al suo codice.
    *
    * @param codice codice su cui si base la ricerca
    * @return stanza con il codice inserito
@@ -22,7 +22,7 @@ public interface StanzaRepository extends JpaRepository<Stanza, Long> {
   Stanza findStanzaByCodice(String codice);
 
   /**
-   * metodo che permette la ricerca di una stanza in base ad un id
+   * Metodo che permette la ricerca di una stanza in base a un id.
    *
    * @param id id su cui si basa la ricerca
    * @return stanza con l'id inserito
@@ -30,7 +30,7 @@ public interface StanzaRepository extends JpaRepository<Stanza, Long> {
   Stanza findStanzaById(long id);
 
   /**
-   * meotodo che permette la ricerca dell'ultima stanza creata
+   * Metodo che permette la ricerca dell'ultima stanza creata.
    *
    * @return l'id dell'ultima stanza inserita
    */
@@ -41,7 +41,7 @@ public interface StanzaRepository extends JpaRepository<Stanza, Long> {
   // 1 se tutto ok
   // 0 se non è ok
   /**
-   * metodo che permette di modificare i dati di una stanza
+   * Metodo che permette di modificare i dati di una stanza.
    *
    * @param id id della stanza da modificare
    * @param attributes i nuovi dati della stanza

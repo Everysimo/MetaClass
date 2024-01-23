@@ -10,8 +10,8 @@ public class RequestUtils {
   /**
    * Ottieni il messaggio di errore.
    *
-   * @param result
-   * @return
+   * @param result insieme di errori rilevati
+   * @return stringa di errori
    */
   public static String errorsRequest(BindingResult result) {
     List<String> errors =

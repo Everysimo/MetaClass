@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
+/** Metodo che gestisce le richieste relative al modulo AI. */
 @RestController
 public class StimaDurataMeetingController {
 
@@ -21,16 +22,16 @@ public class StimaDurataMeetingController {
   @Autowired private GestioneStimaMeetingService gestioneStimaMeetingService;
 
   /**
-   * meotdo che permette di gestire la richiesta di visualizzazione della stima della durata di unn
-   * meeting
+   * Metodo che permette di gestire la richiesta di visualizzazione della stima della durata di unn
+   * meeting.
    *
-   * @param id_stanza id della stanza in cui deve essere schedulato il meeting
+   * @param idStanza id della stanza in cui deve essere schedulato il meeting
    * @param request richiesta HTTP fornita dal client
-   * @return
+   * @return ritorna la durata stimata del meeting
    */
-  @GetMapping(value = "/stimaMeeting/{id_stanza}")
+  @GetMapping(value = "/stimaMeeting/{idStanza}")
   public ResponseEntity<Response<Double>> visualizzaStimaDurataMeeting(
-      @PathVariable Long id_stanza, HttpServletRequest request) {
+      @PathVariable Long idStanza, HttpServletRequest request) {
 
     try {
 
@@ -39,7 +40,7 @@ public class StimaDurataMeetingController {
         throw new RuntimeException403("Token non valido");
       }
 
-      double durata = gestioneStimaMeetingService.getDurataMeeting(id_stanza);
+      double durata = gestioneStimaMeetingService.getDurataMeeting(idStanza);
       return ResponseEntity.ok(new Response<>(durata, "Stima effettuata con successo"));
 
     } catch (RuntimeException403 re) {

@@ -56,7 +56,7 @@ public class GestioneAmministrazioneController {
    * @param id Id della stanza di cui vogliamo visualizzare gli utenti bannati
    * @param request richiesta HTTP fornita dal client
    */
-  @PostMapping(value = "/visualizzaUtentiBannatiInStanza/{Id}")
+  @PostMapping(value = "/visualizzaUtentiBannatiInStanza/{id}")
   public ResponseEntity<Response<List<Utente>>> visualizzaUtentiBannatiInStanza(
       @PathVariable Long id, HttpServletRequest request) {
     try {
@@ -323,7 +323,9 @@ public class GestioneAmministrazioneController {
       String metaId = jwtTokenUtil.getmetaIdFromToken(validationToken.getToken());
 
       // verifica dei permessi
-      if (!checkAdmin(metaId)) {throw new RuntimeException403("accesso non consentito");}
+      if (!checkAdmin(metaId)) {
+        throw new RuntimeException403("accesso non consentito");
+      }
 
       return stanzaControl.eliminaStanza(id, request);
     } catch (RuntimeException403 re) {

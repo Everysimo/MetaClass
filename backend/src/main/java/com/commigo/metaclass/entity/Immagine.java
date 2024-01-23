@@ -52,7 +52,7 @@ public class Immagine {
   /**
    * Costruttore.
    *
-   * @param urlString
+   * @param urlString Url dell'immagine.
    */
   public Immagine(String urlString) {
     String fileName = getFileNameFromUrl(urlString);

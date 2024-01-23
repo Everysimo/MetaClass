@@ -6,10 +6,10 @@ import com.commigo.metaclass.exceptions.DataNotFoundException;
 import com.commigo.metaclass.exceptions.RuntimeException403;
 import com.commigo.metaclass.exceptions.ServerRuntimeException;
 import com.commigo.metaclass.webconfig.ValidationToken;
-
 import java.util.List;
 import java.util.Map;
 
+/** Interfaccia con tutti i metodi che implementano la logica di business relativa all'utente. */
 public interface GestioneUtenzaService {
 
   boolean loginMeta(Utente u) throws ServerRuntimeException;
@@ -18,7 +18,7 @@ public interface GestioneUtenzaService {
 
   List<Stanza> getStanzeByUserId(String metaId) throws ServerRuntimeException;
 
-  Utente getUtenteByUserId(String sessionID) throws DataNotFoundException;
+  Utente getUtenteByUserId(String sessionId) throws DataNotFoundException;
 
   boolean logoutMeta(String metaId, ValidationToken validationToken) throws ServerRuntimeException;
 }

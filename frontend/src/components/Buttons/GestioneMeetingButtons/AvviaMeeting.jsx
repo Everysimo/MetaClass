@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import {faChalkboardUser, faPlay} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {wait} from "@testing-library/user-event/dist/utils";
+
 
 export default class AvviaMeeting extends Component {
     state = {
@@ -36,6 +36,8 @@ export default class AvviaMeeting extends Component {
             console.log("Risposta dal server:", responseData);
             if (responseData && responseData.value) {
                 console.log(responseData.message);
+                // Dopo aver terminato il meeting con successo, aggiorna la pagina
+                window.location.reload();
             }
         }
         catch (error) {

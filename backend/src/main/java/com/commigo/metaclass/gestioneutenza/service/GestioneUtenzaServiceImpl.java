@@ -3,11 +3,11 @@ package com.commigo.metaclass.gestioneutenza.service;
 import com.commigo.metaclass.entity.Stanza;
 import com.commigo.metaclass.entity.StatoPartecipazione;
 import com.commigo.metaclass.entity.Utente;
+import com.commigo.metaclass.exceptions.DataNotFoundException;
 import com.commigo.metaclass.exceptions.RuntimeException403;
 import com.commigo.metaclass.exceptions.ServerRuntimeException;
 import com.commigo.metaclass.gestionestanza.repository.StanzaRepository;
 import com.commigo.metaclass.gestionestanza.repository.StatoPartecipazioneRepository;
-import com.commigo.metaclass.exceptions.DataNotFoundException;
 import com.commigo.metaclass.gestioneutenza.repository.UtenteRepository;
 import com.commigo.metaclass.webconfig.JwtTokenUtil;
 import com.commigo.metaclass.webconfig.ValidationToken;
@@ -44,10 +44,10 @@ public class GestioneUtenzaServiceImpl implements GestioneUtenzaService {
   private final Set<String> adminmetaIds = loadAdminmetaIdsFromFile();
 
   /**
-   * metodo che carica il metaId di un utente admin all'interno del file che conteine tutti i metaId
-   * degli admin
+   * Metodo che carica il metaId di un utente admin all'interno del file che contiene tutti i metaId
+   * degli admin.
    *
-   * @return
+   * @return Insieme di metaID.
    */
   private Set<String> loadAdminmetaIdsFromFile() {
     Set<String> adminIds = new HashSet<>();
@@ -66,11 +66,11 @@ public class GestioneUtenzaServiceImpl implements GestioneUtenzaService {
   }
 
   /**
-   * metodo che consente ad un utente di effettuare il login/registrazione
+   * Metodo che consente a un utente di effettuare il login/registrazione.
    *
    * @param u Utente che esegue il login/registrazione
    * @return valore boolean che identifica l'esito dell'operazione
-   * @throws ServerRuntimeException
+   * @throws ServerRuntimeException Eccezione generata da un errore del server.
    */
   @Override
   public boolean loginMeta(Utente u) throws ServerRuntimeException {
@@ -84,7 +84,9 @@ public class GestioneUtenzaServiceImpl implements GestioneUtenzaService {
       if ((ut = utenteRepository.findFirstBymetaId(u.getMetaId())) != null) {
         ut.setTokenAuth(u.getTokenAuth());
         utenteRepository.save(ut);
-      } else utenteRepository.save(u);
+      } else {
+        utenteRepository.save(u);
+      }
 
       return true;
     } catch (DataIntegrityViolationException e) {
@@ -93,12 +95,12 @@ public class GestioneUtenzaServiceImpl implements GestioneUtenzaService {
   }
 
   /**
-   * metodo che consente la modifica dei dati personali di un determianto utente.
+   * Metodo che consente la modifica dei dati personali di un determianto utente.
    *
    * @param metaId metaId dell'utente che intende modificare i suoi dati
    * @param params nuovi dati dell'utente
    * @return valore boolean che identifica l'esito dell'operazione
-   * @throws RuntimeException403
+   * @throws RuntimeException403 Eccezione generata da un errore del client.
    */
   @Override
   public boolean modificaDatiUtente(String metaId, Map<String, Object> params)
@@ -116,11 +118,11 @@ public class GestioneUtenzaServiceImpl implements GestioneUtenzaService {
   }
 
   /**
-   * metodo che ritorna tutte le stanze di un utente.
+   * Metodo che ritorna tutte le stanze di un utente.
    *
    * @param metaId metaId dell'utente
    * @return lista di stanze di un determinato utente
-   * @throws ServerRuntimeException
+   * @throws ServerRuntimeException Eccezione generata da un errore del server.
    */
   @Override
   public List<Stanza> getStanzeByUserId(String metaId) throws ServerRuntimeException {
@@ -133,21 +135,25 @@ public class GestioneUtenzaServiceImpl implements GestioneUtenzaService {
         throw new ServerRuntimeException("Errore nella ricerca delle stanze");
       } else {
         // Estrai gli attributi 'stanza' dalla lista 'stati' e messi in una nuova lista
-        return stati.stream().map(StatoPartecipazione::getStanza).collect(Collectors.toList());
+        return stati.stream()
+            .filter(stato -> !stato.isBannato() && !stato.isInAttesa())
+            .map(StatoPartecipazione::getStanza)
+            .collect(Collectors.toList());
       }
     }
   }
 
   /**
-   * metodo che permette di visualizzare un utente in base al suo metaId
+   * Metodo che permette di visualizzare un utente in base al suo metaId.
    *
-   * @param sessionID metaId dell'utente che si desidera visualizzare
+   * @param sessionId metaId dell'utente che si desidera visualizzare
    * @return l'utente che si vuole visualizzare
-   * @throws DataNotFoundException
+   * @throws DataNotFoundException Eccezione generata quando dati nella stringa json non sono stati
+   *     trovati.
    */
   @Override
-  public Utente getUtenteByUserId(String sessionID) throws DataNotFoundException {
-    Utente existingUser = utenteRepository.findFirstBymetaId(sessionID);
+  public Utente getUtenteByUserId(String sessionId) throws DataNotFoundException {
+    Utente existingUser = utenteRepository.findFirstBymetaId(sessionId);
     if (existingUser == null) {
       throw new DataNotFoundException("Utente non presente nel database");
     } else {
@@ -156,19 +162,21 @@ public class GestioneUtenzaServiceImpl implements GestioneUtenzaService {
   }
 
   /**
-   * metodo che permette ad un utente loggato di effettuare il logout
+   * Metodo che permette a un utente loggato di effettuare il logout.
    *
    * @param metaId metaId dell'utente che desidera effettuare il logout
    * @param validationToken token assegnato all'utente in fase di login
    * @return valore boolean che identifica la riuscita dell'operazione
-   * @throws ServerRuntimeException
+   * @throws ServerRuntimeException Eccezione generata da un errore del server.
    */
   @Override
   public boolean logoutMeta(String metaId, ValidationToken validationToken)
       throws ServerRuntimeException {
 
     Utente u = utenteRepository.findFirstBymetaId(metaId);
-    if (u == null) return false;
+    if (u == null) {
+      return false;
+    }
 
     u.setTokenAuth(Utente.DEFAULT_TOKEN);
     try {

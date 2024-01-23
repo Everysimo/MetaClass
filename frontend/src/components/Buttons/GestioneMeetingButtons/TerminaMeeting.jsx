@@ -1,22 +1,17 @@
 import React, { Component } from 'react';
-import '../../Forms/CreaScenarioForm/creaScenario.css';
-import {faChalkboardUser, faPlay} from "@fortawesome/free-solid-svg-icons";
-import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {wait} from "@testing-library/user-event/dist/utils";
+import { faChalkboardUser, faPlay } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-export default class AvviaMeeting extends Component {
+export default class TerminaMeeting extends Component {
     state = {
-        id_meeting: this.props.id_meeting || "", // Imposta il valore iniziale con quello ricevuto come prop
+        id_meeting: this.props.id_meeting || "",
         isVisible: true,
         isErrorPopupVisible: false,
         errorMessage: "",
-
     };
 
     sendDataToServer = async () => {
-        const { id_meeting} = this.state;
-
-        // Validazione: Assicurati che idCategoria sia >= 0
+        const { id_meeting } = this.state;
 
         const dataToSend = {
             id_meeting,
@@ -31,30 +26,28 @@ export default class AvviaMeeting extends Component {
             body: JSON.stringify(dataToSend)
         };
 
-        try{
-            console.log("la stringa json:", JSON.stringify(dataToSend));
+        try {
             const response = await fetch(`http://localhost:8080/terminaMeeting/${id_meeting}`, requestOption);
             const responseData = await response.json();
-            console.log("Risposta dal server:", responseData);
+
             if (responseData && responseData.value) {
                 console.log(responseData.message);
+                // Dopo aver terminato il meeting con successo, aggiorna la pagina
+                window.location.reload();
             }
-        }
-        catch (error) {
+        } catch (error) {
             console.error('ERRORE:', error);
         }
     };
 
     callFunction = () => {
-        // Invia i dati al server utilizzando this.state.id_meeting
         this.sendDataToServer();
-        console.log("dati del form", this.state);
-
     };
+
     render() {
         return (
             <div className="button-container">
-                <button onClick={() => this.callFunction()}> Termina Meeting <FontAwesomeIcon icon={faPlay} size="xl" style={{color: "#ffffff",}}/> </button>
+                <button onClick={this.callFunction}> Termina Meeting <FontAwesomeIcon icon={faPlay} size="xl" style={{ color: "#ffffff" }} /> </button>
             </div>
         );
     };

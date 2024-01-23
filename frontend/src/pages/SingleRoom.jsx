@@ -1,24 +1,24 @@
 import React, { useEffect, useState } from "react";
 import { MyHeader } from "../components/Layout/Header/Header";
 import { MyFooter } from "../components/Layout/Footer/Footer";
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import CalendarComp from "../components/Forms/ScheduleMeetingForm/CalendarComp";
 import { checkRole } from "../functions/checkRole";
 import UserListInRoom from "../components/Lists/UserList/UserListInRoom";
 import { faChalkboardUser } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import AvviaMeeting from "../components/Buttons/GestioneMeetingButtons/AvviaMeeting";
 import MyModifyForm from "../components/Forms/ModifyRoomForm/MyModifyForm";
 import MeetingList from "../components/Calendar/CalendarViewer";
 import RequestSection from "../components/Forms/AccessRequest/RequestSection";
 import SelectScenario from "../components/Forms/SelectNewScenario/SelectScenario";
 import BannedUserList from "../components/Lists/UserList/BannedUserList";
+import MeetinginRoon from "../components/Lists/MeetingList/MeetinginRoon";
 
 export const SingleRoom = () => {
-    const navigate = useNavigate();
     const { id: id_stanza } = useParams();
     const [role, setRole] = useState("Partecipante"); // Default role value
     const [stanzaSingola, setStanzaSingola] = useState("");
+    const [isOrganizer, setIsOrganizer] = useState(false);
 
     sessionStorage.setItem("idStanza", id_stanza);
 
@@ -34,7 +34,8 @@ export const SingleRoom = () => {
             'Authorization': 'Bearer ' + sessionStorage.getItem("token")
         },
     };
-    const fetchSingleRoom = async() => {
+
+    const fetchSingleRoom = async () => {
         try {
             const response = await fetch(`http://localhost:8080/visualizzaStanza/${id_stanza}`, requestOption);
 
@@ -45,9 +46,7 @@ export const SingleRoom = () => {
             const data = await response.json();
 
             setStanzaSingola(data.value);
-            console.log("Stanza singola;", data.value)
-
-
+            console.log("Stanza singola;", data.value);
         } catch (error) {
             console.error('Errore durante il recupero degli scenari:', error.message);
         }
@@ -56,10 +55,10 @@ export const SingleRoom = () => {
     useEffect(() => {
         const fetchDataAndResize = async () => {
             try {
-                console.log("fetching");
                 const fetchedRole = await checkRole(id_stanza);
-                console.log(fetchedRole);
-                setRole(fetchedRole.nome);
+                setRole(fetchedRole);
+                // Set isOrganizer based on the fetched role
+                setIsOrganizer(fetchedRole === "Organizzatore" || fetchedRole === "Organizzatore_Master");
             } catch (error) {
                 console.error(error);
                 // Handle error fetching role, set role state accordingly if needed
@@ -76,7 +75,7 @@ export const SingleRoom = () => {
 
     useEffect(() => {
         resizeSideNav(); // Resize side nav when the role changes
-    }, [role]); // Run effect only when role changes
+    }, [role, isOrganizer]); // Run effect when role or isOrganizer changes
 
     const resizeSideNav = () => {
         const mainSection = document.querySelector(".roomSec");
@@ -88,16 +87,9 @@ export const SingleRoom = () => {
         }
     };
 
-    const handleGoToChangeScenario = () => {
-        navigate(`/changescenario/${id_stanza}`);
-    };
-
-    const handleGoToBannedUserList = () => {
-        navigate(`/bannedUserList/${id_stanza}`);
-    };
-
     const isOrg = () => {
-        return role === "Partecipante";
+        console.log("ktm", isOrganizer);
+        return isOrganizer;
     };
 
     return (
@@ -110,7 +102,7 @@ export const SingleRoom = () => {
                     <FontAwesomeIcon
                         icon={faChalkboardUser}
                         size="4x"
-                        style={{color: "#c70049"}}
+                        style={{ color: "#c70049" }}
                     />
                     <h1>Stanza {id_stanza}</h1>
                     <div style={{ border: '2px solid #ccc', borderRadius: '8px', padding: '10px', boxShadow: '0 0 10px rgba(0, 0, 0, 0.1)' }}>
@@ -121,24 +113,25 @@ export const SingleRoom = () => {
                     </div>
                     <h2>Meetings programmati</h2>
                     <div className={"masterDiv"}>
-                    <MeetingList/>
-                    {!isOrg() && (
-                        <>
-                            <div className={"childDiv"}>
-                                <h2>Funzioni organizzatore:</h2>
-                                <CalendarComp/>
-                                <MyModifyForm/>
-                                <SelectScenario Id_stanza = {id_stanza}/>
-                                <RequestSection id_stanza = {id_stanza} />
-                                <BannedUserList id_stanza={id_stanza} />
-                            </div>
-                        </>
-                    )}
+                        <MeetingList />
+                        {isOrg() && (
+                            <>
+                                <div className={"childDiv"}>
+                                    <h2>Funzioni organizzatore:</h2>
+                                    <CalendarComp />
+                                    <MyModifyForm />
+                                    <SelectScenario Id_stanza={id_stanza} />
+                                    <RequestSection id_stanza={id_stanza} />
+                                    <BannedUserList id_stanza={id_stanza} />
+                                </div>
+                            </>
+                        )}
                     </div>
                 </section>
                 <aside className="side-nav">
                     <div className={"childDiv"}>
-                    <UserListInRoom />
+                        <UserListInRoom />
+                        <MeetinginRoon />
                     </div>
                 </aside>
             </main>
