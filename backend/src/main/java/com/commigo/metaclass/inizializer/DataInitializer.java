@@ -54,17 +54,17 @@ public class DataInitializer implements CommandLineRunner {
   /**
    * Popola il database.
    *
-   * @param ruoloRepository
-   * @param categoriaRepository
-   * @param scenarioRepository
-   * @param stanzaRepository
-   * @param utenteRepository
-   * @param reportRepository
-   * @param feedbackMeetingRepository
-   * @param statoPartecipazioneRepository
-   * @param utenteInMeetingRepository
-   * @param meetingRepository
-   * @param immagineRepository
+   * @param ruoloRepository repository del ruolo.
+   * @param categoriaRepository repository della categoria.
+   * @param scenarioRepository repository dello scenario.
+   * @param stanzaRepository repository della stanza.
+   * @param utenteRepository repository dell'utente.
+   * @param reportRepository repository del report.
+   * @param feedbackMeetingRepository repository del feedback meeting.
+   * @param statoPartecipazioneRepository repository dello stato partecipazione.
+   * @param utenteInMeetingRepository repository di utente in meeting.
+   * @param meetingRepository repository del meeting.
+   * @param immagineRepository repository dell'immagine.
    */
   @Autowired
   public DataInitializer(
@@ -96,7 +96,7 @@ public class DataInitializer implements CommandLineRunner {
   public void run(String... args) throws Exception {
 
     // Aggiunta Utente - Michele è amministratore - Francesco utente semplice
-    Utente u1 =
+    final Utente u1 =
         utenteRepository.save(
             new Utente(
                 1L,
@@ -108,7 +108,7 @@ public class DataInitializer implements CommandLineRunner {
                 "7184488154978627",
                 Utente.DEFAULT_TOKEN,
                 true));
-    Utente u2 =
+    final Utente u2 =
         utenteRepository.save(
             new Utente(
                 2L,
@@ -120,7 +120,7 @@ public class DataInitializer implements CommandLineRunner {
                 "7179258205463811",
                 Utente.DEFAULT_TOKEN,
                 false));
-    Utente u3 =
+    final Utente u3 =
         utenteRepository.save(
             new Utente(
                 3L,
@@ -132,7 +132,7 @@ public class DataInitializer implements CommandLineRunner {
                 "7168367147841000",
                 Utente.DEFAULT_TOKEN,
                 false));
-    Utente u4 =
+    final Utente u4 =
         utenteRepository.save(
             new Utente(
                 4L,
@@ -144,7 +144,7 @@ public class DataInitializer implements CommandLineRunner {
                 "2564108403764347",
                 Utente.DEFAULT_TOKEN,
                 true));
-    Utente u5 =
+    final Utente u5 =
         utenteRepository.save(
             new Utente(
                 5L,
@@ -214,8 +214,8 @@ public class DataInitializer implements CommandLineRunner {
         stanzaRepository.save(
             new Stanza(4L, "StanzaCarmine1", "Stanza 1 per il Carmine", true, 50, sc3, "000004"));
     Stanza s5 =
-            stanzaRepository.save(
-                    new Stanza(5L, "StanzaDomenico1", "Stanza 1 per il domenico", true, 50, sc3, "000005"));
+        stanzaRepository.save(
+            new Stanza(5L, "StanzaDomenico1", "Stanza 1 per il domenico", true, 50, sc3, "000005"));
 
     // Aggiunta dello StatoPartecipazione
     // SE VIENE INSERITO UN ORGANIZZATORE_MASTER BANNATO ALLORA DA ERRORE
@@ -333,39 +333,42 @@ public class DataInitializer implements CommandLineRunner {
             "Domenico",
             false));
 
-
-
-
     statoPartecipazioneRepository.save(
-            new StatoPartecipazione(
-                    s5,
-                    u1,
-                    ruoloRepository.findByNome(Ruolo.ORGANIZZATORE),
-                    false,
-                    false,
-                    "Michele",
-                    false));
+        new StatoPartecipazione(
+            s5,
+            u1,
+            ruoloRepository.findByNome(Ruolo.ORGANIZZATORE),
+            false,
+            false,
+            "Michele",
+            false));
     statoPartecipazioneRepository.save(
-            new StatoPartecipazione(
-                    s5,
-                    u2,
-                    ruoloRepository.findByNome(Ruolo.PARTECIPANTE),
-                    true,
-                    false,
-                    "Francesco",
-                    true));
+        new StatoPartecipazione(
+            s5,
+            u2,
+            ruoloRepository.findByNome(Ruolo.PARTECIPANTE),
+            true,
+            false,
+            "Francesco",
+            true));
     statoPartecipazioneRepository.save(
-            new StatoPartecipazione(
-                    s5, u3, ruoloRepository.findByNome(Ruolo.PARTECIPANTE), false, false, "Giorgio", false));
+        new StatoPartecipazione(
+            s5,
+            u3,
+            ruoloRepository.findByNome(Ruolo.PARTECIPANTE),
+            false,
+            false,
+            "Giorgio",
+            false));
     statoPartecipazioneRepository.save(
-            new StatoPartecipazione(
-                    s5,
-                    u4,
-                    ruoloRepository.findByNome(ORGANIZZATORE_MASTER),
-                    false,
-                    false,
-                    "Domenico",
-                    false));
+        new StatoPartecipazione(
+            s5,
+            u4,
+            ruoloRepository.findByNome(ORGANIZZATORE_MASTER),
+            false,
+            false,
+            "Domenico",
+            false));
 
     // Aggiunta meeting
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
@@ -392,15 +395,15 @@ public class DataInitializer implements CommandLineRunner {
                 sc1,
                 s4));
     Meeting m3 =
-            meetingRepository.save(
-                    new Meeting(
-                            3L,
-                            "MeetingStanza5",
-                            LocalDateTime.parse("2024-02-03 18:00", formatter),
-                            LocalDateTime.parse("2024-02-03 20:00", formatter),
-                            false,
-                            sc1,
-                            s5));
+        meetingRepository.save(
+            new Meeting(
+                3L,
+                "MeetingStanza5",
+                LocalDateTime.parse("2024-02-03 18:00", formatter),
+                LocalDateTime.parse("2024-02-03 20:00", formatter),
+                false,
+                sc1,
+                s5));
 
     // Aggiunta Utente in meeting
     utenteInMeetingRepository.save(new UtenteInMeeting(u5, m1, true));
@@ -418,7 +421,8 @@ public class DataInitializer implements CommandLineRunner {
     usersRep1.add(u2);
     usersRep1.add(u4);
     usersRep1.add(u5);
-    Report rep1 = reportRepository.save(new Report(1L, 4, Duration.ofHours(1), 4, m1, usersRep1));
+    final Report rep1 =
+        reportRepository.save(new Report(1L, 4, Duration.ofHours(1), 4, m1, usersRep1));
     List<Utente> usersRep2 = new ArrayList<>();
     usersRep2.add(u2);
     usersRep2.add(u3);

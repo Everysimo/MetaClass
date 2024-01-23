@@ -4,6 +4,9 @@ import './MeetingList.css';
 import '../../Forms/PopUpStyles.css';
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faAlignCenter} from "@fortawesome/free-solid-svg-icons";
+import dayjs from "dayjs";
+import AvviaMeeting from "../../Buttons/GestioneMeetingButtons/AvviaMeeting";
+import TerminaMeeting from "../../Buttons/GestioneMeetingButtons/TerminaMeeting";
 
 const MeetingListRoom = () => {
     const [meetingList, setMeetingList] = useState([]);
@@ -22,7 +25,6 @@ const MeetingListRoom = () => {
             [meetingId]: !prevState[meetingId] || false,
         }));
     };
-
     const requestOption = {
         method: 'POST',
         headers: {
@@ -48,6 +50,7 @@ const MeetingListRoom = () => {
             console.error('Errore durante il recupero della lista:', error);
         }
     }
+
     const handleCloseSuccesPopUp = ()=> {
         setTimeout(() => {
             // Simuliamo il reindirizzamento dopo 2 secondi
@@ -57,35 +60,32 @@ const MeetingListRoom = () => {
         }, 1000);
     };
 
+
     return (
         <div>
             <h2>meeting In Stanza:</h2>
             {meetingList && meetingList.map((meeting) => (
                 <div key={meeting.id} className="user-card">
                     <span>Nome: {`${meeting.nome} `}</span>
+                    <span>Stato: {`${meeting.avviato ? 'Meeting Attivo' : 'Meeting Inattivo'} `}</span>
+                    <span>Inizio: {`${dayjs(meeting.inizio).format('YYYY-DD-MM')} `}</span>
                     <button onClick={() => toggleButtons(meeting.id)}>
                         Options <FontAwesomeIcon icon={faAlignCenter} style={{color: "#ffffff",}}/>
                     </button>
                     <div className={`options-container${showButtonsMap[meeting.id] ? ' open' : ''}`}>
-                        <button>Avvia Meeting</button>
-                        { /*<button onClick={() => handleAvviaMeeting(user.id)}>Avvia Meeting</button>
-                        <button onClick={() => handleTerminaMeeting(user.id)}>Termina Meeting</button>*/}
+                        {meeting.avviato ? (
+                            // Se meeting.avviato è true, mostra il pulsante "Termina Meeting"
+                            <TerminaMeeting id_meeting={meeting.id}/>
+                        ) : (
+                            // Se meeting.avviato è false, mostra il pulsante "Avvia Meeting"
+                            <AvviaMeeting id_meeting={meeting.id}/>
+                        )}
                     </div>
                 </div>
             ))}
-            {showSuccessPopup && (
-                <div className={"modal"}>
-                    <div className={"modal-content"}>
-                        <span
-                            className={"close"}
-                            onClick={handleCloseSuccesPopUp}
-                        >&times;</span>
-                        <h3>{message}</h3>
-                    </div>
-                </div>
-            )}
         </div>
-    );
+    )
+        ;
 };
 
 export default MeetingListRoom;

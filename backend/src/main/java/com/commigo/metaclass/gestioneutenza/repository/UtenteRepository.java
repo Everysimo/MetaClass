@@ -2,30 +2,30 @@ package com.commigo.metaclass.gestioneutenza.repository;
 
 import com.commigo.metaclass.entity.Utente;
 import jakarta.transaction.Transactional;
+import java.util.Map;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.util.Map;
-
+/** Repository dell'utente per gestire transazioni con i dati persistenti. */
 @Repository("UtenteRepository")
 public interface UtenteRepository extends JpaRepository<Utente, Long> {
 
   /**
-   * metodo che consente la ricerca di un utente tramite un metaId
+   * Metodo che consente la ricerca di un utente tramite un metaId.
    *
-   * @param idMeta metaId dell'utente da ricercare
-   * @return
+   * @param idMeta metaId dell'utente da ricercare.
+   * @return Utente dato un meta Id.
    */
   Utente findFirstBymetaId(String idMeta);
 
   /**
-   * metodo che consente la ricerca di un utente tramite un id
+   * Metodo che consente la ricerca di un utente tramite un id.
    *
    * @param id id dell'utente dal ricercare
-   * @return
+   * @return Utente dato un id.
    */
   Utente findUtenteById(long id);
 
@@ -33,11 +33,11 @@ public interface UtenteRepository extends JpaRepository<Utente, Long> {
   // 1 se tutto ok
   // 0 se non è ok
   /**
-   * metodo che consente la modifica dei dati di un utente
+   * Metodo che consente la modifica dei dati di un utente.
    *
-   * @param SessionID ??
+   * @param sessionId Meta id.
    * @param attributes i nuovi dati dell'utente
-   * @return
+   * @return aggiorna utente presente nel database.
    */
   @Modifying
   @Transactional
@@ -51,7 +51,7 @@ public interface UtenteRepository extends JpaRepository<Utente, Long> {
           + "u.telefono = COALESCE(:#{#attributes['telefono']}, u.telefono), "
           + "u.metaId = COALESCE(:#{#attributes['metaId']}, u.metaId), "
           + "u.tokenAuth = COALESCE(:#{#attributes['tokenAuth']}, u.tokenAuth) "
-          + "WHERE u.metaId = :SessionID")
+          + "WHERE u.metaId = :sessionId")
   int updateAttributes(
-      @Param("SessionID") String SessionID, @Param("attributes") Map<String, Object> attributes);
+      @Param("sessionId") String sessionId, @Param("attributes") Map<String, Object> attributes);
 }

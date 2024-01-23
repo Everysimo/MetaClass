@@ -136,13 +136,13 @@ public class Utente {
   /**
    * Costruttore.
    *
-   * @param nome
-   * @param cognome
-   * @param email
-   * @param data
-   * @param sesso
-   * @param idMeta
-   * @throws DataFormatException
+   * @param nome nome utente.
+   * @param cognome cognome utente.
+   * @param email email utente.
+   * @param data nascita utente.
+   * @param sesso sesso utente.
+   * @param idMeta idMeta utente.
+   * @throws DataFormatException eccezione scattata durante l'inserimento di una data errata.
    */
   @JsonCreator(mode = JsonCreator.Mode.DEFAULT)
   public Utente(
@@ -180,16 +180,16 @@ public class Utente {
   /**
    * Costruttore.
    *
-   * @param id
-   * @param nome
-   * @param cognome
-   * @param email
-   * @param data
-   * @param sesso
-   * @param idMeta
-   * @param token
-   * @param isAdmin
-   * @throws DataFormatException
+   * @param id id utente
+   * @param nome nome utente.
+   * @param cognome cognome utente.
+   * @param email email utente.
+   * @param data nascita utente.
+   * @param sesso sesso utente.
+   * @param idMeta idMeta utente.
+   * @param token token di autorizzazione utente.
+   * @param isAdmin controlla se è admin
+   * @throws DataFormatException eccezione scattata durante l'inserimento di una data errata.
    */
   public Utente(
       Long id,

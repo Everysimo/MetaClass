@@ -64,10 +64,10 @@ public class Report {
   private LocalDateTime dataAggiornamento;
 
   /**
-   * costruttore.
+   * Costruttore.
    *
-   * @param meeting
-   * @param ogm
+   * @param meeting Istanza del meeting.
+   * @param ogm Istanza dell'organizzatore master.
    */
   public Report(Meeting meeting, Utente ogm) {
     this.meeting = meeting;
@@ -78,12 +78,12 @@ public class Report {
   /**
    * Costruttore.
    *
-   * @param id
-   * @param numPartecipanti
-   * @param durataMeeting
-   * @param maxPartecipanti
-   * @param meeting
-   * @param listaPartecipanti
+   * @param id id Report.
+   * @param numPartecipanti numero partecipanti al meeting.
+   * @param durataMeeting durata del meeting.
+   * @param maxPartecipanti massimo numero di partecipanti raggiunti al meeting
+   * @param meeting Istanza del meeting.
+   * @param listaPartecipanti Lista dei partecipanti.
    */
   public Report(
       long id,

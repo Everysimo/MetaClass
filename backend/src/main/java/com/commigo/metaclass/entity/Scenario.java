@@ -78,13 +78,13 @@ public class Scenario {
   private Immagine image;
 
   /**
-   * costruttore.
+   * Costruttore.
    *
-   * @param nome
-   * @param descrizione
-   * @param url
-   * @param idCategoria
-   * @throws MismatchJsonProperty
+   * @param nome Nome scenario.
+   * @param descrizione Descrizione scenario.
+   * @param url Url immagine dello scenario.
+   * @param idCategoria id della categoria dell'immagine.
+   * @throws MismatchJsonProperty Eccezione generata quando il parsing json fallisce.
    */
   @JsonCreator
   public Scenario(
@@ -107,13 +107,13 @@ public class Scenario {
   }
 
   /**
-   * costruttore testing.
+   * Costruttore testing.
    *
-   * @param id
-   * @param nome
-   * @param descrizione
-   * @param immagine
-   * @param cat
+   * @param id id dello scenario
+   * @param nome Nome scenario.
+   * @param descrizione Descrizione dello scenario.
+   * @param immagine Immagine dello scenario.
+   * @param cat Istanza si categoria.
    */
   public Scenario(Long id, String nome, String descrizione, Immagine immagine, Categoria cat) {
 

@@ -9,6 +9,7 @@ import com.commigo.metaclass.entity.Stanza;
 import com.commigo.metaclass.entity.StatoPartecipazione;
 import com.commigo.metaclass.entity.Utente;
 import com.commigo.metaclass.entity.UtenteInMeeting;
+import com.commigo.metaclass.exceptions.RuntimeException401;
 import com.commigo.metaclass.exceptions.RuntimeException403;
 import com.commigo.metaclass.exceptions.ServerRuntimeException;
 import com.commigo.metaclass.gestioneamministrazione.repository.ScenarioRepository;
@@ -21,10 +22,13 @@ import com.commigo.metaclass.gestionestanza.repository.StatoPartecipazioneReposi
 import com.commigo.metaclass.gestionestimaduratameeting.service.GestioneStimaMeetingService;
 import com.commigo.metaclass.gestioneutenza.repository.UtenteRepository;
 import com.commigo.metaclass.utility.response.types.Response;
+import com.commigo.metaclass.webconfig.JwtTokenUtil;
+import com.commigo.metaclass.webconfig.ValidationToken;
 import jakarta.transaction.Transactional;
-import java.util.List;
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -51,6 +55,10 @@ public class GestioneMeetingServiceImpl implements GestioneMeetingService {
   private final ReportRepository reportRepository;
 
   @Autowired GestioneStimaMeetingService gestioneStimaMeetingService;
+
+  @Autowired private ValidationToken validationToken;
+
+  @Autowired private JwtTokenUtil jwtTokenUtil;
 
   /**
    * Metodo che permette la schedulazione di un meeting.
@@ -107,29 +115,40 @@ public class GestioneMeetingServiceImpl implements GestioneMeetingService {
   }
 
   /**
-   * Metodo che permette la modifica di un meeting precedentemente schedulato.
+   * metodo che consente la modifica dei dati del meeting.
    *
-   * @param meeting Meeting di cui si vuole modificare la schedulazione
-   * @return valore boolean che identifica il successo dell'operazione
+   * @param params nuovi dati del meeting
+   * @param id id del meeting da modificare
    */
   @Override
-  public boolean modificaScheduling(Meeting meeting)
-      throws ServerRuntimeException, RuntimeException403 {
-    // Cerca il meeting per verificare se è registrato o meno
-    Optional<Meeting> m = meetingRepository.findById(meeting.getId());
+  public boolean modificaScheduling(Map<String, Object> params, Long id)
+      throws RuntimeException403, RuntimeException401 {
 
-    if (m.isPresent()) {
-      if (meeting.getStanza().getId() != m.get().getStanza().getId()) {
-        throw new RuntimeException403("Messaggio di errore qui...");
-      }
-      if (meetingRepository.hasOverlappingMeetings(meeting.getInizio(), meeting.getFine())) {
-        throw new RuntimeException403("il meeting si accavalla con un altro meeting");
-      }
-      return meetingRepository.updateAttributes(m.get().getId(), meeting) > 0;
+    // controllo del ruolo di ogm
+    String metaId = jwtTokenUtil.getmetaIdFromToken(validationToken.getToken());
+    Utente ogm = utenteRepository.findFirstBymetaId(metaId);
+    Meeting existingMeeting = meetingRepository.findMeetingById(id);
+
+    // verifico meeting se esiste
+    if (existingMeeting == null) {
+      throw new RuntimeException403("Il meeting non esiste");
+    }
+    if (ogm == null) {
+      throw new RuntimeException403("Utente non esiste");
+    }
+
+    StatoPartecipazione statoutente =
+        statoPartecipazioneRepository.findStatoPartecipazioneByUtenteAndStanza(
+            ogm, existingMeeting.getStanza());
+
+    if (statoutente == null) {
+      throw new RuntimeException403("Non hai acceduto alla stanza");
+    }
+
+    if (!statoutente.getRuolo().getNome().equalsIgnoreCase(Ruolo.PARTECIPANTE)) {
+      return meetingRepository.updateAttributes(id, params) > 0;
     } else {
-      // Gestisci il caso in cui il meeting non è presente (potrebbe essere opportuno lanciare
-      // un'eccezione o fare altro)
-      throw new ServerRuntimeException("Meeting non trovato con ID: " + meeting.getId());
+      throw new RuntimeException401("devi essere almeno un organizzatore");
     }
   }
 
@@ -426,11 +445,11 @@ public class GestioneMeetingServiceImpl implements GestioneMeetingService {
   }
 
   /**
-   * metodo che consente la visualizzazione di tutti i meeting a cui ha già partecipato un
-   * determinato utente
+   * Metodo che consente la visualizzazione di tutti i meeting a cui ha già partecipato un
+   * determinato utente.
    *
-   * @param metaId metaId dell'utente che ha partecipato ai meeting
-   * @return lista di tutti i meeting a cui l'utente ha già partecipato
+   * @param metaId metaId dell'utente che ha partecipato ai meeting.
+   * @return lista di tutti i meeting a cui l'utente ha già partecipato.
    */
   @Override
   public List<Meeting> getMeetingPrecedenti(String metaId)
@@ -453,7 +472,7 @@ public class GestioneMeetingServiceImpl implements GestioneMeetingService {
   }
 
   /**
-   * metodo che consente la compilazione di un questionario da parte di un determinato utente
+   * Metodo che consente la compilazione di un questionario da parte di un determinato utente.
    *
    * @param value la valutazione dello scenario inserita dall'utente all'interno del questionario
    * @param motionSickness livello di nausea dopo l'uscita dal meeting
@@ -503,14 +522,14 @@ public class GestioneMeetingServiceImpl implements GestioneMeetingService {
 
     // prelevo media e numero dei voti
     float media = sc.getMediaValutazione();
-    int num_voti = sc.getNumVoti();
+    int numVoti = sc.getNumVoti();
 
     // calcolo media
-    float newMedia = ((media * num_voti) + value) / (num_voti + 1);
+    float newMedia = ((media * numVoti) + value) / (numVoti + 1);
 
     // inserimento della media nello scenario
     sc.setMediaValutazione(newMedia);
-    sc.setNumVoti(num_voti + 1);
+    sc.setNumVoti(numVoti + 1);
     scenarioRepository.save(sc);
 
     return true;

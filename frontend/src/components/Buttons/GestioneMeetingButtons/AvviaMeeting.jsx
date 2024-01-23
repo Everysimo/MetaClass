@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import {faChalkboardUser, faPlay} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {wait} from "@testing-library/user-event/dist/utils";
+
 
 export default class AvviaMeeting extends Component {
     state = {
@@ -47,7 +47,7 @@ export default class AvviaMeeting extends Component {
         // Invia i dati al server utilizzando this.state.id_meeting
         this.sendDataToServer();
         console.log("dati del form", this.state);
-
+        window.location.reload();
     };
     render() {
         return (

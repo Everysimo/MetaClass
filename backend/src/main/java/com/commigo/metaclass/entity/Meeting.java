@@ -89,12 +89,12 @@ public class Meeting {
   /**
    * Costruttore.
    *
-   * @param nome
-   * @param inizio
-   * @param fine
-   * @param stanza
-   * @param meeting
-   * @throws DataFormatException
+   * @param nome Nome meeting.
+   * @param inizio Data inizio meeting.
+   * @param fine Data fine meeting.
+   * @param stanza Istanza della stanza.
+   * @param meeting Id del meeting.
+   * @throws DataFormatException Eccezione se le date non rispettano il formato giusto.
    */
   @JsonCreator(mode = JsonCreator.Mode.DEFAULT)
   public Meeting(

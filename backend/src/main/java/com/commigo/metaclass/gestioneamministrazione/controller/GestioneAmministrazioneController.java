@@ -323,7 +323,9 @@ public class GestioneAmministrazioneController {
       String metaId = jwtTokenUtil.getmetaIdFromToken(validationToken.getToken());
 
       // verifica dei permessi
-      if (!checkAdmin(metaId)) {throw new RuntimeException403("accesso non consentito");}
+      if (!checkAdmin(metaId)) {
+        throw new RuntimeException403("accesso non consentito");
+      }
 
       return stanzaControl.eliminaStanza(id, request);
     } catch (RuntimeException403 re) {

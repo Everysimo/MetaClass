@@ -44,12 +44,12 @@ public class GestioneStimaMeetingServiceImpl implements GestioneStimaMeetingServ
   }
 
   /**
-   * metodo che permette di visualizzare la durata di un meeting.
+   * Metodo che permette di visualizzare la durata di un meeting.
    *
    * @param idStanza id della stanza
    * @return valore double
-   * @throws RuntimeException403
-   * @throws ServerRuntimeException
+   * @throws RuntimeException403 eccezione generata quando avviene un errore Client.
+   * @throws ServerRuntimeException eccezione generata quando avviene un errore Server
    */
   @Override
   public Double getDurataMeeting(Long idStanza) throws RuntimeException403, ServerRuntimeException {
@@ -72,6 +72,12 @@ public class GestioneStimaMeetingServiceImpl implements GestioneStimaMeetingServ
     return mediaDuration / users.size();
   }
 
+  /**
+   * Metodo per preparare gli argomenti.
+   *
+   * @param input Mappa conententi valori con chiave una stringa
+   * @return mappa con i valori del dataset.
+   */
   private Map<FieldName, FieldValue> prepareArguments(Map<String, Object> input) {
     Map<FieldName, FieldValue> arguments = new HashMap<>();
 
@@ -87,14 +93,25 @@ public class GestioneStimaMeetingServiceImpl implements GestioneStimaMeetingServ
     return arguments;
   }
 
+  /**
+   * Metodo che decodifica i risultato del modello di AI.
+   *
+   * @param arguments mappa di valori da dare al modello.
+   * @return mappa con la predizione.
+   */
   public Map<String, ?> predict(Map<FieldName, FieldValue> arguments) {
     Map<FieldName, ?> results = evaluator.evaluate(arguments);
 
     return EvaluatorUtil.decodeAll(results);
   }
 
+  /**
+   * Metodo che effettua la predizione tramite il modello.
+   *
+   * @param utente Istanza di un utente.
+   * @return Valore di durata del meeting per l'utente.
+   */
   private Double requestPrediction(Utente utente) {
-    System.out.println("Applicazione avviata con successo");
 
     try (InputStream is = getClass().getResourceAsStream("/RegressoreDurataMeeting.pmml")) {
       evaluator = new LoadingModelEvaluatorBuilder().load(is).build();
@@ -151,10 +168,12 @@ public class GestioneStimaMeetingServiceImpl implements GestioneStimaMeetingServ
   }
 
   /**
-   * @param u
-   * @param durata
-   * @param immersionLevel
-   * @throws ServerRuntimeException
+   * Metodo che richiama l'adapter per arricchire il dataset.
+   *
+   * @param u Istanza di Utente-
+   * @param durata Durata del meeting dell'utente.
+   * @param immersionLevel Livello di immersività dell'utente.
+   * @throws ServerRuntimeException Eccezione generata da errori server.
    */
   @Override
   public void addUtenteInDataset(Utente u, Duration durata, int immersionLevel)

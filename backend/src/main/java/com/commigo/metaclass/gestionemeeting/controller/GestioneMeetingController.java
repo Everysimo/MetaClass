@@ -1,9 +1,12 @@
 package com.commigo.metaclass.gestionemeeting.controller;
 
 import com.commigo.metaclass.entity.Meeting;
+import com.commigo.metaclass.exceptions.ClientRuntimeException;
+import com.commigo.metaclass.exceptions.RuntimeException401;
 import com.commigo.metaclass.exceptions.RuntimeException403;
 import com.commigo.metaclass.exceptions.ServerRuntimeException;
 import com.commigo.metaclass.gestionemeeting.service.GestioneMeetingService;
+import com.commigo.metaclass.utility.MapValidator;
 import com.commigo.metaclass.utility.request.RequestUtils;
 import com.commigo.metaclass.utility.response.types.Response;
 import com.commigo.metaclass.webconfig.JwtTokenUtil;
@@ -14,6 +17,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import java.util.List;
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -79,38 +84,42 @@ public class GestioneMeetingController {
   /**
    * Metodo che permette di gestire la richiesta di modifica di schedulazione di un meeting.
    *
-   * @param m Meeting sul quale modificare la schedulazione
-   * @param result variabile che contiene tutti gli errori di validazione dell'oggetto meeting
+   * @param id id Meeting sul quale modificare la schedulazione
+   * @param params variabile che contiene i parametri da modificare del meeting
    * @param request richiesta HTTP fornita dal client
    * @return un valore booleano che identifica la riuscita dell'operazione ed un messaggio che
    *     descrive l'esito di essa
    */
-  @PostMapping(value = "/modificaScheduling")
-  public ResponseEntity<Response<Boolean>> modificaScheduling(
-      @Valid @RequestBody Meeting m, BindingResult result, HttpServletRequest request) {
+  @PostMapping(value = "/modifyScheduling/{id}")
+  public ResponseEntity<Response<Boolean>> modifyScheduling(
+          @PathVariable Long id, @RequestBody Map<String, Object> params, HttpServletRequest request) {
 
     try {
-      // controllo token
+      // controllo del token
       if (!validationToken.isTokenValid(request)) {
         throw new RuntimeException403("Token non valido");
       }
 
-      // controllo errori di validazione
-      if (result.hasErrors()) {
-        return ResponseEntity.status(403)
-            .body(new Response<>(false, RequestUtils.errorsRequest(result)));
-      }
+      // validazione della map
+      MapValidator.meetingValidate(params);
 
-      if (!meetingService.modificaScheduling(m)) {
+      if (!meetingService.modificaScheduling(params, id)) {
         throw new ServerRuntimeException("modifica non effettuata");
       } else {
-        return ResponseEntity.ok(new Response<>(true, "Meeting schedulato con successo"));
+        return ResponseEntity.ok(new Response<>(true, "Meeting modificata con successo"));
       }
 
-    } catch (RuntimeException403 e) {
-      return ResponseEntity.status(403).body(new Response<>(false, e.getMessage()));
-    } catch (ServerRuntimeException se) {
-      return ResponseEntity.status(500).body(new Response<>(false, se.getMessage()));
+    } catch (RuntimeException403 re) {
+      return ResponseEntity.status(403)
+              .body(new Response<>(false, "Errore durante l'operazione: " + re.getMessage()));
+    } catch (RuntimeException401 ue) {
+      return ResponseEntity.status(401)
+              .body(new Response<>(false, "Errore durante l'operazione: " + ue.getMessage()));
+    } catch (ClientRuntimeException ce) {
+      return ResponseEntity.status(400).body(new Response<>(false, ce.getMessage()));
+    } catch (Exception e) {
+      e.printStackTrace();
+      return ResponseEntity.status(500).body(new Response<>(false, "Errore durante l'operazione"));
     }
   }
 
@@ -150,19 +159,19 @@ public class GestioneMeetingController {
    * Metodo che permette di gestire la richiesta di visualizzazione dei meeting schedulati
    * all'iterno di una stanza.
    *
-   * @param Id Id della stanza di cui bisogna visualizzare i meeting schedulati
+   * @param id Id della stanza di cui bisogna visualizzare i meeting schedulati
    * @param request richiesta HTTP fornita dal client
    * @return una lista di meeting ed un messaggio che descrive l'esito dell'operazione
    */
-  @PostMapping(value = "/visualizzaSchedulingMeeting/{Id}")
+  @PostMapping(value = "/visualizzaSchedulingMeeting/{id}")
   public ResponseEntity<Response<List<Meeting>>> visualizzaSchedulingMeeting(
-      @PathVariable Long Id, HttpServletRequest request) {
+      @PathVariable Long id, HttpServletRequest request) {
     try {
       if (!validationToken.isTokenValid(request)) {
         throw new RuntimeException403("Token non valido");
       }
 
-      return meetingService.visualizzaSchedulingMeeting(Id);
+      return meetingService.visualizzaSchedulingMeeting(id);
 
     } catch (Exception e) {
       return ResponseEntity.ok(
@@ -301,7 +310,7 @@ public class GestioneMeetingController {
   /**
    * Metodo che permette di gestire la richiesta di compilazione del questionario.
    *
-   * @param JSONvalue Valori inseriti dall'utente all'interno del questionario
+   * @param jsonValue Valori inseriti dall'utente all'interno del questionario
    * @param idMeeting id del metting a cui fa riferimento il questionario
    * @param request richiesta HTTP fornita dal client
    * @return un valore booleano che identifica la riuscita dell'operazione ed un messaggio che
@@ -309,7 +318,7 @@ public class GestioneMeetingController {
    */
   @PostMapping("/compilaQuestionario/{idMeeting}")
   public ResponseEntity<Response<Boolean>> compilaQuestionario(
-      @RequestBody String JSONvalue, @PathVariable Long idMeeting, HttpServletRequest request) {
+      @RequestBody String jsonValue, @PathVariable Long idMeeting, HttpServletRequest request) {
 
     try {
       // controllo token
@@ -318,9 +327,8 @@ public class GestioneMeetingController {
       }
 
       ObjectMapper objectMapper = new ObjectMapper();
-      JsonNode jsonNode = objectMapper.readTree(JSONvalue);
+      JsonNode jsonNode = objectMapper.readTree(jsonValue);
       JsonNode valutazioneNode = jsonNode.get("immersionLevel");
-      JsonNode motionSicknessNode = jsonNode.get("motionSickness");
 
       // validazione del livello di immersività
       int value;
@@ -334,6 +342,8 @@ public class GestioneMeetingController {
       if (value < 1 || value > 5) {
         throw new RuntimeException403("valore di immersivita' non valido");
       }
+
+      JsonNode motionSicknessNode = jsonNode.get("motionSickness");
 
       // validazione motionsickness
       int motionSickness;
@@ -369,11 +379,11 @@ public class GestioneMeetingController {
   }
 
   /**
-   * Metodo che permette di gestire la visualizzazione dei metting precedenti a cui ha partecipato
+   * Metodo che permette di gestire la visualizzazione dei meeting precedenti a cui ha partecipato
    * l'utente.
    *
-   * @param request
-   * @return una lista di meeting in cui ed un messaggio che descrive l'esito dell'operazione
+   * @param request richiesta dal client.
+   * @return una lista di meeting in cui e un messaggio che descrive l'esito dell'operazione
    */
   @GetMapping("/visualizzaMeetingPrecedenti")
   public ResponseEntity<Response<List<Meeting>>> visualizzaMeetingPrecedeni(

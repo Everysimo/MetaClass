@@ -1,12 +1,12 @@
 package com.commigo.metaclass.exceptions;
 
-/** eccezione custom. */
+/** Eccezione client. */
 public class ClientRuntimeException extends Exception {
 
   /**
-   * costruttore.
+   * Costruttore.
    *
-   * @param message
+   * @param message messaggio di errore
    */
   public ClientRuntimeException(String message) {
     super(message);

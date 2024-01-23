@@ -94,12 +94,12 @@ public class Stanza {
   /**
    * Costruttore.
    *
-   * @param nome
-   * @param descrizione
-   * @param tipoAccesso
-   * @param maxPosti
-   * @param idscenario
-   * @throws MismatchJsonProperty
+   * @param nome Nome stanza.
+   * @param descrizione Descrizione stanza.
+   * @param tipoAccesso Stanza pubblica o privata.
+   * @param maxPosti Intero con massimo dei posti in stanza
+   * @param idScenario Id scenario.
+   * @throws MismatchJsonProperty Eccezione generata quando la validazione json fallisce.
    */
   @JsonCreator
   public Stanza(
@@ -107,10 +107,10 @@ public class Stanza {
       @JsonProperty("descrizione") String descrizione,
       @JsonProperty("tipoAccesso") boolean tipoAccesso,
       @JsonProperty("maxPosti") Object maxPosti,
-      @JsonProperty("id_scenario") Long idscenario)
+      @JsonProperty("id_scenario") Long idScenario)
       throws MismatchJsonProperty {
 
-    if (nome == null || descrizione == null || idscenario == null) {
+    if (nome == null || descrizione == null || idScenario == null) {
       throw new MismatchJsonProperty("gli attributi non sono corretti");
     }
 
@@ -126,20 +126,19 @@ public class Stanza {
 
     // aggiunta dello scenario
     this.scenario = new Scenario();
-    this.scenario.setId(idscenario);
+    this.scenario.setId(idScenario);
   }
 
   /**
    * Costruttore.
    *
-   * @param id
-   * @param nome
-   * @param descrizione
-   * @param tipoAccesso
-   * @param maxPosti
-   * @param scenario
-   * @param codice
-   * @throws MismatchJsonProperty
+   * @param nome Nome stanza.
+   * @param descrizione Dscrizione stanza.
+   * @param tipoAccesso Stanza pubblica o privata.
+   * @param maxPosti Intero con massimo dei posti in stanza
+   * @param scenario scenario.
+   * @param codice Codice stanza.
+   * @throws MismatchJsonProperty Eccezione generata quando la validazione json fallisce.
    */
   public Stanza(
       Long id,

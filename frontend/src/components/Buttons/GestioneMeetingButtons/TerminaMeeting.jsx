@@ -1,10 +1,8 @@
 import React, { Component } from 'react';
-import '../../Forms/CreaScenarioForm/creaScenario.css';
 import {faChalkboardUser, faPlay} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {wait} from "@testing-library/user-event/dist/utils";
 
-export default class AvviaMeeting extends Component {
+export default class TerminaMeeting extends Component {
     state = {
         id_meeting: this.props.id_meeting || "", // Imposta il valore iniziale con quello ricevuto come prop
         isVisible: true,
@@ -49,7 +47,7 @@ export default class AvviaMeeting extends Component {
         // Invia i dati al server utilizzando this.state.id_meeting
         this.sendDataToServer();
         console.log("dati del form", this.state);
-
+        window.location.reload();
     };
     render() {
         return (

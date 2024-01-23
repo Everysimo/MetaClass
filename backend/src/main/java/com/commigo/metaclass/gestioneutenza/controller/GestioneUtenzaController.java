@@ -14,14 +14,22 @@ import com.commigo.metaclass.webconfig.ValidationToken;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.util.List;
+import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
-import java.util.Map;
-
+/**
+ * Classe controller che gestisce tutte le richieste relative all'utente.
+ *
+ * @author Michele Pesce, Salvatore Alberti, Vincenzo Cutolo
+ * @version 1.0
+ */
 @RestController
 public class GestioneUtenzaController {
 
@@ -32,12 +40,12 @@ public class GestioneUtenzaController {
   @Autowired private ValidationToken validationToken;
 
   /**
-   * metodo che gestisce la richeista di login/registrazione da parte di un utente
+   * Metodo che gestisce la richeista di login/registrazione da parte di un utente.
    *
    * @param u utente che effettua il login/registrazione
    * @param response utilizzata per gestire i cookie gestendo un token
    * @param result contiene tutti i messaggi di errore contenuti nella richiesta
-   * @return
+   * @return body response
    */
   @PostMapping(value = "/login")
   public ResponseEntity<LoginResponse<Boolean>> login(
@@ -75,9 +83,11 @@ public class GestioneUtenzaController {
   }
 
   /**
+   * Metodo che effettua il logout.
+   *
    * @param request richiesta HTTP fornita dal client
    * @param response utilizzata per gestire i cookie gestendo un token
-   * @return
+   * @return body response
    */
   @PostMapping("/Manuallogout")
   public ResponseEntity<Response<Boolean>> logout(
@@ -128,11 +138,11 @@ public class GestioneUtenzaController {
   }
 
   /**
-   * metodo che consente la modifica dei dati dell'utente
+   * Metodo che consente la modifica dei dati dell'utente.
    *
    * @param params nuovi dati dell'utente
    * @param request richiesta HTTP fornita dal client
-   * @return
+   * @return body response
    */
   @PostMapping(value = "/modifyUserData")
   public ResponseEntity<Response<Boolean>> modifyUserData(
@@ -157,10 +167,10 @@ public class GestioneUtenzaController {
   }
 
   /**
-   * metodo che consente di gestire la richiesta di visualizzazione di tutte le stanze dell'utente
+   * Metodo che consente di gestire la richiesta di visualizzazione di tutte le stanze dell'utente.
    *
    * @param request richiesta HTTP fornita dal client
-   * @return
+   * @return body response
    */
   @GetMapping(value = "/visualizzaStanze")
   public ResponseEntity<Response<List<Stanza>>> visualizzaStanze(HttpServletRequest request) {
@@ -190,10 +200,10 @@ public class GestioneUtenzaController {
   }
 
   /**
-   * metodo che consente di gestire la richiesta di visualizzazione dei dati utente dell'utente
+   * Metodo che consente di gestire la richiesta di visualizzazione dei dati utente dell'utente.
    *
    * @param request richiesta HTTP fornita dal client
-   * @return
+   * @return body response
    */
   @GetMapping(value = "/userDetails")
   public ResponseEntity<Response<Utente>> visualizzaDatiUtente(HttpServletRequest request) {
@@ -204,8 +214,8 @@ public class GestioneUtenzaController {
         throw new RuntimeException403("Token non valido");
       }
 
-      String IdMeta = jwtTokenUtil.getmetaIdFromToken(validationToken.getToken());
-      utente = utenzaService.getUtenteByUserId(IdMeta);
+      String idMeta = jwtTokenUtil.getmetaIdFromToken(validationToken.getToken());
+      utente = utenzaService.getUtenteByUserId(idMeta);
       if (utente == null) {
         return ResponseEntity.status(500)
             .body(new Response<>(null, "Errore la ricerca dell'utente"));

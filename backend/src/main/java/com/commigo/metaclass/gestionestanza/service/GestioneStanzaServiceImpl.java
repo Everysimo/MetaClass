@@ -28,7 +28,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-/** Implementazione del service della gestione stanza */
+/** Implementazione del service della gestione stanza. */
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -497,7 +497,8 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService {
             return ResponseEntity.ok(
                 new Response<>(
                     true,
-                    "L'utente selezionato non è più in attesa, hai rifiutato la richiesta di accesso alla stanza"));
+                    "L'utente selezionato non è più in attesa, "
+                        + "hai rifiutato la richiesta di accesso alla stanza"));
           }
         } else {
           return ResponseEntity.status(403)
@@ -510,7 +511,8 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService {
             .body(
                 new Response<>(
                     false,
-                    "Per accettare o rifiutare richiesta di accesso alla stanza devi essere almeno un organizzatore"));
+                    "Per accettare o rifiutare richiesta di "
+                        + "accesso alla stanza devi essere almeno un organizzatore"));
       }
     } else {
       return ResponseEntity.status(403)
@@ -528,7 +530,7 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService {
    *     l'esito di essa
    */
   @Override
-  public ResponseEntity<Response<Boolean>> SilenziaPartecipante(
+  public ResponseEntity<Response<Boolean>> silenziaPartecipante(
       String metaId, Long idStanza, Long idUtente) {
 
     Utente og = utenteRepository.findFirstBymetaId(metaId);
@@ -561,7 +563,8 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService {
             .body(
                 new Response<>(
                     false,
-                    "Per silenziare un partecipante nella stanza devi essere almeno un organizzatore"));
+                    "Per silenziare un partecipante nella stanza "
+                        + "devi essere almeno un organizzatore"));
       }
     } else {
       return ResponseEntity.status(403)
@@ -790,14 +793,16 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService {
               .body(
                   new Response<>(
                       null,
-                      "Non puoi visualizzare gli utenti in attesa se non sei almeno un organizzatore"));
+                      "Non puoi visualizzare gli utenti"
+                          + " in attesa se non sei almeno un organizzatore"));
         }
       } else {
         return ResponseEntity.status(403)
             .body(
                 new Response<>(
                     null,
-                    "Non puoi visualizzare gli utenti in attesa della stanza se non sei almeno un'organizzatore di essa"));
+                    "Non puoi visualizzare gli utenti in attesa"
+                        + " della stanza se non sei almeno un'organizzatore di essa"));
       }
     } else {
       return ResponseEntity.status(403)
@@ -847,13 +852,15 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService {
           return ResponseEntity.status(403)
               .body(
                   new Response<>(
-                      false, "Non puoi modificare lo scenario se non sei almeno un organizzatore"));
+                      false,
+                      "Non puoi modificare lo " + "scenario se non sei almeno un organizzatore"));
         }
       } else {
         return ResponseEntity.status(403)
             .body(
                 new Response<>(
-                    false, "Non sei all'interno della stanza, non puoi modificare lo scenario"));
+                    false,
+                    "Non sei all'interno della stanza, " + "non puoi modificare lo scenario"));
       }
 
     } else {
@@ -863,8 +870,8 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService {
   }
 
   /**
-   * metodo che permette la modifica del nome all'interno di una stanza di uno specifico
-   * partecipante
+   * Metodo che permette la modifica del nome all'interno di una stanza di uno specifico
+   * partecipante.
    *
    * @param metaId metaId dell'utente che vuole effettuare la modifica del nome
    * @param idStanza id della stanza in cui si vuole modificare il nome
@@ -907,14 +914,16 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService {
               .body(
                   new Response<>(
                       false,
-                      "Non puoi modificare il nome in stanza di un utente se non sei almeno un'organizzatore"));
+                      "Non puoi modificare il nome in stanza di un"
+                          + " utente se non sei almeno un'organizzatore"));
         }
       } else {
         return ResponseEntity.status(403)
             .body(
                 new Response<>(
                     false,
-                    "Non puoi modificare il nome in stanza dell'utente selezionato perché non è presente in stanza"));
+                    "Non puoi modificare il nome in stanza "
+                        + "dell'utente selezionato perché non è presente in stanza"));
       }
     } else {
       return ResponseEntity.status(403)
@@ -981,7 +990,7 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService {
    * @return il ruolo del'utente all'interno della stanza
    */
   @Override
-  public Ruolo getRuoloByUserAndStanzaID(String metaId, Long idStanza)
+  public Ruolo getRuoloByUserAndStanzaId(String metaId, Long idStanza)
       throws ServerRuntimeException, RuntimeException403 {
 
     Utente u;
@@ -1067,18 +1076,46 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService {
           }
         } else {
           return ResponseEntity.status(403)
-              .body(new Response<>(false, "L'utente selezioanto non è presente nella stanza"));
+              .body(new Response<>(false, "L'utente selezioanto " + "non è presente nella stanza"));
         }
       } else {
         return ResponseEntity.status(403)
             .body(
                 new Response<>(
                     false,
-                    "Per silenziare un partecipante nella stanza devi essere almeno un organizzatore"));
+                    "Per silenziare un partecipante nella stanza "
+                        + "devi essere almeno un organizzatore"));
       }
     } else {
       return ResponseEntity.status(403)
           .body(new Response<>(false, "La stanza selezionata non esiste"));
     }
+  }
+
+  /**
+   * Metodo che ritorna lo stato partecipazione dell'utente in una stanza
+   *
+   * @param metaId metaId utente
+   * @param idStanza id stanza
+   * @return ritorna lo stato partecipazione
+   * @throws ServerRuntimeException eccezione scattata quando avviene un errore del server
+   * @throws RuntimeException403 eccezione scattata quando avviene un errore del client
+   */
+  public List<StatoPartecipazione> getStatoPartecipazione(String metaId, Long idStanza)
+      throws ServerRuntimeException, RuntimeException403 {
+    Utente u;
+    Stanza stanza;
+    if ((u = utenteRepository.findFirstBymetaId(metaId)) == null) {
+      throw new ServerRuntimeException(("Utente non torvato"));
+    }
+    if ((stanza = stanzaRepository.findStanzaById(idStanza)) == null) {
+      throw new RuntimeException403("Stanza non trovata");
+    }
+    List<StatoPartecipazione> sp;
+    if ((sp = statoPartecipazioneRepository.findAllByStanza(stanza)) == null) {
+      throw new ServerRuntimeException("errore della ricerca degli stati partecipazione");
+    }
+
+    return sp;
   }
 }

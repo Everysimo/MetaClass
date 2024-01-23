@@ -89,6 +89,7 @@ const CreaCategoria = (props) => {
         if (props.onClose) {
             props.onClose();
         }
+        window.location.reload();
     };
 
     return (

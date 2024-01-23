@@ -82,11 +82,11 @@ public class FeedbackMeeting {
   private boolean compiledQuestionario;
 
   /**
-   * costruttore.
+   * Costruttore.
    *
-   * @param utente
-   * @param meeting
-   * @param report
+   * @param utente Istanza dell'utente.
+   * @param meeting Istanza del meeting.
+   * @param report Istanza del report.
    */
   public FeedbackMeeting(Utente utente, Meeting meeting, Report report) {
     this.utente = utente;
