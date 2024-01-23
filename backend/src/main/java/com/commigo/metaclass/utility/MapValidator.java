@@ -13,6 +13,8 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import lombok.NoArgsConstructor;
@@ -132,6 +134,7 @@ public class MapValidator {
    */
   public static boolean meetingValidate(Map<String, Object> params) throws ClientRuntimeException {
 
+    List<LocalDateTime> dates = new ArrayList<>();
     for (Map.Entry<String, Object> entry : params.entrySet()) {
       String attributeName = entry.getKey();
       Object attributeValue = entry.getValue();
@@ -141,7 +144,7 @@ public class MapValidator {
           DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 
           try {
-            LocalDateTime.parse((CharSequence) attributeValue, formatter);
+            dates.add(LocalDateTime.parse((CharSequence) attributeValue, formatter));
           } catch (DateTimeParseException e) {
             throw new ClientRuntimeException(
                 "Errore nella richiesta: L'attributo '"
@@ -150,6 +153,11 @@ public class MapValidator {
           }
 
         } else {
+          // controllo l'ordine delle date
+          if (!isStartDateBeforeEndDate(dates)) {
+            throw new ClientRuntimeException(
+                "Errore nella richiesta: inizio deve essere minore di fine o viceversa");
+          }
           Set<ConstraintViolation<Meeting>> violations =
               validator.validateValue(Meeting.class, attributeName, attributeValue);
 
@@ -172,5 +180,10 @@ public class MapValidator {
       }
     }
     return true;
+  }
+
+  private static boolean isStartDateBeforeEndDate(List<LocalDateTime> dates) {
+    // La validazione sarà passata solo se la data di inizio è precedente a quella di fine
+    return dates.get(0) == null || dates.get(1) == null || dates.get(0).isBefore(dates.get(1));
   }
 }
