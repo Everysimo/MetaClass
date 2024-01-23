@@ -22,7 +22,7 @@ function GenerateRows({ Nomi }) {
     return <div className={"table-row"}>{cells}</div>;
 }
 export function MyFooter() {
-    const stringsArray = ["Gatto Francesco", "Pesce Michele", "Cavaliere Domenico"];
+    const stringsArray = ["Carmine Detta", "Salvatore Alberti", "Vincenzo Cutolo", "Gatto Francesco", "Pesce Michele", "Cavaliere Domenico"];
 
     return (
         <div className={"table-container"}>
