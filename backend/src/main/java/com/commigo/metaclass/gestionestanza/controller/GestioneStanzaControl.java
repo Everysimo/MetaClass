@@ -493,7 +493,7 @@ public class GestioneStanzaControl {
         throw new RuntimeException403("Token non valido");
       }
 
-      return stanzaService.findStanza(id);
+      return stanzaService.findScenarioStanza(id);
 
     } catch (RuntimeException403 se) {
       return ResponseEntity.status(403)

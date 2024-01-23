@@ -609,7 +609,7 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService {
    * @return scenario in uso in una stanza ed un messaggio che descrive l'esito dell'operazione
    */
   @Override
-  public ResponseEntity<Response<Scenario>> findStanza(Long id) {
+  public ResponseEntity<Response<Scenario>> findScenarioStanza(Long id) {
     Stanza stanza = stanzaRepository.findStanzaById(id);
 
     if (stanza == null) {
