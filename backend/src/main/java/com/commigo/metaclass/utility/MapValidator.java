@@ -10,6 +10,7 @@ import jakarta.validation.Validation;
 import jakarta.validation.ValidationException;
 import jakarta.validation.Validator;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.Map;
@@ -136,13 +137,27 @@ public class MapValidator {
       Object attributeValue = entry.getValue();
 
       try {
-        Set<ConstraintViolation<Meeting>> violations =
-            validator.validateValue(Meeting.class, attributeName, attributeValue);
+        if (!attributeName.equalsIgnoreCase("nome")) {
+          DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 
-        if (!violations.isEmpty()) {
-          // Handle validation errors for the specific attribute
-          throw new ClientRuntimeException(
-              "Errore nella richiesta: " + violations.iterator().next().getMessage());
+          try {
+            LocalDateTime.parse((CharSequence) attributeValue, formatter);
+          } catch (DateTimeParseException e) {
+            throw new ClientRuntimeException(
+                "Errore nella richiesta: L'attributo '"
+                    + attributeName
+                    + "' Formato richiesto: yyyy-MM-dd HH:mm");
+          }
+
+        } else {
+          Set<ConstraintViolation<Meeting>> violations =
+              validator.validateValue(Meeting.class, attributeName, attributeValue);
+
+          if (!violations.isEmpty()) {
+            // Handle validation errors for the specific attribute
+            throw new ClientRuntimeException(
+                "Errore nella richiesta: " + violations.iterator().next().getMessage());
+          }
         }
       } catch (IllegalArgumentException e) {
         throw new ClientRuntimeException(
