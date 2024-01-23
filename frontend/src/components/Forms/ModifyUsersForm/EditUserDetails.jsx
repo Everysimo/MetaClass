@@ -122,24 +122,28 @@ const EditUserDetails = ({ userDetails, setUserDetails }) => {
                                     name="nome"
                                     placeholder={userDetails ? userDetails.nome : 'Enter Name'}
                                     onChange={handleInputChange}
+                                    style={{marginBottom: "20px"}}
                                 />
                                 <input
                                     type="text"
                                     name="cognome"
                                     placeholder={userDetails ? userDetails.cognome : 'Enter Surname'}
                                     onChange={handleInputChange}
+                                    style={{marginBottom: "20px"}}
                                 />
                                 <input
                                     type="text"
                                     name="email"
                                     placeholder={userDetails ? userDetails.email : 'Enter e-mail'}
                                     onChange={handleInputChange}
+                                    style={{marginBottom: "20px"}}
                                 />
                                 <input
                                     type="date"
                                     name="dataDiNascita"
                                     placeholder={userDetails ? userDetails.dataDiNascita : 'Enter Date of Birth'}
                                     onChange={handleInputChange}
+                                    style={{marginBottom: "20px"}}
                                 />
                                 <button type="submit">Salva</button>
                             </form>
