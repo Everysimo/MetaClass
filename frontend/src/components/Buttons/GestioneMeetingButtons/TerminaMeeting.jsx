@@ -47,7 +47,7 @@ export default class TerminaMeeting extends Component {
         // Invia i dati al server utilizzando this.state.id_meeting
         this.sendDataToServer();
         console.log("dati del form", this.state);
-
+        window.location.reload();
     };
     render() {
         return (

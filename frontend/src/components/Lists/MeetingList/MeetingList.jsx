@@ -4,6 +4,7 @@ import dayjs from 'dayjs';  // Import dayjs
 import './MeetingList.css';
 import AvviaMeeting from "../../Buttons/GestioneMeetingButtons/AvviaMeeting";
 import TerminaMeeting from "../../Buttons/GestioneMeetingButtons/TerminaMeeting";
+import ModificaMeeting from "../../Forms/ScheduleMeetingForm/ModificaMeeting";
 export const MeetingListInRoom = ({ formattedDate }) => {
     const [meetingList, setMeetingList] = useState([]);
     const [showModal, setShowModal] = useState(false);
@@ -68,6 +69,7 @@ export const MeetingListInRoom = ({ formattedDate }) => {
                                     <span className={'close'} onClick={handleClose}>
                                         &times;
                                     </span>
+                                    <ModificaMeeting id_meeting={meeting.id} nome={meeting.nome} inizio={meeting.inizio} fine={meeting.fine} />
                                     {meeting.avviato ? (
                                         // Se meeting.avviato è true, mostra il pulsante "Termina Meeting"
                                         <TerminaMeeting id_meeting={meeting.id}/>
