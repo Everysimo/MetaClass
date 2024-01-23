@@ -91,9 +91,9 @@ const CalendarComp = () => {
                                     type="text"
                                     value={name}
                                     onChange={(e) => setName(e.target.value)}
-                                    placeholder="Enter name"
+                                    placeholder="Nome meeting"
                                     className="inputField"
-                                    style={{maxWidth: "100%", margin:"20px"}}
+                                    style={{maxWidth: "100%"}}
                                 />
                                 <FontAwesomeIcon icon={faRobot} size="2xl" style={{color: "#c70049", margin: "10px"}} />
                                 <p style={{fontSize: "14px"}}>Stima fatta con il modulo di IA</p>
@@ -105,7 +105,7 @@ const CalendarComp = () => {
                                 />
                             </div>
                             <button onClick={handleSubmit} id="submitBtn">
-                                Submit
+                                Invio
                             </button>
                             {errorMessage && (
                                 <p>{errorMessage}</p>
