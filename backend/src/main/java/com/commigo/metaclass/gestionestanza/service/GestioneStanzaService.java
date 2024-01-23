@@ -60,7 +60,7 @@ public interface GestioneStanzaService {
   Ruolo getRuoloByUserAndStanzaId(String metaId, Long idStanza)
       throws ServerRuntimeException, RuntimeException403;
 
-  StatoPartecipazione getStatoPartecipazione(String metaId, Long idStanza)
+  List<StatoPartecipazione> getStatoPartecipazione(String metaId, Long idStanza)
       throws ServerRuntimeException, RuntimeException403;
 
   ResponseEntity<Response<Boolean>> gestioneAccesso(

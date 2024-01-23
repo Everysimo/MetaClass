@@ -645,7 +645,7 @@ public class GestioneStanzaControl {
    * @return ritorna una risposta con lo stato partecipazione dell'utente
    */
   @PostMapping(value = "/getStatopartecipazione/{idStanza}")
-  public ResponseEntity<Response<StatoPartecipazione>> getStatoPartecipazione(
+  public ResponseEntity<Response<List<StatoPartecipazione>>> getStatoPartecipazione(
       @PathVariable Long idStanza, HttpServletRequest request) {
     try {
 
@@ -655,7 +655,7 @@ public class GestioneStanzaControl {
 
       String metaid = jwtTokenUtil.getmetaIdFromToken(validationToken.getToken());
 
-      StatoPartecipazione sp = stanzaService.getStatoPartecipazione(metaid, idStanza);
+      List<StatoPartecipazione> sp = stanzaService.getStatoPartecipazione(metaid, idStanza);
       if (sp == null) {
         throw new ServerRuntimeException("errore nel recapito del ruolo");
       } else {

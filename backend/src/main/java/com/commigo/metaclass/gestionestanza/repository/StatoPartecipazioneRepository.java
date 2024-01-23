@@ -71,4 +71,12 @@ public interface StatoPartecipazioneRepository extends JpaRepository<StatoPartec
    * @param s stanza su cui si basa la ricerca.
    */
   void deleteAllByStanza(Stanza s);
+
+  /**
+   * Metodo che ritorna l'insieme degli stati partecipazione della stanza.
+   *
+   * @param stanza istanza della stanza
+   * @return lista di stati partecipazione
+   */
+  List<StatoPartecipazione> findAllByStanza(Stanza stanza);
 }

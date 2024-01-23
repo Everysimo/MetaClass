@@ -1101,7 +1101,7 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService {
    * @throws ServerRuntimeException eccezione scattata quando avviene un errore del server
    * @throws RuntimeException403 eccezione scattata quando avviene un errore del client
    */
-  public StatoPartecipazione getStatoPartecipazione(String metaId, Long idStanza)
+  public List<StatoPartecipazione> getStatoPartecipazione(String metaId, Long idStanza)
       throws ServerRuntimeException, RuntimeException403 {
     Utente u;
     Stanza stanza;
@@ -1111,10 +1111,9 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService {
     if ((stanza = stanzaRepository.findStanzaById(idStanza)) == null) {
       throw new RuntimeException403("Stanza non trovata");
     }
-    StatoPartecipazione sp;
-    if ((sp = statoPartecipazioneRepository.findStatoPartecipazioneByUtenteAndStanza(u, stanza))
-        == null) {
-      throw new RuntimeException403("L'utente non ha acceduto alla stanza");
+    List<StatoPartecipazione> sp;
+    if ((sp = statoPartecipazioneRepository.findAllByStanza(stanza)) == null) {
+      throw new ServerRuntimeException("errore della ricerca degli stati partecipazione");
     }
 
     return sp;
