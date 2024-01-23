@@ -7,6 +7,7 @@ import {faAlignCenter} from "@fortawesome/free-solid-svg-icons";
 import dayjs from "dayjs";
 import AvviaMeeting from "../../Buttons/GestioneMeetingButtons/AvviaMeeting";
 import TerminaMeeting from "../../Buttons/GestioneMeetingButtons/TerminaMeeting";
+import ModificaMeeting from "../../Forms/ScheduleMeetingForm/ModificaMeeting";
 
 const MeetingListRoom = () => {
     const [meetingList, setMeetingList] = useState([]);
