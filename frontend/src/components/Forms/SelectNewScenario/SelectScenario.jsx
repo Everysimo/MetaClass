@@ -92,6 +92,7 @@ const ScenarioPage = () => {
         setIsModalOpen(false);
         setSelectedScenario(null);
         setMessage('');
+        window.location.reload();
     }
     return (
         <>

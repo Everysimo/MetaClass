@@ -64,6 +64,7 @@ const CalendarComp = () => {
         setShowModal(false);
         setSuccessMessage('');
         setErrorMessage('');
+        window.location.reload();
     }
     return (
         <>

@@ -36,6 +36,8 @@ export default class AvviaMeeting extends Component {
             console.log("Risposta dal server:", responseData);
             if (responseData && responseData.value) {
                 console.log(responseData.message);
+                // Dopo aver terminato il meeting con successo, aggiorna la pagina
+                window.location.reload();
             }
         }
         catch (error) {
@@ -47,7 +49,7 @@ export default class AvviaMeeting extends Component {
         // Invia i dati al server utilizzando this.state.id_meeting
         this.sendDataToServer();
         console.log("dati del form", this.state);
-        window.location.reload();
+
     };
     render() {
         return (
