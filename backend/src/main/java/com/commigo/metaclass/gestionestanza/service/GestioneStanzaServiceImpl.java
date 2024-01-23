@@ -89,6 +89,8 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService {
         return ResponseEntity.ok(
             new AccessResponse<>(stanza.getId(), "Accesso effettuato con successo", false));
       } else {
+        sp.setInAttesa(true);
+        statoPartecipazioneRepository.save(sp);
         return ResponseEntity.ok(
             new AccessResponse<>(0L, "Richiesta accesso alla stanza effettuata", true));
       }
