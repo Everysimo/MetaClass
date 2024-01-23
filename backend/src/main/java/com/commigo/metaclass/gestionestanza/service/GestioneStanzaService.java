@@ -1,9 +1,6 @@
 package com.commigo.metaclass.gestionestanza.service;
 
-import com.commigo.metaclass.entity.Ruolo;
-import com.commigo.metaclass.entity.Scenario;
-import com.commigo.metaclass.entity.Stanza;
-import com.commigo.metaclass.entity.Utente;
+import com.commigo.metaclass.entity.*;
 import com.commigo.metaclass.exceptions.RuntimeException401;
 import com.commigo.metaclass.exceptions.RuntimeException403;
 import com.commigo.metaclass.exceptions.ServerRuntimeException;
@@ -61,6 +58,9 @@ public interface GestioneStanzaService {
   ResponseEntity<Response<Boolean>> kickPartecipante(String metaId, Long idStanza, Long idUtente);
 
   Ruolo getRuoloByUserAndStanzaId(String metaId, Long idStanza)
+      throws ServerRuntimeException, RuntimeException403;
+
+  StatoPartecipazione getStatoPartecipazione(String metaId, Long idStanza)
       throws ServerRuntimeException, RuntimeException403;
 
   ResponseEntity<Response<Boolean>> gestioneAccesso(

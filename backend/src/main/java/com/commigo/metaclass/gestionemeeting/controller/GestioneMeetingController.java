@@ -1,9 +1,12 @@
 package com.commigo.metaclass.gestionemeeting.controller;
 
 import com.commigo.metaclass.entity.Meeting;
+import com.commigo.metaclass.exceptions.ClientRuntimeException;
+import com.commigo.metaclass.exceptions.RuntimeException401;
 import com.commigo.metaclass.exceptions.RuntimeException403;
 import com.commigo.metaclass.exceptions.ServerRuntimeException;
 import com.commigo.metaclass.gestionemeeting.service.GestioneMeetingService;
+import com.commigo.metaclass.utility.MapValidator;
 import com.commigo.metaclass.utility.request.RequestUtils;
 import com.commigo.metaclass.utility.response.types.Response;
 import com.commigo.metaclass.webconfig.JwtTokenUtil;
@@ -14,6 +17,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import java.util.List;
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -79,38 +84,42 @@ public class GestioneMeetingController {
   /**
    * Metodo che permette di gestire la richiesta di modifica di schedulazione di un meeting.
    *
-   * @param m Meeting sul quale modificare la schedulazione
-   * @param result variabile che contiene tutti gli errori di validazione dell'oggetto meeting
+   * @param id id Meeting sul quale modificare la schedulazione
+   * @param params variabile che contiene i parametri da modificare del meeting
    * @param request richiesta HTTP fornita dal client
    * @return un valore booleano che identifica la riuscita dell'operazione ed un messaggio che
    *     descrive l'esito di essa
    */
-  @PostMapping(value = "/modificaScheduling")
-  public ResponseEntity<Response<Boolean>> modificaScheduling(
-      @Valid @RequestBody Meeting m, BindingResult result, HttpServletRequest request) {
+  @PostMapping(value = "/modifyScheduling/{id}")
+  public ResponseEntity<Response<Boolean>> modifyScheduling(
+          @PathVariable Long id, @RequestBody Map<String, Object> params, HttpServletRequest request) {
 
     try {
-      // controllo token
+      // controllo del token
       if (!validationToken.isTokenValid(request)) {
         throw new RuntimeException403("Token non valido");
       }
 
-      // controllo errori di validazione
-      if (result.hasErrors()) {
-        return ResponseEntity.status(403)
-            .body(new Response<>(false, RequestUtils.errorsRequest(result)));
-      }
+      // validazione della map
+      MapValidator.meetingValidate(params);
 
-      if (!meetingService.modificaScheduling(m)) {
+      if (!meetingService.modificaScheduling(params, id)) {
         throw new ServerRuntimeException("modifica non effettuata");
       } else {
-        return ResponseEntity.ok(new Response<>(true, "Meeting schedulato con successo"));
+        return ResponseEntity.ok(new Response<>(true, "Meeting modificata con successo"));
       }
 
-    } catch (RuntimeException403 e) {
-      return ResponseEntity.status(403).body(new Response<>(false, e.getMessage()));
-    } catch (ServerRuntimeException se) {
-      return ResponseEntity.status(500).body(new Response<>(false, se.getMessage()));
+    } catch (RuntimeException403 re) {
+      return ResponseEntity.status(403)
+              .body(new Response<>(false, "Errore durante l'operazione: " + re.getMessage()));
+    } catch (RuntimeException401 ue) {
+      return ResponseEntity.status(401)
+              .body(new Response<>(false, "Errore durante l'operazione: " + ue.getMessage()));
+    } catch (ClientRuntimeException ce) {
+      return ResponseEntity.status(400).body(new Response<>(false, ce.getMessage()));
+    } catch (Exception e) {
+      e.printStackTrace();
+      return ResponseEntity.status(500).body(new Response<>(false, "Errore durante l'operazione"));
     }
   }
 
