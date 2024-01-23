@@ -76,6 +76,7 @@ const UserListInRoom = () => {
     const fetchstatoPartecipazione = async() => {
         try {
             console.log("sono qui dentro")
+
             const response = await fetch(`http://localhost:8080/getStatopartecipazione/${idStanza}`, requestOption);
 
             if (!response.ok) {
