@@ -10,8 +10,11 @@ import jakarta.validation.Validation;
 import jakarta.validation.ValidationException;
 import jakarta.validation.Validator;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import lombok.NoArgsConstructor;
@@ -131,18 +134,34 @@ public class MapValidator {
    */
   public static boolean meetingValidate(Map<String, Object> params) throws ClientRuntimeException {
 
+    List<LocalDateTime> dates = new ArrayList<>();
     for (Map.Entry<String, Object> entry : params.entrySet()) {
       String attributeName = entry.getKey();
       Object attributeValue = entry.getValue();
 
       try {
-        Set<ConstraintViolation<Meeting>> violations =
-            validator.validateValue(Meeting.class, attributeName, attributeValue);
+        if (!attributeName.equalsIgnoreCase("nome")) {
+          DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 
-        if (!violations.isEmpty()) {
-          // Handle validation errors for the specific attribute
-          throw new ClientRuntimeException(
-              "Errore nella richiesta: " + violations.iterator().next().getMessage());
+          try {
+            dates.add(LocalDateTime.parse((CharSequence) attributeValue, formatter));
+            System.out.println(dates.get(0));
+          } catch (DateTimeParseException e) {
+            throw new ClientRuntimeException(
+                "Errore nella richiesta: L'attributo '"
+                    + attributeName
+                    + "' Formato richiesto: yyyy-MM-dd HH:mm");
+          }
+
+        } else {
+          Set<ConstraintViolation<Meeting>> violations =
+              validator.validateValue(Meeting.class, attributeName, attributeValue);
+
+          if (!violations.isEmpty()) {
+            // Handle validation errors for the specific attribute
+            throw new ClientRuntimeException(
+                "Errore nella richiesta: " + violations.iterator().next().getMessage());
+          }
         }
       } catch (IllegalArgumentException e) {
         throw new ClientRuntimeException(
@@ -156,6 +175,16 @@ public class MapValidator {
                 + "' ha un valore che non rispetta il suo tipo di dato");
       }
     }
+    // controllo l'ordine delle date
+    if (isStartDateBeforeEndDate(dates)) {
+      throw new ClientRuntimeException(
+          "Errore nella richiesta: inizio deve essere minore di fine o viceversa");
+    }
     return true;
+  }
+
+  private static boolean isStartDateBeforeEndDate(List<LocalDateTime> dates) {
+    // La validazione sarà passata solo se la data di inizio è precedente a quella di fine
+    return dates.get(0) == null || dates.get(1) == null || !dates.get(0).isBefore(dates.get(1));
   }
 }
