@@ -122,6 +122,13 @@ public class MapValidator {
     return true;
   }
 
+  /**
+   * Metodo che mi valida gli attributi del meeting presi da una mappa.
+   *
+   * @param params mappa di attributi
+   * @return controllo di validazione avvenuta con successo
+   * @throws ClientRuntimeException errore di bad request
+   */
   public static boolean meetingValidate(Map<String, Object> params) throws ClientRuntimeException {
 
     for (Map.Entry<String, Object> entry : params.entrySet()) {
@@ -130,23 +137,23 @@ public class MapValidator {
 
       try {
         Set<ConstraintViolation<Meeting>> violations =
-                validator.validateValue(Meeting.class, attributeName, attributeValue);
+            validator.validateValue(Meeting.class, attributeName, attributeValue);
 
         if (!violations.isEmpty()) {
           // Handle validation errors for the specific attribute
           throw new ClientRuntimeException(
-                  "Errore nella richiesta: " + violations.iterator().next().getMessage());
+              "Errore nella richiesta: " + violations.iterator().next().getMessage());
         }
       } catch (IllegalArgumentException e) {
         throw new ClientRuntimeException(
-                "Errore nella richiesta: L'attributo '"
-                        + attributeName
-                        + "' non è presente nell'entità Stanza");
+            "Errore nella richiesta: L'attributo '"
+                + attributeName
+                + "' non è presente nell'entità Stanza");
       } catch (ValidationException ve) {
         throw new ClientRuntimeException(
-                "Errore nella richiesta: L'attributo '"
-                        + attributeName
-                        + "' ha un valore che non rispetta il suo tipo di dato");
+            "Errore nella richiesta: L'attributo '"
+                + attributeName
+                + "' ha un valore che non rispetta il suo tipo di dato");
       }
     }
     return true;

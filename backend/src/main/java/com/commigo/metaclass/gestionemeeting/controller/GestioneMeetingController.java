@@ -18,7 +18,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import java.util.List;
 import java.util.Map;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -92,7 +91,7 @@ public class GestioneMeetingController {
    */
   @PostMapping(value = "/modifyScheduling/{id}")
   public ResponseEntity<Response<Boolean>> modifyScheduling(
-          @PathVariable Long id, @RequestBody Map<String, Object> params, HttpServletRequest request) {
+      @PathVariable Long id, @RequestBody Map<String, Object> params, HttpServletRequest request) {
 
     try {
       // controllo del token
@@ -111,10 +110,10 @@ public class GestioneMeetingController {
 
     } catch (RuntimeException403 re) {
       return ResponseEntity.status(403)
-              .body(new Response<>(false, "Errore durante l'operazione: " + re.getMessage()));
+          .body(new Response<>(false, "Errore durante l'operazione: " + re.getMessage()));
     } catch (RuntimeException401 ue) {
       return ResponseEntity.status(401)
-              .body(new Response<>(false, "Errore durante l'operazione: " + ue.getMessage()));
+          .body(new Response<>(false, "Errore durante l'operazione: " + ue.getMessage()));
     } catch (ClientRuntimeException ce) {
       return ResponseEntity.status(400).body(new Response<>(false, ce.getMessage()));
     } catch (Exception e) {

@@ -1021,7 +1021,7 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService {
   }
 
   /**
-   * Metodo che ritorna lo stato partecipazione dell'utente in una stanza
+   * Metodo che ritorna lo stato partecipazione dell'utente in una stanza.
    *
    * @param metaId metaId utente
    * @param idStanza id stanza

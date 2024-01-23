@@ -7,7 +7,6 @@ import com.commigo.metaclass.exceptions.ServerRuntimeException;
 import com.commigo.metaclass.utility.response.types.Response;
 import java.util.List;
 import java.util.Map;
-
 import org.springframework.http.ResponseEntity;
 
 /** Interfaccia che offre servizi legati ai meetings. */
