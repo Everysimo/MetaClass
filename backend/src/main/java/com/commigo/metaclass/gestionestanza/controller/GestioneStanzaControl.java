@@ -1,6 +1,10 @@
 package com.commigo.metaclass.gestionestanza.controller;
 
-import com.commigo.metaclass.entity.*;
+import com.commigo.metaclass.entity.Ruolo;
+import com.commigo.metaclass.entity.Scenario;
+import com.commigo.metaclass.entity.Stanza;
+import com.commigo.metaclass.entity.StatoPartecipazione;
+import com.commigo.metaclass.entity.Utente;
 import com.commigo.metaclass.exceptions.ClientRuntimeException;
 import com.commigo.metaclass.exceptions.RuntimeException401;
 import com.commigo.metaclass.exceptions.RuntimeException403;
@@ -638,7 +642,7 @@ public class GestioneStanzaControl {
   }
 
   /**
-   * Metodo per prelevare lo stato partecipazione dell'utente
+   * Metodo per prelevare lo stato partecipazione dell'utente.
    *
    * @param idStanza id della stanza
    * @param request richiesta http

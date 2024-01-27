@@ -56,7 +56,7 @@ public class GestioneAmministrazioneController {
    * @param id Id della stanza di cui vogliamo visualizzare gli utenti bannati
    * @param request richiesta HTTP fornita dal client
    */
-  @PostMapping(value = "/visualizzaUtentiBannatiInStanza/{Id}")
+  @PostMapping(value = "/visualizzaUtentiBannatiInStanza/{id}")
   public ResponseEntity<Response<List<Utente>>> visualizzaUtentiBannatiInStanza(
       @PathVariable Long id, HttpServletRequest request) {
     try {

@@ -6,7 +6,6 @@ import jakarta.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
-
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -49,7 +48,8 @@ public interface MeetingRepository extends JpaRepository<Meeting, Long> {
           + "m.fine = COALESCE(:#{#attributes['fine']}, m.fine), "
           + "m.isAvviato= COALESCE(:#{#attributes['isAvviato']}, m.isAvviato) "
           + "WHERE m.id = :meetingId")
-  int updateAttributes(@Param("meetingId") Long meetingId, @Param("attributes") Map<String, Object> attributes);
+  int updateAttributes(
+      @Param("meetingId") Long meetingId, @Param("attributes") Map<String, Object> attributes);
 
   /**
    * Metodo che permette la modifica degli attributi di un meeting.
@@ -61,12 +61,12 @@ public interface MeetingRepository extends JpaRepository<Meeting, Long> {
   @Modifying
   @Transactional
   @Query(
-          "UPDATE Meeting m SET "
-                  + "m.nome = COALESCE(:#{#attributes['nome']}, m.nome), "
-                  + "m.inizio = COALESCE(:#{#attributes['inizio']}, m.inizio), "
-                  + "m.fine = COALESCE(:#{#attributes['fine']}, m.fine), "
-                  + "m.isAvviato= COALESCE(:#{#attributes['isAvviato']}, m.isAvviato) "
-                  + "WHERE m.id = :meetingId")
+      "UPDATE Meeting m SET "
+          + "m.nome = COALESCE(:#{#attributes['nome']}, m.nome), "
+          + "m.inizio = COALESCE(:#{#attributes['inizio']}, m.inizio), "
+          + "m.fine = COALESCE(:#{#attributes['fine']}, m.fine), "
+          + "m.isAvviato= COALESCE(:#{#attributes['isAvviato']}, m.isAvviato) "
+          + "WHERE m.id = :meetingId")
   int updateAttributes(@Param("meetingId") Long meetingId, @Param("attributes") Meeting attributes);
 
   /**

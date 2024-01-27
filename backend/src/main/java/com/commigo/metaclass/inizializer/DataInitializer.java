@@ -237,7 +237,7 @@ public class DataInitializer implements CommandLineRunner {
         new StatoPartecipazione(
             s1,
             u1,
-            ruoloRepository.findByNome(ORGANIZZATORE_MASTER),
+            ruoloRepository.findByNome(Ruolo.ORGANIZZATORE),
             false,
             false,
             "Michele",
@@ -246,7 +246,7 @@ public class DataInitializer implements CommandLineRunner {
         new StatoPartecipazione(
             s1,
             u2,
-            ruoloRepository.findByNome(Ruolo.ORGANIZZATORE),
+            ruoloRepository.findByNome(Ruolo.ORGANIZZATORE_MASTER),
             false,
             false,
             "Francesco",
@@ -270,7 +270,7 @@ public class DataInitializer implements CommandLineRunner {
             u2,
             ruoloRepository.findByNome(Ruolo.PARTECIPANTE),
             false,
-            true,
+            false,
             "Francesco",
             false));
     statoPartecipazioneRepository.save(
@@ -381,6 +381,15 @@ public class DataInitializer implements CommandLineRunner {
             false,
             "Domenico",
             false));
+    statoPartecipazioneRepository.save(
+            new StatoPartecipazione(
+                    s5,
+                    u5,
+                    ruoloRepository.findByNome(Ruolo.PARTECIPANTE),
+                    false,
+                    false,
+                    "Carmine",
+                    false));
 
     // Aggiunta meeting
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");

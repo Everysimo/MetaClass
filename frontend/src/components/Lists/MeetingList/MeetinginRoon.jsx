@@ -7,6 +7,8 @@ import {faAlignCenter} from "@fortawesome/free-solid-svg-icons";
 import dayjs from "dayjs";
 import AvviaMeeting from "../../Buttons/GestioneMeetingButtons/AvviaMeeting";
 import TerminaMeeting from "../../Buttons/GestioneMeetingButtons/TerminaMeeting";
+import ModificaMeeting from "../../Forms/ScheduleMeetingForm/ModificaMeeting";
+import {wait} from "@testing-library/user-event/dist/utils";
 
 const MeetingListRoom = () => {
     const [meetingList, setMeetingList] = useState([]);
@@ -67,7 +69,7 @@ const MeetingListRoom = () => {
             {meetingList && meetingList.map((meeting) => (
                 <div key={meeting.id} className="user-card">
                     <span>Nome: {`${meeting.nome} `}</span>
-                    <span>Stato: {`${meeting.avviato ? 'Meeting Attivo' : 'Meeting Inattivo'} `}</span>
+                    <span>Stato: {`${meeting.avviato ? 'Meeting Attivo' : 'Inattivo'} `}</span>
                     <span>Inizio: {`${dayjs(meeting.inizio).format('YYYY-DD-MM')} `}</span>
                     <button onClick={() => toggleButtons(meeting.id)}>
                         Options <FontAwesomeIcon icon={faAlignCenter} style={{color: "#ffffff",}}/>

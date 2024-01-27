@@ -3,7 +3,13 @@ import React, { useEffect, useState } from "react";
 import './UserList.css';
 import '../../Forms/PopUpStyles.css';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faAlignCenter } from "@fortawesome/free-solid-svg-icons";
+import {
+    faAlignCenter,
+    faArrowsRotate, faArrowTrendDown, faArrowTrendUp, faBan,
+    faCrown,
+    faMicrophone,
+    faMicrophoneSlash, faSnowplow
+} from "@fortawesome/free-solid-svg-icons";
 import { checkRole } from "../../../functions/checkRole";
 
 const UserListInRoom = () => {
@@ -15,12 +21,14 @@ const UserListInRoom = () => {
     const [message, setMessage] = useState('');
     const [newName, setNewName] = useState("");
     const [selectedUserId, setSelectedUserId] = useState(null);
+    const [statoPartecipazione, setStatoP] = useState(null);
 
     const { id: id_stanza } = useParams();
     const idStanza = id_stanza;
 
     useEffect(() => {
         fetchUserList();
+        fetchstatoPartecipazione();
     }, []);
 
     const toggleButtons = (userId) => {
@@ -65,8 +73,41 @@ const UserListInRoom = () => {
         }
     }
 
-    const handleChangeNameButton = (idutente) => {
-        setSelectedUserId(idutente);
+    const fetchstatoPartecipazione = async() => {
+        try {
+            console.log("sono qui dentro")
+
+            const response = await fetch(`http://localhost:8080/getStatopartecipazione/${idStanza}`, requestOption);
+
+            if (!response.ok) {
+                throw new Error('Errore nella richiesta');
+            }
+
+            const data = await response.json();
+
+            console.log("dati:", data);
+
+            setStatoP(data);
+
+
+            if (Array.isArray(data.value) && data.value.length > 0) {
+                // Stampa il nome in stanza di ciascun elemento nell'array
+                data.value.forEach((element, index) => {
+                    console.log(`Nome in stanza ${index + 1}: ${element.nomeInStanza}`);
+                });
+            } else {
+                console.log("Nessun dato disponibile.");
+            }
+
+            console.log("Stato partecipazioni:", statoPartecipazione);
+
+        } catch (error) {
+            console.error('Errore durante il recupero della lista di utenti:', error);
+        }
+    }
+
+    const handleChangeNameButton = (idUtente) => {
+        setSelectedUserId(idUtente);
         setChangeNameModal(true);
     }
 
@@ -113,11 +154,11 @@ const UserListInRoom = () => {
         }
     }
 
-    const handleKickUserButton = (idutente) => {
-        handleKickUser(idutente);
+    const handleKickUserButton = (idUtente) => {
+        handleKickUser(idUtente);
     }
 
-    const handleKickUser = async (idutente) => {
+    const handleKickUser = async (idUtente) => {
         const requestOption = {
             method: 'POST',
             headers: {
@@ -127,7 +168,7 @@ const UserListInRoom = () => {
         };
         try {
             const response = await fetch(
-                `http://localhost:8080/kickarePartecipante/${id_stanza}/${idutente}`,
+                `http://localhost:8080/kickarePartecipante/${id_stanza}/${idUtente}`,
                 requestOption
             );
             if (!response.ok) {
@@ -145,11 +186,11 @@ const UserListInRoom = () => {
         }
     }
 
-    const handleSilenziaUserButton = (idutente) => {
-        handleSilenziaUser(idutente);
+    const handleSilenziaUserButton = (idUtente) => {
+        handleSilenziaUser(idUtente);
     }
 
-    const handleSilenziaUser = async (idutente) => {
+    const handleSilenziaUser = async (idUtente) => {
         const requestOption = {
             method: 'POST',
             headers: {
@@ -159,7 +200,7 @@ const UserListInRoom = () => {
         };
         try {
             const response = await fetch(
-                `http://localhost:8080/silenziarePartecipante/${idStanza}/${idutente}`,
+                `http://localhost:8080/silenziarePartecipante/${idStanza}/${idUtente}`,
                 requestOption
             );
             if (!response.ok) {
@@ -177,13 +218,45 @@ const UserListInRoom = () => {
         }
     }
 
-    const handlePromotionButton = (idutente) => {
-        setSelectedUserId(idutente);
-        handlePromotion();
+    const handleUnMuteUserButton = (idUtente) => {
+        handleUnMuteUser(idUtente);
+    }
+
+    const handleUnMuteUser= async(idUtente) => {
+        const requestOption = {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + sessionStorage.getItem("token")
+            },
+        };
+        try {
+            const response = await fetch(
+                `http://localhost:8080/unmutePartecipante/${idStanza}/${idUtente}`,
+                requestOption
+            );
+            if (!response.ok) {
+                throw new Error('Errore nella richiesta di smutare partecipante');
+            }
+
+            if(response.ok){
+                const data = await response.json();
+                setMessage(data.message)
+                setShowSuccessPopup(true);
+            }
+
+        } catch (error) {
+            console.error('Errore durante la richiesta di smutare il partecipante:', error);
+        }
+    }
+
+    const handlePromotionButton = (idUtente) => {
+        setSelectedUserId(idUtente);
+        handlePromotion(idUtente);
     };
 
-    const handlePromotion = async () => {
-        if (!id_stanza || !selectedUserId) {
+    const handlePromotion = async (idUtente) => {
+        if (!id_stanza || !idUtente) {
             console.error('Invalid id_stanza or selectedUserId');
             return;
         }
@@ -198,26 +271,29 @@ const UserListInRoom = () => {
 
         try {
             const response = await fetch(
-                `http://localhost:8080/promuoviOrganizzatore/${idStanza}/${selectedUserId}`,
+                `http://localhost:8080/promuoviOrganizzatore/${idStanza}/${idUtente}`,
                 requestOption
             );
             if (!response.ok) {
                 throw new Error('Error in promoting the user');
             }
 
-            const data = await response.json();
-            console.log('data:', data);
+            if(response.ok){
+                const data = await response.json();
+                setMessage(data.message)
+                setShowSuccessPopup(true);
+            }
         } catch (error) {
             console.error('Error during user promotion:', error);
         }
     };
 
-    const handleBanUserButton = (idutente) => {
-        setSelectedUserId(idutente);
-        handleBanUser();
+    const handleBanUserButton = (idUtente) => {
+        setSelectedUserId(idUtente);
+        handleBanUser(idUtente);
     }
 
-    const handleBanUser = async () => {
+    const handleBanUser = async (idUtente) => {
         const requestOption = {
             method: 'POST',
             headers: {
@@ -227,26 +303,30 @@ const UserListInRoom = () => {
         };
         try {
             const response = await fetch(
-                `http://localhost:8080/banUtente/${idStanza}/${selectedUserId}`,
+                `http://localhost:8080/banUtente/${idStanza}/${idUtente}`,
                 requestOption
             );
             if (!response.ok) {
                 throw new Error('Errore nella richiesta di Bannare il partecipante');
             }
-            const data = await response.json();
-            console.log('data:', data);
+
+            if(response.ok){
+                const data = await response.json();
+                setMessage(data.message)
+                setShowSuccessPopup(true);
+            }
         } catch (error) {
             console.error('Errore durante il ban dell\'utente:', error);
         }
     }
 
-    const handleDeclassifyButton = (idutente) => {
-        setSelectedUserId(idutente);
-        handleDeclassify();
+    const handleDeclassifyButton = (idUtente) => {
+        setSelectedUserId(idUtente);
+        handleDeclassify(idUtente);
     };
 
-    const handleDeclassify = async () => {
-        if (!id_stanza || !selectedUserId) {
+    const handleDeclassify = async (idUtente) => {
+        if (!id_stanza || !idUtente) {
             console.error('Invalid id_stanza or selectedUserId');
             return;
         }
@@ -261,15 +341,19 @@ const UserListInRoom = () => {
 
         try {
             const response = await fetch(
-                `http://localhost:8080/declassaOrganizzatore/${idStanza}/${selectedUserId}`,
+                `http://localhost:8080/declassaOrganizzatore/${idStanza}/${idUtente}`,
                 requestOption
             );
             if (!response.ok) {
                 throw new Error('Errore nella richiesta di declassare');
             }
 
-            const data = await response.json();
-            console.log('data:', data);
+            if(response.ok){
+                const data = await response.json();
+                setMessage(data.message)
+                setShowSuccessPopup(true);
+            }
+
         } catch (error) {
             console.error('Errore nella richiesta di declassare:', error);
         }
@@ -296,13 +380,24 @@ const UserListInRoom = () => {
         }
     }
 
+    const utentiSilenziati = statoPartecipazione?.value?.filter(item => item.silenziato)?.map(item => item.utente.id) || [];
+
     return (
+
         <div>
             <h2>Utenti In Stanza:</h2>
             {userList && userList.map((user) => (
+
                 <div key={user.id} className="user-card">
+                    {statoPartecipazione && statoPartecipazione.value && Array.isArray(statoPartecipazione.value) &&
+                        statoPartecipazione.value.find((partecipazione) => partecipazione.utente.id === user.id && partecipazione.ruolo.nome === 'Organizzatore') && (
+                            <div>
+                                <FontAwesomeIcon icon={faCrown} />
+                            </div>
+                        )}
                     <span>Nome: {`${user.nome} ${user.cognome}`}</span>
-                    <span>Nome In Stanza: {''}</span>
+                    <span>Nome In Stanza: {statoPartecipazione && statoPartecipazione.value && Array.isArray(statoPartecipazione.value) ?
+                        statoPartecipazione.value.find((partecipazione) => partecipazione.utente.id === user.id)?.nomeInStanza || "N/A":"N/A"} </span>
                     <span>Email: {`${user.email}`}</span>
                     {user.role &&
                         <>
@@ -310,12 +405,27 @@ const UserListInRoom = () => {
                                 Opzioni <FontAwesomeIcon icon={faAlignCenter} style={{ color: "#ffffff", }} />
                             </button>
                             <div className={`options-container${showButtonsMap[user.id] ? ' open' : ''}`}>
-                                <button onClick={() => handleChangeNameButton(user.id)}>Cambia Nome</button>
-                                <button onClick={() => handleKickUserButton(user.id)}>Kicka Partecipante</button>
-                                <button onClick={() => handleSilenziaUserButton(user.id)}>Silenzia Partecipante</button>
-                                <button onClick={() => handlePromotionButton(user.id)}>Promuovi</button>
-                                <button onClick={() => handleBanUserButton(user.id)}>Banna Partecipante</button>
-                                <button onClick={() => handleDeclassifyButton(user.id)}>Declassa</button>
+                                <button onClick={() => handleChangeNameButton(user.id)}>Cambia Nome <FontAwesomeIcon icon={faArrowsRotate} style={{ color: "#ffffff", }} /></button>
+                                <button onClick={() => handleKickUserButton(user.id)}>Kicka Partecipante <FontAwesomeIcon icon={faSnowplow} /> </button>
+
+
+                                {utentiSilenziati.includes(user.id) ? (
+                                    <button onClick={() => handleUnMuteUserButton(user.id)}>Smuta Partecipante <FontAwesomeIcon icon={faMicrophoneSlash} /></button>
+                                ) : (
+                                    <button onClick={() => handleSilenziaUserButton(user.id)}>Silenzia Partecipante <FontAwesomeIcon icon={faMicrophone} /></button>
+                                )}
+
+
+                                <button onClick={() => handleBanUserButton(user.id)}>Banna Partecipante <FontAwesomeIcon icon={faBan} /></button>
+
+
+                                {statoPartecipazione && statoPartecipazione.value && Array.isArray(statoPartecipazione.value) &&
+                                statoPartecipazione.value.find((partecipazione) => partecipazione.utente.id === user.id && partecipazione.ruolo.nome === 'Organizzatore') ? (
+                                    <button onClick={() => handleDeclassifyButton(user.id)}>Declassa <FontAwesomeIcon icon={faArrowTrendDown} /></button>
+                                ) : (
+                                    <button onClick={() => handlePromotionButton(user.id)}>Promuovi <FontAwesomeIcon icon={faArrowTrendUp} /></button>
+                                )
+                                }
                             </div>
                         </>
                     }
@@ -353,6 +463,7 @@ const UserListInRoom = () => {
                 </div>
             )}
         </div>
+
     );
 };
 

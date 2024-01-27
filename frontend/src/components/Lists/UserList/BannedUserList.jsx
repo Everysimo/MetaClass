@@ -1,11 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import {wait} from "@testing-library/user-event/dist/utils";
 
 const BannedUserList = ({ id_stanza }) => {
     const [userList, setUserList] = useState([]);
     const [message, setMessage] = useState('');
     const [showModal, setShowModal] = useState(false);
-    const id_stanza_int = parseInt(id_stanza, 10);
     const isAdmin = sessionStorage.getItem('isAdmin');
 
     useEffect(() => {
@@ -22,10 +20,9 @@ const BannedUserList = ({ id_stanza }) => {
 
     const fetchBannedUserList = async () => {
         try {
-            const idStanza = id_stanza_int;
+            //const idStanza = id_stanza_int;
             const response = await fetch(
-                `http://localhost:8080/admin/visualizzaUtentiBannatiInStanza/
-                ${idStanza}`,
+                `http://localhost:8080/admin/visualizzaUtentiBannatiInStanza/${id_stanza}`,
                 requestOption
             );
 
@@ -76,6 +73,8 @@ const BannedUserList = ({ id_stanza }) => {
     const close=()=>{
         setShowModal(false);
         setMessage('');
+        window.location.replace(window.location.pathname);
+
     }
     const checkAdm = () => {
         console.log('isAdmin: ', isAdmin);

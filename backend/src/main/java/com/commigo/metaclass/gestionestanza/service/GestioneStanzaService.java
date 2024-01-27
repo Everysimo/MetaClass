@@ -1,6 +1,10 @@
 package com.commigo.metaclass.gestionestanza.service;
 
-import com.commigo.metaclass.entity.*;
+import com.commigo.metaclass.entity.Ruolo;
+import com.commigo.metaclass.entity.Scenario;
+import com.commigo.metaclass.entity.Stanza;
+import com.commigo.metaclass.entity.StatoPartecipazione;
+import com.commigo.metaclass.entity.Utente;
 import com.commigo.metaclass.exceptions.RuntimeException401;
 import com.commigo.metaclass.exceptions.RuntimeException403;
 import com.commigo.metaclass.exceptions.ServerRuntimeException;
@@ -16,14 +20,14 @@ public interface GestioneStanzaService {
   ResponseEntity<AccessResponse<Long>> accessoStanza(String codiceStanza, String idUtente)
       throws ServerRuntimeException, RuntimeException403;
 
-  ResponseEntity<Response<Boolean>> banPartecipante(Long idStanza, String metaId, Long idUtente)
-      throws ServerRuntimeException, RuntimeException403;
+  public ResponseEntity<Response<Boolean>> banPartecipante(StatoPartecipazione statoUser)
+      throws ServerRuntimeException;
 
   ResponseEntity<Response<Boolean>> banUtente(Long idStanza, String metaId, Long idUtente)
       throws ServerRuntimeException, RuntimeException403;
 
-  ResponseEntity<Response<Boolean>> banOrganizzatore(Long idStanza, String metaId, Long idUtente)
-      throws ServerRuntimeException, RuntimeException403;
+  public ResponseEntity<Response<Boolean>> banOrganizzatore(StatoPartecipazione statoUser)
+      throws ServerRuntimeException;
 
   boolean creaStanza(Stanza s, String metaId) throws Exception;
 
