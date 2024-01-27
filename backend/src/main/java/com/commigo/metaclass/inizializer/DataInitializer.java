@@ -157,6 +157,18 @@ public class DataInitializer implements CommandLineRunner {
                 Utente.DEFAULT_TOKEN,
                 true));
 
+    final Utente u6 =
+            utenteRepository.save(
+                    new Utente(
+                            6L,
+                            "Salvatore",
+                            "Alberti",
+                            "s.alberti1@studenti.unisa.it",
+                            "04/02/2003",
+                            "M",
+                            "100003456926961",
+                            Utente.DEFAULT_TOKEN,
+                            true));
     // Aggiunta ruolo
     ruoloRepository.save(new Ruolo(1L, "Partecipante"));
     ruoloRepository.save(new Ruolo(2L, "Organizzatore"));
