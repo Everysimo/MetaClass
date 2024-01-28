@@ -1,0 +1,28 @@
+.SlideShow {
+    width: auto;
+    display: flex;
+    overflow-x: scroll;
+    scroll-snap-type: x mandatory;
+    padding: 10px;
+}
+
+.SlideShow div{
+    min-width: 205px;
+    height: 300px;
+    display: flex;
+    justify-content: space-around;
+    margin: 0 5px;
+    align-items: center;
+    color: #002f53;
+    scroll-snap-align: center;
+    img{
+        border-radius: 25px;
+        width: 100%;
+    }
+    p{
+        font-size: 14px;
+    }
+    button{
+        width: 100%;
+    }
+}

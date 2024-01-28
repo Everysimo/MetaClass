@@ -184,7 +184,6 @@ const CreaScenario = (props) => {
 
     const handleCloseSuccessPopUp = () => {
         setShowSuccessPopUp(false);
-        window.location.replace(window.location.pathname);
     };
 
     return (

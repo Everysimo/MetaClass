@@ -138,17 +138,25 @@ const RequestSection = ({ id_stanza }) => {
                             <div>
                                 <h2>Richieste di accesso:</h2>
                                 <div className={"table-container"}>
-                                    {array.map((user) => (
-                                        <div key={user.id} className="table-row">
-                                            <span className={"table-cell"}>{`${user.nome} ${user.cognome}`}</span>
-                                            <span className={"table-cell"}>
-                                                <button onClick={() => handleAcceptButton(user.id)}>Accetta</button>
-                                            </span>
-                                            <span className={"table-cell"}>
-                                                <button onClick={() => handleRejectButton(user.id)}>Rifiuta</button>
-                                            </span>
-                                        </div>
-                                    ))}
+                                    {array && array.length > 0 ? (
+                                        array.map((user) => (
+                                            <div key={user.id} className="table-row">
+                                                <span className={"table-cell"}>{`${user.nome} ${user.cognome}`}</span>
+                                                <span className={"table-cell"}>
+                                                    <button onClick={() => handleAcceptButton(user.id)}>Accetta</button>
+                                                </span>
+                                                <span className={"table-cell"}>
+                                                    <button onClick={() => handleRejectButton(user.id)}>Rifiuta</button>
+                                                </span>
+                                            </div>
+                                        ))
+                                    ) : (
+                                        <p
+                                            style={{
+                                                textAlign: "center",
+                                                fontSize: "14px"
+                                        }}>Non ci sono utenti in attesa</p>
+                                    )}
                                 </div>
                             </div>
                         )}

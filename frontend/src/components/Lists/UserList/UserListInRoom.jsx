@@ -24,6 +24,7 @@ const UserListInRoom = () => {
     const [statoPartecipazione, setStatoP] = useState(null);
 
     const { id: id_stanza } = useParams();
+    const id_utente = sessionStorage.getItem('UserMetaID');
     const idStanza = id_stanza;
 
     useEffect(() => {
@@ -373,14 +374,21 @@ const UserListInRoom = () => {
     const checkOrg = async (id_stanza, userId) => {
         try {
             const fetchedRole = await checkRole(id_stanza, userId);
-            return fetchedRole === "Organizzatore" || fetchedRole === "Organizzatore_Master";
+            if(fetchedRole === "Partecipante")
+                return 0;
+            else if(fetchedRole === "Organizzatore")
+                return 1;
+            else
+                return 2;
         } catch (error) {
             console.error(error);
             return false;
         }
     }
 
-    const utentiSilenziati = statoPartecipazione?.value?.filter(item => item.silenziato)?.map(item => item.utente.id) || [];
+    const utentiSilenziati = statoPartecipazione?.value?.filter(
+        item => item.silenziato
+    )?.map(item => item.utente.id) || [];
 
     return (
 
@@ -389,49 +397,112 @@ const UserListInRoom = () => {
             {userList && userList.map((user) => (
 
                 <div key={user.id} className="user-card">
-                    {statoPartecipazione && statoPartecipazione.value && Array.isArray(statoPartecipazione.value) &&
-                        statoPartecipazione.value.find((partecipazione) => partecipazione.utente.id === user.id && partecipazione.ruolo.nome === 'Organizzatore') && (
+                    {
+                        statoPartecipazione &&
+                        statoPartecipazione.value &&
+                        Array.isArray(statoPartecipazione.value) &&
+                        statoPartecipazione.value.find((partecipazione) => partecipazione.utente.id === user.id &&
+                            partecipazione.ruolo.nome === 'Organizzatore') && (
                             <div>
                                 <FontAwesomeIcon icon={faCrown} />
                             </div>
-                        )}
+                        )
+                    }
+                    {
+                        statoPartecipazione &&
+                        statoPartecipazione.value &&
+                        Array.isArray(statoPartecipazione.value) &&
+                        statoPartecipazione.value.find((partecipazione) => partecipazione.utente.id === user.id &&
+                            partecipazione.ruolo.nome === 'Organizzatore_Master') && (
+                            <div>
+                                <FontAwesomeIcon
+                                    icon={faCrown}
+                                    style={{
+                                        color: "yellow",
+                                        backgroundColor: "#002f53",
+                                        borderRadius: "2px"
+                                }}/>
+                            </div>
+                        )
+                    }
                     <span>Nome: {`${user.nome} ${user.cognome}`}</span>
-                    <span>Nome In Stanza: {statoPartecipazione &&
-                    statoPartecipazione.value &&
-                    Array.isArray(statoPartecipazione.value) ?
+                    <span>Nome In Stanza: {
+                        statoPartecipazione &&
+                        statoPartecipazione.value &&
+                        Array.isArray(statoPartecipazione.value) ?
                         statoPartecipazione.value.find(
-                            (partecipazione) => partecipazione.utente.id === user.id)?.nomeInStanza || "N/A":"N/A"} </span>
+                            (partecipazione) => partecipazione.utente.id === user.id)?.nomeInStanza ||
+                            "N/A":"N/A"
+                    }
+                    </span>
                     <span>Email: {`${user.email}`}</span>
-                    {user.role &&
                         <>
-                            <button onClick={() => toggleButtons(user.id)}>
-                                Opzioni <FontAwesomeIcon icon={faAlignCenter} style={{ color: "#ffffff", }} />
-                            </button>
-                            <div className={`options-container${showButtonsMap[user.id] ? ' open' : ''}`}>
-                                <button onClick={() => handleChangeNameButton(user.id)}>Cambia Nome <FontAwesomeIcon icon={faArrowsRotate} style={{ color: "#ffffff", }} /></button>
-                                <button onClick={() => handleKickUserButton(user.id)}>Kicka Partecipante <FontAwesomeIcon icon={faSnowplow} /> </button>
-
-
-                                {utentiSilenziati.includes(user.id) ? (
-                                    <button onClick={() => handleUnMuteUserButton(user.id)}>Smuta Partecipante <FontAwesomeIcon icon={faMicrophoneSlash} /></button>
-                                ) : (
-                                    <button onClick={() => handleSilenziaUserButton(user.id)}>Silenzia Partecipante <FontAwesomeIcon icon={faMicrophone} /></button>
-                                )}
-
-
-                                <button onClick={() => handleBanUserButton(user.id)}>Banna Partecipante <FontAwesomeIcon icon={faBan} /></button>
-
-
-                                {statoPartecipazione && statoPartecipazione.value && Array.isArray(statoPartecipazione.value) &&
-                                statoPartecipazione.value.find((partecipazione) => partecipazione.utente.id === user.id && partecipazione.ruolo.nome === 'Organizzatore') ? (
-                                    <button onClick={() => handleDeclassifyButton(user.id)}>Declassa <FontAwesomeIcon icon={faArrowTrendDown} /></button>
-                                ) : (
-                                    <button onClick={() => handlePromotionButton(user.id)}>Promuovi <FontAwesomeIcon icon={faArrowTrendUp} /></button>
+                            {
+                                statoPartecipazione &&
+                                statoPartecipazione.value &&
+                                Array.isArray(statoPartecipazione.value) &&
+                                statoPartecipazione.value.find(
+                                    (partecipazione) => partecipazione.utente.id === user.id &&
+                                    partecipazione.ruolo.nome !== 'Organizzatore_Master') && (
+                                        <button onClick={() => toggleButtons(user.id)}>
+                                            Opzioni <FontAwesomeIcon
+                                            icon={faAlignCenter}
+                                            style={{color: "#ffffff",}}/>
+                                        </button>
                                 )
+                            }
+                            <div className={`options-container${showButtonsMap[user.id] ? ' open' : ''}`}>
+                                <button
+                                    onClick={() => handleChangeNameButton(user.id)}
+                                >
+                                    Cambia Nome <FontAwesomeIcon icon={faArrowsRotate} style={{ color: "#ffffff", }} />
+                                </button>
+                                {(user.role === 1 || user.role === 2) &&
+                                    <button
+                                        onClick={() => handleKickUserButton(user.id)}
+                                    >
+                                        Kicka Partecipante <FontAwesomeIcon icon={faSnowplow} />
+                                    </button>
+                                }
+                                {(user.role === 1 || user.role === 2) &&(
+                                    utentiSilenziati.includes(user.id) ? (
+                                        <button
+                                            onClick={() => handleUnMuteUserButton(user.id)}
+                                        >
+                                            Smuta Partecipante <FontAwesomeIcon icon={faMicrophoneSlash} />
+                                        </button>
+                                    ) : (
+                                        <button onClick={() => handleSilenziaUserButton(user.id)}>Silenzia Partecipante <FontAwesomeIcon icon={faMicrophone} /></button>
+                                    )
+                                )}
+                                {(user.role === 1 || user.role === 2) &&(
+                                    <button
+                                        onClick={() => handleBanUserButton(user.id)}
+                                    >
+                                        Banna Partecipante <FontAwesomeIcon icon={faBan} />
+                                    </button>
+                                )}
+                                {user.role === 2 &&(
+                                    statoPartecipazione &&
+                                    statoPartecipazione.value &&
+                                    Array.isArray(statoPartecipazione.value) &&
+                                    statoPartecipazione.value.find((partecipazione) => partecipazione.utente.id === user.id &&
+                                        partecipazione.ruolo.nome === 'Organizzatore') ? (
+                                        <button
+                                            onClick={() => handleDeclassifyButton(user.id)}
+                                        >
+                                            Declassa <FontAwesomeIcon icon={faArrowTrendDown} />
+                                        </button>
+                                    ) : (
+                                        <button
+                                            onClick={() => handlePromotionButton(user.id)}
+                                        >
+                                            Promuovi <FontAwesomeIcon icon={faArrowTrendUp} />
+                                        </button>
+                                    ))
                                 }
                             </div>
                         </>
-                    }
                 </div>
             ))}
             {showChangeNameModal && (

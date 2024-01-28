@@ -7,6 +7,7 @@ import '../PopUpStyles.css'
 import axios from 'axios';
 import {faCheck, faRobot} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {wait} from "@testing-library/user-event/dist/utils";
 
 const CalendarComp = () => {
     const offsetMinutes = 30; //prendiamo l'offset dato dall'IA (stima durata)
@@ -24,8 +25,9 @@ const CalendarComp = () => {
     ]);
 
     const handleDateTimeRangeChange = (newDateTimeRange) => {
-        if(newDateTimeRange <= Date())
+        if(newDateTimeRange < Date()){
             setErrorMessage('Il meeting deve essere schedulato in un giorno successivo al presente');
+        }
         else
             setErrorMessage('');
         setSelectedDateTimeRange(newDateTimeRange);
@@ -44,34 +46,40 @@ const CalendarComp = () => {
         else setErrorMessage('');
     }
     const handleSubmit = async () => {
-        try {
-            const [startDate, endDate] = selectedDateTimeRange.map((date) =>
-                    date.format('YYYY-MM-DD HH:mm')
-            );
+        if (name !== ''){
+            try {
+                console.log(selectedDateTimeRange)
+                const [startDate, endDate] = selectedDateTimeRange.map((date) =>
+                        date.format('YYYY-MM-DD HH:mm')
+                );
 
-            const token = sessionStorage.getItem('token');
+                const token = sessionStorage.getItem('token');
 
-            const meetingData = {
-                nome: name,
-                inizio: startDate,
-                fine: endDate,
-                id_stanza: sessionStorage.getItem('idStanza'),
-            };
-            const meetingDataJSON = JSON.stringify(meetingData);
+                const meetingData = {
+                    nome: name,
+                    inizio: startDate,
+                    fine: endDate,
+                    id_stanza: sessionStorage.getItem('idStanza'),
+                };
+                const meetingDataJSON = JSON.stringify(meetingData);
 
-            const response = await axios.post(
-                'http://localhost:8080/schedulingMeeting',
-                meetingDataJSON,
-                {
-                    headers: {
-                        'Content-Type': 'application/json',
-                        Authorization: `Bearer ${token}`,
-                    },
-                });
-            setSuccessMessage(response.data.message);
-        } catch (error) {
-            console.error('Error:', error.response.data.message);
-            setErrorMessage(error.response.data.message || 'An error occurred');
+                const response = await axios.post(
+                    'http://localhost:8080/schedulingMeeting',
+                    meetingDataJSON,
+                    {
+                        headers: {
+                            'Content-Type': 'application/json',
+                            Authorization: `Bearer ${token}`,
+                        },
+                    });
+                setSuccessMessage(response.data.message);
+            } catch (error) {
+                console.error('Error:', error.response.data.message);
+                setErrorMessage(error.response.data.message);
+            }
+        }
+        else {
+            setErrorMessage('Non lasciare campi vuoti');
         }
     };
 

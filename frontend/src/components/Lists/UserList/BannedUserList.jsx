@@ -97,19 +97,29 @@ const BannedUserList = ({ id_stanza }) => {
                             {message ? (
                                 <p>{message}</p>
                                 ) : (
-                                    <>
-                            <h2>Utenti Bannati:</h2>
-                            {userList && userList.map((user) => (
-                                <div key={user.id} className="user-card">
-                                    <span>{`${user.nome} ${user.cognome}`}</span>
-                                    <button
-                                        onClick={() => handleRevocaBanButton(user.id)}
-                                    >
-                                        Revoca Ban Utente
-                                    </button>
-                                </div>
-                            ))}
-                                    </>)}
+                                <>
+                                    <h2>Utenti Bannati:</h2>
+                                    {userList && userList.length > 0 ? (
+                                        userList.map((user) => (
+                                            <div key={user.id} className="user-card">
+                                                <span>{`${user.nome} ${user.cognome}`}</span>
+                                                <button
+                                                    onClick={() => handleRevocaBanButton(user.id)}
+                                                >
+                                                    Revoca Ban Utente
+                                                </button>
+                                            </div>
+                                        ))
+                                    ) : (
+                                        <p
+                                            style={{
+                                                textAlign: "center",
+                                                fontSize: "14px"
+                                        }}>Non ci sono utenti bannati</p>
+                                    )}
+                                </>
+                            )
+                            }
                         </div>
                     </div>
                 }
