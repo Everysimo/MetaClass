@@ -1,37 +1,38 @@
 import Comm from "../../../img/commigo.png";
-import './footer.css'
+import './Footer.css'
 import '../../../css/MyApp.css'
 import React from "react";
 
-function GenerateRows({ Nomi }) {
-    if (!Array.isArray(Nomi)) {
-        return null; // Or handle this case accordingly
-    }
-
-    const cells = Nomi.map((item, index) => {
-        if (item !== null) {
-            return (
-                <div className={"table-cell"} key={index}>
-                    <p>{item}</p>
-                </div>
-            );
-        }
-        return null;
-    });
-
-    return <div className={"table-row"}>{cells}</div>;
-}
 export function MyFooter() {
-    const stringsArray = ["Carmine Detta", "Salvatore Alberti", "Vincenzo Cutolo", "Gatto Francesco", "Pesce Michele", "Cavaliere Domenico"];
-
     return (
-        <div className={"table-container"}>
-            <div className={"table-row"}>
-                <div className={"table-cell"}>
-                    <img src={Comm} className='App-logo' alt='nessuna immagine'></img>
+        <div id={"footer"}>
+            <div className={"table-container"}>
+                <div className={"table-row"}>
+                    <div className={"table-cell"}>
+                        <img src={Comm} className='App-logo' alt='nessuna immagine'></img>
+                    </div>
                 </div>
             </div>
-            <GenerateRows Nomi={stringsArray}/>
+            <div className={"footerLayout"}>
+                <p>
+                    Carmine Detta
+                </p>
+                <p>
+                    Salvatore Alberti
+                </p>
+                <p>
+                    Vincenzo Cutolo
+                </p>
+                <p>
+                    Francesco Gatto
+                </p>
+                <p>
+                    Michele Pesce
+                </p>
+                <p>
+                    Domenico Cavaliere
+                </p>
+            </div>
         </div>
     );
 }

@@ -1,14 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import '../PopUpStyles.css';
-import {faCheck, faFileCircleXmark} from "@fortawesome/free-solid-svg-icons";
+import './Questionario.css'
+import {faCheck, faFileCircleXmark, faInfo} from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 const Questionario = (props) => {
-    //const [valutazione, setValutazione] = useState(0);
+    //const [valutazione, setValutazione] = useState(0)
+    const [info, setInfo] = useState(false);
     const [errore, setErrore] = useState(null);
     const [showModal, setShowModal] = useState(false);
     const [showSuccessPopup, setShowSuccessPopup] = useState(false);
-    const [id_meeting, setId] = useState(props.id_meeting);
+    const id_meeting = props.id_meeting;
 
     const [state, setState] = useState({
         immersion: "",
@@ -31,6 +33,14 @@ const Questionario = (props) => {
         const newValue = parseInt(e.target.value, 10);
         setState(prevState => ({ ...prevState, motion: newValue }));
         console.log("dato di sickness:", newValue);
+    };
+
+    const handleMouseOver = () => {
+        setInfo(true);
+    };
+
+    const handleMouseLeave = () => {
+        setInfo(false);
     };
 
 
@@ -119,7 +129,22 @@ const Questionario = (props) => {
                             className={"close"}
                             onClick={handleClose}
                         >&times;</span>
-                        <h2>Compila il Questionario</h2>
+                        <h2>
+                            Compila il Questionario <FontAwesomeIcon
+                                className={"infoIcon"}
+                                icon={faInfo}
+                                size="2xs"
+                                style={{color: "#74C0FC",}}
+                                onMouseOver={handleMouseOver}
+                                onMouseLeave={handleMouseLeave}
+                            />
+                        </h2>
+                        <div className={`info ${info ? 'open' : ''}`}>
+                            <p>
+                                Questo questionario serve per allenare il modulo di IA
+                                e per fornire una stima più accurata della durata consigliata dei prossimi meetings
+                            </p>
+                        </div>
                         <p style={{fontSize: "14px", textAlign: "center"}}>Livello di immersività (1 a 5)</p>
                         <div className="dots-container">
                             {[1, 2, 3, 4, 5].map((value) => (

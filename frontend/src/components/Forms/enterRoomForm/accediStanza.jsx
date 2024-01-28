@@ -118,7 +118,7 @@ const AccediStanza = () => {
                     <div className="modal-content">
                         <span className="close" onClick={handleCloseModal}>&times;</span>
                         <label>
-                            insert room code:
+                            Inserisci codice stanza:
                             <input
                                 type="number"
                                 placeholder={'Codice di 6 cifre'}

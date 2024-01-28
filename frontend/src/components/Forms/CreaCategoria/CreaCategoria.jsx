@@ -85,11 +85,9 @@ const CreaCategoria = (props) => {
 
     const handleClose = () => {
         setIsVisible(false);
-
         if (props.onClose) {
             props.onClose();
         }
-        window.location.reload();
     };
 
     return (

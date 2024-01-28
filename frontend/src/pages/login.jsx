@@ -14,7 +14,7 @@ export const Login = () => {
 
     return (
         isLoggedIn() ? (
-            navigate("/LoggedInHome"), null
+            navigate("/LoggedInHome")
         ) : (
             <>
                 <header>

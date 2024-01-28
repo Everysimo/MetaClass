@@ -29,7 +29,7 @@ const BurgerButton = ({ isLoggedIn }) => {
                                     <Link to='/Account'>ACCOUNT</Link>
                                 </li>
                                 <li>
-                                    <Link to='/LoggedInHome'>HOME</Link>
+                                    <Link to='/LoggedInHome'>DASHBOARD</Link>
                                 </li>
                             </>
                         ) : (
@@ -43,13 +43,12 @@ const BurgerButton = ({ isLoggedIn }) => {
                             </>
                         )}
                         <li>
-                            <Link to='/'>ABOUT</Link>
-                        </li>
-                        <li>
-                            <Link to='/'>CONTACTS</Link>
+                            <a href={'#footer'}>CONTATTI</a>
                         </li>
                     </ul>
-                    <img src={MCLogo} className='App-logo' alt='nessuna immagine' id={'menu2-image'} />
+                    <div className={"imgContainer"}>
+                        <img src={MCLogo} className='App-logo' alt='nessuna immagine' id={'menu2-image'} />
+                    </div>
                 </nav>
             </div>
         </div>
@@ -60,8 +59,7 @@ export function MyMenu() {
     return (
         <nav>
             <UseSlidingAccount />
-            <Link to='/'>ABOUT</Link>
-            <Link to='/'>CONTACTS</Link>
+            <a href={'#footer'}>CONTATTI</a>
         </nav>
     );
 }

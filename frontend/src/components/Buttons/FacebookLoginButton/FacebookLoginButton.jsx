@@ -111,7 +111,6 @@ export default class Facebook extends Component {
 
             sessionStorage.setItem("token", token);
             sessionStorage.setItem("isAdmin", isAdmin);
-
         } catch (error) {
             console.error("Error:", error);
         }

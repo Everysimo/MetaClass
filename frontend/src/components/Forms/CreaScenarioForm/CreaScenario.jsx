@@ -10,8 +10,6 @@ const CreaScenario = (props) => {
     const [url_immagine, setUrlImmagine] = useState("");
     const [id_categoria, setIdCategoria] = useState(0);
     const [selectedCategoria, setSelectedCategoria] = useState('');
-    const [isVisible, setIsVisible] = useState(true);
-    const [isErrorPopupVisible, setIsErrorPopupVisible] = useState(false);
     const [errorMessage, setErrorMessage] = useState("");
     const [array, setArray] = useState([]);
     const [showCreateFormModal, setShowCreateFormModal] = useState(true);
@@ -97,11 +95,6 @@ const CreaScenario = (props) => {
         }
     };
 
-    const handleErrorPopupClose = () => {
-        setIsErrorPopupVisible(false);
-        setErrorMessage("");
-    };
-
     const sendDataToServer = async () => {
         const url_immagine = '/'+selectedFile.name;
 
@@ -144,34 +137,28 @@ const CreaScenario = (props) => {
     const callFunction = () => {
         if (nome.trim() === '' || nome.length < 2) {
             setErrorMessage('Il campo nome non può essere vuoto o minore di 2 caratteri');
-            setIsErrorPopupVisible(true);
             return;
         }
 
         if (descrizione.trim() === '') {
             setErrorMessage('Il campo descrizione non può essere vuoto');
-            setIsErrorPopupVisible(true);
             return;
         } else if (descrizione.length < 2 || descrizione.length > 254) {
             setErrorMessage('Lunghezza descrizione errata');
-            setIsErrorPopupVisible(true);
             return;
         } else if (!isNaN(descrizione.charAt(0))) {
             setErrorMessage('Errore durante la richiesta, formato Nome errato');
-            setIsErrorPopupVisible(true);
             return;
         }
 
         if (!selectedFile) {
             setErrorMessage('Errore: immagine non selezionata');
-            setIsErrorPopupVisible(true);
             return;
         }
 
         if (!selectedCategoria) {
             setSelectedCategoria('');
             setErrorMessage('Errore, Selezione Categoria errata');
-            setIsErrorPopupVisible(true);
             return;
         }
 
@@ -190,7 +177,6 @@ const CreaScenario = (props) => {
     };
 
     const handleClose = () => {
-        setIsVisible(false);
         if (props.onClose) {
             props.onClose();
         }
@@ -203,10 +189,6 @@ const CreaScenario = (props) => {
 
     return (
         <>
-            <div
-                className={"transWhiteBg"}
-                onClick={handleShowCreateForm}>
-            </div>
             {showCreateFormModal && (
             <div className={"modal"}>
                 <div className={`modal-content`}>

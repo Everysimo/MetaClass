@@ -112,3 +112,8 @@ select {
     margin: 5px;
     cursor: pointer;
 }
+
+.errorMsg{
+    text-align: center;
+    color: #c70049;
+}

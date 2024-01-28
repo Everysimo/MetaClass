@@ -1,0 +1,21 @@
+footer {
+    background-color: #c70049;
+    display: inline-block;
+    color: white;
+    min-height: 400px;
+    z-index: 3;
+    width: 100%;
+}
+
+.footerLayout{
+    display: grid;
+    grid-template-rows: repeat(auto-fit, 1fr);
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+}
+
+@media only screen and(max-width: 800px){
+    .footerLayout{
+        grid-template-columns: repeat(2, 1fr);
+    }
+}

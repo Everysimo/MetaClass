@@ -1,10 +1,10 @@
 .accountPopup {
     position: absolute;
+    display: none;
     z-index: 999;
     top: 120px;
     right: 120px;
     background-color: white;
-    display: none;
     flex-direction: column;
     justify-content: center;
     align-items: center;
@@ -20,7 +20,10 @@
 .accountPopup.show {
     display: flex;
     opacity: 1;
-    button{ display: -webkit-box; }
+    button{
+        text-align: center;
+        display: -webkit-box;
+    }
 }
 
 .accountPopup h2{
@@ -28,8 +31,8 @@
 }
 
 .accountPopup button {
-    display: none;
     min-width: 80%;
     min-height: 45px;
+    display: none;
 }
 

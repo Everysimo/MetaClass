@@ -5,7 +5,7 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { MultiInputDateTimeRangeField } from '@mui/x-date-pickers-pro/MultiInputDateTimeRangeField';
 import '../PopUpStyles.css';
 import axios from 'axios';
-import { faCheck, faRobot } from '@fortawesome/free-solid-svg-icons';
+import { faCheck } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 const ModificaMeeting = ({ id_meeting, nome: initialNome, inizio: initialInizio, fine: initialFine }) => {
@@ -61,9 +61,11 @@ const ModificaMeeting = ({ id_meeting, nome: initialNome, inizio: initialInizio,
 
     const handleClose = () => {
         setShowModal(false);
-        setSuccessMessage('');
+        if(successMessage){
+            setSuccessMessage('');
+            window.location.reload();
+        }
         setErrorMessage('');
-        window.location.reload();
     };
 
     return (
@@ -72,9 +74,9 @@ const ModificaMeeting = ({ id_meeting, nome: initialNome, inizio: initialInizio,
             {showModal && (
                 <div className={'modal'}>
                     <div className={'modal-content'} style={{ maxWidth: '400px', padding: '20px' }}>
-            <span className={'close'} onClick={handleClose}>
-              &times;
-            </span>
+                        <span className={'close'} onClick={handleClose}>
+                          &times;
+                        </span>
                         {successMessage ? (
                             <p>
                                 {successMessage} <FontAwesomeIcon icon={faCheck} size="2xl" style={{ color: '#63E6BE' }} />
@@ -93,7 +95,7 @@ const ModificaMeeting = ({ id_meeting, nome: initialNome, inizio: initialInizio,
                                         onChange={(e) => setName(e.target.value)}
                                         placeholder="Enter name"
                                         className="inputField"
-                                        style={{ maxWidth: '100%', margin: '20px' }}
+                                        style={{ maxWidth: '100%', marginBottom: '20px'}}
                                     />
                                     <MultiInputDateTimeRangeField
                                         value={selectedDateTimeRange}
@@ -103,7 +105,7 @@ const ModificaMeeting = ({ id_meeting, nome: initialNome, inizio: initialInizio,
                                     />
                                 </div>
                                 <button onClick={handleSubmit} id="submitBtn">
-                                    Submit
+                                    Salva
                                 </button>
                                 {errorMessage && <p>{errorMessage}</p>}
                             </LocalizationProvider>

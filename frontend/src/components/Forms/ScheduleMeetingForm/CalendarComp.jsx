@@ -6,26 +6,47 @@ import { MultiInputDateTimeRangeField } from '@mui/x-date-pickers-pro/MultiInput
 import '../PopUpStyles.css'
 import axios from 'axios';
 import {faCheck, faRobot} from "@fortawesome/free-solid-svg-icons";
-import {FontAwesomeIcon} from "@fortawesome/react-fontawesome"; // Import the MessagePopup component
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 
 const CalendarComp = () => {
+    const offsetMinutes = 30; //prendiamo l'offset dato dall'IA (stima durata)
+
+    //inizializziamo le date di inizio e fine, tenendo conto dell'offset
+    const initialStartDate = new Date();
+    const initialEndDate = new Date(initialStartDate.getTime() + offsetMinutes * 60000);
     const [showModal, setShowModal] = useState(false);
     const [name, setName] = useState('');
     const [successMessage, setSuccessMessage] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
     const [selectedDateTimeRange, setSelectedDateTimeRange] = useState([
-        dayjs('2024-01-12T15:30'),
-        dayjs('2024-01-12T18:30'),
+        dayjs(initialStartDate),
+        dayjs(initialEndDate),
     ]);
 
     const handleDateTimeRangeChange = (newDateTimeRange) => {
+        if(newDateTimeRange <= Date())
+            setErrorMessage('Il meeting deve essere schedulato in un giorno successivo al presente');
+        else
+            setErrorMessage('');
         setSelectedDateTimeRange(newDateTimeRange);
     };
 
+    const checkInput=(input)=>{
+        if(input === ''){
+            setErrorMessage("Il campo nome non può essere vuoto");
+        }
+        else if(!(input.charAt(0) === name.charAt(0).toUpperCase())) {
+            setErrorMessage('Il nome del meeting deve cominciare con una lettera maiuscola');
+        }
+        else if (/[^a-zA-Z0-9]/.test(input)) {
+            setErrorMessage('Il nome del meeting non può contenere caratteri speciali');
+        }
+        else setErrorMessage('');
+    }
     const handleSubmit = async () => {
         try {
             const [startDate, endDate] = selectedDateTimeRange.map((date) =>
-                date.format('YYYY-MM-DD HH:mm')
+                    date.format('YYYY-MM-DD HH:mm')
             );
 
             const token = sessionStorage.getItem('token');
@@ -36,7 +57,6 @@ const CalendarComp = () => {
                 fine: endDate,
                 id_stanza: sessionStorage.getItem('idStanza'),
             };
-
             const meetingDataJSON = JSON.stringify(meetingData);
 
             const response = await axios.post(
@@ -47,8 +67,7 @@ const CalendarComp = () => {
                         'Content-Type': 'application/json',
                         Authorization: `Bearer ${token}`,
                     },
-                }
-            );
+                });
             setSuccessMessage(response.data.message);
         } catch (error) {
             console.error('Error:', error.response.data.message);
@@ -56,15 +75,17 @@ const CalendarComp = () => {
         }
     };
 
-
     const handleShow = () =>{
         setShowModal(true);
     }
     const handleClose = () =>{
         setShowModal(false);
-        setSuccessMessage('');
+        if(successMessage){
+            setSuccessMessage('');
+            window.location.reload();
+        }
         setErrorMessage('');
-        window.location.reload();
+        setName('');
     }
     return (
         <>
@@ -91,13 +112,21 @@ const CalendarComp = () => {
                                 <input
                                     type="text"
                                     value={name}
-                                    onChange={(e) => setName(e.target.value)}
+                                    onChange={(e) => {
+                                        setName(e.target.value)
+                                        checkInput(e.target.value)
+                                    }}
                                     placeholder="Nome meeting"
                                     className="inputField"
                                     style={{maxWidth: "100%"}}
                                 />
-                                <FontAwesomeIcon icon={faRobot} size="2xl" style={{color: "#c70049", margin: "10px"}} />
-                                <p style={{fontSize: "14px"}}>Stima fatta con il modulo di IA</p>
+                                <FontAwesomeIcon icon={faRobot} size="2xl" style={{
+                                    color: "#c70049",
+                                    margin: "10px"
+                                }}/>
+                                <p style={{fontSize: "14px", textAlign: "center"}}>
+                                    Stima fatta con il modulo di IA
+                                </p>
                                 <MultiInputDateTimeRangeField
                                     value={selectedDateTimeRange}
                                     onChange={handleDateTimeRangeChange}
@@ -109,7 +138,7 @@ const CalendarComp = () => {
                                 Invio
                             </button>
                             {errorMessage && (
-                                <p>{errorMessage}</p>
+                                <p className={"errorMsg"}>{errorMessage}</p>
                             )}
                         </LocalizationProvider>
                         )}

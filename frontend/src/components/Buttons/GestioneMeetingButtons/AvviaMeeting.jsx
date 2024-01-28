@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import {faChalkboardUser, faPlay} from "@fortawesome/free-solid-svg-icons";
+import {faPlay} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 
 

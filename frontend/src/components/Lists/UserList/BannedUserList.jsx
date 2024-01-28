@@ -72,9 +72,10 @@ const BannedUserList = ({ id_stanza }) => {
     }
     const close=()=>{
         setShowModal(false);
-        setMessage('');
-        window.location.replace(window.location.pathname);
-
+        if(message){
+            setMessage('');
+            window.location.replace(window.location.pathname);
+        }
     }
     const checkAdm = () => {
         console.log('isAdmin: ', isAdmin);

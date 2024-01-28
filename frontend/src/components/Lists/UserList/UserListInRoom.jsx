@@ -396,8 +396,11 @@ const UserListInRoom = () => {
                             </div>
                         )}
                     <span>Nome: {`${user.nome} ${user.cognome}`}</span>
-                    <span>Nome In Stanza: {statoPartecipazione && statoPartecipazione.value && Array.isArray(statoPartecipazione.value) ?
-                        statoPartecipazione.value.find((partecipazione) => partecipazione.utente.id === user.id)?.nomeInStanza || "N/A":"N/A"} </span>
+                    <span>Nome In Stanza: {statoPartecipazione &&
+                    statoPartecipazione.value &&
+                    Array.isArray(statoPartecipazione.value) ?
+                        statoPartecipazione.value.find(
+                            (partecipazione) => partecipazione.utente.id === user.id)?.nomeInStanza || "N/A":"N/A"} </span>
                     <span>Email: {`${user.email}`}</span>
                     {user.role &&
                         <>

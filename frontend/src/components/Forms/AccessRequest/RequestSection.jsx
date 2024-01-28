@@ -110,7 +110,10 @@ const RequestSection = ({ id_stanza }) => {
 
     const handleCloseModal = () => {
         setShowModal(false);
-        setMessage('')
+        if(message){
+            setMessage('');
+            window.location.replace(window.location.pathname);
+        }
     };
 
     return (

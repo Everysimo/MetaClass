@@ -1,13 +1,12 @@
 import React, {useEffect, useState} from 'react';
 import '../PopUpStyles.css';
 import {useParams} from "react-router-dom";
-import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faCheck} from "@fortawesome/free-solid-svg-icons";
 
 const MyModifyForm = () => {
     const [showModal, setShowModal] = useState(false);
     const [formData, setFormData] = useState({});
-    const [message, setMessage] = useState('');
+    const [errorMessage, setErrorMessage] = useState('');
+    const [successMessage, setSuccessMessage] = useState('');
     const [formReset, setFormReset] = useState(false); // State for form reset
     const { id: id_stanza } = useParams();
 
@@ -19,18 +18,19 @@ const MyModifyForm = () => {
         max_Posti: '',
     });
 
+    useEffect(() => {
+        if (formReset) {
+            setFormData({}); // Reset form data
+            setErrorMessage(''); // Reset error message
+            setSuccessMessage(''); // Reset success message
+            setFormReset(false); // Reset formReset state
+        }
+    }, [formReset]);
     const handleCloseModal = () => {
         setShowModal(false);
         setFormReset(true); // Set form reset to true when modal is closed
     };
 
-    useEffect(() => {
-        if (formReset) {
-            setFormData({}); // Reset form data
-            setMessage(''); // Reset success message
-            setFormReset(false); // Reset formReset state
-        }
-    }, [formReset]);
 
     const handleNameChange = (e) => {
         setState({ ...state, nome: e.target.value });
@@ -45,7 +45,7 @@ const MyModifyForm = () => {
     };
 
     const handleMAXChange = (e) => {
-        setState(prevState => ({ ...prevState, maxPosti: parseInt(e.target.value, 10) }));
+        setState({ ...state, max_Posti: parseInt(e.target.value, 10) });
     };
 
     /*funzioni per eliminare la stanza*/
@@ -64,11 +64,10 @@ const MyModifyForm = () => {
         };
 
         try {
-            const idStanza = id_stanza;
-            const response = await fetch(`http://localhost:8080/eliminaStanza/${idStanza}`, requestOption);
+            const response = await fetch(`http://localhost:8080/eliminaStanza/${id_stanza}`, requestOption);
             const responseData = await response.json();
             console.log("Risposta del server:", responseData);
-            setMessage(responseData.message);
+            setSuccessMessage(responseData.message);
         } catch (error) {
             console.error('Errore:', error);
         }
@@ -95,7 +94,7 @@ const MyModifyForm = () => {
 
         // Verifica se l'oggetto dataToSend è vuoto
         if (Object.keys(dataToSend).length === 0) {
-            setMessage('Nessun dato da inviare.');
+            setErrorMessage('Nessun dato da inviare.');
             return;
         }
 
@@ -114,7 +113,7 @@ const MyModifyForm = () => {
             const response = await fetch(`http://localhost:8080/modifyRoomData/${id_stanza}`, requestOption);
 
             const responseData = await response.json();
-            setMessage(responseData.message);
+            setSuccessMessage(responseData.message);
         } catch (error) {
             console.error('ERRORE:', error);
         }
@@ -127,8 +126,8 @@ const MyModifyForm = () => {
                 <div className="modal">
                     <div className="modal-content">
                         <span className="close" onClick={handleCloseModal}>&times;</span>
-                        {message ? (
-                            <p >{message}</p>
+                        {successMessage ? (
+                            <p >{successMessage}</p>
                         ) : (
                         <div className={"childDiv"}>
                             <p className={'textp'}>Inserisci Nuovo Nome:</p>
@@ -180,6 +179,9 @@ const MyModifyForm = () => {
                             >
                                 Salva
                             </button>
+                            {errorMessage &&
+                                <p className={"errorMsg"}>{errorMessage}</p>
+                            }
                         </div>)}
                     </div>
                 </div>
