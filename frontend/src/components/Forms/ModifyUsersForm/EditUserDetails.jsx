@@ -52,7 +52,7 @@ const EditUserDetails = ({ userDetails, setUserDetails }) => {
 
             // Validate at least one field is filled
             if (!Object.values(formData).some(value => value !== undefined && value !== '')) {
-                setErrorMessage('At least one field should be filled');
+                setErrorMessage('Almeno un campo deve essere compilato');
                 return;
             }
 
@@ -72,7 +72,15 @@ const EditUserDetails = ({ userDetails, setUserDetails }) => {
             if (response.status === 200 && response.data.value) {
                 setSuccessMessage(response.data.message);
                 setShowModal(true);
-                setUserDetails({ ...userDetails, ...formData }); // Update userDetails with the form data
+
+                // Update userDetails with the form data
+                setUserDetails({ ...userDetails, ...formData });
+
+                // Update sessionStorage if 'nome' has changed
+                if (formData.nome && formData.nome !== userDetails.nome) {
+                    sessionStorage.setItem('nome', formData.nome);
+                }
+
                 setErrorMessage(''); // Clear error message on success
             } else {
                 setSuccessMessage(response.data.message || 'Changes were unsuccessful');
@@ -83,6 +91,7 @@ const EditUserDetails = ({ userDetails, setUserDetails }) => {
             setShowModal(true);
         }
     };
+
 
     const handleCloseModal = () => {
         setShowModal(false);
