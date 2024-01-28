@@ -1,10 +1,6 @@
 package com.commigo.metaclass.gestionestanza.controller;
 
-import com.commigo.metaclass.entity.Ruolo;
-import com.commigo.metaclass.entity.Scenario;
-import com.commigo.metaclass.entity.Stanza;
-import com.commigo.metaclass.entity.StatoPartecipazione;
-import com.commigo.metaclass.entity.Utente;
+import com.commigo.metaclass.entity.*;
 import com.commigo.metaclass.exceptions.ClientRuntimeException;
 import com.commigo.metaclass.exceptions.RuntimeException401;
 import com.commigo.metaclass.exceptions.RuntimeException403;
@@ -731,6 +727,30 @@ public class GestioneStanzaControl {
     } catch (RuntimeException403 e) {
       return ResponseEntity.status(403).body(new Response<>(null, "Errore nell'operazione"));
     } catch (Exception e) {
+      return ResponseEntity.status(500).body(new Response<>(null, "Errore durante l'operazione"));
+    }
+  }
+
+  /**
+   * Metodo che permette di gestire la richiesta di visualizzare l'immagine dello scenario in uso in una stanza
+   * @param id_stanza id della stanza di cui di vuole visualizzare l'immagine dello scenario
+   * @return L'immagine dello scenario in uso ed un messaggio che descrive l'esito dell'operazione
+   * @throws RuntimeException403
+   */
+  @PostMapping(value = "/visualizzaImmagineScenario/{id_stanza}")
+  public ResponseEntity<Response<Immagine>> visualizzaImmagineScenario(@PathVariable Long id_stanza,
+                                                                       HttpServletRequest request){
+
+    try{
+      if (!validationToken.isTokenValid(request)) {
+        throw new RuntimeException403("Token non valido");
+      }
+
+      return stanzaService.visualizzaImmagineScenario(id_stanza);
+
+    } catch (RuntimeException403 e) {
+      return ResponseEntity.status(403).body(new Response<>(null, "Errore nell'operazione"));
+    } catch(Exception e){
       return ResponseEntity.status(500).body(new Response<>(null, "Errore durante l'operazione"));
     }
   }

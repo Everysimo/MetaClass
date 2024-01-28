@@ -1,10 +1,6 @@
 package com.commigo.metaclass.gestionestanza.service;
 
-import com.commigo.metaclass.entity.Ruolo;
-import com.commigo.metaclass.entity.Scenario;
-import com.commigo.metaclass.entity.Stanza;
-import com.commigo.metaclass.entity.StatoPartecipazione;
-import com.commigo.metaclass.entity.Utente;
+import com.commigo.metaclass.entity.*;
 import com.commigo.metaclass.exceptions.RuntimeException401;
 import com.commigo.metaclass.exceptions.RuntimeException403;
 import com.commigo.metaclass.exceptions.ServerRuntimeException;
@@ -75,6 +71,7 @@ public interface GestioneStanzaService {
 
   ResponseEntity<Response<Boolean>> unmutePartecipante(String metaId, Long idStanza, Long idUtente);
 
+  ResponseEntity<Response<Immagine>>visualizzaImmagineScenario(Long id_stanza) throws RuntimeException403;
   // ResponseEntity<Response<Boolean>> Unmute(String metaId, Long idStanza);
   // ResponseEntity<Response<Boolean>> mute(String metaId, Long idStanza);
 }
