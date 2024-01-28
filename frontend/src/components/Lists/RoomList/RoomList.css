@@ -1,3 +1,13 @@
-.user-card button{
-    max-width: 50%;
+.navigateRoom{
+    text-decoration: none;
+    color: white;
+    border-radius: 5px;
+    padding: 10px;
+    background-color: #002f53;
+    transition: all .5s ease-in-out;
+}
+
+.navigateRoom:hover{
+    transform: translateY(-2px);
+    background-color: #c70049;
 }

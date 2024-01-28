@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { checkOrg } from '../../../functions/checkRole';
 import { faCrown } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import './RoomList.css';
 
 const RoomList = () => {
     const [array, setArray] = useState([]);
@@ -87,14 +88,12 @@ const RoomList = () => {
                         Stanza: {room.nome}
                     </h4>
                     {/* inserisci gli altri dati di cui hai bisogno */}
-                    <button>
-                        <Link
-                            to={`/SingleRoom/${room.id}`}
-                            style={{ textDecoration: 'none', color: 'inherit'}}
-                        >
-                            Vai alla pagina della stanza
-                        </Link>
-                    </button>
+                    <Link
+                        to={`/SingleRoom/${room.id}`}
+                        className={"navigateRoom"}
+                    >
+                        Vai alla pagina della stanza
+                    </Link>
                 </div>
             ))}
         </>
