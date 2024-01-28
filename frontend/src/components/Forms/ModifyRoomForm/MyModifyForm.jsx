@@ -1,43 +1,56 @@
-import React, {useEffect, useState} from 'react';
 import '../PopUpStyles.css';
+import React, {useEffect, useState} from 'react';
 import {useParams} from "react-router-dom";
 
 const MyModifyForm = () => {
     const [showModal, setShowModal] = useState(false);
-    const [formData, setFormData] = useState({});
     const [errorMessage, setErrorMessage] = useState('');
     const [successMessage, setSuccessMessage] = useState('');
-    const [formReset, setFormReset] = useState(false); // State for form reset
     const { id: id_stanza } = useParams();
 
     //si usa useParams per farsi passare il parametro
     const [state, setState] = useState({
         nome: "",
         descrizione: "",
-        tipoAccesso: '',
-        maxPosti: '',
+        tipoAccesso: "",
+        maxPosti: "",
     });
 
-    useEffect(() => {
-        if (formReset) {
-            setFormData({}); // Reset form data
-            setErrorMessage(''); // Reset error message
-            setSuccessMessage(''); // Reset success message
-            setFormReset(false); // Reset formReset state
-        }
-    }, [formReset]);
     const handleCloseModal = () => {
         setShowModal(false);
-        setFormReset(true); // Set form reset to true when modal is closed
+        setErrorMessage('');
+        if(successMessage){
+            setSuccessMessage('');
+            window.location.reload();
+        }
+        setState({
+            nome: "",
+            descrizione: "",
+            tipoAccesso: "",
+            maxPosti: "",
+        });
     };
 
-
     const handleNameChange = (e) => {
-        setState({ ...state, nome: e.target.value });
+        if(
+            e.target.value !== '' &&
+            !(e.target.value.charAt(0) === e.target.value.charAt(0).toUpperCase()))
+                setErrorMessage('Il nome della stanza deve cominciare con la lettera maiuscola');
+        else{
+            setErrorMessage('');
+            setState({ ...state, nome: e.target.value });
+        }
     };
 
     const handleDescriptionChange = (e) => {
-        setState({ ...state, descrizione: e.target.value });
+        if(
+            e.target.value !== '' &&
+            !(e.target.value.charAt(0) === e.target.value.charAt(0).toUpperCase()))
+            setErrorMessage('La descrizione deve cominciare con la lettera maiuscola');
+        else{
+            setErrorMessage('');
+            setState({ ...state, nome: e.target.value });
+        }
     };
 
     const handleOptionChange = (e) => {
@@ -129,60 +142,68 @@ const MyModifyForm = () => {
                         {successMessage ? (
                             <p >{successMessage}</p>
                         ) : (
-                        <div className={"childDiv"}>
-                            <p className={'textp'}>Inserisci Nuovo Nome:</p>
-                            <input
-                                placeholder={"Aggiungi Nuovo Nome"}
-                                type="text"
-                                value={state.nome}
-                                onChange={handleNameChange}
-                            />
+                            <>
+                                <div className={"masterDiv"}>
+                                    <div className={"childDiv"}>
+                                        <p className={'textp'}>Inserisci Nuovo Nome:</p>
+                                        <input
+                                            placeholder={"Aggiungi Nuovo Nome"}
+                                            type="text"
+                                            value={state.nome}
+                                            onChange={handleNameChange}
+                                        />
 
-                            <div className={'textarea-box'}>
-                                <p className={'textp'}>Inserisci Nuova Descrizione:</p>
-                                <textarea
-                                    className={'textarea-field'}
-                                    placeholder={'Aggiungi Descrizione'}
-                                    rows={5}
-                                    type="text"
-                                    value={state.descrizione}
-                                    onChange={handleDescriptionChange}
-                                />
-                            </div>
+                                        <div className={'textarea-box'}>
+                                            <p className={'textp'}>Inserisci Nuova Descrizione:</p>
+                                            <textarea
+                                                className={'textarea-field'}
+                                                placeholder={'Aggiungi Descrizione'}
+                                                rows={5}
+                                                type="text"
+                                                value={state.descrizione}
+                                                onChange={handleDescriptionChange}
+                                            />
+                                        </div>
+                                    </div>
+                                    <div className={"childDiv"}>
+                                        <p className={'textp'}>Scegli: pubblica o privata:</p>
+                                        <div className="select">
+                                            <select value={state.tipoAccesso} onChange={handleOptionChange}>
+                                                <option value=""> -Scegli un'opzione-</option>
+                                                <option value="false">Pubblica</option>
+                                                <option value="true">Privata</option>
+                                            </select>
+                                        </div>
 
-                            <p className={'textp'}>Scegli: pubblica o privata:</p>
-                            <div className="select">
-                                <select value={state.tipoAccesso} onChange={handleOptionChange}>
-                                    <option value=""> -Scegli un'opzione-</option>
-                                    <option value="false">Pubblica</option>
-                                    <option value="true">Privata</option>
-                                </select>
-                            </div>
-
-                            <p className={'textp'}>Inserisci numero MAX utenti:</p>
-                            <input
-                                placeholder={'MAX Posti'}
-                                type="number"
-                                min="1" max="999"
-                                value={state.maxPosti}
-                                onChange={handleMAXChange}
-                            />
-                            <button
-                                type="button"
-                                onClick={deleteButton}
-                            >
-                                Elimina stanza
-                            </button>
-                            <button
-                                type="button"
-                                onClick={() => sendDataModifyRoom()}
-                            >
-                                Salva
-                            </button>
-                            {errorMessage &&
-                                <p className={"errorMsg"}>{errorMessage}</p>
-                            }
-                        </div>)}
+                                        <p className={'textp'}>Inserisci numero MAX utenti:</p>
+                                        <input
+                                            placeholder={'MAX Posti'}
+                                            type="number"
+                                            min="1" max="999"
+                                            value={state.maxPosti}
+                                            onChange={handleMAXChange}
+                                        />
+                                    </div>
+                                </div>
+                                <div className={"childDiv"}>
+                                    <button
+                                        type="button"
+                                        onClick={deleteButton}
+                                    >
+                                        Elimina stanza
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => sendDataModifyRoom()}
+                                    >
+                                        Salva
+                                    </button>
+                                </div>
+                                {errorMessage &&
+                                    <p className={"errorMsg"}>{errorMessage}</p>
+                                }
+                            </>
+                        )}
                     </div>
                 </div>
             )}

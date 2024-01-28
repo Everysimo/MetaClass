@@ -3,7 +3,7 @@ import LogoutButton from '../components/Buttons/LogoutButton/logoutButton';
 import { fetchUserDetails } from '../functions/fetchUserDetails';
 import { MyHeader } from "../components/Layout/Header/Header";
 import { MyFooter } from "../components/Layout/Footer/Footer";
-import EditUserDetails from '../components/Forms/ModifyUsersForm/EditUserDetails';
+import {EditUserDetails} from '../components/Forms';
 import {faUser} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 

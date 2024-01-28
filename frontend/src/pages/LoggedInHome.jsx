@@ -6,13 +6,15 @@ import '../css/LoggedHome.css';
 import { MyHeader } from '../components/Layout/Header/Header';
 import { MyFooter } from "../components/Layout/Footer/Footer";
 import { useNavigate } from 'react-router-dom';
-import CreaCategoria from "../components/Forms/CreaCategoria/CreaCategoria";
-import CreaScenario from "../components/Forms/CreaScenarioForm/CreaScenario";
-import AccediStanza from "../components/Forms/enterRoomForm/accediStanza";
+import {
+    CreaCategoria,
+    CreaScenario,
+    AccediStanza,
+    MyCreateForm
+} from "../components/Forms";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faCalendarDays, faImage, faList, faUser} from "@fortawesome/free-solid-svg-icons";
 import RoomList from "../components/Lists/RoomList/RoomList";
-import MyCreateForm from "../components/Forms/CreateRoomForm/MyCreateForm";
 
 export const LoggedInHome = () => {
     const nome = sessionStorage.getItem('nome');

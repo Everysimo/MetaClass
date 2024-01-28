@@ -7,11 +7,11 @@ import '../PopUpStyles.css'
 import axios from 'axios';
 import {faCheck, faRobot} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {wait} from "@testing-library/user-event/dist/utils";
+import InfoPopUp from "../infoPopUp";
 
 const CalendarComp = () => {
     const offsetMinutes = 30; //prendiamo l'offset dato dall'IA (stima durata)
-
+    const infoPopup = InfoPopUp();
     //inizializziamo le date di inizio e fine, tenendo conto dell'offset
     const initialStartDate = new Date();
     const initialEndDate = new Date(initialStartDate.getTime() + offsetMinutes * 60000);
@@ -25,11 +25,6 @@ const CalendarComp = () => {
     ]);
 
     const handleDateTimeRangeChange = (newDateTimeRange) => {
-        if(newDateTimeRange < Date()){
-            setErrorMessage('Il meeting deve essere schedulato in un giorno successivo al presente');
-        }
-        else
-            setErrorMessage('');
         setSelectedDateTimeRange(newDateTimeRange);
     };
 
@@ -128,10 +123,26 @@ const CalendarComp = () => {
                                     className="inputField"
                                     style={{maxWidth: "100%"}}
                                 />
-                                <FontAwesomeIcon icon={faRobot} size="2xl" style={{
-                                    color: "#c70049",
-                                    margin: "10px"
-                                }}/>
+                                <div
+                                    style={{
+                                        height: "auto",
+                                        width: "20px",
+                                        cursor: "pointer",
+                                        marginInline: "auto"
+                                    }}
+                                    onMouseOver={infoPopup.handleInfoMouseOver}
+                                    onMouseLeave={infoPopup.handleInfoMouseLeave}
+                                >
+                                <FontAwesomeIcon
+                                    className={"infoIcon"}
+                                    icon={faRobot}
+                                    size="2xl"
+                                    style={{
+                                        color: "#c70049",
+                                        marginTop: "10px"
+                                    }}/>
+                                </div>
+                                {infoPopup.popup}
                                 <p style={{fontSize: "14px", textAlign: "center"}}>
                                     Stima fatta con il modulo di IA
                                 </p>

@@ -1,27 +1,21 @@
 import React, { useState, useEffect } from 'react';
 import '../PopUpStyles.css';
-import './Questionario.css'
+import './Questionario.css';
 import {faCheck, faFileCircleXmark, faInfo} from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import InfoPopUp from "../infoPopUp";
 
 const Questionario = (props) => {
-    //const [valutazione, setValutazione] = useState(0)
-    const [info, setInfo] = useState(false);
     const [errore, setErrore] = useState(null);
     const [showModal, setShowModal] = useState(false);
     const [showSuccessPopup, setShowSuccessPopup] = useState(false);
     const id_meeting = props.id_meeting;
+    const infoPopup = InfoPopUp();
 
     const [state, setState] = useState({
         immersion: "",
         motion: "",
     });
-
-    useEffect(() => {
-        if (showSuccessPopup) {
-        }
-    }, [showSuccessPopup]);
-
 
     const handleImmersionChange = (e) => {
         const newValue = parseInt(e.target.value, 10);
@@ -34,15 +28,6 @@ const Questionario = (props) => {
         setState(prevState => ({ ...prevState, motion: newValue }));
         console.log("dato di sickness:", newValue);
     };
-
-    const handleMouseOver = () => {
-        setInfo(true);
-    };
-
-    const handleMouseLeave = () => {
-        setInfo(false);
-    };
-
 
     const sendDataToServer = async () => {
 
@@ -124,27 +109,37 @@ const Questionario = (props) => {
             />
             {showModal &&
                 <div className={"modal"}>
-                    <div className={"modal-content"}>
+                    <div
+                        className={"modal-content"}
+                    >
                         <span
                             className={"close"}
                             onClick={handleClose}
                         >&times;</span>
                         <h2>
-                            Compila il Questionario <FontAwesomeIcon
-                                className={"infoIcon"}
-                                icon={faInfo}
-                                size="2xs"
-                                style={{color: "#74C0FC",}}
-                                onMouseOver={handleMouseOver}
-                                onMouseLeave={handleMouseLeave}
-                            />
+                            Compila il Questionario
+                            <div
+                                style={{
+                                    height: "auto",
+                                    width: "20px",
+                                    cursor: "pointer",
+                                    marginInline: "auto"
+                                }}
+                                onMouseOver={infoPopup.handleInfoMouseOver}
+                                onMouseLeave={infoPopup.handleInfoMouseLeave}
+                            >
+                                <FontAwesomeIcon
+                                    className={"infoIcon"}
+                                    icon={faInfo}
+                                    size="xs"
+                                    style={{
+                                        color: "#74C0FC",
+                                        cursor: "pointer"
+                                    }}
+                                />
+                            </div>
                         </h2>
-                        <div className={`info ${info ? 'open' : ''}`}>
-                            <p>
-                                Questo questionario serve per allenare il modulo di IA
-                                e per fornire una stima più accurata della durata consigliata dei prossimi meetings
-                            </p>
-                        </div>
+                        {infoPopup.popup}
                         <p style={{fontSize: "14px", textAlign: "center"}}>Livello di immersività (1 a 5)</p>
                         <div className="dots-container">
                             {[1, 2, 3, 4, 5].map((value) => (

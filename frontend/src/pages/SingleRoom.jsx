@@ -2,15 +2,17 @@ import React, { useEffect, useState } from "react";
 import { MyHeader } from "../components/Layout/Header/Header";
 import { MyFooter } from "../components/Layout/Footer/Footer";
 import { useParams } from "react-router-dom";
-import CalendarComp from "../components/Forms/ScheduleMeetingForm/CalendarComp";
 import { checkRole } from "../functions/checkRole";
 import UserListInRoom from "../components/Lists/UserList/UserListInRoom";
 import { faChalkboardUser } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import MyModifyForm from "../components/Forms/ModifyRoomForm/MyModifyForm";
+import {
+    MyModifyForm,
+    RequestSection,
+    SelectScenario,
+    CalendarComp
+} from "../components/Forms";
 import MeetingList from "../components/Calendar/CalendarViewer";
-import RequestSection from "../components/Forms/AccessRequest/RequestSection";
-import SelectScenario from "../components/Forms/SelectNewScenario/SelectScenario";
 import BannedUserList from "../components/Lists/UserList/BannedUserList";
 import MeetinginRoon from "../components/Lists/MeetingList/MeetinginRoon";
 
