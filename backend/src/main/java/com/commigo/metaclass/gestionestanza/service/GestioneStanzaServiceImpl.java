@@ -1,10 +1,6 @@
 package com.commigo.metaclass.gestionestanza.service;
 
-import com.commigo.metaclass.entity.Ruolo;
-import com.commigo.metaclass.entity.Scenario;
-import com.commigo.metaclass.entity.Stanza;
-import com.commigo.metaclass.entity.StatoPartecipazione;
-import com.commigo.metaclass.entity.Utente;
+import com.commigo.metaclass.entity.*;
 import com.commigo.metaclass.exceptions.RuntimeException401;
 import com.commigo.metaclass.exceptions.RuntimeException403;
 import com.commigo.metaclass.exceptions.ServerRuntimeException;
@@ -96,7 +92,9 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService {
       }
     } else if (sp.isBannato()) {
       throw new RuntimeException403("Sei stato bannato da questa stanza, non puoi entrare");
-    } else {
+    } else if(sp.isInAttesa()) {
+      throw new RuntimeException403("Sei già in attesa di entrare in questa stanza");
+    }else{
       return ResponseEntity.ok(
           new AccessResponse<>(stanza.getId(), "Sei già all'interno di questa stanza", false));
     }
@@ -1048,4 +1046,22 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService {
 
     return sp;
   }
+
+  /**
+   * Metodo che permette di visualizzare l'immagine dello scenario in uso in una stanza
+   * @param id_stanza id della stanza di cui di vuole visualizzare l'immagine dello scenario
+   * @return L'immagine dello scenario in uso ed un messaggio che descrive l'esito dell'operazione
+   * @throws RuntimeException403
+   */
+  public ResponseEntity<Response<Immagine>>visualizzaImmagineScenario(Long id_stanza) throws RuntimeException403 {
+    Stanza stanza = stanzaRepository.findStanzaById(id_stanza);
+
+    if(stanza == null){
+      throw new RuntimeException403("Stanza non trovata");
+    }
+
+    return ResponseEntity.ok(new Response<Immagine>(stanza.getScenario().getImage(), "Immagine dello scenario trovata con successo"));
+
+  }
+
 }

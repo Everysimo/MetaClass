@@ -158,17 +158,18 @@ public class DataInitializer implements CommandLineRunner {
                 true));
 
     final Utente u6 =
-            utenteRepository.save(
-                    new Utente(
-                            6L,
-                            "Salvatore",
-                            "Alberti",
-                            "s.alberti1@studenti.unisa.it",
-                            "04/02/2003",
-                            "M",
-                            "100003456926961",
-                            Utente.DEFAULT_TOKEN,
-                            true));
+          utenteRepository.save(
+                  new Utente(
+                          6L,
+                          "Salvatore",
+                          "Alberti",
+                          "albertisalvator2003@libero.it",
+                          "04/02/2003",
+                          "M",
+                          "5997434490381722",
+                          Utente.DEFAULT_TOKEN,
+                          true));
+
     // Aggiunta ruolo
     ruoloRepository.save(new Ruolo(1L, "Partecipante"));
     ruoloRepository.save(new Ruolo(2L, "Organizzatore"));
@@ -254,6 +255,10 @@ public class DataInitializer implements CommandLineRunner {
     statoPartecipazioneRepository.save(
         new StatoPartecipazione(
             s1, u3, ruoloRepository.findByNome(Ruolo.PARTECIPANTE), true, false, "Giorgio", true));
+
+    statoPartecipazioneRepository.save(
+            new StatoPartecipazione(
+                    s1, u6, ruoloRepository.findByNome(Ruolo.PARTECIPANTE), false, false, "Salvatore", true));
 
     statoPartecipazioneRepository.save(
         new StatoPartecipazione(
