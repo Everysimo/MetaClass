@@ -15,7 +15,7 @@ const MyModifyForm = () => {
         nome: "",
         descrizione: "",
         tipoAccesso: '',
-        max_Posti: '',
+        maxPosti: '',
     });
 
     useEffect(() => {
@@ -45,7 +45,7 @@ const MyModifyForm = () => {
     };
 
     const handleMAXChange = (e) => {
-        setState({ ...state, max_Posti: parseInt(e.target.value, 10) });
+        setState({ ...state, maxPosti: parseInt(e.target.value, 10) });
     };
 
     /*funzioni per eliminare la stanza*/
@@ -75,7 +75,7 @@ const MyModifyForm = () => {
 
     const sendDataModifyRoom = async () => {
 
-        const {nome, descrizione, tipoAccesso, max_Posti} = state;
+        const {nome, descrizione, tipoAccesso, maxPosti} = state;
         const dataToSend = {};
 
         // Aggiungi solo i campi non vuoti all'oggetto dataToSend
@@ -88,8 +88,8 @@ const MyModifyForm = () => {
         if (tipoAccesso) {
             dataToSend.tipoAccesso = tipoAccesso;
         }
-        if (max_Posti) {
-            dataToSend.max_Posti = max_Posti;
+        if (maxPosti) {
+            dataToSend.maxPosti = maxPosti;
         }
 
         // Verifica se l'oggetto dataToSend è vuoto

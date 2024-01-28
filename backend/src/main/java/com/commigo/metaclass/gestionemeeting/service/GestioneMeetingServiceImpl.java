@@ -97,7 +97,8 @@ public class GestioneMeetingServiceImpl implements GestioneMeetingService {
       }
 
       // controllo dei meeting sovrapponibili
-      if (meetingRepository.hasOverlappingMeetings(meeting.getInizio(), meeting.getFine())) {
+      if (meetingRepository.hasOverlappingMeetings(
+          meeting.getInizio(), meeting.getFine(), meeting.getStanza().getId())) {
         throw new RuntimeException403("il meeting si accavalla con un altro meeting");
       }
       meeting.setStanza(s);

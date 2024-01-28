@@ -25,12 +25,15 @@ public interface MeetingRepository extends JpaRepository<Meeting, Long> {
    * @return valore boolean che identifica la riuscita dell'operazione.
    */
   @Query(
-      "SELECT CASE WHEN COUNT(m) > 0 THEN true ELSE false END FROM Meeting m "
-          + "WHERE (:newInizio BETWEEN m.inizio AND m.fine OR :newFine BETWEEN m.inizio AND m.fine "
-          + "OR m.inizio BETWEEN :newInizio AND :newFine OR m.fine BETWEEN :newInizio AND :newFine "
-          + "OR m.inizio <= :newInizio AND m.fine >= :newFine)")
+          "SELECT CASE WHEN COUNT(m) > 0 THEN true ELSE false END FROM Meeting m "
+                  + "WHERE (:newInizio BETWEEN m.inizio AND m.fine OR :newFine BETWEEN m.inizio AND m.fine "
+                  + "OR m.inizio BETWEEN :newInizio AND :newFine OR m.fine BETWEEN :newInizio AND :newFine "
+                  + "OR m.inizio <= :newInizio AND m.fine >= :newFine) "
+                  + "AND m.stanza.id = :roomId")
   boolean hasOverlappingMeetings(
-      @Param("newInizio") LocalDateTime newInizio, @Param("newFine") LocalDateTime newFine);
+          @Param("newInizio") LocalDateTime newInizio,
+          @Param("newFine") LocalDateTime newFine,
+          @Param("roomId") Long roomId);
 
   /**
    * Metodo che permette la modifica degli attributi di un meeting.

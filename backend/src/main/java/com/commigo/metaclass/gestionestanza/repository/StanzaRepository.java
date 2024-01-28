@@ -55,7 +55,7 @@ public interface StanzaRepository extends JpaRepository<Stanza, Long> {
           + "stanza.codice = COALESCE(:#{#attributes['codice']}, stanza.codice), "
           + "stanza.descrizione = COALESCE(:#{#attributes['descrizione']}, stanza.descrizione), "
           + "stanza.tipoAccesso = COALESCE(:#{#attributes['tipo_Accesso']}, stanza.tipoAccesso), "
-          + "stanza.maxPosti = COALESCE(:#{#attributes['max_Posti']}, stanza.maxPosti), "
+          + "stanza.maxPosti = COALESCE(:#{#attributes['maxPosti']}, stanza.maxPosti), "
           + "stanza.scenario.id = COALESCE(:#{#attributes['id_scenario']}, stanza.scenario.id) "
           + "WHERE stanza.id = :Id")
   int updateAttributes(@Param("Id") Long id, @Param("attributes") Map<String, Object> attributes);
