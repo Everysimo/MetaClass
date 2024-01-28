@@ -40,7 +40,7 @@ const CalendarComp = () => {
         else if(!(input.charAt(0) === name.charAt(0).toUpperCase())) {
             setErrorMessage('Il nome del meeting deve cominciare con una lettera maiuscola');
         }
-        else if (/[^a-zA-Z0-9]/.test(input)) {
+        else if (/[^[A-Z][A-Za-z0-9\s]*$]/.test(input)) {
             setErrorMessage('Il nome del meeting non può contenere caratteri speciali');
         }
         else setErrorMessage('');
