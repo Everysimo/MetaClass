@@ -57,7 +57,7 @@ export const MeetingListInRoom = ({ formattedDate }) => {
                                 onClick={handleOpen}
                             >
                                 {/* Format meeting.inizio in 'YYYY-DD-MM' */}
-                                <span>Inizio: {`${dayjs(meeting.inizio).format('YYYY-DD-MM')} `}</span>
+                                <span>Inizio: {`${dayjs(meeting.inizio).format('HH:mm')} `}</span>
                             </div>
                             {showModal &&
                                 <div className={'modal'}>

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import {useParams} from "react-router-dom";
+import './SelectScenario.css'
 
 const ScenarioPage = () => {
     const [id_scenario, setIdScenario] = useState()
@@ -63,9 +64,7 @@ const ScenarioPage = () => {
         const dataTosend = {
                 id_scenario: parseInt(selectedScenario.id, 10), // converti a numero intero
                 idStanza: parseInt(Id_stanza, 10) // converti a numero intero
-
         }
-
         const requestOption = {
             method: 'POST',
             headers: {
@@ -91,8 +90,10 @@ const ScenarioPage = () => {
     const handleClose=()=>{
         setIsModalOpen(false);
         setSelectedScenario(null);
-        setMessage('');
-        window.location.reload();
+        if(message){
+            setMessage('');
+            window.location.reload();
+        }
     }
     return (
         <>
@@ -126,9 +127,12 @@ const ScenarioPage = () => {
                             ) : (
                             <>
                                 <h2>Scegli uno scenario</h2>
-                                <div className={"masterDiv"}>
+                                <div
+                                    className={"SlideShow"}
+                                >
                                     {array.map((scenario) => (
-                                        <div key={scenario.id} className="childDiv">
+                                        <div key={scenario.id}
+                                             className="childDiv">
                                             <h3>{scenario.nome}</h3>
                                             <h3>{scenario.id}</h3>
                                             <p>{scenario.descrizione}</p>

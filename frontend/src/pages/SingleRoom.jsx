@@ -88,7 +88,6 @@ export const SingleRoom = () => {
     };
 
     const isOrg = () => {
-        console.log("ktm", isOrganizer);
         return isOrganizer;
     };
 
@@ -104,15 +103,24 @@ export const SingleRoom = () => {
                         size="4x"
                         style={{ color: "#c70049" }}
                     />
-                    <h1>Stanza {id_stanza}</h1>
-                    <div style={{ border: '2px solid #ccc', borderRadius: '8px', padding: '10px', boxShadow: '0 0 10px rgba(0, 0, 0, 0.1)' }}>
+                    <h1>{stanzaSingola.nome}</h1>
+                    <div style={{
+                        border: '2px solid #ccc',
+                        borderRadius: '8px',
+                        padding: '10px',
+                        boxShadow: '0 0 10px rgba(0, 0, 0, 0.1)',
+                        maxWidth: "30vw",
+                        marginInline: "auto",
+                        marginBottom: "10px"
+                    }}>
                         <h2>CODICE STANZA: {stanzaSingola.codice}</h2>
                         <h4>
                             SCENARIO SELEZIONATO: {stanzaSingola && stanzaSingola.scenario && stanzaSingola.scenario.nome}
                         </h4>
                     </div>
-                    <h2>Meetings programmati</h2>
-                    <div className={"masterDiv"}>
+                    <div
+                        className={"masterDiv"}
+                    >
                         <MeetingList />
                         {isOrg() && (
                             <>
