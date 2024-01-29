@@ -49,7 +49,7 @@ const MyModifyForm = () => {
             setErrorMessage('La descrizione deve cominciare con la lettera maiuscola');
         else{
             setErrorMessage('');
-            setState({ ...state, nome: e.target.value });
+            setState({ ...state, descrizione: e.target.value });
         }
     };
 

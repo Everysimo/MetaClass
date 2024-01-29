@@ -7,27 +7,28 @@ import '../PopUpStyles.css'
 import axios from 'axios';
 import {faCheck, faRobot} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import InfoPopUp from "../infoPopUp";
+import InfoPopUpSchedule from "../infoPopUp/InfoPopUpSchedule";
 
-const CalendarComp = () => {
-    const offsetMinutes = 30; //prendiamo l'offset dato dall'IA (stima durata)
-    const infoPopup = InfoPopUp();
-    //inizializziamo le date di inizio e fine, tenendo conto dell'offset
-    const initialStartDate = new Date();
-    const initialEndDate = new Date(initialStartDate.getTime() + offsetMinutes * 60000);
+const CalendarComp = ({ stima }) => {
+    const infoPopup = InfoPopUpSchedule();
     const [showModal, setShowModal] = useState(false);
     const [name, setName] = useState('');
     const [successMessage, setSuccessMessage] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
-    const [selectedDateTimeRange, setSelectedDateTimeRange] = useState([
-        dayjs(initialStartDate),
-        dayjs(initialEndDate),
-    ]);
+    const [selectedDateTimeRange, setSelectedDateTimeRange] = useState([]);
+
+    useEffect(() => {
+        // Initialize the date of start and end, taking into account the offset
+        const initialStartDate = new Date();
+        const initialEndDate = new Date(initialStartDate.getTime() + stima * 60000);
+
+        // Set the initial value for selectedDateTimeRange
+        setSelectedDateTimeRange([dayjs(initialStartDate), dayjs(initialEndDate)]);
+    }, [stima]);
 
     const handleDateTimeRangeChange = (newDateTimeRange) => {
         setSelectedDateTimeRange(newDateTimeRange);
     };
-
     const checkInput=(input)=>{
         if(input === ''){
             setErrorMessage("Il campo nome non può essere vuoto");
@@ -144,7 +145,7 @@ const CalendarComp = () => {
                                 </div>
                                 {infoPopup.popup}
                                 <p style={{fontSize: "14px", textAlign: "center"}}>
-                                    Stima fatta con il modulo di IA
+                                    Stima fatta con il modulo di IA: {stima} minuti
                                 </p>
                                 <MultiInputDateTimeRangeField
                                     value={selectedDateTimeRange}

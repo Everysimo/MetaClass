@@ -15,10 +15,29 @@ import {
 import MeetingList from "../components/Calendar/CalendarViewer";
 import BannedUserList from "../components/Lists/UserList/BannedUserList";
 import MeetinginRoon from "../components/Lists/MeetingList/MeetinginRoon";
+import "../css/MyApp.css";
+import ALT from "../img/imm_mare.png";
+import FetchAI from "../components/Forms/ScheduleMeetingForm/fetchAI"; // Replace with your actual CSS file path
 
 export const SingleRoom = () => {
     const { id: id_stanza } = useParams();
-    const [role, setRole] = useState("Partecipante"); // Default role value
+    const [stima, setStima] = useState(null); // Initialize stima as null
+
+    useEffect(() => {
+        const fetchStima = async () => {
+            try {
+                const result = await FetchAI(id_stanza);
+                setStima(result);
+            } catch (error) {
+                console.error('Error fetching stima:', error);
+            }
+        };
+
+        fetchStima(); // Call the fetchStima function
+
+        // Other useEffect dependencies
+    }, [id_stanza]);
+    const [role, setRole] = useState("Partecipante");
     const [stanzaSingola, setStanzaSingola] = useState("");
     const [isOrganizer, setIsOrganizer] = useState(false);
 
@@ -27,7 +46,7 @@ export const SingleRoom = () => {
     useEffect(() => {
         fetchSingleRoom();
         // eslint-disable-next-line
-    }, []);
+    }, [id_stanza]);
 
     const requestOption = {
         method: 'POST',
@@ -59,87 +78,82 @@ export const SingleRoom = () => {
             try {
                 const fetchedRole = await checkRole(id_stanza);
                 setRole(fetchedRole);
-                // Set isOrganizer based on the fetched role
                 setIsOrganizer(fetchedRole === "Organizzatore" || fetchedRole === "Organizzatore_Master");
             } catch (error) {
                 console.error(error);
-                // Handle error fetching role, set role state accordingly if needed
             }
         };
 
-        fetchDataAndResize(); // Fetch the role when the component mounts
+        fetchDataAndResize();
 
         window.addEventListener("resize", resizeSideNav);
         return () => {
             window.removeEventListener("resize", resizeSideNav);
         };
-    }, [id_stanza]); // Run effect only when id_stanza changes
-
-    useEffect(() => {
-        resizeSideNav(); // Resize side nav when the role changes
-    }, [role, isOrganizer]); // Run effect when role or isOrganizer changes
+    }, [id_stanza, role, isOrganizer]);
 
     const resizeSideNav = () => {
-        const mainSection = document.querySelector(".roomSec");
-        const sideNav = document.querySelector(".side-nav");
-
-        if (mainSection && sideNav) {
-            const mainHeight = window.getComputedStyle(mainSection).height;
-            sideNav.style.maxHeight = mainHeight;
-        }
+        // No need to manually resize the side-nav, it will dynamically adjust based on the flex properties in the CSS.
     };
 
     const isOrg = () => {
         return isOrganizer;
     };
 
+    const importImage = (nome) =>{
+        return require(`../img/${nome}`);
+    }
+
     return (
         <>
             <header>
                 <MyHeader />
             </header>
-            <main>
-                <section className={"roomSec"} id={"rSec"}>
+            <main className="main-container">
+                <section className="roomSec" id="rSec">
                     <FontAwesomeIcon
                         icon={faChalkboardUser}
                         size="4x"
                         style={{ color: "#c70049" }}
                     />
                     <h1>{stanzaSingola.nome}</h1>
-                    <div style={{
-                        border: '2px solid #ccc',
-                        borderRadius: '8px',
-                        padding: '10px',
-                        boxShadow: '0 0 10px rgba(0, 0, 0, 0.1)',
-                        maxWidth: "30vw",
-                        marginInline: "auto",
-                        marginBottom: "10px"
-                    }}>
+                    <div className="room-info">
                         <h2>CODICE STANZA: {stanzaSingola.codice}</h2>
-                        <h4>
-                            SCENARIO SELEZIONATO: {stanzaSingola && stanzaSingola.scenario && stanzaSingola.scenario.nome}
-                        </h4>
+                        <h4>SCENARIO SELEZIONATO: {
+                            stanzaSingola &&
+                            stanzaSingola.scenario &&
+                            stanzaSingola.scenario.nome
+                        }</h4>
+                        {
+                            stanzaSingola &&
+                            stanzaSingola.scenario &&
+                            stanzaSingola.scenario.image.nome &&
+                            <img
+                                style={{
+                                    borderRadius: "25px",
+                                    maxWidth: "300px",
+                                    height: "auto"
+                                }}
+                                src={importImage(stanzaSingola.scenario.image.nome)}
+                                alt={ALT}/>
+                        }
                     </div>
-                    <div
-                        className={"masterDiv"}
-                    >
+                    <div className="masterDiv">
                         <MeetingList />
                         {isOrg() && (
-                            <>
-                                <div className={"childDiv"}>
-                                    <h2>Funzioni organizzatore:</h2>
-                                    <CalendarComp />
-                                    <MyModifyForm />
-                                    <SelectScenario Id_stanza={id_stanza} />
-                                    <RequestSection id_stanza={id_stanza} />
-                                    <BannedUserList id_stanza={id_stanza} />
-                                </div>
-                            </>
+                            <div className="childDiv">
+                                <h2>Funzioni organizzatore:</h2>
+                                <CalendarComp stima={stima}/>
+                                <MyModifyForm />
+                                <SelectScenario Id_stanza={id_stanza} />
+                                <RequestSection id_stanza={id_stanza} />
+                                <BannedUserList id_stanza={id_stanza} />
+                            </div>
                         )}
                     </div>
                 </section>
                 <aside className="side-nav">
-                    <div className={"childDiv"}>
+                    <div className="childDiv">
                         <UserListInRoom />
                         <MeetinginRoon />
                     </div>

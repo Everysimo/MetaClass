@@ -17,7 +17,8 @@
     scroll-snap-align: center;
     img{
         border-radius: 25px;
-        width: 100%;
+        width: auto;
+        height: 120px;
     }
     p{
         font-size: 14px;

@@ -185,16 +185,16 @@ public class DataInitializer implements CommandLineRunner {
     // Aggiunta Immagine
     Immagine i1 =
         immagineRepository.save(
-            new Immagine(1L, "lavoro1.txt", "https://www.lavoro1.com/path/to/lavoro1.txt"));
+            new Immagine(1L, "vr1_fhd.jpg", "https://www.lavoro1.com/path/to/vr1_fhd.jpg"));
     Immagine i2 =
         immagineRepository.save(
-            new Immagine(2L, "scuola1.txt", "https://www.scuola1.com/path/to/scuola1.txt"));
+            new Immagine(2L, "scuola.png", "https://www.scuola1.com/path/to/scuola.png"));
     Immagine i3 =
         immagineRepository.save(
             new Immagine(
                 3L,
-                "divertimento1.txt",
-                "https://www.divertimento1.com/path/to/divertimento1.txt"));
+                "imm_mare.png",
+                "https://www.divertimento1.com/path/to/imm_mare.png"));
 
     // Aggiunta dello Scenario
 

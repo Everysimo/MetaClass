@@ -24,7 +24,6 @@ const UserListInRoom = () => {
     const [statoPartecipazione, setStatoP] = useState(null);
 
     const { id: id_stanza } = useParams();
-    const id_utente = sessionStorage.getItem('UserMetaID');
     const idStanza = id_stanza;
 
     useEffect(() => {
@@ -443,7 +442,7 @@ const UserListInRoom = () => {
                                 Array.isArray(statoPartecipazione.value) &&
                                 statoPartecipazione.value.find(
                                     (partecipazione) => partecipazione.utente.id === user.id &&
-                                    partecipazione.ruolo.nome !== 'Organizzatore_Master') && (
+                                    partecipazione.ruolo.nome !== 'Organizzatore_Master') && user.role !== 0 &&(
                                         <button onClick={() => toggleButtons(user.id)}>
                                             Opzioni <FontAwesomeIcon
                                             icon={faAlignCenter}

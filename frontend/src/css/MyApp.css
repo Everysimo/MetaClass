@@ -14,9 +14,10 @@ body{
     position: relative;
     display: flex;
     flex-direction: column;
-    min-height: 100vh;  
+    min-height: 100vh;
     min-width: 345px;
     color: #002f53;
+    overflow-x: hidden; /* Prevent horizontal scrollbar */
 }
 body::-webkit-scrollbar {
     width: 0; /* Hides the scrollbar */
@@ -27,6 +28,7 @@ main {
     display: flex;
     justify-content: center;
     background-color: white;
+    flex: 1;
 }
 #loginMain {
     min-height: 80vh;
@@ -123,8 +125,9 @@ section p{
 
 .roomSec {
     flex: 3 1;
-    height: auto;
     min-height: 600px;
+    padding: 20px;
+    box-sizing: border-box;
     background: transparent;
 }
 
@@ -134,9 +137,8 @@ section p{
     flex: 1;
     background-color: #f4f4f4;
     padding: 20px;
-    overflow-y: auto; /* Enable scrollbar if content overflows */
+    overflow-y: auto;
     box-shadow: 0 0 20px 0 rgba(0, 0, 0, 0.19);
-    min-height: 85vh;
     animation: slideRight 1.5s 1;
 }
 
@@ -155,6 +157,17 @@ section p{
     display: flex; /* Children of .master will be displayed horizontally */
     flex-direction: column; /* Children inside .child will be displayed vertically */
     margin: 5%; /* Optional: Add margin between .child elements */
+}
+/* Add a wrapper around side-nav content to make it fill the height */
+.side-nav-wrapper {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+/* Adjust styles for childDiv within side-nav */
+.side-nav .childDiv {
+    flex: 1;
 }
 
 .fitCont{

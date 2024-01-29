@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, {useEffect, useState} from 'react';
 import {useParams} from "react-router-dom";
-import './SelectScenario.css'
+import './SelectScenario.css';
+import ALT from '../../../img/imm_mare.png';
 
 const ScenarioPage = () => {
     const [id_scenario, setIdScenario] = useState()
@@ -37,6 +38,7 @@ const ScenarioPage = () => {
 
             data.value.forEach((parametro, indice) => {
                 const nome = parametro.nome;
+                console.log(parametro.image.nome);
                 console.log(`Nome ${indice + 1}: ${nome}`);
             });
 
@@ -76,7 +78,12 @@ const ScenarioPage = () => {
 
         try {
             console.log("la stringa json:", dataTosend);
-            const response = await fetch(`http://localhost:8080/modificaScenario/${encodeURIComponent(dataTosend.idStanza)}/${encodeURIComponent(dataTosend.id_scenario)}`, requestOption);
+            const response = await fetch(
+                `http://localhost:8080/modificaScenario/
+                ${encodeURIComponent(dataTosend.idStanza)}/
+                ${encodeURIComponent(dataTosend.id_scenario)}`,
+                requestOption
+            );
             const responseData = await response.json();
             setMessage(responseData.message);
         } catch (error) {
@@ -94,6 +101,10 @@ const ScenarioPage = () => {
             setMessage('');
             window.location.reload();
         }
+    }
+
+    const importImage = (nome) =>{
+        return require(`../../../img/${nome}`);
     }
     return (
         <>
@@ -130,11 +141,11 @@ const ScenarioPage = () => {
                                 <div
                                     className={"SlideShow"}
                                 >
-                                    {array.map((scenario) => (
+                                    {array.map( (scenario) => (
                                         <div key={scenario.id}
                                              className="childDiv">
                                             <h3>{scenario.nome}</h3>
-                                            <h3>{scenario.id}</h3>
+                                            <img src={importImage(scenario.image.nome)} alt={ALT}/>
                                             <p>{scenario.descrizione}</p>
                                             <button onClick={() => handleSelectScenario(scenario)}>Scegli</button>
                                         </div>
