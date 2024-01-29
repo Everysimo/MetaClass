@@ -192,7 +192,6 @@ const CreaScenario = (props) => {
             <div className={"modal"}>
                 <div className={`modal-content`}>
                     <span className="close" onClick={handleClose}>&times;</span>
-
                         <div className="card-content">
                             <label>
                                 Nome:
@@ -202,6 +201,7 @@ const CreaScenario = (props) => {
                                     placeholder='Inserisci Nome'
                                     value={nome}
                                     onChange={handleNameChange}
+                                    style={{marginBlock: "10px"}}
                                 />
                             </label>
                             <label>
@@ -212,6 +212,7 @@ const CreaScenario = (props) => {
                                     placeholder='Inserisci Descrizione'
                                     value={descrizione}
                                     onChange={handleDescChange}
+                                    style={{marginBlock: "10px"}}
                                 />
                             </label>
                             <label>
@@ -219,7 +220,7 @@ const CreaScenario = (props) => {
                                 <input
                                     type="file"
                                     name="immagine"
-                                    accept="image/*"  // specifica il tipo di file che gli utenti possono selezionare, in questo caso, immagini
+                                    accept="image/*"
                                     onChange={handleImageChange}
                                 />
                             </label>

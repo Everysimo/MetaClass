@@ -114,6 +114,7 @@ const CreaCategoria = (props) => {
                                             name="nome"
                                             value={formData.nome}
                                             onChange={handleNameChange}
+                                            style={{marginBlock: "10px"}}
                                         />
                                     </label>
                                     <label>
@@ -123,6 +124,7 @@ const CreaCategoria = (props) => {
                                             name="descrizione"
                                             value={formData.descrizione}
                                             onChange={handleDescChange}
+                                            style={{marginBlock: "10px"}}
                                         />
                                     </label>
                                     <button onClick={handleClear}>Cancella</button>
