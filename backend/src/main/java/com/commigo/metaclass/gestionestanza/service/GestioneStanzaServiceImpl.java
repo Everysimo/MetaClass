@@ -92,9 +92,9 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService {
       }
     } else if (sp.isBannato()) {
       throw new RuntimeException403("Sei stato bannato da questa stanza, non puoi entrare");
-    } else if(sp.isInAttesa()) {
+    } else if (sp.isInAttesa()) {
       throw new RuntimeException403("Sei già in attesa di entrare in questa stanza");
-    }else{
+    } else {
       return ResponseEntity.ok(
           new AccessResponse<>(stanza.getId(), "Sei già all'interno di questa stanza", false));
     }
@@ -1048,20 +1048,22 @@ public class GestioneStanzaServiceImpl implements GestioneStanzaService {
   }
 
   /**
-   * Metodo che permette di visualizzare l'immagine dello scenario in uso in una stanza
+   * Metodo che permette di visualizzare l'immagine dello scenario in uso in una stanza.
+   *
    * @param id_stanza id della stanza di cui di vuole visualizzare l'immagine dello scenario
    * @return L'immagine dello scenario in uso ed un messaggio che descrive l'esito dell'operazione
-   * @throws RuntimeException403
+   * @throws RuntimeException403 Eccezione per ritornare un errore di accesso non consnetito
    */
-  public ResponseEntity<Response<Immagine>>visualizzaImmagineScenario(Long id_stanza) throws RuntimeException403 {
+  public ResponseEntity<Response<Immagine>> visualizzaImmagineScenario(Long id_stanza)
+      throws RuntimeException403 {
     Stanza stanza = stanzaRepository.findStanzaById(id_stanza);
 
-    if(stanza == null){
+    if (stanza == null) {
       throw new RuntimeException403("Stanza non trovata");
     }
 
-    return ResponseEntity.ok(new Response<Immagine>(stanza.getScenario().getImage(), "Immagine dello scenario trovata con successo"));
-
+    return ResponseEntity.ok(
+        new Response<Immagine>(
+            stanza.getScenario().getImage(), "Immagine dello scenario trovata con successo"));
   }
-
 }

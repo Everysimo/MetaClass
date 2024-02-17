@@ -404,8 +404,8 @@ public class DataInitializer implements CommandLineRunner {
             new Meeting(
                 1L,
                 "MeetingStanza4",
-                LocalDateTime.parse("2024-02-02 18:00", formatter),
-                LocalDateTime.parse("2024-02-02 20:00", formatter),
+                LocalDateTime.parse("2025-02-02 18:00", formatter),
+                LocalDateTime.parse("2025-02-02 20:00", formatter),
                 false,
                 sc1,
                 s4));
@@ -415,8 +415,8 @@ public class DataInitializer implements CommandLineRunner {
             new Meeting(
                 2L,
                 "MeetingStanza4",
-                LocalDateTime.parse("2024-02-03 18:00", formatter),
-                LocalDateTime.parse("2024-02-03 20:00", formatter),
+                LocalDateTime.parse("2025-02-03 18:00", formatter),
+                LocalDateTime.parse("2025-02-03 20:00", formatter),
                 false,
                 sc1,
                 s4));
@@ -425,8 +425,8 @@ public class DataInitializer implements CommandLineRunner {
             new Meeting(
                 3L,
                 "MeetingStanza5",
-                LocalDateTime.parse("2024-02-03 18:00", formatter),
-                LocalDateTime.parse("2024-02-03 20:00", formatter),
+                LocalDateTime.parse("2025-02-03 18:00", formatter),
+                LocalDateTime.parse("2025-02-03 20:00", formatter),
                 false,
                 sc1,
                 s5));
@@ -462,7 +462,7 @@ public class DataInitializer implements CommandLineRunner {
             m1,
             rep1,
             Duration.ofMinutes(30),
-            LocalDateTime.parse("2024-02-03 19:00", formatter),
+            LocalDateTime.parse("2025-02-03 19:00", formatter),
             false));
     feedbackMeetingRepository.save(
         new FeedbackMeeting(
@@ -470,7 +470,7 @@ public class DataInitializer implements CommandLineRunner {
             m1,
             rep1,
             Duration.ofMinutes(30),
-            LocalDateTime.parse("2024-02-03 19:00", formatter),
+            LocalDateTime.parse("2025-02-03 19:00", formatter),
             false));
     feedbackMeetingRepository.save(
         new FeedbackMeeting(
@@ -478,7 +478,7 @@ public class DataInitializer implements CommandLineRunner {
             m1,
             rep1,
             Duration.ofMinutes(30),
-            LocalDateTime.parse("2024-02-03 19:00", formatter),
+            LocalDateTime.parse("2025-02-03 19:00", formatter),
             false));
     feedbackMeetingRepository.save(
         new FeedbackMeeting(
@@ -486,7 +486,7 @@ public class DataInitializer implements CommandLineRunner {
             m1,
             rep1,
             Duration.ofMinutes(30),
-            LocalDateTime.parse("2024-02-03 19:00", formatter),
+            LocalDateTime.parse("2025-02-03 19:00", formatter),
             false));
     feedbackMeetingRepository.save(
         new FeedbackMeeting(
@@ -494,7 +494,7 @@ public class DataInitializer implements CommandLineRunner {
             m2,
             rep2,
             Duration.ofMinutes(30),
-            LocalDateTime.parse("2024-02-03 19:00", formatter),
+            LocalDateTime.parse("2025-02-03 19:00", formatter),
             false));
     feedbackMeetingRepository.save(
         new FeedbackMeeting(
@@ -502,7 +502,7 @@ public class DataInitializer implements CommandLineRunner {
             m2,
             rep2,
             Duration.ofMinutes(30),
-            LocalDateTime.parse("2024-02-03 19:00", formatter),
+            LocalDateTime.parse("2025-02-03 19:00", formatter),
             true));
     feedbackMeetingRepository.save(
         new FeedbackMeeting(
@@ -510,7 +510,7 @@ public class DataInitializer implements CommandLineRunner {
             m2,
             rep2,
             Duration.ofMinutes(30),
-            LocalDateTime.parse("2024-02-03 19:00", formatter),
+            LocalDateTime.parse("2025-02-03 19:00", formatter),
             false));
   }
 }
