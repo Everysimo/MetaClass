@@ -68,6 +68,9 @@ dependencies {
 	implementation 'org.pmml4s:pmml4s_2.12:0.9.12'
 	implementation 'org.jpmml:pmml-evaluator:1.5.6'
 	implementation 'org.jpmml:pmml-evaluator-extension:1.5.6'
+	implementation 'commons-io:commons-io:2.11.0'
+	implementation 'com.twosigma.beakerx:beakerx-kernel:2.0.0' // Sostituisci con l'ultima versione disponibile
+
 
 	checkstyle 'com.puppycrawl.tools:checkstyle:10.9.1'
 	badger 'com.github.bordertech.buildtools:badger:1.0.0'
