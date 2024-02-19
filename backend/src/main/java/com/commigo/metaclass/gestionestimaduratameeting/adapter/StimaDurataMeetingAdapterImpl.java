@@ -11,12 +11,6 @@ import java.time.Period;
 import java.util.List;
 import java.util.Objects;
 
-import com.twosigma.beakerx.kernel.KernelManager;
-import com.twosigma.beakerx.mimetype.MIMEContainer;
-import com.twosigma.beakerx.kernel.comm.Comm;
-import com.twosigma.beakerx.kernel.comm.TargetNamesEnum;
-import com.twosigma.beakerx.kernel.magic.command.functionality.ClasspathAddJarMagicCommand;
-
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVPrinter;
@@ -123,39 +117,11 @@ public class StimaDurataMeetingAdapterImpl implements StimaDurataMeetingAdapter 
     }
   }
 
-  public String executeNotebook(String notebookPath) {
-    try {
-      // Inizializza il kernel BeakerX
-      KernelManager.create();
+  //metodo per il riallenamento del modello
+  private void trainingModel() {
 
-      // Aggiungi il percorso del notebook al classpath
-      ClasspathAddJarMagicCommand.run(notebookPath);
-
-      // Carica il contenuto del notebook
-      String notebookContent = readNotebookContent(notebookPath);
-
-      // Esegui il codice del notebook
-      MIMEContainer result = runNotebookCode(notebookContent);
-
-      // Restituisci l'output (puoi personalizzare in base alle tue esigenze)
-      return result.getData().toString();
-    } catch (Exception e) {
-      e.printStackTrace();
-      return "Errore durante l'esecuzione del notebook: " + e.getMessage();
-    }
   }
 
-  private String readNotebookContent(String notebookPath) throws IOException {
-    // Leggi il contenuto del notebook
-    Path path = Paths.get(notebookPath);
-    List<String> lines = Files.readAllLines(path);
-    return String.join("\n", lines);
-  }
-
-  private MIMEContainer runNotebookCode(String notebookContent) {
-    // Esegui il codice Python del notebook
-    return KernelManager.get().evaluate(notebookContent);
-  }
 
 
 
