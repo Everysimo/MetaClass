@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="it"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Meeting.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">MetaClass</a> &gt; <a href="index.source.html" class="el_package">com.commigo.metaclass.entity</a> &gt; <span class="el_source">Meeting.java</span></div><h1>Meeting.java</h1><pre class="source lang-java linenums">package com.commigo.metaclass.entity;
+
+import com.commigo.metaclass.exceptions.DataFormatException;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.validation.constraints.AssertTrue;
+import jakarta.validation.constraints.Future;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+
+/** Entità Meeting. */
+@Entity
+<span class="pc bpc" id="L33" title="48 of 52 branches missed.">@Data</span>
+<span class="nc" id="L34">@NoArgsConstructor</span>
+<span class="fc" id="L35">@AllArgsConstructor</span>
+@JsonInclude(JsonInclude.Include.NON_NULL)
+public class Meeting {
+  /** Costante per valore intero di 254. */
+  public static final int MAX_NAME_LENGTH = 254;
+
+  /** Costante per valore intero di 2. */
+  public static final int MIN_NAME_LENGTH = 2;
+
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+<span class="fc" id="L46">  private long id;</span>
+
+  @NotNull(message = &quot;Il nome non può essere nullo&quot;)
+  @Column(length = MAX_NAME_LENGTH)
+  @Size(min = MIN_NAME_LENGTH, max = MAX_NAME_LENGTH, message = &quot;Lunghezza nome non valida&quot;)
+  @NotBlank(message = &quot;Il nome non può essere vuoto&quot;)
+  @Pattern(
+      regexp = &quot;^[A-Z][A-Za-z0-9\\s]*$&quot;,
+      message =
+          &quot;Il nome deve iniziare con una lettera maiuscola seguita da lettere &quot;
+              + &quot;minuscole senza spazi o caratteri speciali&quot;)
+<span class="fc" id="L57">  private String nome;</span>
+
+  @NotNull(message = &quot;L'inizio non può essere nullo&quot;)
+  @Future(message = &quot;l'inizio deve essere successiva alla data odierna&quot;)
+<span class="fc" id="L61">  private LocalDateTime inizio;</span>
+
+  @NotNull(message = &quot;La fine non può essere nulla&quot;)
+  @Future(message = &quot;la fine deve essere successiva alla data odierna&quot;)
+<span class="fc" id="L65">  private LocalDateTime fine;</span>
+
+  @NotNull(message = &quot;isAvviato non può essere nullo&quot;)
+<span class="nc" id="L68">  private boolean isAvviato;</span>
+
+  /** Chiave Esterna sullo Scenario. */
+  @NotNull(message = &quot;Lo scenario non può essere nullo&quot;)
+  @ManyToOne(fetch = FetchType.EAGER, optional = true)
+  @JoinColumn(name = &quot;id_scenario&quot;, nullable = true)
+<span class="nc" id="L74">  private Scenario scenarioIniziale;</span>
+
+  /** Chiave Esterna sulla stanza. */
+  @NotNull(message = &quot;Lo stanza non può essere nulla&quot;)
+  @ManyToOne(cascade = CascadeType.REMOVE)
+  @JoinColumn(name = &quot;id_stanza&quot;)
+  @OnDelete(action = OnDeleteAction.CASCADE)
+<span class="fc" id="L81">  private Stanza stanza;</span>
+
+  @AssertTrue(message = &quot;L'inizio deve essere precedente alla fine&quot;)
+  public boolean isStartDateBeforeEndDate() {
+    // La validazione sarà passata solo se la data di inizio è precedente a quella di fine
+<span class="pc bpc" id="L86" title="2 of 6 branches missed.">    return inizio == null || fine == null || inizio.isBefore(fine);</span>
+  }
+
+  /**
+   * Costruttore.
+   *
+   * @param nome Nome meeting.
+   * @param inizio Data inizio meeting.
+   * @param fine Data fine meeting.
+   * @param stanza Istanza della stanza.
+   * @param meeting Id del meeting.
+   * @throws DataFormatException Eccezione se le date non rispettano il formato giusto.
+   */
+  @JsonCreator(mode = JsonCreator.Mode.DEFAULT)
+  public Meeting(
+      @JsonProperty(&quot;nome&quot;) String nome,
+      @JsonProperty(&quot;inizio&quot;) String inizio,
+      @JsonProperty(&quot;fine&quot;) String fine,
+      @JsonProperty(&quot;id_stanza&quot;) Long stanza,
+      @JsonProperty(&quot;idMeeting&quot;) Long meeting)
+<span class="fc" id="L106">      throws DataFormatException {</span>
+
+<span class="fc" id="L108">    DateTimeFormatter formatter = DateTimeFormatter.ofPattern(&quot;yyyy-MM-dd HH:mm&quot;);</span>
+
+<span class="pc bpc" id="L110" title="1 of 2 branches missed.">    if (meeting != null) {</span>
+<span class="nc" id="L111">      this.id = meeting;</span>
+    }
+
+<span class="fc" id="L114">    this.nome = nome;</span>
+
+    try {
+<span class="fc" id="L117">      this.inizio = LocalDateTime.parse(inizio, formatter);</span>
+<span class="fc" id="L118">    } catch (DateTimeParseException ex) {</span>
+<span class="fc" id="L119">      throw new DataFormatException(&quot;Formato 'inizio' non valido (yyyy-MM-dd HH:mm)&quot;);</span>
+<span class="fc" id="L120">    }</span>
+
+    try {
+<span class="fc" id="L123">      this.fine = LocalDateTime.parse(fine, formatter);</span>
+<span class="nc" id="L124">    } catch (DateTimeParseException ex) {</span>
+<span class="nc" id="L125">      throw new DataFormatException(&quot;Formato 'fine' non valido (yyyy-MM-dd HH:mm)&quot;);</span>
+<span class="fc" id="L126">    }</span>
+
+<span class="fc" id="L128">    this.isAvviato = false;</span>
+
+<span class="fc" id="L130">    this.stanza = new Stanza();</span>
+<span class="fc" id="L131">    this.stanza.setId(stanza);</span>
+
+<span class="fc" id="L133">    this.scenarioIniziale = new Scenario();</span>
+<span class="fc" id="L134">  }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.9.202303310957</span></div></body></html>

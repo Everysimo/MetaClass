@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="it"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Scenario.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">MetaClass</a> &gt; <a href="index.source.html" class="el_package">com.commigo.metaclass.MetaClass.entity</a> &gt; <span class="el_source">Scenario.java</span></div><h1>Scenario.java</h1><pre class="source lang-java linenums">package com.commigo.metaclass.MetaClass.entity;
+
+import com.commigo.metaclass.MetaClass.exceptions.MismatchJsonProperty;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+import org.hibernate.annotations.UpdateTimestamp;
+import org.hibernate.validator.constraints.URL;
+
+import java.time.LocalDateTime;
+
+@Entity
+<span class="nc bnc" id="L21" title="All 66 branches missed.">@Data</span>
+<span class="fc" id="L22">@NoArgsConstructor</span>
+<span class="nc" id="L23">@AllArgsConstructor</span>
+@JsonIgnoreProperties({&quot;hibernateLazyInitializer&quot;, &quot;handler&quot;})
+public class Scenario {
+
+    public static final int MAX_LENGTH = 254;
+    public static final int MIN_LENGTH = 3;
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+<span class="nc" id="L32">    private Long id;</span>
+
+    @NotNull(message = &quot;Il nome non può essere nullo&quot;)
+    @Column(unique = true)
+    @Size(min = MIN_LENGTH, max = MAX_LENGTH, message = &quot;Lunghezza del nome non valida&quot;)
+    @Pattern(regexp = &quot;^[A-Z][A-Za-z0-9\\s]*$&quot;,
+            message = &quot;Formato nome errato&quot;)
+    @NotBlank (message = &quot;Il nome non può essere vuoto&quot;)
+<span class="nc" id="L40">    private String nome;</span>
+
+
+    @NotBlank (message = &quot;La descrizione non puo' essere vuota&quot;)
+    @NotNull(message = &quot;La descrizione non puo' essere nulla&quot;)
+    @Size(min = MIN_LENGTH, max = MAX_LENGTH, message = &quot;Lunghezza della descrizione non valida&quot;)
+    @Pattern(regexp=&quot;^[A-Z][a-zA-Z0-9.,!?()'\&quot;\\-\\s]+$&quot;,
+            message = &quot;Formato descrizione errato&quot;)
+<span class="nc" id="L48">    private String descrizione;</span>
+
+<span class="nc" id="L50">    private float media_valutazione;</span>
+
+<span class="pc" id="L52">    @NotNull(message = &quot;Il numero dei voti non può mai essere nullo&quot;)</span>
+<span class="nc" id="L53">    private int num_voti = 0;</span>
+
+    /**
+     *Chiave Esterna sulla Categoria
+     */
+    @NotNull(message = &quot;La categoria non può essere nulla&quot;)
+    @ManyToOne(cascade = CascadeType.MERGE)
+    @JoinColumn(name = &quot;id_categoria&quot;)
+    @OnDelete(action = OnDeleteAction.CASCADE)
+<span class="nc" id="L62">    private Categoria categoria;</span>
+
+    @Column(name = &quot;Data_Creazione&quot;, updatable = false)
+    @CreationTimestamp
+<span class="nc" id="L66">    private LocalDateTime data_creazione;</span>
+
+    @Column(name = &quot;Data_Aggiornamento&quot;)
+    @UpdateTimestamp
+<span class="nc" id="L70">    private LocalDateTime data_aggiornamento;</span>
+
+    @NotNull(message = &quot;L'URL dell'immagine non può essere nullo&quot;)
+    @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.REFRESH})
+<span class="nc" id="L74">    private Immagine image;</span>
+
+    @JsonCreator
+    public Scenario(@JsonProperty(&quot;nome&quot;) String Nome,
+                    @JsonProperty(&quot;descrizione&quot;) String Descrizione,
+                    @JsonProperty(&quot;url_immagine&quot;) String url ,
+<span class="nc" id="L80">                    @JsonProperty(&quot;id_categoria&quot;) Long idCategoria) throws MismatchJsonProperty {</span>
+
+<span class="nc bnc" id="L82" title="All 8 branches missed.">        if (Nome == null || Descrizione == null || url == null || idCategoria == null) {</span>
+<span class="nc" id="L83">            throw new MismatchJsonProperty(&quot;gli attributi non sono corretti&quot;);</span>
+        }
+
+<span class="nc" id="L86">        this.nome = Nome;</span>
+<span class="nc" id="L87">        this.descrizione = Descrizione;</span>
+<span class="nc" id="L88">        this.image = new Immagine();</span>
+<span class="nc" id="L89">        this.image.setUrl(url);</span>
+<span class="nc" id="L90">        this.categoria = new Categoria();</span>
+<span class="nc" id="L91">        this.categoria.setId(idCategoria);</span>
+
+<span class="nc" id="L93">    }</span>
+
+    //costruttore creato a fini di testing
+<span class="fc" id="L96">    public Scenario(Long Id, String Nome, String Descrizione, Immagine immagine ,Categoria cat)  {</span>
+
+<span class="fc" id="L98">        this.id = Id;</span>
+<span class="fc" id="L99">        this.nome = Nome;</span>
+<span class="fc" id="L100">        this.descrizione = Descrizione;</span>
+<span class="fc" id="L101">        this.image = immagine;</span>
+<span class="fc" id="L102">        this.categoria = cat;</span>
+
+<span class="fc" id="L104">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.9.202303310957</span></div></body></html>

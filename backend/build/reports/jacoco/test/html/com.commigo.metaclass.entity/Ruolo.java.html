@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="it"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Ruolo.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">MetaClass</a> &gt; <a href="index.source.html" class="el_package">com.commigo.metaclass.entity</a> &gt; <span class="el_source">Ruolo.java</span></div><h1>Ruolo.java</h1><pre class="source lang-java linenums">package com.commigo.metaclass.entity;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+/** Entità Ruolo. */
+@Entity
+<span class="nc bnc" id="L17" title="All 16 branches missed.">@Data</span>
+<span class="nc" id="L18">@NoArgsConstructor</span>
+<span class="fc" id="L19">@AllArgsConstructor</span>
+public class Ruolo {
+
+  public static final int MAX_NAME_LENGTH = 254;
+  public static final int MIN_NAME_LENGTH = 1;
+
+  public static final String PARTECIPANTE = &quot;Partecipante&quot;;
+  public static final String ORGANIZZATORE = &quot;Organizzatore&quot;;
+  public static final String ORGANIZZATORE_MASTER = &quot;Organizzatore_Master&quot;;
+
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+<span class="nc" id="L31">  private long id;</span>
+
+  @NotNull(message = &quot;Il nome non può essere nullo&quot;)
+  @Column(unique = true)
+  @Size(min = MIN_NAME_LENGTH, max = MAX_NAME_LENGTH, message = &quot;Lunghezza del nome non valida&quot;)
+  @NotBlank(message = &quot;il nome non può essere vuoto&quot;)
+<span class="nc" id="L37">  private String nome;</span>
+
+<span class="nc" id="L39">  public Ruolo(String nome) {</span>
+<span class="nc" id="L40">    this.nome = nome;</span>
+<span class="nc" id="L41">  }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.9.202303310957</span></div></body></html>

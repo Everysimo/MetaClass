@@ -1,0 +1,409 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="it"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>GestioneMeetingController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">MetaClass</a> &gt; <a href="index.source.html" class="el_package">com.commigo.metaclass.gestionemeeting.controller</a> &gt; <span class="el_source">GestioneMeetingController.java</span></div><h1>GestioneMeetingController.java</h1><pre class="source lang-java linenums">package com.commigo.metaclass.gestionemeeting.controller;
+
+import com.commigo.metaclass.entity.Meeting;
+import com.commigo.metaclass.exceptions.ClientRuntimeException;
+import com.commigo.metaclass.exceptions.RuntimeException401;
+import com.commigo.metaclass.exceptions.RuntimeException403;
+import com.commigo.metaclass.exceptions.ServerRuntimeException;
+import com.commigo.metaclass.gestionemeeting.service.GestioneMeetingService;
+import com.commigo.metaclass.utility.MapValidator;
+import com.commigo.metaclass.utility.request.RequestUtils;
+import com.commigo.metaclass.utility.response.types.Response;
+import com.commigo.metaclass.webconfig.JwtTokenUtil;
+import com.commigo.metaclass.webconfig.ValidationToken;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
+import java.util.List;
+import java.util.Map;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
+
+/** Gestione meeting. */
+@RestController
+<span class="fc" id="L33">public class GestioneMeetingController {</span>
+
+  @Autowired private GestioneMeetingService meetingService;
+
+  @Autowired private ValidationToken validationToken;
+
+  @Autowired private JwtTokenUtil jwtTokenUtil;
+
+  /**
+   * Metodo che permette di gestire la richiesta di schedulazione di un meeting.
+   *
+   * @param m Meeting che deve essere schedulato
+   * @param result Variabile che contiene tutti gli errori di validazione dell'oggetto meeting
+   * @param request richiesta HTTP fornita dal client
+   * @return un valore booleano che identifica la riuscita dell'operazione ed un messaggio che
+   *     descrive l'esito di essa
+   */
+  @PostMapping(value = &quot;/schedulingMeeting&quot;)
+  public ResponseEntity&lt;Response&lt;Boolean&gt;&gt; schedulingMeeting(
+      @Valid @RequestBody Meeting m, BindingResult result, HttpServletRequest request) {
+    try {
+
+      // controllo token
+<span class="fc bfc" id="L56" title="All 2 branches covered.">      if (!validationToken.isTokenValid(request)) {</span>
+<span class="fc" id="L57">        throw new RuntimeException403(&quot;Token non valido&quot;);</span>
+      }
+
+      // controlla se i parametri passati al meeting sono corretti
+<span class="fc bfc" id="L61" title="All 2 branches covered.">      if (result.hasErrors()) {</span>
+<span class="fc" id="L62">        throw new RuntimeException403(RequestUtils.errorsRequest(result));</span>
+      }
+
+<span class="fc" id="L65">      String metaId = jwtTokenUtil.getmetaIdFromToken(validationToken.getToken());</span>
+
+<span class="fc" id="L67">      meetingService.creaScheduling(m, metaId);</span>
+<span class="fc" id="L68">      return ResponseEntity.ok(new Response&lt;&gt;(true, &quot;Meeting schedulato con successo&quot;));</span>
+
+<span class="fc" id="L70">    } catch (RuntimeException403 e) {</span>
+<span class="fc" id="L71">      return ResponseEntity.status(403)</span>
+<span class="fc" id="L72">          .body(</span>
+              new Response&lt;&gt;(
+<span class="fc" id="L74">                  false, &quot;Errore durante la schedulazione del meeting: &quot; + e.getMessage()));</span>
+<span class="fc" id="L75">    } catch (ServerRuntimeException e) {</span>
+<span class="fc" id="L76">      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)</span>
+<span class="fc" id="L77">          .body(</span>
+              new Response&lt;&gt;(
+<span class="fc" id="L79">                  false, &quot;Errore durante la schedulazione del meeting: &quot; + e.getMessage()));</span>
+    }
+  }
+
+  /**
+   * Metodo che permette di gestire la richiesta di modifica di schedulazione di un meeting.
+   *
+   * @param id id Meeting sul quale modificare la schedulazione
+   * @param params variabile che contiene i parametri da modificare del meeting
+   * @param request richiesta HTTP fornita dal client
+   * @return un valore booleano che identifica la riuscita dell'operazione ed un messaggio che
+   *     descrive l'esito di essa
+   */
+  @PostMapping(value = &quot;/modifyScheduling/{id}&quot;)
+  public ResponseEntity&lt;Response&lt;Boolean&gt;&gt; modifyScheduling(
+      @PathVariable Long id, @RequestBody Map&lt;String, Object&gt; params, HttpServletRequest request) {
+
+    try {
+      // controllo del token
+<span class="nc bnc" id="L98" title="All 2 branches missed.">      if (!validationToken.isTokenValid(request)) {</span>
+<span class="nc" id="L99">        throw new RuntimeException403(&quot;Token non valido&quot;);</span>
+      }
+
+      // validazione della map
+<span class="nc" id="L103">      MapValidator.meetingValidate(params);</span>
+
+<span class="nc bnc" id="L105" title="All 2 branches missed.">      if (!meetingService.modificaScheduling(params, id)) {</span>
+<span class="nc" id="L106">        throw new ServerRuntimeException(&quot;modifica non effettuata&quot;);</span>
+      } else {
+<span class="nc" id="L108">        return ResponseEntity.ok(new Response&lt;&gt;(true, &quot;Meeting modificata con successo&quot;));</span>
+      }
+
+<span class="nc" id="L111">    } catch (RuntimeException403 re) {</span>
+<span class="nc" id="L112">      return ResponseEntity.status(403)</span>
+<span class="nc" id="L113">          .body(new Response&lt;&gt;(false, &quot;Errore durante l'operazione: &quot; + re.getMessage()));</span>
+<span class="nc" id="L114">    } catch (RuntimeException401 ue) {</span>
+<span class="nc" id="L115">      return ResponseEntity.status(401)</span>
+<span class="nc" id="L116">          .body(new Response&lt;&gt;(false, &quot;Errore durante l'operazione: &quot; + ue.getMessage()));</span>
+<span class="nc" id="L117">    } catch (ClientRuntimeException ce) {</span>
+<span class="nc" id="L118">      return ResponseEntity.status(400).body(new Response&lt;&gt;(false, ce.getMessage()));</span>
+<span class="nc" id="L119">    } catch (Exception e) {</span>
+<span class="nc" id="L120">      e.printStackTrace();</span>
+<span class="nc" id="L121">      return ResponseEntity.status(500).body(new Response&lt;&gt;(false, &quot;Errore durante l'operazione&quot;));</span>
+    }
+  }
+
+  /**
+   * Metodo che permette di gestire la richiesta di avvio di un meeting.
+   *
+   * @param idMeeting ID del meeting che deve essere avviato
+   * @param request richiesta HTTP fornita dal client
+   * @return un valore booleano che identifica la riuscita dell'operazione ed un messaggio che
+   *     descrive l'esito di essa
+   */
+  @PostMapping(value = &quot;/avviaMeeting/{idMeeting}&quot;)
+  public ResponseEntity&lt;Response&lt;Boolean&gt;&gt; avviaMeeting(
+      @PathVariable Long idMeeting, HttpServletRequest request) {
+    try {
+      // controllo token
+<span class="nc bnc" id="L138" title="All 2 branches missed.">      if (!validationToken.isTokenValid(request)) {</span>
+<span class="nc" id="L139">        throw new RuntimeException403(&quot;Token non valido&quot;);</span>
+      }
+
+<span class="nc" id="L142">      String metaId = jwtTokenUtil.getmetaIdFromToken(validationToken.getToken());</span>
+
+<span class="nc bnc" id="L144" title="All 2 branches missed.">      if (meetingService.avviaMeeting(metaId, idMeeting)) {</span>
+<span class="nc" id="L145">        return ResponseEntity.ok(new Response&lt;&gt;(true, &quot;Avvio meeting avvenuto con successo&quot;));</span>
+      } else {
+<span class="nc" id="L147">        throw new ServerRuntimeException(&quot;Errore nell'avvio del meeting&quot;);</span>
+      }
+
+<span class="nc" id="L150">    } catch (RuntimeException403 e) {</span>
+<span class="nc" id="L151">      return ResponseEntity.status(403).body(new Response&lt;&gt;(false, e.getMessage()));</span>
+<span class="nc" id="L152">    } catch (ServerRuntimeException se) {</span>
+<span class="nc" id="L153">      return ResponseEntity.status(500).body(new Response&lt;&gt;(false, se.getMessage()));</span>
+    }
+  }
+
+  /**
+   * Metodo che permette di gestire la richiesta di visualizzazione dei meeting schedulati
+   * all'iterno di una stanza.
+   *
+   * @param id Id della stanza di cui bisogna visualizzare i meeting schedulati
+   * @param request richiesta HTTP fornita dal client
+   * @return una lista di meeting ed un messaggio che descrive l'esito dell'operazione
+   */
+  @PostMapping(value = &quot;/visualizzaSchedulingMeeting/{id}&quot;)
+  public ResponseEntity&lt;Response&lt;List&lt;Meeting&gt;&gt;&gt; visualizzaSchedulingMeeting(
+      @PathVariable Long id, HttpServletRequest request) {
+    try {
+<span class="nc bnc" id="L169" title="All 2 branches missed.">      if (!validationToken.isTokenValid(request)) {</span>
+<span class="nc" id="L170">        throw new RuntimeException403(&quot;Token non valido&quot;);</span>
+      }
+
+<span class="nc" id="L173">      return meetingService.visualizzaSchedulingMeeting(id);</span>
+
+<span class="nc" id="L175">    } catch (Exception e) {</span>
+<span class="nc" id="L176">      return ResponseEntity.ok(</span>
+          new Response&lt;&gt;(null, &quot;Errore visualizzazione Scheduling dei meeting per la stanza&quot;));
+    }
+  }
+
+  /**
+   * Metodo che permette di gestire la richiesta di accesso ad un meeting.
+   *
+   * @param idMeeting id del meeting a cui si vuole fare accesso
+   * @param request richiesta HTTP fornita dal client
+   * @return un valore booleano che identifica la riuscita dell'operazione ed un messaggio che
+   *     descrive l'esito di essa
+   */
+  @PostMapping(value = &quot;/accediMeeting/{idMeeting}&quot;)
+  public ResponseEntity&lt;Response&lt;Boolean&gt;&gt; accediMeeting(
+      @PathVariable Long idMeeting, HttpServletRequest request) {
+    try {
+
+      // controllo token
+<span class="nc bnc" id="L195" title="All 2 branches missed.">      if (!validationToken.isTokenValid(request)) {</span>
+<span class="nc" id="L196">        throw new RuntimeException403(&quot;Token non valido&quot;);</span>
+      }
+
+<span class="nc" id="L199">      String metaId = jwtTokenUtil.getmetaIdFromToken(validationToken.getToken());</span>
+
+<span class="nc bnc" id="L201" title="All 2 branches missed.">      if (meetingService.accediMeeting(metaId, idMeeting)) {</span>
+<span class="nc" id="L202">        return ResponseEntity.ok(new Response&lt;&gt;(true, &quot;Accesso avvenuto con successo&quot;));</span>
+      } else {
+<span class="nc" id="L204">        throw new ServerRuntimeException(&quot;Errore nell'accesso al meeting&quot;);</span>
+      }
+<span class="nc" id="L206">    } catch (RuntimeException403 e) {</span>
+<span class="nc" id="L207">      return ResponseEntity.status(403).body(new Response&lt;&gt;(false, e.getMessage()));</span>
+<span class="nc" id="L208">    } catch (ServerRuntimeException se) {</span>
+<span class="nc" id="L209">      return ResponseEntity.status(500).body(new Response&lt;&gt;(false, se.getMessage()));</span>
+    }
+  }
+
+  /**
+   * Metodo che permette di gestire la richiesta di terminazione di un meeting.
+   *
+   * @param idMeeting id del meeting che si vuole teminare
+   * @param request richiesta HTTP fornita dal client
+   * @return un valore booleano che identifica la riuscita dell'operazione ed un messaggio che
+   *     descrive l'esito di essa
+   */
+  @PostMapping(value = &quot;/terminaMeeting/{idMeeting}&quot;)
+  public ResponseEntity&lt;Response&lt;Boolean&gt;&gt; terminaMeeting(
+      @PathVariable Long idMeeting, HttpServletRequest request) {
+    try {
+      // controllo token
+<span class="nc bnc" id="L226" title="All 2 branches missed.">      if (!validationToken.isTokenValid(request)) {</span>
+<span class="nc" id="L227">        throw new RuntimeException403(&quot;Token non valido&quot;);</span>
+      }
+
+<span class="nc" id="L230">      String metaId = jwtTokenUtil.getmetaIdFromToken(validationToken.getToken());</span>
+
+<span class="nc bnc" id="L232" title="All 2 branches missed.">      if (meetingService.terminaMeeting(metaId, idMeeting)) {</span>
+<span class="nc" id="L233">        return ResponseEntity.ok(new Response&lt;&gt;(true, &quot;Meeting terminato con successo&quot;));</span>
+      } else {
+<span class="nc" id="L235">        throw new ServerRuntimeException(&quot;Errore nella terminazione del meeting&quot;);</span>
+      }
+
+<span class="nc" id="L238">    } catch (RuntimeException403 e) {</span>
+<span class="nc" id="L239">      return ResponseEntity.status(403).body(new Response&lt;&gt;(false, e.getMessage()));</span>
+<span class="nc" id="L240">    } catch (ServerRuntimeException se) {</span>
+<span class="nc" id="L241">      return ResponseEntity.status(500).body(new Response&lt;&gt;(false, se.getMessage()));</span>
+    }
+  }
+
+  /**
+   * Metodo che permette di gestire la richista di uscita da un determianto meeting.
+   *
+   * @param idMeeting id del meeting da cui si vuole uscire
+   * @param request richiesta HTTP fornita dal client
+   * @return un valore booleano che identifica la riuscita dell'operazione ed un messaggio che
+   *     descrive l'esito di essa
+   */
+  @PostMapping(value = &quot;/uscitaMeeting/{idMeeting}&quot;)
+  public ResponseEntity&lt;Response&lt;Boolean&gt;&gt; uscitaMeeting(
+      @PathVariable Long idMeeting, HttpServletRequest request) {
+    try {
+      // controllo token
+<span class="nc bnc" id="L258" title="All 2 branches missed.">      if (!validationToken.isTokenValid(request)) {</span>
+<span class="nc" id="L259">        throw new RuntimeException403(&quot;Token non valido&quot;);</span>
+      }
+
+<span class="nc" id="L262">      String metaId = jwtTokenUtil.getmetaIdFromToken(validationToken.getToken());</span>
+
+<span class="nc bnc" id="L264" title="All 2 branches missed.">      if (meetingService.uscitaMeeting(metaId, idMeeting)) {</span>
+<span class="nc" id="L265">        return ResponseEntity.ok(new Response&lt;&gt;(true, &quot;Uscita avvenuta con successo&quot;));</span>
+      } else {
+<span class="nc" id="L267">        throw new ServerRuntimeException(&quot;Errore nell'uscita dell'utente del meeting&quot;);</span>
+      }
+
+<span class="nc" id="L270">    } catch (RuntimeException403 e) {</span>
+<span class="nc" id="L271">      return ResponseEntity.status(403).body(new Response&lt;&gt;(false, e.getMessage()));</span>
+<span class="nc" id="L272">    } catch (ServerRuntimeException se) {</span>
+<span class="nc" id="L273">      return ResponseEntity.status(500).body(new Response&lt;&gt;(false, se.getMessage()));</span>
+    }
+  }
+
+  /**
+   * Metodo che permette di gestire la richiesta di visualizzazione del questionario.
+   *
+   * @param request richiesta HTTP fornita dal client
+   * @returnun una lista di meeting in cui l'utente deve compilare in questionario ed un messaggio
+   *     che descrive l'esito di essa
+   */
+  @GetMapping(&quot;/visualizzaQuestionari&quot;)
+  public ResponseEntity&lt;Response&lt;List&lt;Meeting&gt;&gt;&gt; visualizzaQuestionario(
+      HttpServletRequest request) {
+
+    try {
+      // controllo token
+<span class="nc bnc" id="L290" title="All 2 branches missed.">      if (!validationToken.isTokenValid(request)) {</span>
+<span class="nc" id="L291">        throw new RuntimeException403(&quot;Token non valido&quot;);</span>
+      }
+
+<span class="nc" id="L294">      String metaId = jwtTokenUtil.getmetaIdFromToken(validationToken.getToken());</span>
+<span class="nc" id="L295">      List&lt;Meeting&gt; meetingToQuest = meetingService.visualizzaQuestionari(metaId);</span>
+<span class="nc" id="L296">      return ResponseEntity.ok(</span>
+          new Response&lt;&gt;(
+              meetingToQuest,
+              &quot;La stampa dei meeting su cui bisogna compilare il questionario è&quot;
+                  + &quot; avvenuto con successo&quot;));
+
+<span class="nc" id="L302">    } catch (RuntimeException403 e) {</span>
+<span class="nc" id="L303">      return ResponseEntity.status(403).body(new Response&lt;&gt;(null, e.getMessage()));</span>
+<span class="nc" id="L304">    } catch (ServerRuntimeException se) {</span>
+<span class="nc" id="L305">      return ResponseEntity.status(500).body(new Response&lt;&gt;(null, se.getMessage()));</span>
+    }
+  }
+
+  /**
+   * Metodo che permette di gestire la richiesta di compilazione del questionario.
+   *
+   * @param jsonValue Valori inseriti dall'utente all'interno del questionario
+   * @param idMeeting id del metting a cui fa riferimento il questionario
+   * @param request richiesta HTTP fornita dal client
+   * @return un valore booleano che identifica la riuscita dell'operazione ed un messaggio che
+   *     descrive l'esito di essa
+   */
+  @PostMapping(&quot;/compilaQuestionario/{idMeeting}&quot;)
+  public ResponseEntity&lt;Response&lt;Boolean&gt;&gt; compilaQuestionario(
+      @RequestBody String jsonValue, @PathVariable Long idMeeting, HttpServletRequest request) {
+
+    try {
+      // controllo token
+<span class="fc bfc" id="L324" title="All 2 branches covered.">      if (!validationToken.isTokenValid(request)) {</span>
+<span class="fc" id="L325">        throw new RuntimeException403(&quot;Token non valido&quot;);</span>
+      }
+
+<span class="fc" id="L328">      ObjectMapper objectMapper = new ObjectMapper();</span>
+<span class="fc" id="L329">      JsonNode jsonNode = objectMapper.readTree(jsonValue);</span>
+<span class="fc" id="L330">      JsonNode valutazioneNode = jsonNode.get(&quot;immersionLevel&quot;);</span>
+
+      // validazione del livello di immersività
+      int value;
+<span class="fc bfc" id="L334" title="All 2 branches covered.">      if (valutazioneNode.isNull()) {</span>
+<span class="fc" id="L335">        throw new RuntimeException403(&quot;inserire 'immersionLevel' come nome dell'attributo&quot;);</span>
+      }
+<span class="fc bfc" id="L337" title="All 2 branches covered.">      if (!valutazioneNode.isInt()) {</span>
+<span class="fc" id="L338">        throw new RuntimeException403(&quot;inserire un valore di immersivita' intero [1,5]&quot;);</span>
+      }
+<span class="fc" id="L340">      value = valutazioneNode.asInt();</span>
+<span class="fc bfc" id="L341" title="All 4 branches covered.">      if (value &lt; 1 || value &gt; 5) {</span>
+<span class="fc" id="L342">        throw new RuntimeException403(&quot;valore di immersivita' non valido&quot;);</span>
+      }
+
+<span class="fc" id="L345">      JsonNode motionSicknessNode = jsonNode.get(&quot;motionSickness&quot;);</span>
+
+      // validazione motionsickness
+      int motionSickness;
+<span class="fc bfc" id="L349" title="All 2 branches covered.">      if (motionSicknessNode.isNull()) {</span>
+<span class="fc" id="L350">        throw new RuntimeException403(&quot;inserire 'motionSickness' come nome dell'attributo&quot;);</span>
+      }
+<span class="fc bfc" id="L352" title="All 2 branches covered.">      if (!motionSicknessNode.isInt()) {</span>
+<span class="fc" id="L353">        throw new RuntimeException403(&quot;inserire un valore di motionSickness intero [1,10]&quot;);</span>
+      }
+<span class="fc" id="L355">      motionSickness = motionSicknessNode.asInt();</span>
+<span class="fc bfc" id="L356" title="All 4 branches covered.">      if (motionSickness &lt; 1 || motionSickness &gt; 10) {</span>
+<span class="fc" id="L357">        throw new RuntimeException403(&quot;valore di motionSickness non valido&quot;);</span>
+      }
+
+<span class="fc" id="L360">      String metaId = jwtTokenUtil.getmetaIdFromToken(validationToken.getToken());</span>
+
+<span class="fc" id="L362">      meetingService.compilaQuestionario(value, motionSickness, metaId, idMeeting);</span>
+
+<span class="fc" id="L364">      return ResponseEntity.ok(new Response&lt;&gt;(true, &quot;questionario compilato con successo&quot;));</span>
+
+<span class="fc" id="L366">    } catch (RuntimeException403 e) {</span>
+<span class="fc" id="L367">      return ResponseEntity.status(403).body(new Response&lt;&gt;(null, e.getMessage()));</span>
+<span class="fc" id="L368">    } catch (ServerRuntimeException se) {</span>
+<span class="fc" id="L369">      return ResponseEntity.status(500).body(new Response&lt;&gt;(null, se.getMessage()));</span>
+<span class="fc" id="L370">    } catch (JsonProcessingException e) {</span>
+<span class="fc" id="L371">      return ResponseEntity.status(403)</span>
+<span class="fc" id="L372">          .body(</span>
+              new Response&lt;&gt;(
+                  null,
+                  &quot;'valutazione' o altri attributi non sono &quot;
+                      + &quot;disponibili: (immersionLevel,motionSickness) &quot;));
+    }
+  }
+
+  /**
+   * Metodo che permette di gestire la visualizzazione dei meeting precedenti a cui ha partecipato
+   * l'utente.
+   *
+   * @param request richiesta dal client.
+   * @return una lista di meeting in cui e un messaggio che descrive l'esito dell'operazione
+   */
+  @GetMapping(&quot;/visualizzaMeetingPrecedenti&quot;)
+  public ResponseEntity&lt;Response&lt;List&lt;Meeting&gt;&gt;&gt; visualizzaMeetingPrecedeni(
+      HttpServletRequest request) {
+
+    try {
+      // controllo token
+<span class="nc bnc" id="L393" title="All 2 branches missed.">      if (!validationToken.isTokenValid(request)) {</span>
+<span class="nc" id="L394">        throw new RuntimeException403(&quot;Token non valido&quot;);</span>
+      }
+
+<span class="nc" id="L397">      String metaId = jwtTokenUtil.getmetaIdFromToken(validationToken.getToken());</span>
+
+<span class="nc" id="L399">      List&lt;Meeting&gt; meetingToQuest = meetingService.getMeetingPrecedenti(metaId);</span>
+<span class="nc" id="L400">      return ResponseEntity.ok(new Response&lt;&gt;(meetingToQuest, &quot;Operazione avvenuta con successo&quot;));</span>
+
+<span class="nc" id="L402">    } catch (RuntimeException403 e) {</span>
+<span class="nc" id="L403">      return ResponseEntity.status(403).body(new Response&lt;&gt;(null, e.getMessage()));</span>
+<span class="nc" id="L404">    } catch (ServerRuntimeException se) {</span>
+<span class="nc" id="L405">      return ResponseEntity.status(500).body(new Response&lt;&gt;(null, se.getMessage()));</span>
+    }
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.9.202303310957</span></div></body></html>

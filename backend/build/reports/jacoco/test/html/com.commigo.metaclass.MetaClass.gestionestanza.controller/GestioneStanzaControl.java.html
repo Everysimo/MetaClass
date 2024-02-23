@@ -1,0 +1,706 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="it"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>GestioneStanzaControl.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">MetaClass</a> &gt; <a href="index.source.html" class="el_package">com.commigo.metaclass.MetaClass.gestionestanza.controller</a> &gt; <span class="el_source">GestioneStanzaControl.java</span></div><h1>GestioneStanzaControl.java</h1><pre class="source lang-java linenums">package com.commigo.metaclass.MetaClass.gestionestanza.controller;
+
+import com.commigo.metaclass.MetaClass.entity.*;
+import com.commigo.metaclass.MetaClass.exceptions.ClientRuntimeException;
+import com.commigo.metaclass.MetaClass.exceptions.RuntimeException401;
+import com.commigo.metaclass.MetaClass.exceptions.RuntimeException403;
+import com.commigo.metaclass.MetaClass.exceptions.ServerRuntimeException;
+import com.commigo.metaclass.MetaClass.gestionestanza.service.GestioneStanzaService;
+import com.commigo.metaclass.MetaClass.utility.MapValidator;
+import com.commigo.metaclass.MetaClass.utility.request.RequestUtils;
+import com.commigo.metaclass.MetaClass.utility.response.ResponseUtils;
+import com.commigo.metaclass.MetaClass.utility.response.types.AccessResponse;
+import com.commigo.metaclass.MetaClass.utility.response.types.Response;
+import com.commigo.metaclass.MetaClass.webconfig.JwtTokenUtil;
+import com.commigo.metaclass.MetaClass.webconfig.ValidationToken;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.Map;
+
+@RestController
+<span class="nc" id="L32">public class GestioneStanzaControl {</span>
+
+    @Autowired
+    private GestioneStanzaService stanzaService;
+
+    @Autowired
+    private ValidationToken validationToken;
+
+    @Autowired
+    private JwtTokenUtil jwtTokenUtil;
+
+
+    /**
+     * metodo che gestisce la richiesta di ban di un utente all'interno di una stanza
+     *
+     * @param IdStanza
+     * @param IdUtente
+     * @param request
+     * @return
+     *
+     */
+    @PostMapping(value = &quot;/banUtente/{IdStanza}/{IdUtente}&quot;)
+    public ResponseEntity&lt;Response&lt;Boolean&gt;&gt; banUtente(@PathVariable Long IdStanza,
+                                                              @PathVariable Long IdUtente,
+                                                              HttpServletRequest request) {
+
+        try {
+            //controllo del token
+<span class="nc bnc" id="L60" title="All 2 branches missed.">            if (!validationToken.isTokenValid(request)) {</span>
+<span class="nc" id="L61">                throw new RuntimeException403(&quot;Token non valido&quot;);</span>
+            }
+
+<span class="nc" id="L64">            String metaID = jwtTokenUtil.getMetaIdFromToken(validationToken.getToken());</span>
+<span class="nc" id="L65">            return stanzaService.banUtente(IdStanza,metaID,IdUtente);</span>
+
+<span class="nc" id="L67">        } catch (RuntimeException403 re) {</span>
+<span class="nc" id="L68">            return ResponseEntity.status(403)</span>
+<span class="nc" id="L69">                    .body(new Response&lt;&gt;(false, &quot;Errore durante l'operazione: &quot; + re.getMessage()));</span>
+<span class="nc" id="L70">        } catch (Exception e) {</span>
+<span class="nc" id="L71">            e.printStackTrace();</span>
+<span class="nc" id="L72">            return ResponseEntity.status(500)</span>
+<span class="nc" id="L73">                    .body(new Response&lt;&gt;(false, &quot;Errore durante l'operazione&quot;));</span>
+        }
+    }
+
+    /**
+     *
+     * @param s
+     * @param result
+     * @param request
+     * @return
+     */
+    @PostMapping(value = &quot;/creastanza&quot;)
+    public ResponseEntity&lt;Response&lt;Boolean&gt;&gt; creaStanza(@Valid @RequestBody Stanza s,
+                                                        BindingResult result,
+                                                        HttpServletRequest request){
+        try
+        {
+            //validazione dl token
+<span class="nc bnc" id="L91" title="All 2 branches missed.">            if (!validationToken.isTokenValid(request)) {</span>
+<span class="nc" id="L92">                throw new RuntimeException403(&quot;Token non valido&quot;);</span>
+            }
+
+<span class="nc bnc" id="L95" title="All 2 branches missed.">            if(result.hasErrors()) {</span>
+<span class="nc" id="L96">                throw new RuntimeException403(RequestUtils.errorsRequest(result));</span>
+            }
+
+<span class="nc" id="L99">            String metaID = jwtTokenUtil.getMetaIdFromToken(validationToken.getToken());</span>
+
+<span class="nc" id="L101">            stanzaService.creaStanza(s,metaID);</span>
+<span class="nc" id="L102">            return ResponseUtils.getResponseOk(&quot;Corretto&quot;);</span>
+
+
+<span class="nc" id="L105">        }catch (ServerRuntimeException e) {</span>
+<span class="nc" id="L106">            return ResponseUtils.getResponseError(HttpStatus.INTERNAL_SERVER_ERROR,&quot;Errore durante la richiesta: &quot; + e.getMessage());</span>
+<span class="nc" id="L107">        }catch(RuntimeException403 se){</span>
+<span class="nc" id="L108">            return ResponseUtils.getResponseError(HttpStatus.valueOf(403),</span>
+<span class="nc" id="L109">                    &quot;Errore durante la richiesta: &quot; + se.getMessage());</span>
+<span class="nc" id="L110">        }catch(Exception ge){</span>
+<span class="nc" id="L111">            return ResponseUtils.getResponseError(HttpStatus.valueOf(500),</span>
+<span class="nc" id="L112">                    &quot;Errore durante la richiesta: &quot; + ge.getMessage());</span>
+        }
+    }
+
+    /**
+     *
+     * @param IdStanza
+     * @param IdUtente
+     * @param request
+     * @return
+     */
+    @PostMapping(value = &quot;/declassaOrganizzatore/{IdStanza}/{IdUtente}&quot;)
+    public ResponseEntity&lt;Response&lt;Boolean&gt;&gt; declassaOrganizzatore(@PathVariable Long IdStanza,
+                                                                   @PathVariable Long IdUtente,
+                                                                   HttpServletRequest request) {
+        try {
+<span class="nc bnc" id="L128" title="All 2 branches missed.">            if (!validationToken.isTokenValid(request)) {</span>
+<span class="nc" id="L129">                throw new RuntimeException403(&quot;Token non valido&quot;);</span>
+            }
+
+<span class="nc" id="L132">            String metaID = jwtTokenUtil.getMetaIdFromToken(validationToken.getToken());</span>
+
+<span class="nc" id="L134">            return ResponseEntity.ok(stanzaService.downgradeUtente(metaID, IdUtente, IdStanza));</span>
+
+<span class="nc" id="L136">        } catch (ServerRuntimeException se) {</span>
+<span class="nc" id="L137">            return ResponseEntity.status(500)</span>
+<span class="nc" id="L138">                    .body(new Response&lt;&gt;(false, &quot;Errore durante l'operazione: &quot;+se.getMessage()));</span>
+<span class="nc" id="L139">        } catch (RuntimeException403 re) {</span>
+<span class="nc" id="L140">            return ResponseEntity.status(403)</span>
+<span class="nc" id="L141">                    .body(new Response&lt;&gt;(false, &quot;Errore durante l'operazione: &quot;+re.getMessage()));</span>
+        }
+    }
+
+    /**
+     *
+     * @param Id
+     * @param request
+     * @return
+     */
+    @PostMapping(value = &quot;/eliminaStanza/{Id}&quot;)
+    public ResponseEntity&lt;Response&lt;Boolean&gt;&gt; eliminaStanza(@PathVariable Long Id, HttpServletRequest request) {
+        try {
+<span class="nc bnc" id="L154" title="All 2 branches missed.">            if (!validationToken.isTokenValid(request)) {</span>
+<span class="nc" id="L155">                throw new RuntimeException403(&quot;Token non valido&quot;);</span>
+            }
+
+<span class="nc" id="L158">            String metaID = jwtTokenUtil.getMetaIdFromToken(validationToken.getToken());</span>
+
+<span class="nc" id="L160">            return ResponseEntity.ok(stanzaService.deleteRoom(metaID, Id));</span>
+
+<span class="nc" id="L162">        } catch (RuntimeException403 re) {</span>
+<span class="nc" id="L163">            return ResponseEntity.status(403)</span>
+<span class="nc" id="L164">                    .body(new Response&lt;&gt;(false, &quot;Errore durante l'operazione: &quot;+re.getMessage()));</span>
+<span class="nc" id="L165">        } catch (Exception e) {</span>
+<span class="nc" id="L166">            return ResponseEntity.status(500)</span>
+<span class="nc" id="L167">                    .body(new Response&lt;&gt;(false, &quot;Errore durante l'operazione&quot; + e.getMessage()));</span>
+        }
+    }
+
+    /**
+     *
+     * @param idStanza
+     * @param idUtente
+     * @param scelta
+     * @param request
+     * @return
+     */
+    @PostMapping(value = &quot;/gestioneAccessi/{idStanza}/{idUtente}&quot;)
+    public ResponseEntity&lt;Response&lt;Boolean&gt;&gt; gestioneAccessi(@PathVariable Long idStanza,
+                                                             @PathVariable Long idUtente,
+                                                             @RequestBody String scelta,
+                                                             HttpServletRequest request){
+        try {
+<span class="nc bnc" id="L185" title="All 2 branches missed.">            if (!validationToken.isTokenValid(request)) {</span>
+<span class="nc" id="L186">                throw new RuntimeException403(&quot;Token non valido&quot;);</span>
+            }
+
+<span class="nc" id="L189">            ObjectMapper objectMapper = new ObjectMapper();</span>
+<span class="nc" id="L190">            JsonNode jsonNode = objectMapper.readTree(scelta);</span>
+<span class="nc" id="L191">            Boolean Newscelta = jsonNode.get(&quot;scelta&quot;).asBoolean();</span>
+
+<span class="nc" id="L193">            String metaID = jwtTokenUtil.getMetaIdFromToken(validationToken.getToken());</span>
+<span class="nc" id="L194">            return stanzaService.gestioneAccesso(metaID, idUtente, idStanza, Newscelta);</span>
+
+<span class="nc" id="L196">        }catch(RuntimeException403 re){</span>
+<span class="nc" id="L197">            return ResponseEntity.status(403)</span>
+<span class="nc" id="L198">                    .body(new Response&lt;&gt;(false, &quot;Errore nell'operazione: &quot;+re.getMessage()));</span>
+<span class="nc" id="L199">        } catch (Exception e) {</span>
+<span class="nc" id="L200">            return ResponseEntity.status(500)</span>
+<span class="nc" id="L201">                    .body(new Response&lt;&gt;(false, &quot;Errore durante l'operazione&quot; + e.getMessage()));</span>
+        }
+    }
+
+
+    /**
+     *
+     * @param Id
+     * @param params
+     * @param request
+     * @return
+     */
+    @PostMapping(value = &quot;/modifyRoomData/{Id}&quot;)
+    public ResponseEntity&lt;Response&lt;Boolean&gt;&gt; modifyRoomData(@PathVariable Long Id,
+                                                            @RequestBody Map&lt;String,Object&gt; params,
+                                                            HttpServletRequest request) {
+
+        try {
+                //controllo del token
+<span class="nc bnc" id="L220" title="All 2 branches missed.">                if (!validationToken.isTokenValid(request)) {</span>
+<span class="nc" id="L221">                    throw new RuntimeException403(&quot;Token non valido&quot;);</span>
+                }
+
+                //validazione della map
+<span class="nc" id="L225">                MapValidator.stanzaValidate(params);</span>
+
+<span class="nc bnc" id="L227" title="All 2 branches missed.">                if(!stanzaService.modificaDatiStanza(params,Id)){</span>
+<span class="nc" id="L228">                    throw new ServerRuntimeException(&quot;modifica non effettuata&quot;);</span>
+                } else {
+<span class="nc" id="L230">                    return ResponseEntity.ok(new Response&lt;&gt;(true, &quot;Stanza modificata con successo&quot;));</span>
+                }
+
+<span class="nc" id="L233">        } catch(RuntimeException403 re) {</span>
+<span class="nc" id="L234">            return ResponseEntity.status(403)</span>
+<span class="nc" id="L235">                    .body(new Response&lt;&gt;(false, &quot;Errore durante l'operazione: &quot;+re.getMessage()));</span>
+<span class="nc" id="L236">        }catch(RuntimeException401 ue) {</span>
+<span class="nc" id="L237">            return ResponseEntity.status(401)</span>
+<span class="nc" id="L238">                .body(new Response&lt;&gt;(false, &quot;Errore durante l'operazione: &quot;+ue.getMessage()));</span>
+<span class="nc" id="L239">        }catch(ClientRuntimeException ce) {</span>
+<span class="nc" id="L240">            return ResponseEntity.status(400)</span>
+<span class="nc" id="L241">                    .body(new Response&lt;&gt;(false, ce.getMessage()));</span>
+<span class="nc" id="L242">        }catch(Exception e) {</span>
+<span class="nc" id="L243">            e.printStackTrace();</span>
+<span class="nc" id="L244">            return ResponseEntity.status(500)</span>
+<span class="nc" id="L245">                    .body(new Response&lt;&gt;(false, &quot;Errore durante l'operazione&quot;));</span>
+        }
+    }
+
+    /**
+     *
+     * @param IdStanza
+     * @param IdUtente
+     * @param request
+     * @return
+     */
+    @PostMapping(value = &quot;/promuoviOrganizzatore/{IdStanza}/{IdUtente}&quot;)
+    public ResponseEntity&lt;Response&lt;Boolean&gt;&gt; promuoviOrganizzatore(@PathVariable Long IdStanza,
+                                                                   @PathVariable Long IdUtente,
+                                                                   HttpServletRequest request) {
+        try {
+<span class="nc bnc" id="L261" title="All 2 branches missed.">            if (!validationToken.isTokenValid(request)) {</span>
+<span class="nc" id="L262">                throw new RuntimeException403(&quot;Token non valido&quot;);</span>
+            }
+
+<span class="nc" id="L265">            String metaID = jwtTokenUtil.getMetaIdFromToken(validationToken.getToken());</span>
+
+<span class="nc" id="L267">            return ResponseEntity.ok(stanzaService.upgradeUtente(metaID, IdUtente, IdStanza));</span>
+
+<span class="nc" id="L269">        } catch (ServerRuntimeException se) {</span>
+<span class="nc" id="L270">            return ResponseEntity.status(500)</span>
+<span class="nc" id="L271">                    .body(new Response&lt;&gt;(false, &quot;Errore durante l'operazione: &quot;+se.getMessage()));</span>
+<span class="nc" id="L272">        } catch (RuntimeException403 re) {</span>
+<span class="nc" id="L273">            return ResponseEntity.status(403)</span>
+<span class="nc" id="L274">                    .body(new Response&lt;&gt;(false, &quot;Errore durante l'operazione: &quot;+re.getMessage()));</span>
+        }
+    }
+
+    /**
+     *
+     * @param requestBody
+     * @param request
+     * @return
+     */
+    @PostMapping(value = &quot;/accessoStanza&quot;)
+    public ResponseEntity&lt;AccessResponse&lt;Long&gt;&gt; richiestaAccessoStanza(@RequestBody String requestBody,
+                                                                          HttpServletRequest request) {
+        try {
+<span class="nc bnc" id="L288" title="All 2 branches missed.">            if (!validationToken.isTokenValid(request)) {</span>
+<span class="nc" id="L289">                throw new RuntimeException403(&quot;Token non valido&quot;);</span>
+            }
+
+<span class="nc" id="L292">            String metaID = jwtTokenUtil.getMetaIdFromToken(validationToken.getToken());</span>
+
+<span class="nc" id="L294">            ObjectMapper objectMapper = new ObjectMapper();</span>
+<span class="nc" id="L295">            JsonNode jsonNode = objectMapper.readTree(requestBody);</span>
+<span class="nc" id="L296">            JsonNode codiceNode = jsonNode.get(&quot;codice&quot;);</span>
+
+            //controllo se il codice è null
+<span class="nc bnc" id="L299" title="All 2 branches missed.">            if (codiceNode == null)</span>
+<span class="nc" id="L300">                throw new RuntimeException403(&quot;l'attributo deve essere nominato 'codice' e non diversamente&quot;);</span>
+
+            //controllo se l'attributo è testuale
+<span class="nc bnc" id="L303" title="All 2 branches missed.">            if(!codiceNode.isTextual())</span>
+<span class="nc" id="L304">                throw new RuntimeException403(&quot;l'attributo deve essere una stringa&quot;);</span>
+
+<span class="nc" id="L306">            String codiceStanza = codiceNode.asText();</span>
+<span class="nc" id="L307">            System.out.println(codiceStanza.length());</span>
+<span class="nc bnc" id="L308" title="All 2 branches missed.">            if(codiceStanza.length()!=6)</span>
+<span class="nc" id="L309">                throw new RuntimeException403(&quot;il codice deve essere un numero di 6 cifre&quot;);</span>
+
+<span class="nc" id="L311">            ResponseEntity&lt;AccessResponse&lt;Long&gt;&gt; resp = ResponseEntity.ok(stanzaService.accessoStanza(codiceStanza, metaID).getBody());</span>
+<span class="nc" id="L312">            return resp;</span>
+
+<span class="nc" id="L314">        }catch (JsonProcessingException je) {</span>
+<span class="nc" id="L315">            return ResponseEntity.status(403)</span>
+<span class="nc" id="L316">                    .body(new AccessResponse&lt;&gt;(-1L, &quot;Errore durante la richiesta: il body della tua richiesta è vuoto&quot;, false));</span>
+<span class="nc" id="L317">        } catch (RuntimeException403 re) {</span>
+<span class="nc" id="L318">            return ResponseEntity.status(403)</span>
+<span class="nc" id="L319">                    .body(new AccessResponse&lt;&gt;(-1L, &quot;Errore durante la richiesta: &quot;+re.getMessage(), false));</span>
+<span class="nc" id="L320">        }catch (ServerRuntimeException e) {</span>
+<span class="nc" id="L321">            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)</span>
+<span class="nc" id="L322">                    .body(new AccessResponse&lt;&gt;(-1L, &quot;Errore durante la richiesta: &quot; + e.getMessage(), false));</span>
+        }
+    }
+
+    /**
+     *
+     * @param Id
+     * @param request
+     * @return
+     * @throws RuntimeException403
+     */
+    public ResponseEntity&lt;Response&lt;List&lt;Utente&gt;&gt;&gt; visualizzaUtentiBannatiInStanza(@PathVariable Long Id, HttpServletRequest request) throws RuntimeException403 {
+        try{
+<span class="nc bnc" id="L335" title="All 2 branches missed.">            if (!validationToken.isTokenValid(request)) {</span>
+<span class="nc" id="L336">                throw new RuntimeException403(&quot;Token non valido&quot;);</span>
+            }
+
+<span class="nc" id="L339">            return stanzaService.visualizzaUtentiBannatiInStanza(Id);</span>
+
+<span class="nc" id="L341">        }catch (RuntimeException403 re) {</span>
+<span class="nc" id="L342">            return ResponseEntity.status(HttpStatus.FORBIDDEN)</span>
+<span class="nc" id="L343">                    .body(new Response&lt;&gt;(null, &quot;Errore durante la richiesta: &quot; + re.getMessage()));</span>
+        }
+    }
+
+    /**
+     *
+     * @param Id
+     * @param request
+     * @return
+     * @throws RuntimeException403
+     */
+    @PostMapping(value = &quot;/visualizzaUtentiInStanza/{Id}&quot;)
+    public ResponseEntity&lt;Response&lt;List&lt;Utente&gt;&gt;&gt; visualizzaUtentiInStanza(@PathVariable Long Id, HttpServletRequest request) throws RuntimeException403 {
+        try{
+<span class="nc bnc" id="L357" title="All 2 branches missed.">            if (!validationToken.isTokenValid(request)) {</span>
+<span class="nc" id="L358">                throw new RuntimeException403(&quot;Token non valido&quot;);</span>
+            }
+
+<span class="nc" id="L361">            return stanzaService.visualizzaUtentiInStanza(Id);</span>
+
+<span class="nc" id="L363">        }catch (RuntimeException403 re) {</span>
+<span class="nc" id="L364">            return ResponseEntity.status(HttpStatus.FORBIDDEN)</span>
+<span class="nc" id="L365">                    .body(new Response&lt;&gt;(null, &quot;Errore durante la richiesta: &quot; + re.getMessage()));</span>
+        }
+    }
+
+
+    /**
+     *
+     * @param Id
+     * @param request
+     * @return
+     * @throws RuntimeException403
+     */
+    @PostMapping(value = &quot;/visualizzaUtentiInAttesaInStanza/{Id}&quot;)
+    ResponseEntity&lt;Response&lt;List&lt;Utente&gt;&gt;&gt; visualizzaUtentiInAttesaInStanza(@PathVariable Long Id, HttpServletRequest request) throws RuntimeException403 {
+        try{
+<span class="nc bnc" id="L380" title="All 2 branches missed.">            if (!validationToken.isTokenValid(request)) {</span>
+<span class="nc" id="L381">                throw new RuntimeException403(&quot;Token non valido&quot;);</span>
+            }
+
+<span class="nc" id="L384">            String metaID = jwtTokenUtil.getMetaIdFromToken(validationToken.getToken());</span>
+<span class="nc" id="L385">            return stanzaService.visualizzaUtentiInAttesaInStanza(Id, metaID);</span>
+
+<span class="nc" id="L387">        }catch (RuntimeException403 re) {</span>
+<span class="nc" id="L388">            return ResponseEntity.status(HttpStatus.FORBIDDEN)</span>
+<span class="nc" id="L389">                    .body(new Response&lt;&gt;(null, &quot;Errore durante la richiesta: &quot; + re.getMessage()));</span>
+        }
+    }
+
+    /**
+     *
+     * @param Id
+     * @param request
+     * @return
+     */
+    @PostMapping(value = &quot;/visualizzaStanza/{Id}&quot;)
+    public ResponseEntity&lt;Response&lt;Stanza&gt;&gt; visualizzaStanza(@PathVariable Long Id,
+                                                             HttpServletRequest request) {
+
+        try{
+<span class="nc bnc" id="L404" title="All 2 branches missed.">           if (!validationToken.isTokenValid(request)) {</span>
+<span class="nc" id="L405">               throw new RuntimeException403(&quot;Token non valido&quot;);</span>
+           }
+<span class="nc" id="L407">           Stanza s = stanzaService.visualizzaStanza(Id);</span>
+<span class="nc bnc" id="L408" title="All 2 branches missed.">           if(s!=null){</span>
+<span class="nc" id="L409">               return ResponseEntity.ok(new Response&lt;&gt;</span>
+                       (s, &quot;operazione effettuata con successo&quot;));
+           }else{
+<span class="nc" id="L412">               throw new ClientRuntimeException(&quot;stanza non trovata, id non valido&quot;);</span>
+           }
+<span class="nc" id="L414">      } catch (ClientRuntimeException ce) {</span>
+<span class="nc" id="L415">          return ResponseEntity.status(HttpStatus.BAD_REQUEST)</span>
+<span class="nc" id="L416">                  .body(new Response&lt;&gt;(null, &quot;Errore durante la richiesta: &quot; + ce.getMessage()));</span>
+
+<span class="nc" id="L418">      }catch (RuntimeException403 re) {</span>
+<span class="nc" id="L419">          return ResponseEntity.status(HttpStatus.FORBIDDEN)</span>
+<span class="nc" id="L420">                  .body(new Response&lt;&gt;(null, &quot;Errore durante la richiesta: &quot; + re.getMessage()));</span>
+
+      }
+    }
+
+    /**
+     *
+     * @param request
+     * @return
+     */
+    @GetMapping(value = &quot;/visualizzaScenari&quot;)
+    public ResponseEntity&lt;Response&lt;List&lt;Scenario&gt;&gt;&gt; visualizzaScenari(HttpServletRequest request) {
+        List&lt;Scenario&gt; scenari;
+        try {
+
+            //validazione dl token
+<span class="nc bnc" id="L436" title="All 2 branches missed.">            if (!validationToken.isTokenValid(request)) {</span>
+<span class="nc" id="L437">                throw new RuntimeException403(&quot;Token non valido&quot;);</span>
+            }
+
+<span class="nc" id="L440">            scenari = stanzaService.getAllScenari();</span>
+<span class="nc bnc" id="L441" title="All 2 branches missed.">            if (scenari == null) {</span>
+<span class="nc" id="L442">                return ResponseEntity.status(500)</span>
+<span class="nc" id="L443">                        .body(new Response&lt;&gt;(null, &quot;nessuno scenario creato&quot;));</span>
+            } else {
+<span class="nc" id="L445">                return ResponseEntity</span>
+<span class="nc" id="L446">                        .ok(new Response&lt;&gt;(scenari, &quot;operazione effettuata con successo&quot;));</span>
+            }
+<span class="nc" id="L448">        } catch (RuntimeException403 se) {</span>
+<span class="nc" id="L449">            return ResponseEntity.status(403)</span>
+<span class="nc" id="L450">                    .body(new Response&lt;&gt;(null, &quot;Errore durante l'operazione: &quot;+se.getMessage()));</span>
+<span class="nc" id="L451">        } catch (Exception e) {</span>
+<span class="nc" id="L452">            return ResponseEntity.status(500)</span>
+<span class="nc" id="L453">                    .body(new Response&lt;&gt;(null, &quot;Errore durante l'operazione&quot;));</span>
+        }
+    }
+
+    /**
+     *
+     * @param Id
+     * @param request
+     * @return
+     */
+    @PostMapping(value = &quot;/visualizzaScenarioStanza/{Id}&quot;)
+    public ResponseEntity&lt;Response&lt;Scenario&gt;&gt; visualizzaScenarioStanza(@PathVariable Long Id,
+                                                                       HttpServletRequest request) {
+        try {
+
+<span class="nc bnc" id="L468" title="All 2 branches missed.">            if (!validationToken.isTokenValid(request)) {</span>
+<span class="nc" id="L469">                throw new RuntimeException403(&quot;Token non valido&quot;);</span>
+            }
+
+<span class="nc" id="L472">            return  stanzaService.findStanza(Id);</span>
+
+<span class="nc" id="L474">        } catch (RuntimeException403 se) {</span>
+<span class="nc" id="L475">            return ResponseEntity.status(403)</span>
+<span class="nc" id="L476">                    .body(new Response&lt;&gt;(null, &quot;Errore durante l'operazione: &quot; + se.getMessage()));</span>
+<span class="nc" id="L477">        } catch (Exception e) {</span>
+<span class="nc" id="L478">            return ResponseEntity.status(500)</span>
+<span class="nc" id="L479">                    .body(new Response&lt;&gt;(null, &quot;Errore durante l'operazione&quot;));</span>
+        }
+
+    }
+
+    /**
+     *
+     * @param Id_stanza
+     * @param Id_scenario
+     * @param request
+     * @return
+     */
+    @PostMapping(value = &quot;/modificaScenario/{Id_stanza}/{Id_scenario}&quot;)
+    public ResponseEntity&lt;Response&lt;Boolean&gt;&gt; modificaScenario(@PathVariable Long Id_stanza,
+                                                              @PathVariable Long Id_scenario,
+                                                              HttpServletRequest request){
+        try{
+
+<span class="nc bnc" id="L497" title="All 2 branches missed.">            if (!validationToken.isTokenValid(request)) {</span>
+<span class="nc" id="L498">                throw new RuntimeException403(&quot;Token non valido&quot;);</span>
+            }
+
+<span class="nc" id="L501">            String metaID = jwtTokenUtil.getMetaIdFromToken(validationToken.getToken());</span>
+<span class="nc" id="L502">            return stanzaService.modificaScenario(metaID, Id_scenario, Id_stanza);</span>
+
+<span class="nc" id="L504">        } catch (RuntimeException403 e) {</span>
+<span class="nc" id="L505">            e.printStackTrace();</span>
+<span class="nc" id="L506">            return ResponseEntity.status(403).body(new Response&lt;&gt;(null, &quot;Errore nell'operazione&quot;));</span>
+<span class="nc" id="L507">        } catch (Exception e) {</span>
+<span class="nc" id="L508">            e.printStackTrace();</span>
+<span class="nc" id="L509">            return ResponseEntity.status(500).body(new Response&lt;&gt;(null, &quot;Errore durante l'operazione&quot;));</span>
+        }
+    }
+
+    /**
+     *
+     * @param IdStanza
+     * @param IdUtente
+     * @param nome
+     * @param request
+     * @return
+     */
+    @PostMapping(value = &quot;/modificaNomePartecipante/{IdStanza}/{IdUtente}&quot;)
+    public ResponseEntity&lt;Response&lt;Boolean&gt;&gt; modificaNomePartecipante(@PathVariable Long IdStanza,
+                                                                      @PathVariable Long IdUtente,
+                                                                      @RequestBody String nome,
+                                                                      HttpServletRequest request) {
+
+        try {
+<span class="nc bnc" id="L528" title="All 2 branches missed.">            if (!validationToken.isTokenValid(request)) {</span>
+<span class="nc" id="L529">                throw new RuntimeException403(&quot;Token non valido&quot;);</span>
+            }
+
+<span class="nc" id="L532">            String metaID = jwtTokenUtil.getMetaIdFromToken(validationToken.getToken());</span>
+
+<span class="nc" id="L534">            ObjectMapper objectMapper = new ObjectMapper();</span>
+<span class="nc" id="L535">            JsonNode jsonNode = objectMapper.readTree(nome);</span>
+<span class="nc" id="L536">            String NuovoNome = jsonNode.get(&quot;nome&quot;).asText();</span>
+
+<span class="nc" id="L538">            return stanzaService.modificaNomePartecipante(metaID, IdStanza, IdUtente, NuovoNome);</span>
+
+<span class="nc" id="L540">        } catch (RuntimeException403 e) {</span>
+<span class="nc" id="L541">            e.printStackTrace();</span>
+<span class="nc" id="L542">            return ResponseEntity.status(403).body(new Response&lt;&gt;(null, &quot;Errore nell'operazione&quot;));</span>
+<span class="nc" id="L543">        } catch (Exception e) {</span>
+<span class="nc" id="L544">            e.printStackTrace();</span>
+<span class="nc" id="L545">            return ResponseEntity.status(500).body(new Response&lt;&gt;(null, &quot;Errore durante l'operazione&quot;));</span>
+        }
+    }
+
+    /**
+     *
+     * @param IdStanza
+     * @param IdUtente
+     * @param request
+     * @return
+     */
+    @PostMapping(value = &quot;/kickarePartecipante/{IdStanza}/{IdUtente}&quot;)
+    public ResponseEntity&lt;Response&lt;Boolean&gt;&gt; kickPartecipante(@PathVariable Long IdStanza,
+                                                                      @PathVariable Long IdUtente,
+                                                                      HttpServletRequest request) {
+
+        try {
+<span class="nc bnc" id="L562" title="All 2 branches missed.">            if (!validationToken.isTokenValid(request)) {</span>
+<span class="nc" id="L563">                throw new RuntimeException403(&quot;Token non valido&quot;);</span>
+            }
+
+<span class="nc" id="L566">            String metaID = jwtTokenUtil.getMetaIdFromToken(validationToken.getToken());</span>
+
+<span class="nc" id="L568">            return stanzaService.kickPartecipante(metaID, IdStanza, IdUtente);</span>
+
+<span class="nc" id="L570">        } catch (RuntimeException403 e) {</span>
+<span class="nc" id="L571">            e.printStackTrace();</span>
+<span class="nc" id="L572">            return ResponseEntity.status(403).body(new Response&lt;&gt;(null, &quot;Errore nell'operazione&quot;));</span>
+<span class="nc" id="L573">        } catch (Exception e) {</span>
+<span class="nc" id="L574">            e.printStackTrace();</span>
+<span class="nc" id="L575">            return ResponseEntity.status(500).body(new Response&lt;&gt;(null, &quot;Errore durante l'operazione&quot;));</span>
+        }
+    }
+
+    /**
+     *
+     * @param id_stanza
+     * @param request
+     * @return
+     */
+    @PostMapping(value = &quot;/getRuolo/{id_stanza}&quot;)
+    public ResponseEntity&lt;Response&lt;Ruolo&gt;&gt; getRuoloByUserAndByStanza(@PathVariable Long id_stanza,
+                                                              HttpServletRequest request){
+        try{
+
+<span class="nc bnc" id="L590" title="All 2 branches missed.">            if (!validationToken.isTokenValid(request)) {</span>
+<span class="nc" id="L591">                throw new RuntimeException403(&quot;Token non valido&quot;);</span>
+            }
+
+<span class="nc" id="L594">            String metaID = jwtTokenUtil.getMetaIdFromToken(validationToken.getToken());</span>
+
+<span class="nc" id="L596">            Ruolo r = stanzaService.getRuoloByUserAndStanzaID(metaID,id_stanza);</span>
+<span class="nc bnc" id="L597" title="All 2 branches missed.">            if(r == null)  throw new ServerRuntimeException(&quot;errore nel recapito del ruolo&quot;);</span>
+<span class="nc" id="L598">            else  return ResponseEntity.ok(new Response&lt;&gt;(r,&quot;ruolo recapitato con successo&quot;));</span>
+
+<span class="nc" id="L600">        } catch (ServerRuntimeException | RuntimeException403 e) {</span>
+
+        // Gestisci le eccezioni e restituisci una risposta appropriata
+<span class="nc bnc" id="L603" title="All 2 branches missed.">        int statusCode = (e instanceof ServerRuntimeException) ? 500 : 403;</span>
+<span class="nc" id="L604">        return ResponseEntity.status(statusCode)</span>
+<span class="nc" id="L605">                .body(new Response&lt;&gt;(null, &quot;Errore durante l'operazione: &quot; + e.getMessage()));</span>
+       }
+    }
+
+    /**
+     *
+     * @param IdStanza
+     * @param IdUtente
+     * @param request
+     * @return
+     */
+    @PostMapping(value = &quot;/silenziarePartecipante/{IdStanza}/{IdUtente}&quot;)
+    public ResponseEntity&lt;Response&lt;Boolean&gt;&gt; SilenziaPartecipante(@PathVariable Long IdStanza,
+                                                                @PathVariable Long IdUtente,
+                                                                HttpServletRequest request) {
+
+        try {
+<span class="nc bnc" id="L622" title="All 2 branches missed.">            if (!validationToken.isTokenValid(request)) {</span>
+<span class="nc" id="L623">                throw new RuntimeException403(&quot;Token non valido&quot;);</span>
+            }
+
+<span class="nc" id="L626">            String metaID = jwtTokenUtil.getMetaIdFromToken(validationToken.getToken());</span>
+
+<span class="nc" id="L628">            return stanzaService.SilenziaPartecipante(metaID, IdStanza, IdUtente);</span>
+
+<span class="nc" id="L630">        } catch (RuntimeException403 e) {</span>
+<span class="nc" id="L631">            e.printStackTrace();</span>
+<span class="nc" id="L632">            return ResponseEntity.status(403).body(new Response&lt;&gt;(null, &quot;Errore nell'operazione&quot;));</span>
+<span class="nc" id="L633">        } catch (Exception e) {</span>
+<span class="nc" id="L634">            e.printStackTrace();</span>
+<span class="nc" id="L635">            return ResponseEntity.status(500).body(new Response&lt;&gt;(null, &quot;Errore durante l'operazione&quot;));</span>
+        }
+    }
+
+    @PostMapping(value = &quot;/unmutePartecipante/{IdStanza}/{IdUtente}&quot;)
+    public ResponseEntity&lt;Response&lt;Boolean&gt;&gt; UnmutePartecipante(@PathVariable Long IdStanza,
+                                                                  @PathVariable Long IdUtente,
+                                                                  HttpServletRequest request) {
+
+        try {
+<span class="nc bnc" id="L645" title="All 2 branches missed.">            if (!validationToken.isTokenValid(request)) {</span>
+<span class="nc" id="L646">                throw new RuntimeException403(&quot;Token non valido&quot;);</span>
+            }
+
+<span class="nc" id="L649">            String metaID = jwtTokenUtil.getMetaIdFromToken(validationToken.getToken());</span>
+
+<span class="nc" id="L651">            return stanzaService.UnmutePartecipante(metaID, IdStanza, IdUtente);</span>
+
+<span class="nc" id="L653">        } catch (RuntimeException403 e) {</span>
+<span class="nc" id="L654">            e.printStackTrace();</span>
+<span class="nc" id="L655">            return ResponseEntity.status(403).body(new Response&lt;&gt;(null, &quot;Errore nell'operazione&quot;));</span>
+<span class="nc" id="L656">        } catch (Exception e) {</span>
+<span class="nc" id="L657">            e.printStackTrace();</span>
+<span class="nc" id="L658">            return ResponseEntity.status(500).body(new Response&lt;&gt;(null, &quot;Errore durante l'operazione&quot;));</span>
+        }
+    }
+
+    /*@PostMapping(value = &quot;/unmute/{IdStanza}&quot;)
+    public ResponseEntity&lt;Response&lt;Boolean&gt;&gt; unmute(@PathVariable Long IdStanza,
+                                                    HttpServletRequest request) {
+
+        try {
+            if (!validationToken.isTokenValid(request)) {
+                throw new RuntimeException403(&quot;Token non valido&quot;);
+            }
+
+            String metaID = jwtTokenUtil.getMetaIdFromToken(validationToken.getToken());
+
+            return stanzaService.Unmute(metaID, IdStanza);
+
+        } catch (RuntimeException403 e) {
+            e.printStackTrace();
+            return ResponseEntity.status(403).body(new Response&lt;&gt;(null, &quot;Errore nell'operazione&quot;));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(500).body(new Response&lt;&gt;(null, &quot;Errore durante l'operazione&quot;));
+        }
+    }
+
+    @PostMapping(value = &quot;/mute/{IdStanza}&quot;)
+    public ResponseEntity&lt;Response&lt;Boolean&gt;&gt; mute(@PathVariable Long IdStanza,
+                                                    HttpServletRequest request) {
+
+        try {
+            if (!validationToken.isTokenValid(request)) {
+                throw new RuntimeException403(&quot;Token non valido&quot;);
+            }
+
+            String metaID = jwtTokenUtil.getMetaIdFromToken(validationToken.getToken());
+
+            return stanzaService.mute(metaID, IdStanza);
+
+        } catch (RuntimeException403 e) {
+            e.printStackTrace();
+            return ResponseEntity.status(403).body(new Response&lt;&gt;(null, &quot;Errore nell'operazione&quot;));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(500).body(new Response&lt;&gt;(null, &quot;Errore durante l'operazione&quot;));
+        }
+    }*/
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.9.202303310957</span></div></body></html>

@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="it"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>GestioneStimaMeetingServiceImpl.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">MetaClass</a> &gt; <a href="index.source.html" class="el_package">com.commigo.metaclass.gestionestimaduratameeting.service</a> &gt; <span class="el_source">GestioneStimaMeetingServiceImpl.java</span></div><h1>GestioneStimaMeetingServiceImpl.java</h1><pre class="source lang-java linenums">package com.commigo.metaclass.gestionestimaduratameeting.service;
+
+import com.commigo.metaclass.entity.FeedbackMeeting;
+import com.commigo.metaclass.entity.Stanza;
+import com.commigo.metaclass.entity.Utente;
+import com.commigo.metaclass.exceptions.RuntimeException403;
+import com.commigo.metaclass.exceptions.ServerRuntimeException;
+import com.commigo.metaclass.gestionemeeting.repository.FeedbackMeetingRepository;
+import com.commigo.metaclass.gestionestanza.repository.StanzaRepository;
+import com.commigo.metaclass.gestionestanza.repository.StatoPartecipazioneRepository;
+import com.commigo.metaclass.gestionestimaduratameeting.adapter.StimaDurataMeetingAdapter;
+import com.commigo.metaclass.gestionestimaduratameeting.adapter.StimaDurataMeetingAdapterImpl;
+import java.io.InputStream;
+import java.time.Duration;
+import java.time.LocalDate;
+import java.time.Period;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import org.dmg.pmml.FieldName;
+import org.jpmml.evaluator.Evaluator;
+import org.jpmml.evaluator.EvaluatorUtil;
+import org.jpmml.evaluator.FieldValue;
+import org.jpmml.evaluator.FieldValueUtil;
+import org.jpmml.evaluator.LoadingModelEvaluatorBuilder;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+/** Service gestione stima meeting. */
+@Service(&quot;GestioneStimaMeetingService&quot;)
+public class GestioneStimaMeetingServiceImpl implements GestioneStimaMeetingService {
+
+  /** Adapter per ottenere i risultati dell'agente intelligente. */
+  private StimaDurataMeetingAdapter stimaProgressiAdapter;
+
+  @Autowired private StanzaRepository stanzaRepository;
+  @Autowired private StatoPartecipazioneRepository statoPartecipazioneRepository;
+  @Autowired private FeedbackMeetingRepository feedbackMeetingRepository;
+  private Evaluator evaluator;
+
+  /** constructor. */
+<span class="nc" id="L42">  public GestioneStimaMeetingServiceImpl() {</span>
+<span class="nc" id="L43">    stimaProgressiAdapter = new StimaDurataMeetingAdapterImpl();</span>
+<span class="nc" id="L44">  }</span>
+
+  /**
+   * Metodo che permette di visualizzare la durata di un meeting.
+   *
+   * @param idStanza id della stanza
+   * @return valore double
+   * @throws RuntimeException403 eccezione generata quando avviene un errore Client.
+   * @throws ServerRuntimeException eccezione generata quando avviene un errore Server
+   */
+  @Override
+  public Double getDurataMeeting(Long idStanza) throws RuntimeException403, ServerRuntimeException {
+    // controllo la stanza se esiste
+    Stanza s;
+<span class="nc bnc" id="L58" title="All 2 branches missed.">    if ((s = stanzaRepository.findStanzaById(idStanza)) == null) {</span>
+<span class="nc" id="L59">      throw new RuntimeException403(&quot;non è possibile effettuare la stima: stanza non trovata&quot;);</span>
+    }
+    // mi recapito la lista di utenti in stanza
+    List&lt;Utente&gt; users;
+<span class="nc bnc" id="L63" title="All 2 branches missed.">    if ((users = statoPartecipazioneRepository.findUtentiInStanza(s.getId())) == null) {</span>
+<span class="nc" id="L64">      throw new ServerRuntimeException(</span>
+          &quot;non è possibile effettuare la stima: &quot; + &quot;errore nella ricerca dei partecipanti&quot;);
+    }
+<span class="nc" id="L67">    double mediaDuration = 0;</span>
+
+<span class="nc bnc" id="L69" title="All 2 branches missed.">    for (Utente u : users) {</span>
+<span class="nc" id="L70">      mediaDuration += requestPrediction(u);</span>
+<span class="nc" id="L71">    }</span>
+<span class="nc" id="L72">    return mediaDuration / users.size();</span>
+  }
+
+  /**
+   * Metodo per preparare gli argomenti.
+   *
+   * @param input Mappa conententi valori con chiave una stringa
+   * @return mappa con i valori del dataset.
+   */
+  private Map&lt;FieldName, FieldValue&gt; prepareArguments(Map&lt;String, Object&gt; input) {
+<span class="nc" id="L82">    Map&lt;FieldName, FieldValue&gt; arguments = new HashMap&lt;&gt;();</span>
+
+<span class="nc bnc" id="L84" title="All 2 branches missed.">    for (Map.Entry&lt;String, Object&gt; entry : input.entrySet()) {</span>
+<span class="nc" id="L85">      FieldName fieldName = FieldName.create(entry.getKey());</span>
+<span class="nc" id="L86">      Object value = entry.getValue();</span>
+
+<span class="nc" id="L88">      FieldValue fieldValue = FieldValueUtil.create(value);</span>
+
+<span class="nc" id="L90">      arguments.put(fieldName, fieldValue);</span>
+<span class="nc" id="L91">    }</span>
+
+<span class="nc" id="L93">    return arguments;</span>
+  }
+
+  /**
+   * Metodo che decodifica i risultato del modello di AI.
+   *
+   * @param arguments mappa di valori da dare al modello.
+   * @return mappa con la predizione.
+   */
+  public Map&lt;String, ?&gt; predict(Map&lt;FieldName, FieldValue&gt; arguments) {
+<span class="nc" id="L103">    Map&lt;FieldName, ?&gt; results = evaluator.evaluate(arguments);</span>
+
+<span class="nc" id="L105">    return EvaluatorUtil.decodeAll(results);</span>
+  }
+
+  /**
+   * Metodo che effettua la predizione tramite il modello.
+   *
+   * @param utente Istanza di un utente.
+   * @return Valore di durata del meeting per l'utente.
+   */
+  private Double requestPrediction(Utente utente) {
+
+<span class="nc" id="L116">    try (InputStream is = getClass().getResourceAsStream(&quot;/RegressoreDurataMeeting.pmml&quot;)) {</span>
+<span class="nc" id="L117">      evaluator = new LoadingModelEvaluatorBuilder().load(is).build();</span>
+<span class="nc" id="L118">    } catch (Exception e) {</span>
+<span class="nc" id="L119">      e.printStackTrace();</span>
+<span class="nc" id="L120">    }</span>
+
+    // calcolo l'età
+<span class="nc" id="L123">    Period periodo = Period.between(utente.getDataDiNascita(), LocalDate.now());</span>
+
+    // conversione sesso
+    int sex;
+<span class="nc bnc" id="L127" title="All 2 branches missed.">    if (utente.getSesso().equalsIgnoreCase(&quot;M&quot;)) {</span>
+<span class="nc" id="L128">      sex = 2;</span>
+<span class="nc bnc" id="L129" title="All 2 branches missed.">    } else if (utente.getSesso().equalsIgnoreCase(&quot;F&quot;)) {</span>
+<span class="nc" id="L130">      sex = 1;</span>
+    } else {
+<span class="nc" id="L132">      sex = 0;</span>
+    }
+
+    // ricavo la media dei vari ImmersionLevel dell'utente
+<span class="nc" id="L136">    List&lt;FeedbackMeeting&gt; feeds = feedbackMeetingRepository.findFeedbackMeetingByUtente(utente);</span>
+<span class="nc" id="L137">    double immersionLevelAverage =</span>
+<span class="nc" id="L138">        feeds.stream()</span>
+<span class="nc" id="L139">            .mapToInt(</span>
+                FeedbackMeeting::getImmersionLevel) // Estrae gli immersionLevel come IntStream
+<span class="nc" id="L141">            .average() // Calcola la media degli immersionLevel</span>
+<span class="nc" id="L142">            .orElse(0.0); // Valore di default se la lista è vuota</span>
+
+    // ricavo la media dei motionSickness
+<span class="nc" id="L145">    double motionSicknessAverage =</span>
+<span class="nc" id="L146">        feeds.stream()</span>
+<span class="nc" id="L147">            .mapToInt(FeedbackMeeting::getMotionSickness) // Estrae motionSickness come IntStream</span>
+<span class="nc" id="L148">            .average() // Calcola la media dei motionSickness</span>
+<span class="nc" id="L149">            .orElse(0.0); // Valore di default se la lista è vuota</span>
+
+    // Esempio di utilizzo
+<span class="nc" id="L152">    Map&lt;String, Object&gt; input = new HashMap&lt;&gt;();</span>
+<span class="nc" id="L153">    input.put(&quot;Age&quot;, periodo.getYears()); // Sostituisci con il valore effettivo</span>
+<span class="nc" id="L154">    input.put(&quot;Gender&quot;, sex); // Sostituisci con il valore effettivo (0&quot;O&quot;, 1&quot;F&quot; o 2&quot;M&quot;)</span>
+<span class="nc" id="L155">    input.put(</span>
+        &quot;ImmersionLevel&quot;,
+<span class="nc" id="L157">        (int) immersionLevelAverage); // Sostituisci con il valore effettivo (da 1 a 5)</span>
+<span class="nc" id="L158">    input.put(</span>
+        &quot;MotionSickness&quot;,
+<span class="nc" id="L160">        (int) motionSicknessAverage); // Sostituisci con il valore effettivo (da 1 a 10)</span>
+
+<span class="nc" id="L162">    Map&lt;FieldName, FieldValue&gt; arguments = prepareArguments(input);</span>
+
+<span class="nc" id="L164">    Map&lt;String, ?&gt; results = predict(arguments);</span>
+
+    // Stampa i risultati
+<span class="nc" id="L167">    return (Double) results.get(&quot;Duration&quot;);</span>
+  }
+
+  /**
+   * Metodo che richiama l'adapter per arricchire il dataset.
+   *
+   * @param u Istanza di Utente-
+   * @param durata Durata del meeting dell'utente.
+   * @param immersionLevel Livello di immersività dell'utente.
+   * @throws ServerRuntimeException Eccezione generata da errori server.
+   */
+  @Override
+  public void addUtenteInDataset(Utente u, Duration durata, int immersionLevel)
+      throws ServerRuntimeException {
+<span class="nc" id="L181">    stimaProgressiAdapter.addUtenteInDataset(u, durata, immersionLevel);</span>
+<span class="nc" id="L182">  }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.9.202303310957</span></div></body></html>

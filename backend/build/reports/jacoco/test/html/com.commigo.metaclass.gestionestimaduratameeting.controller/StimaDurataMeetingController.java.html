@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="it"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>StimaDurataMeetingController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">MetaClass</a> &gt; <a href="index.source.html" class="el_package">com.commigo.metaclass.gestionestimaduratameeting.controller</a> &gt; <span class="el_source">StimaDurataMeetingController.java</span></div><h1>StimaDurataMeetingController.java</h1><pre class="source lang-java linenums">package com.commigo.metaclass.gestionestimaduratameeting.controller;
+
+import com.commigo.metaclass.exceptions.RuntimeException403;
+import com.commigo.metaclass.exceptions.ServerRuntimeException;
+import com.commigo.metaclass.gestionestimaduratameeting.service.GestioneStimaMeetingService;
+import com.commigo.metaclass.utility.response.types.Response;
+import com.commigo.metaclass.webconfig.ValidationToken;
+import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RestController;
+
+/** Metodo che gestisce le richieste relative al modulo AI. */
+@RestController
+<span class="nc" id="L18">public class StimaDurataMeetingController {</span>
+
+  @Autowired private ValidationToken validationToken;
+
+  @Autowired private GestioneStimaMeetingService gestioneStimaMeetingService;
+
+  /**
+   * Metodo che permette di gestire la richiesta di visualizzazione della stima della durata di unn
+   * meeting.
+   *
+   * @param idStanza id della stanza in cui deve essere schedulato il meeting
+   * @param request richiesta HTTP fornita dal client
+   * @return ritorna la durata stimata del meeting
+   */
+  @GetMapping(value = &quot;/stimaMeeting/{idStanza}&quot;)
+  public ResponseEntity&lt;Response&lt;Double&gt;&gt; visualizzaStimaDurataMeeting(
+      @PathVariable Long idStanza, HttpServletRequest request) {
+
+    try {
+
+      // validazione dl token
+<span class="nc bnc" id="L39" title="All 2 branches missed.">      if (!validationToken.isTokenValid(request)) {</span>
+<span class="nc" id="L40">        throw new RuntimeException403(&quot;Token non valido&quot;);</span>
+      }
+
+<span class="nc" id="L43">      double durata = gestioneStimaMeetingService.getDurataMeeting(idStanza);</span>
+<span class="nc" id="L44">      return ResponseEntity.ok(new Response&lt;&gt;(durata, &quot;Stima effettuata con successo&quot;));</span>
+
+<span class="nc" id="L46">    } catch (RuntimeException403 re) {</span>
+<span class="nc" id="L47">      return ResponseEntity.status(HttpStatus.FORBIDDEN)</span>
+<span class="nc" id="L48">          .body(new Response&lt;&gt;(null, &quot;Errore durante la richiesta: &quot; + re.getMessage()));</span>
+<span class="nc" id="L49">    } catch (ServerRuntimeException e) {</span>
+<span class="nc" id="L50">      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)</span>
+<span class="nc" id="L51">          .body(new Response&lt;&gt;(null, &quot;Errore durante la richiesta: &quot; + e.getMessage()));</span>
+    }
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.9.202303310957</span></div></body></html>

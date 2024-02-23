@@ -1,0 +1,1050 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="it"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>GestioneStanzaServiceImpl.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">MetaClass</a> &gt; <a href="index.source.html" class="el_package">com.commigo.metaclass.gestionestanza.service</a> &gt; <span class="el_source">GestioneStanzaServiceImpl.java</span></div><h1>GestioneStanzaServiceImpl.java</h1><pre class="source lang-java linenums">package com.commigo.metaclass.gestionestanza.service;
+
+import com.commigo.metaclass.entity.Ruolo;
+import com.commigo.metaclass.entity.Scenario;
+import com.commigo.metaclass.entity.Stanza;
+import com.commigo.metaclass.entity.StatoPartecipazione;
+import com.commigo.metaclass.entity.Utente;
+import com.commigo.metaclass.exceptions.RuntimeException401;
+import com.commigo.metaclass.exceptions.RuntimeException403;
+import com.commigo.metaclass.exceptions.ServerRuntimeException;
+import com.commigo.metaclass.gestioneamministrazione.repository.ScenarioRepository;
+import com.commigo.metaclass.gestionestanza.repository.RuoloRepository;
+import com.commigo.metaclass.gestionestanza.repository.StanzaRepository;
+import com.commigo.metaclass.gestionestanza.repository.StatoPartecipazioneRepository;
+import com.commigo.metaclass.gestioneutenza.repository.UtenteRepository;
+import com.commigo.metaclass.utility.response.ResponseUtils;
+import com.commigo.metaclass.utility.response.types.AccessResponse;
+import com.commigo.metaclass.utility.response.types.Response;
+import com.commigo.metaclass.webconfig.JwtTokenUtil;
+import com.commigo.metaclass.webconfig.ValidationToken;
+import jakarta.transaction.Transactional;
+import java.util.List;
+import java.util.Map;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
+
+/** Implementazione del service della gestione stanza. */
+@Service
+<span class="nc" id="L33">@RequiredArgsConstructor</span>
+<span class="nc" id="L34">@Slf4j</span>
+@Transactional // ogni operazione è una transazione
+public class GestioneStanzaServiceImpl implements GestioneStanzaService {
+
+  private final StatoPartecipazioneRepository statoPartecipazioneRepository;
+  private final RuoloRepository ruoloRepository;
+  private final StanzaRepository stanzaRepository;
+  private final UtenteRepository utenteRepository;
+  private final ScenarioRepository scenarioRepository;
+
+  @Autowired private ValidationToken validationToken;
+
+  @Autowired private JwtTokenUtil jwtTokenUtil;
+
+  /**
+   * metodo che permette ad un utente di accedere ad una determinata stanza.
+   *
+   * @param codiceStanza codice della stanza a cui l'utente vuole accedere
+   * @param idUtente id dell'utente che deve accedere alla stanza
+   * @return un valore long che identifica la riuscita dell'operazione ed un messaggio che descrive
+   *     l'esito di essa
+   */
+  @Override
+  public ResponseEntity&lt;AccessResponse&lt;Long&gt;&gt; accessoStanza(String codiceStanza, String idUtente)
+      throws ServerRuntimeException, RuntimeException403 {
+
+    // controllo stanza se è vuota
+<span class="nc" id="L61">    Stanza stanza = stanzaRepository.findStanzaByCodice(codiceStanza);</span>
+<span class="nc bnc" id="L62" title="All 2 branches missed.">    if (stanza == null) {</span>
+<span class="nc" id="L63">      throw new RuntimeException403(&quot;stanza non trovata&quot;);</span>
+    }
+
+    // prelevo l'utente
+<span class="nc" id="L67">    Utente u = utenteRepository.findFirstBymetaId(idUtente);</span>
+<span class="nc bnc" id="L68" title="All 2 branches missed.">    if (u == null) {</span>
+<span class="nc" id="L69">      throw new ServerRuntimeException(&quot;utente non trovato&quot;);</span>
+    }
+
+<span class="nc" id="L72">    StatoPartecipazione sp =</span>
+<span class="nc" id="L73">        statoPartecipazioneRepository.findStatoPartecipazioneByUtenteAndStanza(u, stanza);</span>
+
+<span class="nc bnc" id="L75" title="All 2 branches missed.">    if (sp == null) {</span>
+<span class="nc" id="L76">      sp =</span>
+          new StatoPartecipazione(
+              stanza,
+              u,
+<span class="nc" id="L80">              ruoloRepository.findByNome(Ruolo.PARTECIPANTE),</span>
+<span class="nc bnc" id="L81" title="All 2 branches missed.">              !stanza.isTipoAccesso(),</span>
+              false,
+<span class="nc" id="L83">              u.getNome(),</span>
+              true);
+<span class="nc" id="L85">      statoPartecipazioneRepository.save(sp);</span>
+
+      // verifico se la stanza è privata o pubblica
+<span class="nc bnc" id="L88" title="All 2 branches missed.">      if (stanza.isTipoAccesso()) {</span>
+<span class="nc" id="L89">        return ResponseEntity.ok(</span>
+<span class="nc" id="L90">            new AccessResponse&lt;&gt;(stanza.getId(), &quot;Accesso effettuato con successo&quot;, false));</span>
+      } else {
+<span class="nc" id="L92">        return ResponseEntity.ok(</span>
+<span class="nc" id="L93">            new AccessResponse&lt;&gt;(0L, &quot;Richiesta accesso alla stanza effettuata&quot;, true));</span>
+      }
+<span class="nc bnc" id="L95" title="All 2 branches missed.">    } else if (sp.isBannato()) {</span>
+<span class="nc" id="L96">      throw new RuntimeException403(&quot;Sei stato bannato da questa stanza, non puoi entrare&quot;);</span>
+    } else {
+<span class="nc" id="L98">      return ResponseEntity.ok(</span>
+<span class="nc" id="L99">          new AccessResponse&lt;&gt;(stanza.getId(), &quot;Sei già all'interno di questa stanza&quot;, false));</span>
+    }
+  }
+
+  /**
+   * metodo che permette di bannare un utente generico all'interno di una specifica stanza.
+   *
+   * @param idStanza id della stanza da cui si vuole bannare l'utente
+   * @param metaId metaId dell'utente che vuole effettuare il ban
+   * @param idUtente id dell'utente che deve essere bannato
+   * @return valore boolean che identifica la riuscita dell'operazione ed un messaggio che descrive
+   *     l'esito di essa
+   */
+  @Override
+  public ResponseEntity&lt;Response&lt;Boolean&gt;&gt; banUtente(Long idStanza, String metaId, Long idUtente)
+      throws ServerRuntimeException, RuntimeException403 {
+    Utente ogm;
+<span class="nc bnc" id="L116" title="All 2 branches missed.">    if ((ogm = utenteRepository.findFirstBymetaId(metaId)) == null) {</span>
+<span class="nc" id="L117">      throw new ServerRuntimeException(&quot;errore nella ricerca dell'organizzatore master&quot;);</span>
+    }
+
+    // controllo stanza
+    Stanza stanza;
+<span class="nc bnc" id="L122" title="All 2 branches missed.">    if ((stanza = stanzaRepository.findStanzaById(idStanza)) == null) {</span>
+<span class="nc" id="L123">      throw new RuntimeException403(&quot;stanza non trovata&quot;);</span>
+    }
+
+    // controllo dello stato partecipazione dell'organizzatore
+<span class="nc" id="L127">    StatoPartecipazione statoOgm =</span>
+<span class="nc" id="L128">        statoPartecipazioneRepository.findStatoPartecipazioneByUtenteAndStanza(ogm, stanza);</span>
+<span class="nc bnc" id="L129" title="All 2 branches missed.">    if (statoOgm == null) {</span>
+<span class="nc" id="L130">      throw new RuntimeException403(</span>
+          &quot;tu organizzatore non hai acceduto alla stanza, forse sei stato kickato&quot;);
+    }
+<span class="nc bnc" id="L133" title="All 2 branches missed.">    if (statoOgm.isBannato()) {</span>
+<span class="nc" id="L134">      throw new RuntimeException403(&quot;sei bannato dalla stanza&quot;);</span>
+    }
+<span class="nc bnc" id="L136" title="All 2 branches missed.">    if (statoOgm.isInAttesa()) {</span>
+<span class="nc" id="L137">      throw new RuntimeException403(&quot;sei in attesa di entrare in stanza&quot;);</span>
+    }
+
+    // controllo organizzatore da bannare
+    Utente u;
+<span class="nc bnc" id="L142" title="All 2 branches missed.">    if ((u = utenteRepository.findUtenteById(idUtente)) == null) {</span>
+<span class="nc" id="L143">      throw new RuntimeException403(&quot;utente non trovato&quot;);</span>
+    }
+
+    // controllo dello stato partecipazione dell'organizzatore
+<span class="nc" id="L147">    StatoPartecipazione statoUser =</span>
+<span class="nc" id="L148">        statoPartecipazioneRepository.findStatoPartecipazioneByUtenteAndStanza(u, stanza);</span>
+<span class="nc bnc" id="L149" title="All 2 branches missed.">    if (statoUser == null) {</span>
+<span class="nc" id="L150">      throw new RuntimeException403(</span>
+          &quot;tu organizzatore non hai acceduto alla stanza, forse sei stato kickato&quot;);
+    }
+<span class="nc bnc" id="L153" title="All 2 branches missed.">    if (statoUser.isBannato()) {</span>
+<span class="nc" id="L154">      throw new RuntimeException403(&quot;l'utente è già bannato dalla stanza&quot;);</span>
+    }
+<span class="nc bnc" id="L156" title="All 2 branches missed.">    if (statoOgm.isInAttesa()) {</span>
+<span class="nc" id="L157">      throw new RuntimeException403(&quot;L'utente selezionato è in attesa di entrare in stanza&quot;);</span>
+    }
+
+<span class="nc bnc" id="L160" title="All 2 branches missed.">    if (statoOgm.getRuolo().getNome().equalsIgnoreCase(Ruolo.ORGANIZZATORE_MASTER)) {</span>
+<span class="nc" id="L161">      return banOrganizzatore(statoUser);</span>
+<span class="nc bnc" id="L162" title="All 2 branches missed.">    } else if ((statoOgm.getRuolo().getNome().equalsIgnoreCase(Ruolo.ORGANIZZATORE))) {</span>
+<span class="nc" id="L163">      return banPartecipante(statoUser);</span>
+    } else {
+<span class="nc" id="L165">      return ResponseEntity.ok(</span>
+<span class="nc" id="L166">          new Response&lt;&gt;(false, &quot;Non puoi bannare nessuno. non sei un'organizzatore&quot;));</span>
+    }
+  }
+
+  /**
+   * metodo che permette di bannare un organizzatore all'interno di una specifica stanza.
+   *
+   * @param statoUser id dello stato partecipazione da cui si vuole bannare l'organizzatore
+   * @return valore boolean che identifica la riuscita dell'operazione ed un messaggio che descrive
+   *     l'esito di essa
+   */
+  @Override
+  public ResponseEntity&lt;Response&lt;Boolean&gt;&gt; banOrganizzatore(StatoPartecipazione statoUser)
+      throws ServerRuntimeException {
+
+<span class="nc bnc" id="L181" title="All 2 branches missed.">    if (statoUser == null) {</span>
+<span class="nc" id="L182">      throw new ServerRuntimeException(&quot;errore nella ricerca dell'o stato dell'utente&quot;);</span>
+    }
+
+    // controllo del ruolo di organizztaore master
+<span class="nc bnc" id="L186" title="All 2 branches missed.">    if (!statoUser.getRuolo().getNome().equalsIgnoreCase(Ruolo.ORGANIZZATORE_MASTER)) {</span>
+<span class="nc" id="L187">      statoUser.setBannato(true);</span>
+<span class="nc" id="L188">      statoPartecipazioneRepository.save(statoUser);</span>
+<span class="nc" id="L189">      return ResponseEntity.ok(new Response&lt;&gt;(true, &quot;L'utente selezionato ora è bannato&quot;));</span>
+    }
+<span class="nc" id="L191">    throw new ServerRuntimeException(&quot;l'utente selezionato è un organizzatore master&quot;);</span>
+  }
+
+  /**
+   * metodo che permette di bannare un partecipante all'interno di una specifica stanza.
+   *
+   * @param statoUser id dello stato partecipazione da cui si vuole bannare l'organizzatore
+   * @return valore boolean che identifica la riuscita dell'operazione ed un messaggio che descrive
+   *     l'esito di essa
+   */
+  @Override
+  public ResponseEntity&lt;Response&lt;Boolean&gt;&gt; banPartecipante(StatoPartecipazione statoUser)
+      throws ServerRuntimeException {
+
+<span class="nc bnc" id="L205" title="All 2 branches missed.">    if (statoUser == null) {</span>
+<span class="nc" id="L206">      throw new ServerRuntimeException(&quot;errore nella ricerca dell'o stato dell'utente&quot;);</span>
+    }
+
+    // controllo del ruolo di organizztaore master
+<span class="nc bnc" id="L210" title="All 2 branches missed.">    if (statoUser.getRuolo().getNome().equalsIgnoreCase(Ruolo.PARTECIPANTE)) {</span>
+<span class="nc" id="L211">      statoUser.setBannato(true);</span>
+<span class="nc" id="L212">      statoPartecipazioneRepository.save(statoUser);</span>
+<span class="nc" id="L213">      return ResponseEntity.ok(new Response&lt;&gt;(true, &quot;L'utente selezionato ora è bannato&quot;));</span>
+    }
+<span class="nc" id="L215">    throw new ServerRuntimeException(&quot;l'utente selezionato è un organizzatore master&quot;);</span>
+  }
+
+  /**
+   * metodo che permette la creazione di una stanza.
+   *
+   * @param s stanza che deve essere creata
+   * @param metaId metaId dell'utente che intende creare la stanza
+   * @return valore boolean che identifica la riuscita dell'operazione ed un messaggio che descrive
+   *     l'esito di essa
+   */
+  @Override
+  public boolean creaStanza(Stanza s, String metaId) throws Exception {
+
+<span class="nc bnc" id="L229" title="All 2 branches missed.">    if (metaId == null) {</span>
+<span class="nc" id="L230">      throw new ServerRuntimeException(&quot;Errore col metaId&quot;);</span>
+    }
+
+<span class="nc" id="L233">    Utente u = utenteRepository.findFirstBymetaId(metaId);</span>
+<span class="nc bnc" id="L234" title="All 2 branches missed.">    if (u == null) {</span>
+<span class="nc" id="L235">      throw new ServerRuntimeException(&quot;Utente non trovato&quot;);</span>
+    }
+
+    // settaggio scenario
+<span class="nc" id="L239">    Scenario sc = scenarioRepository.findScenarioById(s.getScenario().getId());</span>
+<span class="nc bnc" id="L240" title="All 2 branches missed.">    if (sc != null) {</span>
+<span class="nc" id="L241">      s.setScenario(sc);</span>
+    } else {
+<span class="nc" id="L243">      throw new RuntimeException403(&quot;Scenario non trovato&quot;);</span>
+    }
+
+<span class="nc" id="L246">    stanzaRepository.save(s);</span>
+
+    // Prelevo l'id della stanza a cui si deve generare il codice
+<span class="nc" id="L249">    Long idStanza = stanzaRepository.findIdUltimaTupla();</span>
+    // Converto l'id in una stringa di 6 caratteri
+<span class="nc" id="L251">    String codice = String.format(&quot;%06d&quot;, idStanza);</span>
+<span class="nc" id="L252">    s.setCodice(codice);</span>
+<span class="nc" id="L253">    stanzaRepository.save(s);</span>
+
+<span class="nc" id="L255">    StatoPartecipazione sp =</span>
+        new StatoPartecipazione(
+            s,
+            u,
+<span class="nc" id="L259">            ruoloRepository.findByNome(Ruolo.ORGANIZZATORE_MASTER),</span>
+            false,
+            false,
+<span class="nc" id="L262">            u.getNome(),</span>
+            true);
+
+<span class="nc" id="L265">    statoPartecipazioneRepository.save(sp);</span>
+
+<span class="nc" id="L267">    return true;</span>
+  }
+
+  /**
+   * metodo che permette di effettuare il downgrade del ruolo di un utente.
+   *
+   * @param idUogm id dell'utente che deve effettuare il downgrade dell'organizzatore
+   * @param idog id dell'organizzatore a cui deve essere effettuato il downgrade
+   * @param idStanza id della stanza su cui vuole essere il downgrade
+   * @return valore boolean che identifica la riuscita dell'operazione ed un messaggio che descrive
+   *     l'esito di essa
+   */
+  @Override
+  public Response&lt;Boolean&gt; downgradeUtente(String idUogm, long idog, long idStanza)
+      throws ServerRuntimeException, RuntimeException403 {
+
+    // controllo organizzatore master
+<span class="nc" id="L284">    Utente userOgm = utenteRepository.findFirstBymetaId(idUogm);</span>
+<span class="nc bnc" id="L285" title="All 2 branches missed.">    if (userOgm == null) {</span>
+<span class="nc" id="L286">      throw new ServerRuntimeException(&quot;errore nella ricerca dell'organizzatore master&quot;);</span>
+    }
+
+    // controllo utente da promuovere
+<span class="nc" id="L290">    Utente user = utenteRepository.findUtenteById(idog);</span>
+<span class="nc bnc" id="L291" title="All 2 branches missed.">    if (user == null) {</span>
+<span class="nc" id="L292">      throw new RuntimeException403(&quot;utente non trovato&quot;);</span>
+    }
+
+    // controllo stanza
+    Stanza stanza;
+<span class="nc bnc" id="L297" title="All 2 branches missed.">    if ((stanza = stanzaRepository.findStanzaById(idStanza)) == null) {</span>
+<span class="nc" id="L298">      throw new RuntimeException403(&quot;stanza non trovata&quot;);</span>
+    }
+
+    // controllo dell'accesso dell'organizzatore master nella stanza
+<span class="nc" id="L302">    StatoPartecipazione statoOgm =</span>
+<span class="nc" id="L303">        statoPartecipazioneRepository.findStatoPartecipazioneByUtenteAndStanza(userOgm, stanza);</span>
+<span class="nc bnc" id="L304" title="All 2 branches missed.">    if (statoOgm == null) {</span>
+<span class="nc" id="L305">      throw new ServerRuntimeException(</span>
+          &quot;l'organizzatore master sembra &quot; + &quot;non aver acceduto alla stanza&quot;);
+    }
+
+    // controllo del ruolo di organizztaore master
+<span class="nc bnc" id="L310" title="All 2 branches missed.">    if (!statoOgm.getRuolo().getNome().equalsIgnoreCase(Ruolo.ORGANIZZATORE_MASTER)) {</span>
+<span class="nc" id="L311">      throw new RuntimeException403(</span>
+          &quot;Non puoi declassare un'utente perché &quot; + &quot;non sei un'organizzatore master&quot;);
+    }
+
+    // ricerco e controllo se l'utente ha fatto accesso alla stanza
+<span class="nc" id="L316">    StatoPartecipazione statoOg =</span>
+<span class="nc" id="L317">        statoPartecipazioneRepository.findStatoPartecipazioneByUtenteAndStanza(user, stanza);</span>
+<span class="nc bnc" id="L318" title="All 2 branches missed.">    if (statoOg == null) {</span>
+<span class="nc" id="L319">      throw new RuntimeException403(&quot;l'utente non ha acceduto alla stanza, forse è stato kickato&quot;);</span>
+    }
+
+    // verifico se l'utente è in attesa
+<span class="nc bnc" id="L323" title="All 2 branches missed.">    if (statoOg.isInAttesa()) {</span>
+<span class="nc" id="L324">      throw new RuntimeException403(</span>
+          &quot;l'utente è in attesa di entrare in stanza, non può essere declassato&quot;);
+    }
+
+    // verifico se l'utente è bannato
+<span class="nc bnc" id="L329" title="All 2 branches missed.">    if (statoOg.isBannato()) {</span>
+<span class="nc" id="L330">      throw new RuntimeException403(&quot;l'utente è bannato, non può essere promosso&quot;);</span>
+    }
+
+    // verifico il ruolo dell'utente nella stanza
+<span class="nc bnc" id="L334" title="All 2 branches missed.">    if (statoOg.getRuolo().getNome().equalsIgnoreCase(Ruolo.ORGANIZZATORE)) {</span>
+
+      // se è organizzatpre allora posso declassarlo a partecipante
+<span class="nc" id="L337">      Ruolo r = ruoloRepository.findByNome(Ruolo.PARTECIPANTE);</span>
+<span class="nc" id="L338">      statoOg.setRuolo(r);</span>
+<span class="nc" id="L339">      statoPartecipazioneRepository.save(statoOg);</span>
+
+<span class="nc" id="L341">      return ResponseEntity.ok(new Response&lt;&gt;(true, &quot;L'utente selezionato ora è un partecipante&quot;))</span>
+<span class="nc" id="L342">          .getBody();</span>
+
+<span class="nc bnc" id="L344" title="All 2 branches missed.">    } else if (statoOg.getRuolo().getNome().equalsIgnoreCase(Ruolo.PARTECIPANTE)) {</span>
+<span class="nc" id="L345">      throw new RuntimeException403(&quot;L'utente selezionato è già un partecipante&quot;);</span>
+    } else {
+<span class="nc" id="L347">      throw new RuntimeException403(&quot;Sembra sia stato inviato un organizzatore master&quot;);</span>
+    }
+  }
+
+  /**
+   * metodo che permette l'eliminazione di una stanza.
+   *
+   * @param metaId metaId dell'utente che vuole eliminare una stanza
+   * @param idStanza id della stanza che deve essere eliminata
+   * @return valore boolean che identifica la riuscita dell'operazione ed un messaggio che descrive
+   *     l'esito di essa
+   */
+  @Override
+  public Response&lt;Boolean&gt; deleteRoom(String metaId, Long idStanza) {
+
+<span class="nc" id="L362">    Utente ogm = utenteRepository.findFirstBymetaId(metaId);</span>
+<span class="nc" id="L363">    Stanza stanza = stanzaRepository.findStanzaById(idStanza);</span>
+<span class="nc bnc" id="L364" title="All 2 branches missed.">    if (stanza == null) {</span>
+<span class="nc" id="L365">      return ResponseUtils.getResponseError(</span>
+              HttpStatus.INTERNAL_SERVER_ERROR, &quot;La stanza selezionata non esiste&quot;)
+<span class="nc" id="L367">          .getBody();</span>
+    }
+
+<span class="nc" id="L370">    StatoPartecipazione statoOgm =</span>
+<span class="nc" id="L371">        statoPartecipazioneRepository.findStatoPartecipazioneByUtenteAndStanza(ogm, stanza);</span>
+<span class="nc bnc" id="L372" title="All 2 branches missed.">    if (statoOgm.getRuolo().getNome().equalsIgnoreCase(Ruolo.ORGANIZZATORE_MASTER)</span>
+<span class="nc bnc" id="L373" title="All 2 branches missed.">        || ogm.isAdmin()) {</span>
+      // elimina tutti gli stati partecipazione
+<span class="nc" id="L375">      statoPartecipazioneRepository.deleteAllByStanza(stanza);</span>
+      // elimina stanza
+<span class="nc" id="L377">      stanzaRepository.delete(stanza);</span>
+<span class="nc" id="L378">      return ResponseEntity.ok(new Response&lt;&gt;(true, &quot;Stanza eliminata con successo&quot;)).getBody();</span>
+    } else {
+<span class="nc" id="L380">      return ResponseEntity.status(403)</span>
+<span class="nc" id="L381">          .body(</span>
+              new Response&lt;&gt;(
+<span class="nc" id="L383">                  false, &quot;Non puoi eliminare una stanza se non sei un'organizzatore master&quot;))</span>
+<span class="nc" id="L384">          .getBody();</span>
+    }
+  }
+
+  /**
+   * metodo che permette la gestione dell'accesso di un utente ad una stanza.
+   *
+   * @param metaId metaId dell'utente che deve gestire l'accesso alla stanza di un altro utente
+   * @param idUtente id dell'utente che vuole accedere alla stanza
+   * @param idStanza id della stanza acui l'utente vuole accedere
+   * @param scelta valore booleano che identifica la scelta sull'accesso alla stanza da parte
+   *     dell'organizzatore
+   * @return valore boolean che identifica la riuscita dell'operazione ed un messaggio che descrive
+   *     l'esito di essa
+   */
+  @Override
+  public ResponseEntity&lt;Response&lt;Boolean&gt;&gt; gestioneAccesso(
+      String metaId, Long idUtente, Long idStanza, boolean scelta) {
+
+<span class="nc" id="L403">    Utente og = utenteRepository.findFirstBymetaId(metaId);</span>
+<span class="nc" id="L404">    Utente accesso = utenteRepository.findUtenteById(idUtente);</span>
+<span class="nc" id="L405">    Stanza stanza = stanzaRepository.findStanzaById(idStanza);</span>
+
+<span class="nc bnc" id="L407" title="All 2 branches missed.">    if (stanza != null) {</span>
+<span class="nc" id="L408">      StatoPartecipazione statoOg =</span>
+<span class="nc" id="L409">          statoPartecipazioneRepository.findStatoPartecipazioneByUtenteAndStanza(og, stanza);</span>
+<span class="nc bnc" id="L410" title="All 2 branches missed.">      if (statoOg.getRuolo().getNome().equalsIgnoreCase(Ruolo.ORGANIZZATORE_MASTER)</span>
+<span class="nc bnc" id="L411" title="All 2 branches missed.">          || statoOg.getRuolo().getNome().equalsIgnoreCase(Ruolo.ORGANIZZATORE)</span>
+<span class="nc bnc" id="L412" title="All 2 branches missed.">              &amp;&amp; !statoOg.isBannato()) {</span>
+<span class="nc" id="L413">        StatoPartecipazione statoAccesso =</span>
+<span class="nc" id="L414">            statoPartecipazioneRepository.findStatoPartecipazioneByUtenteAndStanza(accesso, stanza);</span>
+<span class="nc bnc" id="L415" title="All 2 branches missed.">        if (statoAccesso.isInAttesa()) {</span>
+<span class="nc bnc" id="L416" title="All 2 branches missed.">          if (scelta) {</span>
+<span class="nc" id="L417">            statoAccesso.setInAttesa(false);</span>
+<span class="nc" id="L418">            statoPartecipazioneRepository.save(statoAccesso);</span>
+<span class="nc" id="L419">            return ResponseEntity.ok(</span>
+                new Response&lt;&gt;(
+<span class="nc" id="L421">                    true,</span>
+                    &quot;L'utente selezionato non è più in attesa e sta per entrare nella stanza&quot;));
+          } else {
+<span class="nc" id="L424">            statoPartecipazioneRepository.delete(statoAccesso);</span>
+<span class="nc" id="L425">            return ResponseEntity.ok(</span>
+                new Response&lt;&gt;(
+<span class="nc" id="L427">                    true,</span>
+                    &quot;L'utente selezionato non è più in attesa, &quot;
+                        + &quot;hai rifiutato la richiesta di accesso alla stanza&quot;));
+          }
+        } else {
+<span class="nc" id="L432">          return ResponseEntity.status(403)</span>
+<span class="nc" id="L433">              .body(</span>
+                  new Response&lt;&gt;(
+<span class="nc" id="L435">                      false, &quot;L'utente selezioanto non è in attesa di entrare in questa stanza&quot;));</span>
+        }
+      } else {
+<span class="nc" id="L438">        return ResponseEntity.status(403)</span>
+<span class="nc" id="L439">            .body(</span>
+                new Response&lt;&gt;(
+<span class="nc" id="L441">                    false,</span>
+                    &quot;Per accettare o rifiutare richiesta di &quot;
+                        + &quot;accesso alla stanza devi essere almeno un organizzatore&quot;));
+      }
+    } else {
+<span class="nc" id="L446">      return ResponseEntity.status(403)</span>
+<span class="nc" id="L447">          .body(new Response&lt;&gt;(false, &quot;La stanza selezionata non esiste&quot;));</span>
+    }
+  }
+
+  /**
+   * meotodo che permette di seleziare un parteciapante all'interno di una stanza.
+   *
+   * @param metaId metaId dell'utente che vuole silenziare un partecipante all'interno della stanza
+   * @param idStanza id della stanza in cui si vuole silenziare un partecipante
+   * @param idUtente id dell'utente che si vuole silenziare all'interno della stanza
+   * @return valore boolean che identifica la riuscita dell'operazione ed un messaggio che descrive
+   *     l'esito di essa
+   */
+  @Override
+  public ResponseEntity&lt;Response&lt;Boolean&gt;&gt; silenziaPartecipante(
+      String metaId, Long idStanza, Long idUtente) {
+
+<span class="nc" id="L464">    Utente og = utenteRepository.findFirstBymetaId(metaId);</span>
+<span class="nc" id="L465">    Utente silenzia = utenteRepository.findUtenteById(idUtente);</span>
+<span class="nc" id="L466">    Stanza stanza = stanzaRepository.findStanzaById(idStanza);</span>
+
+<span class="nc bnc" id="L468" title="All 2 branches missed.">    if (stanza != null) {</span>
+<span class="nc" id="L469">      StatoPartecipazione statoOg =</span>
+<span class="nc" id="L470">          statoPartecipazioneRepository.findStatoPartecipazioneByUtenteAndStanza(og, stanza);</span>
+<span class="nc bnc" id="L471" title="All 2 branches missed.">      if (statoOg.getRuolo().getNome().equalsIgnoreCase(Ruolo.ORGANIZZATORE_MASTER)</span>
+<span class="nc bnc" id="L472" title="All 2 branches missed.">          || statoOg.getRuolo().getNome().equalsIgnoreCase(Ruolo.ORGANIZZATORE)</span>
+<span class="nc bnc" id="L473" title="All 2 branches missed.">              &amp;&amp; !statoOg.isBannato()) {</span>
+<span class="nc" id="L474">        StatoPartecipazione statoSilenzio =</span>
+<span class="nc" id="L475">            statoPartecipazioneRepository.findStatoPartecipazioneByUtenteAndStanza(</span>
+                silenzia, stanza);
+<span class="nc bnc" id="L477" title="All 2 branches missed.">        if (statoSilenzio != null) {</span>
+<span class="nc bnc" id="L478" title="All 2 branches missed.">          if (!statoSilenzio.isSilenziato()) {</span>
+<span class="nc" id="L479">            statoSilenzio.setSilenziato(true);</span>
+<span class="nc" id="L480">            statoPartecipazioneRepository.save(statoSilenzio);</span>
+<span class="nc" id="L481">            return ResponseEntity.ok(new Response&lt;&gt;(true, &quot;L'utente selezionato ora è silenziato&quot;));</span>
+          } else {
+<span class="nc" id="L483">            return ResponseEntity.ok(new Response&lt;&gt;(true, &quot;L'utente selezionato è gia silenziato&quot;));</span>
+          }
+        } else {
+<span class="nc" id="L486">          return ResponseEntity.status(403)</span>
+<span class="nc" id="L487">              .body(new Response&lt;&gt;(false, &quot;L'utente selezioanto non è presente nella stanza&quot;));</span>
+        }
+      } else {
+<span class="nc" id="L490">        return ResponseEntity.status(403)</span>
+<span class="nc" id="L491">            .body(</span>
+                new Response&lt;&gt;(
+<span class="nc" id="L493">                    false,</span>
+                    &quot;Per silenziare un partecipante nella stanza &quot;
+                        + &quot;devi essere almeno un organizzatore&quot;));
+      }
+    } else {
+<span class="nc" id="L498">      return ResponseEntity.status(403)</span>
+<span class="nc" id="L499">          .body(new Response&lt;&gt;(false, &quot;La stanza selezionata non esiste&quot;));</span>
+    }
+  }
+
+  /**
+   * metodo che consente la modifica dei dati della stanza.
+   *
+   * @param params nuovi dati della stanza
+   * @param id id della stanza da modificare
+   */
+  @Override
+  public Boolean modificaDatiStanza(Map&lt;String, Object&gt; params, Long id)
+      throws RuntimeException403, RuntimeException401 {
+
+    // controllo del ruolo di ogm
+<span class="nc" id="L514">    String metaId = jwtTokenUtil.getmetaIdFromToken(validationToken.getToken());</span>
+<span class="nc" id="L515">    Utente ogm = utenteRepository.findFirstBymetaId(metaId);</span>
+<span class="nc" id="L516">    Stanza existingStanza = stanzaRepository.findStanzaById(id);</span>
+
+<span class="nc bnc" id="L518" title="All 2 branches missed.">    if (existingStanza == null) {</span>
+<span class="nc" id="L519">      throw new RuntimeException403(&quot;La stanza non esiste&quot;);</span>
+    }
+
+<span class="nc" id="L522">    StatoPartecipazione statoutente =</span>
+<span class="nc" id="L523">        statoPartecipazioneRepository.findStatoPartecipazioneByUtenteAndStanza(ogm, existingStanza);</span>
+
+<span class="nc bnc" id="L525" title="All 2 branches missed.">    if (statoutente == null) {</span>
+<span class="nc" id="L526">      throw new RuntimeException403(&quot;Non hai acceduto alla stanza&quot;);</span>
+    }
+
+<span class="nc bnc" id="L529" title="All 2 branches missed.">    if (!statoutente.getRuolo().getNome().equalsIgnoreCase(Ruolo.PARTECIPANTE)) {</span>
+<span class="nc bnc" id="L530" title="All 2 branches missed.">      return stanzaRepository.updateAttributes(id, params) &gt; 0;</span>
+    } else {
+<span class="nc" id="L532">      throw new RuntimeException401(&quot;devi essere almeno un organizzatore&quot;);</span>
+    }
+  }
+
+  /**
+   * metodo che permette la visualizzazione di lo scenario in uso all'interno di una stanza.
+   *
+   * @param id id della stanza di cui si vuole visualizzare lo scenario in uso
+   * @return scenario in uso in una stanza ed un messaggio che descrive l'esito dell'operazione
+   */
+  @Override
+  public ResponseEntity&lt;Response&lt;Scenario&gt;&gt; findScenarioStanza(Long id) {
+<span class="nc" id="L544">    Stanza stanza = stanzaRepository.findStanzaById(id);</span>
+
+<span class="nc bnc" id="L546" title="All 2 branches missed.">    if (stanza == null) {</span>
+<span class="nc" id="L547">      return ResponseEntity.status(500)</span>
+<span class="nc" id="L548">          .body(new Response&lt;&gt;(null, &quot;La stanza selezionata non esiste&quot;));</span>
+    } else {
+
+<span class="nc" id="L551">      return ResponseEntity.ok(</span>
+<span class="nc" id="L552">          new Response&lt;&gt;(stanza.getScenario(), &quot;operazione effettuata con successo&quot;));</span>
+    }
+  }
+
+  /**
+   * metodo che permette di effettuare l'upgrade di un partecipante in organizzatore all'interno di
+   * una stanza.
+   *
+   * @param idUogm id dell'utente che vuole effettuare l'upgrade
+   * @param idog id dell'utente su cui verrà effettuato l'upgradde
+   * @param idStanza id della stanza in cui l'utente diventerà organizzatore
+   * @return valore boolean che identifica la riuscita dell'operazione ed un messaggio che descrive
+   *     l'esito di essa
+   */
+  @Override
+  public Response&lt;Boolean&gt; upgradeUtente(String idUogm, long idog, long idStanza)
+      throws ServerRuntimeException, RuntimeException403 {
+
+    // controllo organizzatore master
+    Utente ogm;
+<span class="nc bnc" id="L572" title="All 2 branches missed.">    if ((ogm = utenteRepository.findFirstBymetaId(idUogm)) == null) {</span>
+<span class="nc" id="L573">      throw new ServerRuntimeException(&quot;errore nella ricerca dell'organizzatore master&quot;);</span>
+    }
+
+    // controllo utente da promuovere
+    Utente og;
+<span class="nc bnc" id="L578" title="All 2 branches missed.">    if ((og = utenteRepository.findUtenteById(idog)) == null) {</span>
+<span class="nc" id="L579">      throw new RuntimeException403(&quot;utente non trovato&quot;);</span>
+    }
+
+    // controllo stanza
+    Stanza stanza;
+<span class="nc bnc" id="L584" title="All 2 branches missed.">    if ((stanza = stanzaRepository.findStanzaById(idStanza)) == null) {</span>
+<span class="nc" id="L585">      throw new RuntimeException403(&quot;stanza non trovata&quot;);</span>
+    }
+
+    // controllo dell'accesso dell'organizzatore master nella stanza
+<span class="nc" id="L589">    StatoPartecipazione statoOgm =</span>
+<span class="nc" id="L590">        statoPartecipazioneRepository.findStatoPartecipazioneByUtenteAndStanza(ogm, stanza);</span>
+<span class="nc bnc" id="L591" title="All 2 branches missed.">    if (statoOgm == null) {</span>
+<span class="nc" id="L592">      throw new ServerRuntimeException(</span>
+          &quot;l'organizzatore master sembra &quot; + &quot;non aver acceduto alla stanza&quot;);
+    }
+
+    // controllo del ruolo di organizztaore master
+<span class="nc bnc" id="L597" title="All 2 branches missed.">    if (!statoOgm.getRuolo().getNome().equalsIgnoreCase(Ruolo.ORGANIZZATORE_MASTER)) {</span>
+<span class="nc" id="L598">      throw new RuntimeException403(</span>
+          &quot;Non puoi promuovere un'utente perché &quot; + &quot;non sei un'organizzatore master&quot;);
+    }
+
+    // ricerco e controllo se l'utente ha fatto accesso alla stanza
+<span class="nc" id="L603">    StatoPartecipazione statoOg =</span>
+<span class="nc" id="L604">        statoPartecipazioneRepository.findStatoPartecipazioneByUtenteAndStanza(og, stanza);</span>
+<span class="nc bnc" id="L605" title="All 2 branches missed.">    if (statoOg == null) {</span>
+<span class="nc" id="L606">      throw new RuntimeException403(&quot;l'utente non ha acceduto alla stanza, magari è stato kickato&quot;);</span>
+    }
+
+    // verifico se l'utente è in attesa
+<span class="nc bnc" id="L610" title="All 2 branches missed.">    if (statoOg.isInAttesa()) {</span>
+<span class="nc" id="L611">      throw new RuntimeException403(</span>
+          &quot;l'utente è in attesa di entrare in stanza, non può essere promosso&quot;);
+    }
+
+    // verifico se l'utente è bannato
+<span class="nc bnc" id="L616" title="All 2 branches missed.">    if (statoOg.isBannato()) {</span>
+<span class="nc" id="L617">      throw new RuntimeException403(&quot;l'utente è bannato, non può essere promosso&quot;);</span>
+    }
+
+    // verifico il ruolo dell'utente nella stanza
+<span class="nc bnc" id="L621" title="All 2 branches missed.">    if (statoOg.getRuolo().getNome().equalsIgnoreCase(Ruolo.PARTECIPANTE)) {</span>
+
+      // se è partecipante allora posso promuoverlo ad organizzatore
+<span class="nc" id="L624">      Ruolo r = ruoloRepository.findByNome(Ruolo.ORGANIZZATORE);</span>
+<span class="nc" id="L625">      statoOg.setRuolo(r);</span>
+<span class="nc" id="L626">      statoPartecipazioneRepository.save(statoOg);</span>
+
+<span class="nc" id="L628">      return ResponseEntity.ok(new Response&lt;&gt;(true, &quot;L'utente selezionato ora è un organizzatore&quot;))</span>
+<span class="nc" id="L629">          .getBody();</span>
+
+<span class="nc bnc" id="L631" title="All 2 branches missed.">    } else if (statoOg.getRuolo().getNome().equalsIgnoreCase(Ruolo.ORGANIZZATORE)) {</span>
+<span class="nc" id="L632">      throw new RuntimeException403(&quot;L'utente selezionato è già un'organizzatore&quot;);</span>
+    } else {
+<span class="nc" id="L634">      throw new RuntimeException403(&quot;Sembra sia stato inviato un organizzatore master&quot;);</span>
+    }
+  }
+
+  /**
+   * metodo che permette la visualizzazione di tutti gli utenti all'interno di una specifica stanza.
+   *
+   * @param id id della stanza di cui vogliamo visualizzare gli utenti al suo interno
+   * @return lista di utenti all'interno della stanza specificata ed un messaggio che descrive
+   *     l'esito dell'operazione
+   */
+  @Override
+  public ResponseEntity&lt;Response&lt;List&lt;Utente&gt;&gt;&gt; visualizzaUtentiInStanza(Long id) {
+
+<span class="nc" id="L648">    Stanza stanza = stanzaRepository.findStanzaById(id);</span>
+
+<span class="nc bnc" id="L650" title="All 2 branches missed.">    if (stanza != null) {</span>
+<span class="nc" id="L651">      List&lt;Utente&gt; utenti = statoPartecipazioneRepository.findUtentiInStanza(id);</span>
+<span class="nc bnc" id="L652" title="All 2 branches missed.">      if (utenti != null) {</span>
+<span class="nc" id="L653">        return ResponseEntity.ok(new Response&lt;&gt;(utenti, &quot;operazione effettuata con successo&quot;));</span>
+      } else {
+<span class="nc" id="L655">        return ResponseEntity.ok(</span>
+            new Response&lt;&gt;(null, &quot;Non sono presenti utenti all'interno della stanza&quot;));
+      }
+    } else {
+<span class="nc" id="L659">      return ResponseEntity.status(403)</span>
+<span class="nc" id="L660">          .body(new Response&lt;&gt;(null, &quot;La stanza selezionata non esiste&quot;));</span>
+    }
+  }
+
+  /**
+   * metodo che permette la visualizzazione degli utenti bannatiall'interno di una stanza.
+   *
+   * @param id id della stanza di cui si vogliono visualizzare gli utenti bannati
+   * @return lista di utenti bannati all'interno della stanza selezionata ed un messaggio che
+   *     descrive l'esito dell'operazione
+   */
+  @Override
+  public ResponseEntity&lt;Response&lt;List&lt;Utente&gt;&gt;&gt; visualizzaUtentiBannatiInStanza(Long id) {
+
+<span class="nc" id="L674">    Stanza stanza = stanzaRepository.findStanzaById(id);</span>
+
+<span class="nc bnc" id="L676" title="All 2 branches missed.">    if (stanza != null) {</span>
+<span class="nc" id="L677">      List&lt;Utente&gt; utenti = statoPartecipazioneRepository.findUtentiBannatiInStanza(id);</span>
+<span class="nc bnc" id="L678" title="All 2 branches missed.">      if (utenti != null) {</span>
+<span class="nc" id="L679">        return ResponseEntity.ok(new Response&lt;&gt;(utenti, &quot;operazione effettuata con successo&quot;));</span>
+      } else {
+<span class="nc" id="L681">        return ResponseEntity.ok(</span>
+            new Response&lt;&gt;(null, &quot;Non sono presenti utenti bannati all'interno della stanza&quot;));
+      }
+    } else {
+<span class="nc" id="L685">      return ResponseEntity.status(403)</span>
+<span class="nc" id="L686">          .body(new Response&lt;&gt;(null, &quot;La stanza selezionata non esiste&quot;));</span>
+    }
+  }
+
+  /**
+   * metodo che permette la visualizzazione degli utenti in attesa all'interno di una stanza.
+   *
+   * @param id id della stanza di cui vogliamo visualizzare gli utenti in attesa
+   * @param metaId metaId dell'utente che vuole visualizzare gli utenti in attesa
+   * @return lista di utenti in attesa all'interno di una stanza ed un messaggio che descrive
+   *     l'esito dell'operazione
+   */
+  @Override
+  public ResponseEntity&lt;Response&lt;List&lt;Utente&gt;&gt;&gt; visualizzaUtentiInAttesaInStanza(
+      Long id, String metaId) {
+<span class="nc" id="L701">    Stanza stanza = stanzaRepository.findStanzaById(id);</span>
+<span class="nc" id="L702">    Utente u = utenteRepository.findFirstBymetaId(metaId);</span>
+<span class="nc bnc" id="L703" title="All 2 branches missed.">    if (stanza != null) {</span>
+<span class="nc" id="L704">      StatoPartecipazione stato =</span>
+<span class="nc" id="L705">          statoPartecipazioneRepository.findStatoPartecipazioneByUtenteAndStanza(u, stanza);</span>
+<span class="nc bnc" id="L706" title="All 2 branches missed.">      if (stato != null) {</span>
+<span class="nc bnc" id="L707" title="All 2 branches missed.">        if (stato.getRuolo().getNome().equalsIgnoreCase(Ruolo.ORGANIZZATORE_MASTER)</span>
+<span class="nc bnc" id="L708" title="All 2 branches missed.">            || stato.getRuolo().getNome().equalsIgnoreCase(Ruolo.ORGANIZZATORE)</span>
+<span class="nc bnc" id="L709" title="All 2 branches missed.">                &amp;&amp; !stato.isBannato()) {</span>
+<span class="nc" id="L710">          List&lt;Utente&gt; utenti = statoPartecipazioneRepository.findUtentiInAttesaInStanza(id);</span>
+
+<span class="nc bnc" id="L712" title="All 2 branches missed.">          if (utenti != null) {</span>
+<span class="nc" id="L713">            return ResponseEntity.ok(new Response&lt;&gt;(utenti, &quot;operazione effettuata con successo&quot;));</span>
+          } else {
+<span class="nc" id="L715">            return ResponseEntity.ok(</span>
+                new Response&lt;&gt;(
+                    null, &quot;Non sono presenti utenti in attesa all'interno della stanza&quot;));
+          }
+        } else {
+<span class="nc" id="L720">          return ResponseEntity.status(403)</span>
+<span class="nc" id="L721">              .body(</span>
+                  new Response&lt;&gt;(
+                      null,
+                      &quot;Non puoi visualizzare gli utenti&quot;
+                          + &quot; in attesa se non sei almeno un organizzatore&quot;));
+        }
+      } else {
+<span class="nc" id="L728">        return ResponseEntity.status(403)</span>
+<span class="nc" id="L729">            .body(</span>
+                new Response&lt;&gt;(
+                    null,
+                    &quot;Non puoi visualizzare gli utenti in attesa&quot;
+                        + &quot; della stanza se non sei almeno un'organizzatore di essa&quot;));
+      }
+    } else {
+<span class="nc" id="L736">      return ResponseEntity.status(403)</span>
+<span class="nc" id="L737">          .body(new Response&lt;&gt;(null, &quot;La stanza selezionata non esiste&quot;));</span>
+    }
+  }
+
+  /**
+   * metodo che permette la modifica dellos cenario in uso all'itnerno di una stanza.
+   *
+   * @param metaId metaId dell'utente che vuole effettuare la modifica dello scenario all'interno
+   *     della stanza
+   * @param idScenario id del nuovo scenario
+   * @param idStanza id della stanza
+   * @return valore boolean che identifica la riuscita dell'operazione ed un messaggio che descrive
+   *     l'esito di essa
+   */
+  @Override
+  public ResponseEntity&lt;Response&lt;Boolean&gt;&gt; modificaScenario(
+      String metaId, Long idScenario, Long idStanza) {
+<span class="nc" id="L754">    Utente u = utenteRepository.findFirstBymetaId(metaId);</span>
+<span class="nc" id="L755">    Stanza stanza = stanzaRepository.findStanzaById(idStanza);</span>
+
+<span class="nc bnc" id="L757" title="All 2 branches missed.">    if (stanza != null) {</span>
+<span class="nc" id="L758">      StatoPartecipazione stato =</span>
+<span class="nc" id="L759">          statoPartecipazioneRepository.findStatoPartecipazioneByUtenteAndStanza(u, stanza);</span>
+<span class="nc bnc" id="L760" title="All 2 branches missed.">      if (stato != null) {</span>
+<span class="nc bnc" id="L761" title="All 2 branches missed.">        if (stato.getRuolo().getNome().equalsIgnoreCase(Ruolo.ORGANIZZATORE_MASTER)</span>
+<span class="nc bnc" id="L762" title="All 2 branches missed.">            || stato.getRuolo().getNome().equalsIgnoreCase(Ruolo.ORGANIZZATORE)</span>
+<span class="nc bnc" id="L763" title="All 2 branches missed.">                &amp;&amp; !stato.isBannato()) {</span>
+<span class="nc" id="L764">          Scenario scenario = scenarioRepository.findScenarioById(idScenario);</span>
+<span class="nc bnc" id="L765" title="All 2 branches missed.">          if (scenario != null) {</span>
+<span class="nc bnc" id="L766" title="All 2 branches missed.">            if (scenario != stanza.getScenario()) {</span>
+<span class="nc" id="L767">              stanza.setScenario(scenario);</span>
+<span class="nc" id="L768">              stanzaRepository.save(stanza);</span>
+<span class="nc" id="L769">              return ResponseEntity.ok(new Response&lt;&gt;(true, &quot;Lo scenario è stato modificato&quot;));</span>
+            } else {
+<span class="nc" id="L771">              return ResponseEntity.status(403)</span>
+<span class="nc" id="L772">                  .body(</span>
+<span class="nc" id="L773">                      new Response&lt;&gt;(false, &quot;Lo scenario selezionato è già in uso per la stanza&quot;));</span>
+            }
+          } else {
+<span class="nc" id="L776">            return ResponseEntity.status(403)</span>
+<span class="nc" id="L777">                .body(new Response&lt;&gt;(false, &quot;Lo scenario selezionato non esiste&quot;));</span>
+          }
+        } else {
+<span class="nc" id="L780">          return ResponseEntity.status(403)</span>
+<span class="nc" id="L781">              .body(</span>
+                  new Response&lt;&gt;(
+<span class="nc" id="L783">                      false,</span>
+                      &quot;Non puoi modificare lo &quot; + &quot;scenario se non sei almeno un organizzatore&quot;));
+        }
+      } else {
+<span class="nc" id="L787">        return ResponseEntity.status(403)</span>
+<span class="nc" id="L788">            .body(</span>
+                new Response&lt;&gt;(
+<span class="nc" id="L790">                    false,</span>
+                    &quot;Non sei all'interno della stanza, &quot; + &quot;non puoi modificare lo scenario&quot;));
+      }
+
+    } else {
+<span class="nc" id="L795">      return ResponseEntity.status(403)</span>
+<span class="nc" id="L796">          .body(new Response&lt;&gt;(false, &quot;La stanza selezionata non esiste&quot;));</span>
+    }
+  }
+
+  /**
+   * Metodo che permette la modifica del nome all'interno di una stanza di uno specifico
+   * partecipante.
+   *
+   * @param metaId metaId dell'utente che vuole effettuare la modifica del nome
+   * @param idStanza id della stanza in cui si vuole modificare il nome
+   * @param idUtente id dell'utente a cui viene modificato il nome all'itnerno della stanza
+   * @param nome nuovo nome dell'utente
+   * @return valore boolean che identifica la riuscita dell'operazione ed un messaggio che descrive
+   *     l'esito di essa
+   */
+  @Override
+  public ResponseEntity&lt;Response&lt;Boolean&gt;&gt; modificaNomePartecipante(
+      String metaId, Long idStanza, Long idUtente, String nome) {
+<span class="nc" id="L814">    Utente og = utenteRepository.findFirstBymetaId(metaId);</span>
+<span class="nc" id="L815">    Stanza stanza = stanzaRepository.findStanzaById(idStanza);</span>
+
+<span class="nc" id="L817">    Utente modifica = utenteRepository.findUtenteById(idUtente);</span>
+<span class="nc bnc" id="L818" title="All 2 branches missed.">    if (stanza != null) {</span>
+<span class="nc" id="L819">      StatoPartecipazione statoOg =</span>
+<span class="nc" id="L820">          statoPartecipazioneRepository.findStatoPartecipazioneByUtenteAndStanza(og, stanza);</span>
+<span class="nc bnc" id="L821" title="All 2 branches missed.">      if (statoOg != null) {</span>
+<span class="nc bnc" id="L822" title="All 2 branches missed.">        if (statoOg.getRuolo().getNome().equalsIgnoreCase(Ruolo.ORGANIZZATORE_MASTER)</span>
+<span class="nc bnc" id="L823" title="All 2 branches missed.">            || statoOg.getRuolo().getNome().equalsIgnoreCase(Ruolo.ORGANIZZATORE)</span>
+<span class="nc bnc" id="L824" title="All 2 branches missed.">                &amp;&amp; !statoOg.isBannato()) {</span>
+
+<span class="nc" id="L826">          StatoPartecipazione statoModifica =</span>
+<span class="nc" id="L827">              statoPartecipazioneRepository.findStatoPartecipazioneByUtenteAndStanza(</span>
+                  modifica, stanza);
+<span class="nc bnc" id="L829" title="All 2 branches missed.">          if (statoModifica != null) {</span>
+<span class="nc" id="L830">            statoModifica.setNomeInStanza(nome);</span>
+<span class="nc" id="L831">            statoPartecipazioneRepository.save(statoModifica);</span>
+
+<span class="nc" id="L833">            return ResponseEntity.ok(new Response&lt;&gt;(true, &quot;Il nome in stanza è stato modificato&quot;));</span>
+          } else {
+<span class="nc" id="L835">            return ResponseEntity.status(403)</span>
+<span class="nc" id="L836">                .body(</span>
+                    new Response&lt;&gt;(
+<span class="nc" id="L838">                        false, &quot;Il partecipante selezionato non è presente nella stanza&quot;));</span>
+          }
+        } else {
+<span class="nc" id="L841">          return ResponseEntity.status(403)</span>
+<span class="nc" id="L842">              .body(</span>
+                  new Response&lt;&gt;(
+<span class="nc" id="L844">                      false,</span>
+                      &quot;Non puoi modificare il nome in stanza di un&quot;
+                          + &quot; utente se non sei almeno un'organizzatore&quot;));
+        }
+      } else {
+<span class="nc" id="L849">        return ResponseEntity.status(403)</span>
+<span class="nc" id="L850">            .body(</span>
+                new Response&lt;&gt;(
+<span class="nc" id="L852">                    false,</span>
+                    &quot;Non puoi modificare il nome in stanza &quot;
+                        + &quot;dell'utente selezionato perché non è presente in stanza&quot;));
+      }
+    } else {
+<span class="nc" id="L857">      return ResponseEntity.status(403)</span>
+<span class="nc" id="L858">          .body(new Response&lt;&gt;(false, &quot;La stanza selezionata non esiste&quot;));</span>
+    }
+  }
+
+  /**
+   * metodo che permette di kickare un partecipante da una stanza.
+   *
+   * @param metaId metaId dell'utente che vuole effettuare il kick del partecipante
+   * @param idStanza id della stanza dal quale deve essere kickato l'utente
+   * @param idUtente id dell'utente che deve essere keckato
+   * @return valore boolean che identifica la riuscita dell'operazione ed un messaggio che descrive
+   *     l'esito di essa
+   */
+  @Override
+  public ResponseEntity&lt;Response&lt;Boolean&gt;&gt; kickPartecipante(
+      String metaId, Long idStanza, Long idUtente) {
+<span class="nc" id="L874">    Utente og = utenteRepository.findFirstBymetaId(metaId);</span>
+<span class="nc" id="L875">    Stanza stanza = stanzaRepository.findStanzaById(idStanza);</span>
+
+<span class="nc" id="L877">    Utente kick = utenteRepository.findUtenteById(idUtente);</span>
+<span class="nc bnc" id="L878" title="All 2 branches missed.">    if (stanza != null) {</span>
+<span class="nc" id="L879">      StatoPartecipazione statoOg =</span>
+<span class="nc" id="L880">          statoPartecipazioneRepository.findStatoPartecipazioneByUtenteAndStanza(og, stanza);</span>
+<span class="nc bnc" id="L881" title="All 2 branches missed.">      if (statoOg != null) {</span>
+<span class="nc bnc" id="L882" title="All 2 branches missed.">        if (statoOg.getRuolo().getNome().equalsIgnoreCase(Ruolo.ORGANIZZATORE_MASTER)</span>
+<span class="nc bnc" id="L883" title="All 2 branches missed.">            || statoOg.getRuolo().getNome().equalsIgnoreCase(Ruolo.ORGANIZZATORE)</span>
+<span class="nc bnc" id="L884" title="All 2 branches missed.">                &amp;&amp; !statoOg.isBannato()) {</span>
+
+<span class="nc" id="L886">          StatoPartecipazione statoKick =</span>
+<span class="nc" id="L887">              statoPartecipazioneRepository.findStatoPartecipazioneByUtenteAndStanza(kick, stanza);</span>
+<span class="nc bnc" id="L888" title="All 2 branches missed.">          if (statoKick != null) {</span>
+<span class="nc" id="L889">            statoPartecipazioneRepository.delete(statoKick);</span>
+<span class="nc" id="L890">            return ResponseEntity.ok(new Response&lt;&gt;(true, &quot;L'utente è stato kickato con successo&quot;));</span>
+          } else {
+<span class="nc" id="L892">            return ResponseEntity.status(403)</span>
+<span class="nc" id="L893">                .body(</span>
+                    new Response&lt;&gt;(
+<span class="nc" id="L895">                        false, &quot;Il partecipante selezionato non è presente nella stanza&quot;));</span>
+          }
+        } else {
+<span class="nc" id="L898">          return ResponseEntity.status(403)</span>
+<span class="nc" id="L899">              .body(</span>
+                  new Response&lt;&gt;(
+<span class="nc" id="L901">                      false, &quot;Non puoi kickare un utente se non sei almeno un'organizzatore&quot;));</span>
+        }
+      } else {
+<span class="nc" id="L904">        return ResponseEntity.status(403)</span>
+<span class="nc" id="L905">            .body(new Response&lt;&gt;(false, &quot;Il partecipante selezionato non è presente nella stanza&quot;));</span>
+      }
+    } else {
+<span class="nc" id="L908">      return ResponseEntity.status(403)</span>
+<span class="nc" id="L909">          .body(new Response&lt;&gt;(false, &quot;La stanza selezionata non esiste&quot;));</span>
+    }
+  }
+
+  /**
+   * meotodo che permette di visualizzare il ruolo dell'utente all'interno di una stanza.
+   *
+   * @param metaId metaId dell'utente che vuole visualizzare il proprio ruolo
+   * @param idStanza id della stanza
+   * @return il ruolo del'utente all'interno della stanza
+   */
+  @Override
+  public Ruolo getRuoloByUserAndStanzaId(String metaId, Long idStanza)
+      throws ServerRuntimeException, RuntimeException403 {
+
+    Utente u;
+    Stanza stanza;
+<span class="nc bnc" id="L926" title="All 2 branches missed.">    if ((u = utenteRepository.findFirstBymetaId(metaId)) == null) {</span>
+<span class="nc" id="L927">      throw new ServerRuntimeException((&quot;Utente non torvato&quot;));</span>
+    }
+<span class="nc bnc" id="L929" title="All 2 branches missed.">    if ((stanza = stanzaRepository.findStanzaById(idStanza)) == null) {</span>
+<span class="nc" id="L930">      throw new RuntimeException403(&quot;Stanza non trovata&quot;);</span>
+    }
+
+    StatoPartecipazione sp;
+<span class="nc bnc" id="L934" title="All 2 branches missed.">    if ((sp = statoPartecipazioneRepository.findStatoPartecipazioneByUtenteAndStanza(u, stanza))</span>
+        == null) {
+<span class="nc" id="L936">      throw new RuntimeException403(&quot;L'utente non ha acceduto alla stanza&quot;);</span>
+    }
+
+<span class="nc bnc" id="L939" title="All 2 branches missed.">    if (sp.getRuolo().getNome().equalsIgnoreCase(Ruolo.PARTECIPANTE)) {</span>
+<span class="nc bnc" id="L940" title="All 2 branches missed.">      if (sp.isBannato()) {</span>
+<span class="nc" id="L941">        throw new RuntimeException403(&quot;Utente bannato dalla stanza&quot;);</span>
+      }
+<span class="nc bnc" id="L943" title="All 2 branches missed.">      if (sp.isInAttesa()) {</span>
+<span class="nc" id="L944">        throw new RuntimeException403(&quot;Utente in attesa di entrare in stanza&quot;);</span>
+      }
+    }
+
+<span class="nc" id="L948">    return sp.getRuolo();</span>
+  }
+
+  /**
+   * metodo che consente di visualizzare una determinata stanza.
+   *
+   * @param id id della stanza da visualizzare
+   * @return la stanza che si vuole visualizzare
+   */
+  @Override
+  public Stanza visualizzaStanza(Long id) {
+<span class="nc" id="L959">    return stanzaRepository.findStanzaById(id);</span>
+  }
+
+  /**
+   * metodo che consente di visualizzare tutti gli scenari.
+   *
+   * @return lista di scenari presenti sul DB
+   */
+  public List&lt;Scenario&gt; getAllScenari() {
+<span class="nc" id="L968">    return scenarioRepository.findAll();</span>
+  }
+
+  /**
+   * meotodo che consente ad un organizzatore di smutare un partecipante all'interno di una stanza.
+   *
+   * @param metaId metaId dell'utente che desidera effettuare l'operazione
+   * @param idStanza id della stanza su cui si vuole effettuare l'oeprazione
+   * @param idUtente id dell'utente per cui si vuole effettuare l'operazione
+   * @return valore boolean che identifica la riuscita dell'operazione ed un messaggio che descrive
+   *     l'esito di essa
+   */
+  public ResponseEntity&lt;Response&lt;Boolean&gt;&gt; unmutePartecipante(
+      String metaId, Long idStanza, Long idUtente) {
+
+<span class="nc" id="L983">    Utente og = utenteRepository.findFirstBymetaId(metaId);</span>
+<span class="nc" id="L984">    Utente silenzia = utenteRepository.findUtenteById(idUtente);</span>
+<span class="nc" id="L985">    Stanza stanza = stanzaRepository.findStanzaById(idStanza);</span>
+
+<span class="nc bnc" id="L987" title="All 2 branches missed.">    if (stanza != null) {</span>
+<span class="nc" id="L988">      StatoPartecipazione statoOg =</span>
+<span class="nc" id="L989">          statoPartecipazioneRepository.findStatoPartecipazioneByUtenteAndStanza(og, stanza);</span>
+<span class="nc bnc" id="L990" title="All 2 branches missed.">      if (statoOg.getRuolo().getNome().equalsIgnoreCase(Ruolo.ORGANIZZATORE_MASTER)</span>
+<span class="nc bnc" id="L991" title="All 2 branches missed.">          || statoOg.getRuolo().getNome().equalsIgnoreCase(Ruolo.ORGANIZZATORE)</span>
+<span class="nc bnc" id="L992" title="All 2 branches missed.">              &amp;&amp; !statoOg.isBannato()) {</span>
+<span class="nc" id="L993">        StatoPartecipazione statoSilenzio =</span>
+<span class="nc" id="L994">            statoPartecipazioneRepository.findStatoPartecipazioneByUtenteAndStanza(</span>
+                silenzia, stanza);
+<span class="nc bnc" id="L996" title="All 2 branches missed.">        if (statoSilenzio != null) {</span>
+<span class="nc bnc" id="L997" title="All 2 branches missed.">          if (statoSilenzio.isSilenziato()) {</span>
+<span class="nc" id="L998">            statoSilenzio.setSilenziato(false);</span>
+<span class="nc" id="L999">            statoPartecipazioneRepository.save(statoSilenzio);</span>
+<span class="nc" id="L1000">            return ResponseEntity.ok(</span>
+<span class="nc" id="L1001">                new Response&lt;&gt;(true, &quot;L'utente selezionato ora non è più silenziato&quot;));</span>
+          } else {
+<span class="nc" id="L1003">            return ResponseEntity.ok(new Response&lt;&gt;(true, &quot;L'utente selezionato è gia mutato&quot;));</span>
+          }
+        } else {
+<span class="nc" id="L1006">          return ResponseEntity.status(403)</span>
+<span class="nc" id="L1007">              .body(new Response&lt;&gt;(false, &quot;L'utente selezioanto &quot; + &quot;non è presente nella stanza&quot;));</span>
+        }
+      } else {
+<span class="nc" id="L1010">        return ResponseEntity.status(403)</span>
+<span class="nc" id="L1011">            .body(</span>
+                new Response&lt;&gt;(
+<span class="nc" id="L1013">                    false,</span>
+                    &quot;Per silenziare un partecipante nella stanza &quot;
+                        + &quot;devi essere almeno un organizzatore&quot;));
+      }
+    } else {
+<span class="nc" id="L1018">      return ResponseEntity.status(403)</span>
+<span class="nc" id="L1019">          .body(new Response&lt;&gt;(false, &quot;La stanza selezionata non esiste&quot;));</span>
+    }
+  }
+
+  /**
+   * Metodo che ritorna lo stato partecipazione dell'utente in una stanza.
+   *
+   * @param metaId metaId utente
+   * @param idStanza id stanza
+   * @return ritorna lo stato partecipazione
+   * @throws ServerRuntimeException eccezione scattata quando avviene un errore del server
+   * @throws RuntimeException403 eccezione scattata quando avviene un errore del client
+   */
+  public List&lt;StatoPartecipazione&gt; getStatoPartecipazione(String metaId, Long idStanza)
+      throws ServerRuntimeException, RuntimeException403 {
+    Utente u;
+    Stanza stanza;
+<span class="nc bnc" id="L1036" title="All 2 branches missed.">    if ((u = utenteRepository.findFirstBymetaId(metaId)) == null) {</span>
+<span class="nc" id="L1037">      throw new ServerRuntimeException((&quot;Utente non torvato&quot;));</span>
+    }
+<span class="nc bnc" id="L1039" title="All 2 branches missed.">    if ((stanza = stanzaRepository.findStanzaById(idStanza)) == null) {</span>
+<span class="nc" id="L1040">      throw new RuntimeException403(&quot;Stanza non trovata&quot;);</span>
+    }
+    List&lt;StatoPartecipazione&gt; sp;
+<span class="nc bnc" id="L1043" title="All 2 branches missed.">    if ((sp = statoPartecipazioneRepository.findAllByStanza(stanza)) == null) {</span>
+<span class="nc" id="L1044">      throw new ServerRuntimeException(&quot;errore della ricerca degli stati partecipazione&quot;);</span>
+    }
+
+<span class="nc" id="L1047">    return sp;</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.9.202303310957</span></div></body></html>

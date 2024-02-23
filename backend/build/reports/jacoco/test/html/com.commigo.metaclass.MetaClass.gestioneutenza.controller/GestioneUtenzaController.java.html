@@ -1,0 +1,226 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="it"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>GestioneUtenzaController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">MetaClass</a> &gt; <a href="index.source.html" class="el_package">com.commigo.metaclass.MetaClass.gestioneutenza.controller</a> &gt; <span class="el_source">GestioneUtenzaController.java</span></div><h1>GestioneUtenzaController.java</h1><pre class="source lang-java linenums">package com.commigo.metaclass.MetaClass.gestioneutenza.controller;
+
+import com.commigo.metaclass.MetaClass.entity.Stanza;
+import com.commigo.metaclass.MetaClass.entity.Utente;
+import com.commigo.metaclass.MetaClass.exceptions.ClientRuntimeException;
+import com.commigo.metaclass.MetaClass.exceptions.RuntimeException403;
+import com.commigo.metaclass.MetaClass.exceptions.ServerRuntimeException;
+import com.commigo.metaclass.MetaClass.gestioneutenza.service.GestioneUtenzaService;
+import com.commigo.metaclass.MetaClass.utility.MapValidator;
+import com.commigo.metaclass.MetaClass.utility.request.RequestUtils;
+import com.commigo.metaclass.MetaClass.utility.response.types.LoginResponse;
+import com.commigo.metaclass.MetaClass.utility.response.types.Response;
+import com.commigo.metaclass.MetaClass.webconfig.JwtTokenUtil;
+import com.commigo.metaclass.MetaClass.webconfig.ValidationToken;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.Map;
+
+@RestController
+<span class="nc" id="L28">public class GestioneUtenzaController {</span>
+
+    @Autowired
+    private GestioneUtenzaService utenzaService;
+
+    @Autowired
+    private JwtTokenUtil jwtTokenUtil;
+
+    @Autowired
+    private ValidationToken validationToken;
+
+    /**
+     * metodo che gestisce la richeista di login/registrazione da parte di un utente
+     * @param u utente che effettua il login/registrazione
+     * @param response utilizzata per gestire i cookie gestendo un token
+     * @param result contiene tutti i messaggi di errore contenuti nella richiesta
+     * @return
+     */
+    @PostMapping(value = &quot;/login&quot;)
+    public ResponseEntity&lt;LoginResponse&lt;Boolean&gt;&gt; login(@RequestBody Utente u,
+                                                        HttpServletResponse response,
+                                                        BindingResult result) {
+
+        try {
+
+            // Generazione del token JWT usando metaId come identificatore
+<span class="nc" id="L54">            String token = jwtTokenUtil.generateToken(u.getMetaId());</span>
+<span class="nc" id="L55">            u.setTokenAuth(token);</span>
+
+            //controllo errori di validazione
+<span class="nc bnc" id="L58" title="All 2 branches missed.">            if(result.hasErrors())</span>
+            {
+<span class="nc" id="L60">                throw new RuntimeException403(RequestUtils.errorsRequest(result));</span>
+
+            }
+
+            // Aggiungi il token al cookie
+<span class="nc" id="L65">            Cookie cookie = new Cookie(&quot;jwtToken&quot;, token);</span>
+<span class="nc" id="L66">            cookie.setPath(&quot;/&quot;);</span>
+<span class="nc" id="L67">            response.addCookie(cookie);</span>
+
+<span class="nc bnc" id="L69" title="All 2 branches missed.">            if (!utenzaService.loginMeta(u)){</span>
+<span class="nc" id="L70">                throw new ServerRuntimeException(&quot;errore nel login&quot;);</span>
+            }
+
+<span class="nc" id="L73">            return ResponseEntity.ok(new LoginResponse&lt;&gt;(true, &quot;Login effettuato con successo&quot;,token, u.isAdmin()));</span>
+<span class="nc" id="L74">        } catch (ServerRuntimeException e) {</span>
+<span class="nc" id="L75">            return ResponseEntity.status(500).body(new LoginResponse&lt;&gt;(false, e.getMessage(), null, false));</span>
+<span class="nc" id="L76">        } catch (RuntimeException403 e) {</span>
+<span class="nc" id="L77">            return ResponseEntity.status(403).body(new LoginResponse&lt;&gt;(false, e.getMessage(), null, false));</span>
+        }
+    }
+
+    /**
+     *
+     * @param request richiesta HTTP fornita dal client
+     * @param response utilizzata per gestire i cookie gestendo un token
+     * @return
+     */
+    @PostMapping(&quot;/Manuallogout&quot;)
+    public ResponseEntity&lt;Response&lt;Boolean&gt;&gt; logout(HttpServletRequest request, HttpServletResponse response) {
+        try {
+<span class="nc bnc" id="L90" title="All 2 branches missed.">            if (!validationToken.isTokenValid(request)) {</span>
+<span class="nc" id="L91">                throw new RuntimeException403(&quot;Token non valido&quot;);</span>
+            }
+
+            // Invalida il token lato client rimuovendo il cookie
+<span class="nc" id="L95">            Cookie[] cookies = request.getCookies();</span>
+
+<span class="nc bnc" id="L97" title="All 2 branches missed.">            if (cookies != null) {</span>
+<span class="nc bnc" id="L98" title="All 2 branches missed.">                for (Cookie cookie : cookies) {</span>
+<span class="nc bnc" id="L99" title="All 2 branches missed.">                    if (&quot;jwtToken&quot;.equals(cookie.getName())) {</span>
+<span class="nc" id="L100">                        cookie.setMaxAge(0); // Imposta la durata del cookie a 0 secondi per invalidarlo</span>
+<span class="nc" id="L101">                        response.addCookie(cookie);</span>
+                    }
+                }
+            }
+
+            // Ottieni l'header Authorization dalla richiesta
+<span class="nc" id="L107">            String authorizationHeader = request.getHeader(&quot;Authorization&quot;);</span>
+<span class="nc" id="L108">            String token = null;</span>
+
+            // Verifica che l'header Authorization sia presente e inizia con &quot;Bearer &quot;
+<span class="nc bnc" id="L111" title="All 4 branches missed.">            if (authorizationHeader != null &amp;&amp; authorizationHeader.startsWith(&quot;Bearer &quot;)) {</span>
+                // Estrai solo la parte del token dopo &quot;Bearer &quot;
+<span class="nc" id="L113">                token = authorizationHeader.substring(7);</span>
+            }else{
+<span class="nc" id="L115">                throw new RuntimeException403(&quot;Token non valido&quot;);</span>
+            }
+
+<span class="nc" id="L118">            String metaID = jwtTokenUtil.getMetaIdFromToken(validationToken.getToken());</span>
+            // Rimuovi il token nel sistema
+<span class="nc bnc" id="L120" title="All 2 branches missed.">            if (utenzaService.logoutMeta(metaID, validationToken)) {</span>
+<span class="nc" id="L121">                return ResponseEntity.ok(new Response&lt;Boolean&gt;(true, &quot;Utente disconnesso con successo&quot;));</span>
+            } else {
+<span class="nc" id="L123">                throw new ServerRuntimeException(&quot;Errore nella rimozione del token dell'utente&quot;);</span>
+            }
+<span class="nc" id="L125">        } catch (RuntimeException403 e) {</span>
+<span class="nc" id="L126">            return ResponseEntity.status(403).body(new Response&lt;&gt;(false, e.getMessage()));</span>
+<span class="nc" id="L127">        } catch (ServerRuntimeException se) {</span>
+<span class="nc" id="L128">            return ResponseEntity.status(500).body(new Response&lt;&gt;(false, se.getMessage()));</span>
+<span class="nc" id="L129">        }catch(Exception e){</span>
+<span class="nc" id="L130">            return ResponseEntity.status(500).body(new Response&lt;&gt;(false, &quot;errore&quot;));</span>
+        }
+    }
+
+    /**
+     * metodo che consente la modifica dei dati dell'utente
+     * @param params nuovi dati dell'utente
+     * @param request richiesta HTTP fornita dal client
+     * @return
+     */
+    @PostMapping(value = &quot;/modifyUserData&quot;)
+    public ResponseEntity&lt;Response&lt;Boolean&gt;&gt; modifyUserData(@RequestBody Map&lt;String, Object&gt; params,
+                                                            HttpServletRequest request) {
+        try{
+
+<span class="nc bnc" id="L145" title="All 2 branches missed.">            if (!validationToken.isTokenValid(request)) {</span>
+<span class="nc" id="L146">                throw new RuntimeException403(&quot;Token non valido&quot;);</span>
+            }
+
+            //Validazione dati utente
+<span class="nc" id="L150">            MapValidator.utenteValidate(params);</span>
+
+<span class="nc" id="L152">            String metaID = jwtTokenUtil.getMetaIdFromToken(validationToken.getToken());</span>
+
+<span class="nc" id="L154">            utenzaService.modificaDatiUtente(metaID,params);</span>
+<span class="nc" id="L155">            return ResponseEntity.ok(new Response&lt;&gt;(true, &quot;Utente modificato con successo&quot;));</span>
+
+<span class="nc" id="L157">        }catch(RuntimeException403 e){</span>
+<span class="nc" id="L158">            return ResponseEntity.status(403).body(new Response&lt;&gt;(null, e.getMessage()));</span>
+        }
+    }
+
+    /**
+     * metodo che consente di gestire la richiesta di visualizzazione di tutte le stanze dell'utente
+     * @param request richiesta HTTP fornita dal client
+     * @return
+     */
+    @GetMapping(value = &quot;/visualizzaStanze&quot;)
+    public ResponseEntity&lt;Response&lt;List&lt;Stanza&gt;&gt;&gt; visualizzaStanze(HttpServletRequest request) {
+        try {
+            // Validazione del token
+<span class="nc bnc" id="L171" title="All 2 branches missed.">            if (!validationToken.isTokenValid(request)) {</span>
+<span class="nc" id="L172">                throw new RuntimeException403(&quot;Token non valido&quot;);</span>
+            }
+
+<span class="nc" id="L175">            String metaID = jwtTokenUtil.getMetaIdFromToken(validationToken.getToken());</span>
+<span class="nc" id="L176">            List&lt;Stanza&gt; stanze = utenzaService.getStanzeByUserId(metaID);</span>
+
+<span class="nc bnc" id="L178" title="All 2 branches missed.">            if (stanze.isEmpty()) {</span>
+                // Se non ci sono stanze, restituisci una risposta con un messaggio appropriato
+<span class="nc" id="L180">                return ResponseEntity.ok(new Response&lt;&gt;(stanze, &quot;Non hai accesso a nessuna stanza&quot;));</span>
+            }
+
+            // Se ci sono stanze, restituisci una risposta con le stanze e un messaggio di successo
+<span class="nc" id="L184">            return ResponseEntity.ok(new Response&lt;&gt;(stanze, &quot;Operazione effettuata con successo&quot;));</span>
+<span class="nc" id="L185">        } catch (ServerRuntimeException | RuntimeException403 e) {</span>
+
+            // Gestisci le eccezioni e restituisci una risposta appropriata
+<span class="nc bnc" id="L188" title="All 2 branches missed.">            int statusCode = (e instanceof ServerRuntimeException) ? 500 : 403;</span>
+<span class="nc" id="L189">            return ResponseEntity.status(statusCode)</span>
+<span class="nc" id="L190">                    .body(new Response&lt;&gt;(null, &quot;Errore durante l'operazione: &quot; + e.getMessage()));</span>
+        }
+    }
+
+
+    /**
+     * metodo che consente di gestire la richiesta di visualizzazione dei dati utente dell'utente
+     * @param request richiesta HTTP fornita dal client
+     * @return
+     */
+    @GetMapping(value = &quot;/userDetails&quot;)
+    public ResponseEntity&lt;Response&lt;Utente&gt;&gt; visualizzaDatiUtente(HttpServletRequest request) {
+        Utente utente;
+        try {
+
+<span class="nc bnc" id="L205" title="All 2 branches missed.">            if (!validationToken.isTokenValid(request)) {</span>
+<span class="nc" id="L206">                throw new RuntimeException403(&quot;Token non valido&quot;);</span>
+            }
+
+<span class="nc" id="L209">            String IdMeta = jwtTokenUtil.getMetaIdFromToken(validationToken.getToken());</span>
+<span class="nc" id="L210">            utente = utenzaService.getUtenteByUserId(IdMeta);</span>
+<span class="nc bnc" id="L211" title="All 2 branches missed.">            if (utente == null) {</span>
+<span class="nc" id="L212">                return ResponseEntity.status(500)</span>
+<span class="nc" id="L213">                        .body(new Response&lt;&gt;(null,&quot;Errore la ricerca dell'utente&quot;));</span>
+            } else {
+<span class="nc" id="L215">                return ResponseEntity.ok(new Response&lt;&gt;(utente, &quot;operazione effettuata con successo&quot;));</span>
+            }
+<span class="nc" id="L217">        }catch (RuntimeException403 e) {</span>
+<span class="nc" id="L218">                return ResponseEntity.status(403).body(new Response&lt;&gt;(null, e.getMessage()));</span>
+<span class="nc" id="L219">        } catch (Exception e) {</span>
+<span class="nc" id="L220">            return ResponseEntity.status(500)</span>
+<span class="nc" id="L221">                    .body(new Response&lt;&gt;(null, &quot;Errore durante l'operazione&quot;));</span>
+        }
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.9.202303310957</span></div></body></html>

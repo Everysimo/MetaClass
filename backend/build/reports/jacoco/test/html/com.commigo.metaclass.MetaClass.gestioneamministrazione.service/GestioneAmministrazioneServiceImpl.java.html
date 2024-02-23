@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="it"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>GestioneAmministrazioneServiceImpl.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">MetaClass</a> &gt; <a href="index.source.html" class="el_package">com.commigo.metaclass.MetaClass.gestioneamministrazione.service</a> &gt; <span class="el_source">GestioneAmministrazioneServiceImpl.java</span></div><h1>GestioneAmministrazioneServiceImpl.java</h1><pre class="source lang-java linenums">package com.commigo.metaclass.MetaClass.gestioneamministrazione.service;
+
+import com.commigo.metaclass.MetaClass.entity.*;
+import com.commigo.metaclass.MetaClass.exceptions.RuntimeException403;
+import com.commigo.metaclass.MetaClass.exceptions.ServerRuntimeException;
+import com.commigo.metaclass.MetaClass.gestioneamministrazione.repository.CategoriaRepository;
+import com.commigo.metaclass.MetaClass.gestioneamministrazione.repository.ImmagineRepository;
+import com.commigo.metaclass.MetaClass.gestioneamministrazione.repository.ScenarioRepository;
+import com.commigo.metaclass.MetaClass.gestionestanza.repository.StanzaRepository;
+import com.commigo.metaclass.MetaClass.gestionestanza.repository.StatoPartecipazioneRepository;
+import com.commigo.metaclass.MetaClass.gestioneutenza.repository.UtenteRepository;
+import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.stereotype.Service;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+@Service
+<span class="nc" id="L28">@RequiredArgsConstructor</span>
+<span class="nc" id="L29">@Slf4j</span>
+@Transactional
+public class GestioneAmministrazioneServiceImpl implements GestioneAmministrazioneService{
+
+    @Autowired
+    @Qualifier(&quot;CategoriaRepository&quot;)
+    private CategoriaRepository categoriaRepository;
+
+    @Autowired
+    @Qualifier(&quot;ScenarioRepository&quot;)
+    private ScenarioRepository scenarioRepository;
+
+    @Autowired
+    @Qualifier(&quot;ImmagineRepository&quot;)
+    private ImmagineRepository immagineRepository;
+
+    @Autowired
+    @Qualifier(&quot;StanzaRepository&quot;)
+    private StanzaRepository stanzaRepository;
+
+    @Autowired
+    @Qualifier(&quot;UtenteRepository&quot;)
+    private UtenteRepository utenteRepository;
+
+    @Autowired
+    @Qualifier(&quot;StatoPartecipazioneRepository&quot;)
+    private StatoPartecipazioneRepository statoPartecipazioneRepository;
+
+<span class="nc" id="L57">    private final Set&lt;String&gt; adminMetaIds = loadAdminMetaIdsFromFile();</span>
+
+    /**
+     * Metodo che prende dal file &quot;admins.txt&quot; tutti i metaID degli admin
+     * @return
+     */
+    public Set&lt;String&gt; loadAdminMetaIdsFromFile() {
+<span class="nc" id="L64">        Set&lt;String&gt; adminIds = new HashSet&lt;&gt;();</span>
+<span class="nc" id="L65">        try (BufferedReader br = new BufferedReader(new InputStreamReader(new ClassPathResource(&quot;admins.txt&quot;).getInputStream()))) {</span>
+            String line;
+<span class="nc bnc" id="L67" title="All 2 branches missed.">            while ((line = br.readLine()) != null) {</span>
+<span class="nc" id="L68">                adminIds.add(line.trim());</span>
+            }
+<span class="nc" id="L70">        } catch (IOException e) {</span>
+            // Gestione eccezioni legate alla lettura del file (ad esempio FileNotFoundException)
+<span class="nc" id="L72">            e.printStackTrace();</span>
+<span class="nc" id="L73">        }</span>
+<span class="nc" id="L74">        return adminIds;</span>
+    }
+
+    /**
+     * confronta il metaID di un utente con quelli degli admin, per verificare se l'utente è un admin
+     * @param metaId metaId che deve essere confrontato
+     * @return
+     */
+    public boolean checkAdmin(String metaId) {
+<span class="nc" id="L83">        return adminMetaIds.contains(metaId);</span>
+    }
+
+    /**
+     * Metodo che ritona la lista di tutte le categorie
+     * @return lista di categorie
+     */
+    @Override
+    public List&lt;Categoria&gt; getCategorie() {
+<span class="nc" id="L92">        return categoriaRepository.findAll();</span>
+    }
+
+    /**
+     * Metodo che permette la modifica di una Categoria
+     * @param c Categoria che deve essere modificata
+     * @return Valore booleno che identifica il successo dell'operazione
+     */
+    @Override
+    public boolean updateCategoria(Categoria c) {
+<span class="nc bnc" id="L102" title="All 2 branches missed.">         if(categoriaRepository.findByNome(c.getNome())==null){</span>
+<span class="nc" id="L103">             categoriaRepository.save(c);</span>
+<span class="nc" id="L104">             return true;</span>
+         }
+<span class="nc" id="L106">         return false;</span>
+    }
+
+
+    /**
+     * Metodo che permette la modifica di uno scenario
+     * @param s Scenario che deve essere modificato
+     * @return valore boolean che identifica il successo dell'operazione
+     */
+    @Override
+    public boolean updateScenario(Scenario s, long IdCategoria){
+
+        try{
+            //gestione della categoria
+            Categoria cat;
+<span class="nc bnc" id="L121" title="All 2 branches missed.">            if((cat = categoriaRepository.findById(IdCategoria))==null)</span>
+<span class="nc" id="L122">                 throw new ServerRuntimeException(&quot;categoria non valida&quot;);</span>
+
+<span class="nc" id="L124">            s.setCategoria(cat);</span>
+
+<span class="nc" id="L126">            Immagine image = immagineRepository.save(new Immagine(s.getImage().getUrl()));</span>
+<span class="nc" id="L127">            s.setImage(image);</span>
+
+            //getsione dello scenario
+<span class="nc bnc" id="L130" title="All 2 branches missed.">            if((scenarioRepository.findByNome(s.getNome()))!=null)</span>
+<span class="nc" id="L131">                 throw new ServerRuntimeException(&quot;Il nome dello scenario&quot;+s.getNome()+&quot;già è in uso&quot;);</span>
+
+<span class="nc" id="L133">            scenarioRepository.save(s);</span>
+<span class="nc" id="L134">            return true;</span>
+<span class="nc" id="L135">        }catch(ServerRuntimeException se){</span>
+<span class="nc" id="L136">             se.printStackTrace();</span>
+<span class="nc" id="L137">             return false;</span>
+        }
+    }
+
+    /**
+     * Meotodo che permette di ottenere una lista di stanze
+     * @return Una lista di stanze
+     */
+    @Override
+    public List&lt;Stanza&gt; getStanze() {
+        try{
+<span class="nc" id="L148">            return stanzaRepository.findAll();</span>
+<span class="nc" id="L149">        }catch(Exception e){</span>
+<span class="nc" id="L150">            return null;</span>
+        }
+    }
+
+    /**
+     * Metodo che permette l'eliminazione di un ban di un determinato utente in una determinata stanza
+     * @param idUtente Id dell'utente a cui deve essere eliminato il ban nella stanza
+     * @param idStanza Id della stanza dalla quale va eliminato il ban dell'utente
+     * @return valore boolean che identifica la riuscita dell'operazione
+     * @throws RuntimeException403
+     */
+    @Override
+    public boolean deleteBanToUser(Long idUtente, Long idStanza) throws RuntimeException403 {
+        Utente u;
+        Stanza s;
+
+<span class="nc bnc" id="L166" title="All 2 branches missed.">        if((u=utenteRepository.findUtenteById(idUtente))==null)</span>
+<span class="nc" id="L167">            throw new RuntimeException403(&quot;utente non trovato&quot;);</span>
+
+<span class="nc bnc" id="L169" title="All 2 branches missed.">        if((s=stanzaRepository.findStanzaById(idStanza))==null)</span>
+<span class="nc" id="L170">            throw new RuntimeException403(&quot;stanza non trovata&quot;);</span>
+
+        StatoPartecipazione sp;
+<span class="nc" id="L173">        if((sp=statoPartecipazioneRepository</span>
+<span class="nc bnc" id="L174" title="All 2 branches missed.">                .findStatoPartecipazioneByUtenteAndStanza(u,s))==null)</span>
+<span class="nc" id="L175">            throw new RuntimeException403(&quot;L'utente non ha acceduto alla stanza &quot;+s.getNome());</span>
+
+<span class="nc bnc" id="L177" title="All 2 branches missed.">        if(sp.isInAttesa())</span>
+<span class="nc" id="L178">            throw new RuntimeException403(&quot;L'utente ancora viene accettato nella stanza &quot;+s.getNome());</span>
+
+<span class="nc bnc" id="L180" title="All 2 branches missed.">        if(!sp.isBannato())</span>
+<span class="nc" id="L181">            throw new RuntimeException403(&quot;L'utente non è bannato nella stanza &quot;+s.getNome());</span>
+
+<span class="nc" id="L183">        sp.setBannato(false);</span>
+<span class="nc" id="L184">        statoPartecipazioneRepository.save(sp);</span>
+<span class="nc" id="L185">        return true;</span>
+
+    }
+}
+
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.9.202303310957</span></div></body></html>

@@ -5,7 +5,20 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="7b24a0b4-b04f-40f4-b6e7-08bf6f75d1cf" name="Changes" comment="fix(backend): format">
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/build/reports/tests/test/classes/com.commigo.metaclass.MetaClass.MetaClassApplicationTests.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/build/reports/tests/test/classes/com.commigo.metaclass.MetaClass.gestioneamministrazione.controller.GestioneAmministrazioneControllerUnitTest.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/build/reports/tests/test/classes/com.commigo.metaclass.MetaClass.gestionemeeting.controller.GestioneMeetingControllerUnitTest.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/build/reports/tests/test/classes/com.commigo.metaclass.MetaClass.gestionestanza.controller.GestioneStanzaControllerUnitTest.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/build/reports/tests/test/classes/com.commigo.metaclass.MetaClass.gestioneutenza.controller.GestioneUtenzaControllerUnitTest.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/build/reports/tests/test/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/backend/build/reports/tests/test/index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/build/reports/tests/test/packages/com.commigo.metaclass.MetaClass.gestioneamministrazione.controller.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/build/reports/tests/test/packages/com.commigo.metaclass.MetaClass.gestionemeeting.controller.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/build/reports/tests/test/packages/com.commigo.metaclass.MetaClass.gestionestanza.controller.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/build/reports/tests/test/packages/com.commigo.metaclass.MetaClass.gestioneutenza.controller.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/build/reports/tests/test/packages/com.commigo.metaclass.MetaClass.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/resources/application.properties" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -25,12 +38,7 @@
         </task>
         <projects_view>
           <tree_state>
-            <expand>
-              <path>
-                <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
-                <item name="MetaClass" type="f1a62948:ProjectNode" />
-              </path>
-            </expand>
+            <expand />
             <select />
           </tree_state>
         </projects_view>
@@ -82,7 +90,7 @@
     "git-widget-placeholder": "main",
     "jdk.selected.JAVA_MODULE": "19",
     "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "C:/Users/Everysimo/Documents/Intellij_Projects/MetaClass",
+    "last_opened_file_path": "C:/Users/HP/IdeaProjects/MetaClass",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -226,6 +234,7 @@
       <workItem from="1705767648208" duration="4389000" />
       <workItem from="1705798409326" duration="1676000" />
       <workItem from="1705858779570" duration="61000" />
+      <workItem from="1708712075370" duration="54000" />
     </task>
     <task id="LOCAL-00001" summary="fix: project structure">
       <option name="closed" value="true" />

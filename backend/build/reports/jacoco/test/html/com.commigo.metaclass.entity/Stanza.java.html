@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="it"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Stanza.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">MetaClass</a> &gt; <a href="index.source.html" class="el_package">com.commigo.metaclass.entity</a> &gt; <span class="el_source">Stanza.java</span></div><h1>Stanza.java</h1><pre class="source lang-java linenums">package com.commigo.metaclass.entity;
+
+import com.commigo.metaclass.exceptions.MismatchJsonProperty;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
+import java.time.LocalDateTime;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+
+/** Entità stanza. */
+@Entity
+<span class="pc bpc" id="L29" title="52 of 62 branches missed.">@Data</span>
+<span class="fc" id="L30">@NoArgsConstructor</span>
+<span class="nc" id="L31">@AllArgsConstructor</span>
+public class Stanza {
+
+  /** Costante per valore intero di 2. */
+  public static final int MIN_NAME_LENGTH = 2;
+
+  /** Costante per valore intero di 254. */
+  public static final int MAX_NAME_LENGTH = 254;
+
+  /** Costante per valore intero di 254. */
+  public static final int MAX_DESCR_LENGTH = 254;
+
+  /** ID della stanza. */
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+<span class="fc" id="L46">  private long id;</span>
+
+  /** Nome della Stanza. */
+  @NotNull(message = &quot;Il nome non può essere nullo&quot;)
+  @Column(length = MAX_NAME_LENGTH)
+  @Size(min = MIN_NAME_LENGTH, max = MAX_NAME_LENGTH, message = &quot;Lunghezza nome errata&quot;)
+  @Pattern(regexp = &quot;^[A-Z][a-zA-Z0-9\\s]*$&quot;, message = &quot;Formato nome errato&quot;)
+  @NotBlank(message = &quot;Il nome non può essere vuoto&quot;)
+<span class="fc" id="L54">  private String nome;</span>
+
+  /** Codice della Stanza. */
+  @Column(length = MAX_NAME_LENGTH, unique = true)
+  @Size(min = 6, max = 6, message = &quot;Lunghezza codice_stanza errato&quot;)
+  @Pattern(regexp = &quot;^[0-9]*$&quot;, message = &quot;Formato codice_stanza errato&quot;)
+<span class="fc" id="L60">  private String codice;</span>
+
+  /** Descrizione della Stanza. */
+  @NotNull(message = &quot;La descrizione della stanza non può essere nulla&quot;)
+  @Column(length = MAX_DESCR_LENGTH)
+  @Size(min = MIN_NAME_LENGTH, max = MAX_DESCR_LENGTH, message = &quot;Lunghezza descrizione errata&quot;)
+  @Pattern(regexp = &quot;^[A-Z][a-zA-Z0-9.,!?()'\&quot;\\-\\s]*$&quot;, message = &quot;Formato descrizione errata&quot;)
+  @NotBlank(message = &quot;La descrizione non può essere vuota&quot;)
+<span class="fc" id="L68">  private String descrizione;</span>
+
+  /** Tipo di Accesso alla Stanza, ovvero la stanza è pubblica (1) o privata (0). */
+  @NotNull(message = &quot;Il tipo di accesso non può essere nullo&quot;)
+<span class="fc" id="L72">  private boolean tipoAccesso;</span>
+
+  /** Identifica il numero massimo di posti nella stanza. */
+  @NotNull(message = &quot;Il numero massimo di posti non può essere nullo&quot;)
+  @Min(value = 1, message = &quot;Il valore del  parametro non deve essere inferiore ad 1&quot;)
+  @Max(value = 999, message = &quot;Il valore del  parametro non deve superare 999&quot;)
+<span class="fc" id="L78">  private int maxPosti;</span>
+
+  /** Chiave Esterna sullo Scenario. */
+  @NotNull(message = &quot;Lo scenario non può essere nullo&quot;)
+  @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.REFRESH})
+  @JoinColumn(name = &quot;id_scenario&quot;)
+<span class="fc" id="L84">  private Scenario scenario;</span>
+
+  @Column(name = &quot;Data_Creazione&quot;, updatable = false)
+  @CreationTimestamp
+<span class="nc" id="L88">  private LocalDateTime dataCreazione;</span>
+
+  @Column(name = &quot;Data_Aggiornamento&quot;)
+  @UpdateTimestamp
+<span class="nc" id="L92">  private LocalDateTime dataAggiornamento;</span>
+
+  /**
+   * Costruttore.
+   *
+   * @param nome Nome stanza.
+   * @param descrizione Descrizione stanza.
+   * @param tipoAccesso Stanza pubblica o privata.
+   * @param maxPosti Intero con massimo dei posti in stanza
+   * @param idScenario Id scenario.
+   * @throws MismatchJsonProperty Eccezione generata quando la validazione json fallisce.
+   */
+  @JsonCreator
+  public Stanza(
+      @JsonProperty(&quot;nome&quot;) String nome,
+      @JsonProperty(&quot;descrizione&quot;) String descrizione,
+      @JsonProperty(&quot;tipoAccesso&quot;) boolean tipoAccesso,
+      @JsonProperty(&quot;maxPosti&quot;) Object maxPosti,
+      @JsonProperty(&quot;id_scenario&quot;) Long idScenario)
+<span class="fc" id="L111">      throws MismatchJsonProperty {</span>
+
+<span class="pc bpc" id="L113" title="2 of 6 branches missed.">    if (nome == null || descrizione == null || idScenario == null) {</span>
+<span class="fc" id="L114">      throw new MismatchJsonProperty(&quot;gli attributi non sono corretti&quot;);</span>
+    }
+
+<span class="fc bfc" id="L117" title="All 2 branches covered.">    if (maxPosti instanceof Integer) {</span>
+<span class="fc" id="L118">      this.maxPosti = (int) maxPosti;</span>
+    } else {
+<span class="fc" id="L120">      throw new MismatchJsonProperty(&quot;maxPosti non è un intero&quot;);</span>
+    }
+
+<span class="fc" id="L123">    this.nome = nome;</span>
+<span class="fc" id="L124">    this.descrizione = descrizione;</span>
+<span class="fc" id="L125">    this.tipoAccesso = tipoAccesso;</span>
+
+    // aggiunta dello scenario
+<span class="fc" id="L128">    this.scenario = new Scenario();</span>
+<span class="fc" id="L129">    this.scenario.setId(idScenario);</span>
+<span class="fc" id="L130">  }</span>
+
+  /**
+   * Costruttore.
+   *
+   * @param nome Nome stanza.
+   * @param descrizione Dscrizione stanza.
+   * @param tipoAccesso Stanza pubblica o privata.
+   * @param maxPosti Intero con massimo dei posti in stanza
+   * @param scenario scenario.
+   * @param codice Codice stanza.
+   * @throws MismatchJsonProperty Eccezione generata quando la validazione json fallisce.
+   */
+  public Stanza(
+      Long id,
+      String nome,
+      String descrizione,
+      boolean tipoAccesso,
+      int maxPosti,
+      Scenario scenario,
+      String codice)
+<span class="fc" id="L151">      throws MismatchJsonProperty {</span>
+
+<span class="pc bpc" id="L153" title="2 of 4 branches missed.">    if (nome == null || descrizione == null) {</span>
+<span class="nc" id="L154">      throw new MismatchJsonProperty(&quot;gli attributi non sono corretti&quot;);</span>
+    }
+
+<span class="fc" id="L157">    this.nome = nome;</span>
+<span class="fc" id="L158">    this.descrizione = descrizione;</span>
+<span class="fc" id="L159">    this.tipoAccesso = tipoAccesso;</span>
+<span class="pc bpc" id="L160" title="1 of 2 branches missed.">    this.maxPosti = (maxPosti &gt; 0) ? maxPosti : 1;</span>
+<span class="fc" id="L161">    this.codice = codice;</span>
+    // aggiunta dello scenario
+<span class="fc" id="L163">    this.scenario = scenario;</span>
+<span class="fc" id="L164">  }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.9.202303310957</span></div></body></html>

@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="it"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>DataInitializer.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">MetaClass</a> &gt; <a href="index.source.html" class="el_package">com.commigo.metaclass.MetaClass.inizializer</a> &gt; <span class="el_source">DataInitializer.java</span></div><h1>DataInitializer.java</h1><pre class="source lang-java linenums">package com.commigo.metaclass.MetaClass.inizializer;
+import com.commigo.metaclass.MetaClass.entity.*;
+import com.commigo.metaclass.MetaClass.gestioneamministrazione.repository.CategoriaRepository;
+import com.commigo.metaclass.MetaClass.gestioneamministrazione.repository.ImmagineRepository;
+import com.commigo.metaclass.MetaClass.gestioneamministrazione.repository.ScenarioRepository;
+import com.commigo.metaclass.MetaClass.gestionemeeting.repository.FeedbackMeetingRepository;
+import com.commigo.metaclass.MetaClass.gestionemeeting.repository.MeetingRepository;
+import com.commigo.metaclass.MetaClass.gestionemeeting.repository.ReportRepository;
+import com.commigo.metaclass.MetaClass.gestionemeeting.repository.UtenteInMeetingRepository;
+import com.commigo.metaclass.MetaClass.gestionestanza.repository.RuoloRepository;
+import com.commigo.metaclass.MetaClass.gestionestanza.repository.StanzaRepository;
+import com.commigo.metaclass.MetaClass.gestionestanza.repository.StatoPartecipazioneRepository;
+import com.commigo.metaclass.MetaClass.gestionestanza.service.GestioneStanzaServiceImpl;
+import com.commigo.metaclass.MetaClass.gestioneutenza.repository.UtenteRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.stereotype.Component;
+
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
+
+import static com.commigo.metaclass.MetaClass.entity.Ruolo.ORGANIZZATORE_MASTER;
+
+@Component
+public class DataInitializer implements CommandLineRunner {
+
+    private final RuoloRepository ruoloRepository;
+    private final CategoriaRepository categoriaRepository;
+    private final ScenarioRepository scenarioRepository;
+    private final StanzaRepository stanzaRepository;
+    private final UtenteRepository utenteRepository;
+    private final ReportRepository reportRepository;
+    private final FeedbackMeetingRepository feedbackMeetingRepository;
+    private final StatoPartecipazioneRepository statoPartecipazioneRepository;
+
+    private final UtenteInMeetingRepository utenteInMeetingRepository;
+
+    private final MeetingRepository meetingRepository;
+    private final ImmagineRepository immagineRepository;
+
+    private final GestioneStanzaServiceImpl stanzaService;
+
+
+
+    @Autowired
+<span class="nc" id="L49">    public DataInitializer(RuoloRepository ruoloRepository, CategoriaRepository categoriaRepository, ScenarioRepository scenarioRepository, StanzaRepository stanzaRepository, UtenteRepository utenteRepository, ReportRepository reportRepository, FeedbackMeetingRepository feedbackMeetingRepository, StatoPartecipazioneRepository statoPartecipazioneRepository, UtenteInMeetingRepository utenteInMeetingRepository, MeetingRepository meetingRepository, ImmagineRepository immagineRepository, GestioneStanzaServiceImpl stanzaService) {</span>
+<span class="nc" id="L50">        this.ruoloRepository = ruoloRepository;</span>
+<span class="nc" id="L51">        this.categoriaRepository = categoriaRepository;</span>
+<span class="nc" id="L52">        this.scenarioRepository = scenarioRepository;</span>
+<span class="nc" id="L53">        this.stanzaRepository = stanzaRepository;</span>
+<span class="nc" id="L54">        this.utenteRepository = utenteRepository;</span>
+<span class="nc" id="L55">        this.reportRepository = reportRepository;</span>
+<span class="nc" id="L56">        this.feedbackMeetingRepository = feedbackMeetingRepository;</span>
+<span class="nc" id="L57">        this.statoPartecipazioneRepository = statoPartecipazioneRepository;</span>
+<span class="nc" id="L58">        this.utenteInMeetingRepository = utenteInMeetingRepository;</span>
+<span class="nc" id="L59">        this.meetingRepository = meetingRepository;</span>
+<span class="nc" id="L60">        this.immagineRepository = immagineRepository;</span>
+<span class="nc" id="L61">        this.stanzaService = stanzaService;</span>
+<span class="nc" id="L62">    }</span>
+
+    @Override
+    public void run(String... args) throws Exception {
+
+        //Aggiunta Utente - Michele è amministratore - Francesco utente semplice
+<span class="nc" id="L68">            Utente u1 = utenteRepository.save(new Utente(1L, &quot;Michele&quot;, &quot;Pesce&quot;, &quot;pescemichele@live.com&quot;, &quot;05/30/1993&quot;,&quot;M&quot;,&quot;7184488154978627&quot;, Utente.DEFAULT_TOKEN, true));</span>
+<span class="nc" id="L69">            Utente u2 = utenteRepository.save(new Utente(2L, &quot;Francesco&quot;, &quot;Gatto&quot;, &quot;francescogatto2001@gmail.com&quot;, &quot;11/01/2001&quot;,&quot;M&quot;,&quot;7179258205463811&quot;, Utente.DEFAULT_TOKEN, false));</span>
+<span class="nc" id="L70">            Utente u3 = utenteRepository.save(new Utente(3L, &quot;Giorgio&quot;, &quot;Castelluccio&quot;, &quot;giorgio_castelluccio@outlook.it&quot;, &quot;10/10/2010&quot;,&quot;M&quot;,&quot;7168367147841000&quot;, Utente.DEFAULT_TOKEN, false));</span>
+<span class="nc" id="L71">            Utente u4 = utenteRepository.save(new Utente(4L, &quot;Domenico&quot;, &quot;Cavaliere&quot;, &quot;d.cavaliere13@studenti.unisa.it&quot;, &quot;01/16/2002&quot;,&quot;M&quot;,&quot;2564108403764347&quot;, Utente.DEFAULT_TOKEN, false));</span>
+<span class="nc" id="L72">            Utente u5 = utenteRepository.save(new Utente(5L, &quot;Carmine&quot;, &quot;Detta&quot;, &quot;carminedetta02@gmail.com&quot;, &quot;08/11/2002&quot;,&quot;M&quot;,&quot;725841336137765&quot;, Utente.DEFAULT_TOKEN, true));</span>
+
+        //Aggiunta ruolo
+<span class="nc" id="L75">            Ruolo r1 = ruoloRepository.save(new Ruolo(1L, &quot;Partecipante&quot;));</span>
+<span class="nc" id="L76">            Ruolo r2 = ruoloRepository.save(new Ruolo(2L, &quot;Organizzatore&quot;));</span>
+<span class="nc" id="L77">            Ruolo r3 = ruoloRepository.save(new Ruolo(3L, &quot;Organizzatore_Master&quot;));</span>
+
+        //Aggiunta della Categoria
+<span class="nc" id="L80">            Categoria c1 = categoriaRepository.save(new Categoria(1L, &quot;Lavoro&quot;, &quot;Categoria per il lavoro&quot;));</span>
+<span class="nc" id="L81">            Categoria c2 = categoriaRepository.save(new Categoria(2L,&quot;Scuola&quot;, &quot;Categoria per la scuola&quot;));</span>
+<span class="nc" id="L82">            Categoria c3 = categoriaRepository.save(new Categoria(3L, &quot;Divertimento&quot;, &quot;Categoria per il divertimento&quot;));</span>
+
+        //Aggiunta Immagine
+<span class="nc" id="L85">            Immagine i1 = immagineRepository.save(new Immagine(1L, &quot;lavoro1.txt&quot;,&quot;https://www.lavoro1.com/path/to/lavoro1.txt&quot;));</span>
+<span class="nc" id="L86">            Immagine i2 = immagineRepository.save(new Immagine(2L, &quot;scuola1.txt&quot;,&quot;https://www.scuola1.com/path/to/scuola1.txt&quot;));</span>
+<span class="nc" id="L87">            Immagine i3 = immagineRepository.save(new Immagine(3L, &quot;divertimento1.txt&quot;,&quot;https://www.divertimento1.com/path/to/divertimento1.txt&quot;));</span>
+
+        //Aggiunta dello Scenario
+
+<span class="nc" id="L91">            Scenario sc1 = scenarioRepository.save(new Scenario(1L, &quot;Lavoro1&quot;, &quot;Scenario 1 per il lavoro&quot;, i1, c1));</span>
+<span class="nc" id="L92">            Scenario sc2 = scenarioRepository.save(new Scenario(2L, &quot;Scuola1&quot;, &quot;Scenario 1 per la scuola&quot;, i2, c2));</span>
+<span class="nc" id="L93">            Scenario sc3 = scenarioRepository.save(new Scenario(3L, &quot;Divertimento1&quot;, &quot;Divertimento 1 per la scuola&quot;, i3, c3));</span>
+
+
+        //Aggiunta della Stanza
+<span class="nc" id="L97">            Stanza s1 = stanzaRepository.save(new Stanza(1L, &quot;StanzaLavoro1&quot;, &quot;Stanza 1 per il lavoro&quot;, true, 500, sc1, &quot;000001&quot;));</span>
+<span class="nc" id="L98">            Stanza s2 = stanzaRepository.save(new Stanza(2L, &quot;StanzaScuola1&quot;, &quot;Stanza 1 per la scuola&quot;, false, 200, sc2, &quot;000002&quot;));</span>
+<span class="nc" id="L99">            Stanza s3 = stanzaRepository.save(new Stanza(3L, &quot;StanzaDivertimento1&quot;, &quot;Stanza 1 per il divertimento&quot;, true, 50, sc3, &quot;000003&quot;));</span>
+<span class="nc" id="L100">            Stanza s4 = stanzaRepository.save(new Stanza(4L, &quot;StanzaCarmine1&quot;, &quot;Stanza 1 per il Carmine&quot;, true, 50, sc3, &quot;000004&quot;));</span>
+
+           //Aggiunta dello StatoPartecipazione
+           //SE VIENE INSERITO UN ORGANIZZATORE_MASTER BANNATO ALLORA DA ERRORE
+           //STESSA COSA VALE PER isInAttesa SIA PER ORGANIZZATORI CHE ORGANIZZATORI MASTER
+
+<span class="nc" id="L106">            StatoPartecipazione sp1 = statoPartecipazioneRepository.save(new StatoPartecipazione(s1, u1, ruoloRepository.findByNome(ORGANIZZATORE_MASTER), false, false, &quot;Michele&quot;, false));</span>
+<span class="nc" id="L107">            StatoPartecipazione sp2 = statoPartecipazioneRepository.save(new StatoPartecipazione(s1, u2, ruoloRepository.findByNome(Ruolo.ORGANIZZATORE), false, false, &quot;Francesco&quot;, true));</span>
+<span class="nc" id="L108">            StatoPartecipazione sp3 = statoPartecipazioneRepository.save(new StatoPartecipazione(s1, u3, ruoloRepository.findByNome(Ruolo.PARTECIPANTE), true, false, &quot;Giorgio&quot;, true));</span>
+
+<span class="nc" id="L110">            StatoPartecipazione sp4 = statoPartecipazioneRepository.save(new StatoPartecipazione(s2, u1, ruoloRepository.findByNome(Ruolo.PARTECIPANTE), false, false, &quot;Michele&quot;, false));</span>
+<span class="nc" id="L111">            StatoPartecipazione sp5 = statoPartecipazioneRepository.save(new StatoPartecipazione(s2, u2, ruoloRepository.findByNome(Ruolo.PARTECIPANTE), false, true, &quot;Francesco&quot;, false));</span>
+<span class="nc" id="L112">            StatoPartecipazione sp6 = statoPartecipazioneRepository.save(new StatoPartecipazione(s3, u3, ruoloRepository.findByNome(ORGANIZZATORE_MASTER), false, false, &quot;Giorgio&quot;, false));</span>
+
+<span class="nc" id="L114">            StatoPartecipazione sp7 = statoPartecipazioneRepository.save(new StatoPartecipazione(s3, u1, ruoloRepository.findByNome(Ruolo.PARTECIPANTE), true, false, &quot;Michele&quot;, false));</span>
+<span class="nc" id="L115">            StatoPartecipazione sp8 = statoPartecipazioneRepository.save(new StatoPartecipazione(s3, u2, ruoloRepository.findByNome(Ruolo.PARTECIPANTE), false, false, &quot;Francesco&quot;, true));</span>
+<span class="nc" id="L116">            StatoPartecipazione sp9 = statoPartecipazioneRepository.save(new StatoPartecipazione(s3, u3, ruoloRepository.findByNome(ORGANIZZATORE_MASTER), false, false, &quot;Giorgio&quot;, true));</span>
+
+<span class="nc" id="L118">            StatoPartecipazione sp10 = statoPartecipazioneRepository.save(new StatoPartecipazione(s4, u5, ruoloRepository.findByNome(ORGANIZZATORE_MASTER), false, false, &quot;Carmine&quot;, false));</span>
+<span class="nc" id="L119">            StatoPartecipazione sp11 = statoPartecipazioneRepository.save(new StatoPartecipazione(s4, u1, ruoloRepository.findByNome(Ruolo.ORGANIZZATORE), false, false, &quot;Michele&quot;, false));</span>
+<span class="nc" id="L120">            StatoPartecipazione sp12 = statoPartecipazioneRepository.save(new StatoPartecipazione(s4, u2, ruoloRepository.findByNome(Ruolo.PARTECIPANTE), true, false, &quot;Francesco&quot;, true));</span>
+<span class="nc" id="L121">            StatoPartecipazione sp13 = statoPartecipazioneRepository.save(new StatoPartecipazione(s4, u3, ruoloRepository.findByNome(Ruolo.PARTECIPANTE), false, true, &quot;Giorgio&quot;, false));</span>
+<span class="nc" id="L122">            StatoPartecipazione sp14 = statoPartecipazioneRepository.save(new StatoPartecipazione(s4, u4, ruoloRepository.findByNome(Ruolo.PARTECIPANTE), false, false, &quot;Domenico&quot;, false));</span>
+
+            //Aggiunta meeting
+<span class="nc" id="L125">            DateTimeFormatter formatter = DateTimeFormatter.ofPattern(&quot;yyyy-MM-dd HH:mm&quot;);</span>
+
+<span class="nc" id="L127">            Meeting m1 = meetingRepository.save(new Meeting(1L, &quot;MeetingStanza4&quot;,</span>
+<span class="nc" id="L128">                    LocalDateTime.parse(&quot;2024-02-02 18:00&quot;,formatter),</span>
+<span class="nc" id="L129">                    LocalDateTime.parse(&quot;2024-02-02 20:00&quot;,formatter), false, sc1, s4 ));</span>
+
+<span class="nc" id="L131">            Meeting m2 = meetingRepository.save(new Meeting(2L, &quot;MeetingStanza4&quot;,</span>
+<span class="nc" id="L132">                LocalDateTime.parse(&quot;2024-02-03 18:00&quot;,formatter),</span>
+<span class="nc" id="L133">                LocalDateTime.parse(&quot;2024-02-03 20:00&quot;,formatter), false, sc1, s4 ));</span>
+
+            //Aggiunta Utente in meeting
+<span class="nc" id="L136">            UtenteInMeeting um1 = utenteInMeetingRepository.save(new UtenteInMeeting(u5, m1, true));</span>
+<span class="nc" id="L137">            UtenteInMeeting um2 = utenteInMeetingRepository.save(new UtenteInMeeting(u4, m1, true));</span>
+<span class="nc" id="L138">            UtenteInMeeting um3 = utenteInMeetingRepository.save(new UtenteInMeeting(u2, m1, true));</span>
+<span class="nc" id="L139">            UtenteInMeeting um4 = utenteInMeetingRepository.save(new UtenteInMeeting(u1, m1, true));</span>
+
+<span class="nc" id="L141">            UtenteInMeeting um5 = utenteInMeetingRepository.save(new UtenteInMeeting(u5, m2, false));</span>
+<span class="nc" id="L142">            UtenteInMeeting um6 = utenteInMeetingRepository.save(new UtenteInMeeting(u2, m2, false));</span>
+<span class="nc" id="L143">            UtenteInMeeting um7 = utenteInMeetingRepository.save(new UtenteInMeeting(u3, m2, false));</span>
+
+            //aggiunta repoort
+<span class="nc" id="L146">            List&lt;Utente&gt; usersRep1 = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L147">            usersRep1.add(u1);</span>
+<span class="nc" id="L148">            usersRep1.add(u2);</span>
+<span class="nc" id="L149">            usersRep1.add(u4);</span>
+<span class="nc" id="L150">            usersRep1.add(u5);</span>
+<span class="nc" id="L151">            Report rep1 =  reportRepository.save(new Report(1L,4, Duration.ofHours(1),4,m1,usersRep1));</span>
+<span class="nc" id="L152">            List&lt;Utente&gt; usersRep2 = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L153">            usersRep2.add(u2);</span>
+<span class="nc" id="L154">            usersRep2.add(u3);</span>
+<span class="nc" id="L155">            usersRep2.add(u5);</span>
+<span class="nc" id="L156">            Report rep2 =  reportRepository.save(new Report(2L,3, Duration.ofHours(1),3,m2,usersRep2));</span>
+
+            //aggiunta feedackmeeting
+<span class="nc" id="L159">            FeedbackMeeting feed1 = feedbackMeetingRepository.save(</span>
+<span class="nc" id="L160">                    new FeedbackMeeting(u1,m1,rep1,Duration.ofMinutes(30),</span>
+<span class="nc" id="L161">                            LocalDateTime.parse(&quot;2024-02-03 19:00&quot;,formatter),false));</span>
+<span class="nc" id="L162">            FeedbackMeeting feed2 = feedbackMeetingRepository.save(</span>
+<span class="nc" id="L163">                new FeedbackMeeting(u2,m1,rep1,Duration.ofMinutes(30),</span>
+<span class="nc" id="L164">                        LocalDateTime.parse(&quot;2024-02-03 19:00&quot;,formatter),false));</span>
+<span class="nc" id="L165">        FeedbackMeeting feed3 = feedbackMeetingRepository.save(</span>
+<span class="nc" id="L166">                new FeedbackMeeting(u4,m1,rep1,Duration.ofMinutes(30),</span>
+<span class="nc" id="L167">                        LocalDateTime.parse(&quot;2024-02-03 19:00&quot;,formatter),false));</span>
+<span class="nc" id="L168">        FeedbackMeeting feed4 = feedbackMeetingRepository.save(</span>
+<span class="nc" id="L169">                new FeedbackMeeting(u5,m1,rep1,Duration.ofMinutes(30),</span>
+<span class="nc" id="L170">                        LocalDateTime.parse(&quot;2024-02-03 19:00&quot;,formatter),false));</span>
+<span class="nc" id="L171">        FeedbackMeeting feed5 = feedbackMeetingRepository.save(</span>
+<span class="nc" id="L172">                new FeedbackMeeting(u2,m2,rep2,Duration.ofMinutes(30),</span>
+<span class="nc" id="L173">                        LocalDateTime.parse(&quot;2024-02-03 19:00&quot;,formatter),false));</span>
+<span class="nc" id="L174">        FeedbackMeeting feed6 = feedbackMeetingRepository.save(</span>
+<span class="nc" id="L175">                new FeedbackMeeting(u3,m2,rep2,Duration.ofMinutes(30),</span>
+<span class="nc" id="L176">                        LocalDateTime.parse(&quot;2024-02-03 19:00&quot;,formatter),true));</span>
+<span class="nc" id="L177">        FeedbackMeeting feed7 = feedbackMeetingRepository.save(</span>
+<span class="nc" id="L178">                new FeedbackMeeting(u5,m2,rep2,Duration.ofMinutes(30),</span>
+<span class="nc" id="L179">                        LocalDateTime.parse(&quot;2024-02-03 19:00&quot;,formatter),false));</span>
+<span class="nc" id="L180">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.9.202303310957</span></div></body></html>
