@@ -102,7 +102,7 @@
     "settings.editor.selected.configurable": "project.propVCSSupport.Mappings",
     "vue.rearranger.settings.migration": "true"
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="C:\Users\Everysimo\Documents\Intellij_Projects\MetaClass\backend\src\main\resources" />
