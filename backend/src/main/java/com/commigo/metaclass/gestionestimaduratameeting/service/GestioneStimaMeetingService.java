@@ -23,8 +23,9 @@ public interface GestioneStimaMeetingService {
    * @param u Istanza di Utente-
    * @param durata Durata del meeting dell'utente.
    * @param immersionLevel Livello di immersività dell'utente.
+   * @param motionSickness Livello di fastidio.
    * @throws ServerRuntimeException Eccezione generata da errori server.
    */
-  public void addUtenteInDataset(Utente u, Duration durata, int immersionLevel)
+  public void addUtenteInDataset(Utente u, Duration durata, int immersionLevel, int motionSickness)
       throws ServerRuntimeException;
 }

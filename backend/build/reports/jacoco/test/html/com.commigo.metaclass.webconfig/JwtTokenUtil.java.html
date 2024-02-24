@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="it"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>JwtTokenUtil.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">MetaClass</a> &gt; <a href="index.source.html" class="el_package">com.commigo.metaclass.webconfig</a> &gt; <span class="el_source">JwtTokenUtil.java</span></div><h1>JwtTokenUtil.java</h1><pre class="source lang-java linenums">package com.commigo.metaclass.webconfig;
+
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.security.Keys;
+import jakarta.annotation.PostConstruct;
+import java.security.Key;
+import java.util.Date;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+
+/** Token utility. */
+@Component
+<span class="nc" id="L17">@NoArgsConstructor</span>
+<span class="nc" id="L18">@AllArgsConstructor</span>
+public class JwtTokenUtil {
+
+  private Key secretKey;
+
+  @Value(&quot;${jwt.expiration}000&quot;)
+  private Long expiration;
+
+  /** Inizializza il controllore dei token. */
+  @PostConstruct
+  public void init() {
+    // Inizializza la chiave segreta al momento della creazione del bean
+<span class="nc" id="L30">    secretKey = Keys.secretKeyFor(SignatureAlgorithm.HS512);</span>
+<span class="nc" id="L31">  }</span>
+
+  /**
+   * genera il token per utente con metaId.
+   *
+   * @param metaId metaId
+   */
+  public String generateToken(String metaId) {
+<span class="nc" id="L39">    Date now = new Date();</span>
+<span class="nc" id="L40">    Date expiryDate = new Date(now.getTime() + expiration);</span>
+
+<span class="nc" id="L42">    return Jwts.builder()</span>
+<span class="nc" id="L43">        .setSubject(metaId)</span>
+<span class="nc" id="L44">        .setIssuedAt(now)</span>
+<span class="nc" id="L45">        .setExpiration(expiryDate)</span>
+<span class="nc" id="L46">        .signWith(SignatureAlgorithm.HS512, secretKey)</span>
+<span class="nc" id="L47">        .compact();</span>
+  }
+
+  /**
+   * Ottieni il metaId dal token.
+   *
+   * @param token token su cui operare
+   * @return metaId
+   */
+  public String getmetaIdFromToken(String token) {
+<span class="nc" id="L57">    Claims claims = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody();</span>
+
+<span class="nc" id="L59">    return claims.getSubject();</span>
+  }
+
+  /**
+   * Convalida un token.
+   *
+   * @param token token da convalidare
+   * @return ritorna se è valido o meno
+   */
+  public boolean validateToken(String token) {
+    try {
+<span class="nc" id="L70">      Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token);</span>
+<span class="nc" id="L71">      return true;</span>
+<span class="nc" id="L72">    } catch (Exception e) {</span>
+<span class="nc" id="L73">      return false;</span>
+    }
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.9.202303310957</span></div></body></html>

@@ -1,0 +1,369 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="it"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>GestioneAmministrazioneController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">MetaClass</a> &gt; <a href="index.source.html" class="el_package">com.commigo.metaclass.gestioneamministrazione.controller</a> &gt; <span class="el_source">GestioneAmministrazioneController.java</span></div><h1>GestioneAmministrazioneController.java</h1><pre class="source lang-java linenums">package com.commigo.metaclass.gestioneamministrazione.controller;
+
+import com.commigo.metaclass.entity.Categoria;
+import com.commigo.metaclass.entity.Scenario;
+import com.commigo.metaclass.entity.Stanza;
+import com.commigo.metaclass.entity.Utente;
+import com.commigo.metaclass.exceptions.RuntimeException403;
+import com.commigo.metaclass.exceptions.ServerRuntimeException;
+import com.commigo.metaclass.gestioneamministrazione.service.GestioneAmministrazioneService;
+import com.commigo.metaclass.gestionestanza.controller.GestioneStanzaControl;
+import com.commigo.metaclass.utility.request.RequestUtils;
+import com.commigo.metaclass.utility.response.types.Response;
+import com.commigo.metaclass.webconfig.JwtTokenUtil;
+import com.commigo.metaclass.webconfig.ValidationToken;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
+import java.util.List;
+import java.util.Map;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+/** Classe per le API della gestione amministrazione. */
+@RestController
+@RequestMapping(&quot;/admin&quot;)
+<span class="fc" id="L33">public class GestioneAmministrazioneController {</span>
+
+  @Autowired private GestioneAmministrazioneService gestioneamministrazione;
+
+  @Autowired private ValidationToken validationToken;
+
+  @Autowired private JwtTokenUtil jwtTokenUtil;
+
+  @Autowired private GestioneStanzaControl stanzaControl;
+
+  /**
+   * confronta il metaId di un utente con quelli degli admin, per verificare se l'utente è un admin.
+   *
+   * @param metaId metaId che deve essere confrontato
+   */
+  public boolean checkAdmin(String metaId) {
+<span class="fc" id="L49">    return gestioneamministrazione.checkAdmin(metaId); // chiamata al servizio</span>
+  }
+
+  /**
+   * Metodo che gestisce la richiesta di fornire la lista degli utenti bannati in una determinata
+   * stanza da parte di un admin di sistema.
+   *
+   * @param id Id della stanza di cui vogliamo visualizzare gli utenti bannati
+   * @param request richiesta HTTP fornita dal client
+   */
+  @PostMapping(value = &quot;/visualizzaUtentiBannatiInStanza/{id}&quot;)
+  public ResponseEntity&lt;Response&lt;List&lt;Utente&gt;&gt;&gt; visualizzaUtentiBannatiInStanza(
+      @PathVariable Long id, HttpServletRequest request) {
+    try {
+<span class="nc bnc" id="L63" title="All 2 branches missed.">      if (!validationToken.isTokenValid(request)) {</span>
+<span class="nc" id="L64">        throw new RuntimeException403(&quot;Token non valido&quot;);</span>
+      }
+
+<span class="nc" id="L67">      String metaId = jwtTokenUtil.getmetaIdFromToken(validationToken.getToken());</span>
+
+<span class="nc bnc" id="L69" title="All 2 branches missed.">      if (!checkAdmin(metaId)) {</span>
+<span class="nc" id="L70">        throw new RuntimeException403(&quot;Non sei amministratore&quot;);</span>
+      }
+<span class="nc" id="L72">      return stanzaControl.visualizzaUtentiBannatiInStanza(id, request);</span>
+
+<span class="nc" id="L74">    } catch (RuntimeException403 re) {</span>
+<span class="nc" id="L75">      return ResponseEntity.status(HttpStatus.FORBIDDEN)</span>
+<span class="nc" id="L76">          .body(new Response&lt;&gt;(null, &quot;Errore durante la richiesta: &quot; + re.getMessage()));</span>
+    }
+  }
+
+  /**
+   * Metodo che gestisce la richiesta di annullamento del ban di un determinato utente in una
+   * determinata stanza da parte di un admin di sistema.
+   *
+   * @param idUtente Id dell'utente a cui deve essere eliminato il ban
+   * @param idStanza Id della stanza in cui l'utente è bannato
+   * @param request richiesta HTTP fornita dal client
+   */
+  @PostMapping(value = &quot;annullaBan/{idStanza}/{idUtente}&quot;)
+  public ResponseEntity&lt;Response&lt;Boolean&gt;&gt; annullaBan(
+      @PathVariable Long idUtente,
+      @PathVariable(&quot;idStanza&quot;) Long idStanza,
+      HttpServletRequest request) {
+    try {
+<span class="nc bnc" id="L94" title="All 2 branches missed.">      if (!validationToken.isTokenValid(request)) {</span>
+<span class="nc" id="L95">        throw new RuntimeException403(&quot;Token non valido&quot;);</span>
+      }
+
+<span class="nc" id="L98">      String metaId = jwtTokenUtil.getmetaIdFromToken(validationToken.getToken());</span>
+
+      // verifica dei permessi
+<span class="nc bnc" id="L101" title="All 2 branches missed.">      if (!checkAdmin(metaId)) {</span>
+<span class="nc" id="L102">        throw new RuntimeException403(&quot;non sei amministratore&quot;);</span>
+      }
+
+<span class="nc" id="L105">      gestioneamministrazione.deleteBanToUser(idUtente, idStanza);</span>
+<span class="nc" id="L106">      return ResponseEntity.ok(new Response&lt;&gt;(true, &quot;Ban annullato correttamente&quot;));</span>
+
+<span class="nc" id="L108">    } catch (RuntimeException403 e) {</span>
+<span class="nc" id="L109">      return ResponseEntity.status(HttpStatus.FORBIDDEN)</span>
+<span class="nc" id="L110">          .body(new Response&lt;&gt;(false, &quot;Errore durante la richiesta: &quot; + e.getMessage()));</span>
+    }
+  }
+
+  /**
+   * Metodo che gestisce la richiesta di creazione di una categoria da parte di un admin di sistema.
+   *
+   * @param c Categoria che deve essere creata
+   * @param result Variabile che contiene tutti gli errori di validazione dell'oggetto categoria
+   * @param request richiesta HTTP fornita dal client
+   * @return un valore booleano che identifica la riuscita dell'operazione ed un messaggio che
+   *     descrive l'esito di essa
+   */
+  @PostMapping(value = &quot;updateCategoria&quot;)
+  public ResponseEntity&lt;Response&lt;Boolean&gt;&gt; updateCategoria(
+      @Valid @RequestBody Categoria c, BindingResult result, HttpServletRequest request) {
+    try {
+
+      // validazione dl token
+<span class="nc bnc" id="L129" title="All 2 branches missed.">      if (!validationToken.isTokenValid(request)) {</span>
+<span class="nc" id="L130">        throw new RuntimeException403(&quot;Token non valido&quot;);</span>
+      }
+
+<span class="nc" id="L133">      String metaId = jwtTokenUtil.getmetaIdFromToken(validationToken.getToken());</span>
+
+      // verifica dei permessi
+<span class="nc bnc" id="L136" title="All 2 branches missed.">      if (!checkAdmin(metaId)) {</span>
+<span class="nc" id="L137">        throw new RuntimeException403(&quot;non sei amministratore&quot;);</span>
+      }
+
+      // controllo errori di validazione
+<span class="nc bnc" id="L141" title="All 2 branches missed.">      if (result.hasErrors()) {</span>
+<span class="nc" id="L142">        throw new RuntimeException403(RequestUtils.errorsRequest(result));</span>
+      }
+
+<span class="nc bnc" id="L145" title="All 2 branches missed.">      if (!gestioneamministrazione.updateCategoria(c)) {</span>
+<span class="nc" id="L146">        throw new ServerRuntimeException(&quot;Errore durante l'inserimento della categoria&quot;);</span>
+      } else {
+<span class="nc" id="L148">        return ResponseEntity.ok(new Response&lt;&gt;(true, &quot;categoria creata con successo&quot;));</span>
+      }
+<span class="nc" id="L150">    } catch (RuntimeException403 e) {</span>
+<span class="nc" id="L151">      return ResponseEntity.status(403).body(new Response&lt;&gt;(false, e.getMessage()));</span>
+<span class="nc" id="L152">    } catch (ServerRuntimeException e) {</span>
+<span class="nc" id="L153">      return ResponseEntity.status(500).body(new Response&lt;&gt;(false, e.getMessage()));</span>
+    }
+  }
+
+  /**
+   * Metodo che gestisce la richiesta di creazione uno scenario da parte di un admin di sistema.
+   *
+   * @param s Scenario che deve essere creato
+   * @param result Variabile che contiene tutti gli errori di validazione dell'oggetto scenario
+   * @param request richiesta HTTP fornita dal client
+   * @return un valore booleano che identifica la riuscita dell'operazione ed un messaggio che
+   *     descrive l'esito di essa
+   */
+  @PostMapping(value = &quot;updateScenario&quot;)
+  public ResponseEntity&lt;Response&lt;Boolean&gt;&gt; updateScenario(
+      @Valid @RequestBody Scenario s, BindingResult result, HttpServletRequest request) {
+    try {
+      // validazione dl token
+<span class="fc bfc" id="L171" title="All 2 branches covered.">      if (!validationToken.isTokenValid(request)) {</span>
+<span class="fc" id="L172">        throw new RuntimeException403(&quot;Token non valido&quot;);</span>
+      }
+
+<span class="fc" id="L175">      String metaId = jwtTokenUtil.getmetaIdFromToken(validationToken.getToken());</span>
+
+      // verifica dei permessi
+<span class="fc bfc" id="L178" title="All 2 branches covered.">      if (!checkAdmin(metaId)) {</span>
+<span class="fc" id="L179">        throw new RuntimeException403(&quot;accesso non consentito&quot;);</span>
+      }
+
+      // controllo errori di validazione
+<span class="fc bfc" id="L183" title="All 2 branches covered.">      if (result.hasErrors()) {</span>
+<span class="fc" id="L184">        throw new RuntimeException403(RequestUtils.errorsRequest(result));</span>
+      }
+
+<span class="fc" id="L187">      gestioneamministrazione.updateScenario(s, s.getCategoria().getId());</span>
+<span class="fc" id="L188">      return ResponseEntity.ok(new Response&lt;&gt;(true, &quot;scenario creato con successo&quot;));</span>
+
+<span class="fc" id="L190">    } catch (RuntimeException403 e) {</span>
+<span class="fc" id="L191">      return ResponseEntity.status(403).body(new Response&lt;&gt;(false, e.getMessage()));</span>
+    }
+  }
+
+  /**
+   * Metodo che permette di gestire la richiesta di visualizzare tutte le stanza da parte di un adin
+   * di sistema.
+   *
+   * @param request richiesta HTTP fornita dal client
+   * @return una lista di stanze ed un messaggio che descrive l'esito dell'operazione
+   */
+  @GetMapping(value = &quot;allStanze&quot;)
+  public ResponseEntity&lt;Response&lt;List&lt;Stanza&gt;&gt;&gt; visualizzaStanze(HttpServletRequest request) {
+    List&lt;Stanza&gt; stanze;
+    try {
+      // validazione dl token
+<span class="nc bnc" id="L207" title="All 2 branches missed.">      if (!validationToken.isTokenValid(request)) {</span>
+<span class="nc" id="L208">        throw new RuntimeException403(&quot;Token non valido&quot;);</span>
+      }
+
+<span class="nc" id="L211">      String metaId = jwtTokenUtil.getmetaIdFromToken(validationToken.getToken());</span>
+
+      // verifica dei permessi
+<span class="nc bnc" id="L214" title="All 2 branches missed.">      if (!checkAdmin(metaId)) {</span>
+<span class="nc" id="L215">        throw new RuntimeException403(&quot;accesso non consentito&quot;);</span>
+      }
+
+<span class="nc" id="L218">      stanze = gestioneamministrazione.getStanze();</span>
+<span class="nc bnc" id="L219" title="All 2 branches missed.">      if (stanze == null) {</span>
+<span class="nc" id="L220">        throw new ServerRuntimeException(&quot;Errore nella ricerca delle stanze&quot;);</span>
+<span class="nc bnc" id="L221" title="All 2 branches missed.">      } else if (stanze.isEmpty()) {</span>
+<span class="nc" id="L222">        return ResponseEntity.ok(new Response&lt;&gt;(stanze, &quot;nessuna stanza creata&quot;));</span>
+      } else {
+<span class="nc" id="L224">        return ResponseEntity.ok(new Response&lt;&gt;(stanze, &quot;operazione effettuata con successo&quot;));</span>
+      }
+<span class="nc" id="L226">    } catch (RuntimeException403 re) {</span>
+<span class="nc" id="L227">      return ResponseEntity.status(403)</span>
+<span class="nc" id="L228">          .body(new Response&lt;&gt;(null, &quot;Errore durante l'operazione: &quot; + re.getMessage()));</span>
+<span class="nc" id="L229">    } catch (ServerRuntimeException e) {</span>
+<span class="nc" id="L230">      return ResponseEntity.status(500).body(new Response&lt;&gt;(null, &quot;Errore durante l'operazione&quot;));</span>
+    }
+  }
+
+  /**
+   * Metodo che permette la gestire la richiesta di visualizzazione di tutte le categorie.
+   *
+   * @param request richiesta HTTP fornita dal client
+   * @return lista di categoria ed un messagggio che identifica l'esito dell'operazione
+   */
+  @GetMapping(value = &quot;visualizzaCategoria&quot;)
+  public ResponseEntity&lt;Response&lt;List&lt;Categoria&gt;&gt;&gt; visualizzaCategorie(HttpServletRequest request) {
+    List&lt;Categoria&gt; cats;
+    try {
+      // validazione dl token
+<span class="nc bnc" id="L245" title="All 2 branches missed.">      if (!validationToken.isTokenValid(request)) {</span>
+<span class="nc" id="L246">        throw new RuntimeException403(&quot;Token non valido&quot;);</span>
+      }
+
+<span class="nc" id="L249">      String metaId = jwtTokenUtil.getmetaIdFromToken(validationToken.getToken());</span>
+
+      // verifica dei permessi
+<span class="nc bnc" id="L252" title="All 2 branches missed.">      if (!checkAdmin(metaId)) {</span>
+<span class="nc" id="L253">        throw new RuntimeException403(&quot;accesso non consentito&quot;);</span>
+      }
+
+<span class="nc" id="L256">      cats = gestioneamministrazione.getCategorie();</span>
+<span class="nc bnc" id="L257" title="All 2 branches missed.">      if (cats == null) {</span>
+<span class="nc" id="L258">        throw new ServerRuntimeException(&quot;Errore nella ricerca delle categorie&quot;);</span>
+<span class="nc bnc" id="L259" title="All 2 branches missed.">      } else if (cats.isEmpty()) {</span>
+<span class="nc" id="L260">        return ResponseEntity.ok(new Response&lt;&gt;(cats, &quot;nessuna categoria creata&quot;));</span>
+      } else {
+<span class="nc" id="L262">        return ResponseEntity.ok(new Response&lt;&gt;(cats, &quot;operazione effettuata con successo&quot;));</span>
+      }
+<span class="nc" id="L264">    } catch (RuntimeException403 re) {</span>
+<span class="nc" id="L265">      return ResponseEntity.status(403)</span>
+<span class="nc" id="L266">          .body(new Response&lt;&gt;(null, &quot;Errore durante l'operazione: &quot; + re.getMessage()));</span>
+<span class="nc" id="L267">    } catch (ServerRuntimeException e) {</span>
+<span class="nc" id="L268">      return ResponseEntity.status(500).body(new Response&lt;&gt;(null, &quot;Errore durante l'operazione&quot;));</span>
+    }
+  }
+
+  /**
+   * Metodo che permette di gestire la richiesta di modifica di una determinata stanza da parte di
+   * un admin.
+   *
+   * @param id ID della stanza che deve essere modificata
+   * @param params Nuovi attributi della stanza
+   * @param request richiesta HTTP fornita dal client
+   * @return un valore booleano che identifica la riuscita dell'operazione ed un messaggio che
+   *     descrive l'esito di essa
+   */
+  @PostMapping(value = &quot;modificaStanza/{Id}&quot;)
+  public ResponseEntity&lt;Response&lt;Boolean&gt;&gt; modifyRoomDataAdmin(
+      @PathVariable Long id, @RequestBody Map&lt;String, Object&gt; params, HttpServletRequest request) {
+
+    try { // validazione dl token
+<span class="nc bnc" id="L287" title="All 2 branches missed.">      if (!validationToken.isTokenValid(request)) {</span>
+<span class="nc" id="L288">        throw new RuntimeException403(&quot;Token non valido&quot;);</span>
+      }
+
+<span class="nc" id="L291">      String metaId = jwtTokenUtil.getmetaIdFromToken(validationToken.getToken());</span>
+
+      // verifica dei permessi
+<span class="nc bnc" id="L294" title="All 2 branches missed.">      if (!checkAdmin(metaId)) {</span>
+<span class="nc" id="L295">        throw new RuntimeException403(&quot;accesso non consentito&quot;);</span>
+      }
+
+<span class="nc" id="L298">      return stanzaControl.modifyRoomData(id, params, request);</span>
+<span class="nc" id="L299">    } catch (RuntimeException403 re) {</span>
+<span class="nc" id="L300">      return ResponseEntity.status(403)</span>
+<span class="nc" id="L301">          .body(new Response&lt;&gt;(null, &quot;Errore durante l'operazione: &quot; + re.getMessage()));</span>
+    }
+  }
+
+  /**
+   * Metodo che permette di gestire la richiesta di eliminazione di una stanza da parte di un admin
+   * di sistema.
+   *
+   * @param id ID della stanza che deve essere eliminata
+   * @param request richiesta HTTP fornita dal client
+   * @return un valore booleano che identifica la riuscita dell'operazione ed un messaggio che
+   *     descrive l'esito di essa
+   */
+  @PostMapping(value = &quot;eliminaStanza/{Id}&quot;)
+  public ResponseEntity&lt;Response&lt;Boolean&gt;&gt; eliminaStanza(
+      @PathVariable Long id, HttpServletRequest request) {
+    try {
+      // validazione dl token
+<span class="nc bnc" id="L319" title="All 2 branches missed.">      if (!validationToken.isTokenValid(request)) {</span>
+<span class="nc" id="L320">        throw new RuntimeException403(&quot;Token non valido&quot;);</span>
+      }
+
+<span class="nc" id="L323">      String metaId = jwtTokenUtil.getmetaIdFromToken(validationToken.getToken());</span>
+
+      // verifica dei permessi
+<span class="nc bnc" id="L326" title="All 2 branches missed.">      if (!checkAdmin(metaId)) {</span>
+<span class="nc" id="L327">        throw new RuntimeException403(&quot;accesso non consentito&quot;);</span>
+      }
+
+<span class="nc" id="L330">      return stanzaControl.eliminaStanza(id, request);</span>
+<span class="nc" id="L331">    } catch (RuntimeException403 re) {</span>
+<span class="nc" id="L332">      return ResponseEntity.status(403)</span>
+<span class="nc" id="L333">          .body(new Response&lt;&gt;(false, &quot;Errore durante l'operazione: &quot; + re.getMessage()));</span>
+    }
+  }
+
+  /**
+   * Metodo che permette di gestire la richiesta di visualizzazione di una stanza da parte di un
+   * admin di sistema.
+   *
+   * @param id ID della stanza che deve essere visualizzata
+   * @param request richiesta HTTP fornita dal client
+   * @return la stanza che deve essere visualizzata, ed un messaggio che descrive l'esito
+   *     dell'operazione
+   */
+  @PostMapping(value = &quot;visualizzaStanza/{Id}&quot;)
+  public ResponseEntity&lt;Response&lt;Stanza&gt;&gt; visualizzaStanza(
+      @PathVariable Long id, HttpServletRequest request) {
+    try {
+      // validazione dl token
+<span class="nc bnc" id="L351" title="All 2 branches missed.">      if (!validationToken.isTokenValid(request)) {</span>
+<span class="nc" id="L352">        throw new RuntimeException403(&quot;Token non valido&quot;);</span>
+      }
+
+<span class="nc" id="L355">      String metaId = jwtTokenUtil.getmetaIdFromToken(validationToken.getToken());</span>
+
+      // verifica dei permessi
+<span class="nc bnc" id="L358" title="All 2 branches missed.">      if (!checkAdmin(metaId)) {</span>
+<span class="nc" id="L359">        throw new RuntimeException403(&quot;Non sei un amministratore&quot;);</span>
+      }
+
+<span class="nc" id="L362">      return stanzaControl.visualizzaStanza(id, request);</span>
+<span class="nc" id="L363">    } catch (RuntimeException403 re) {</span>
+<span class="nc" id="L364">      return ResponseEntity.status(403)</span>
+<span class="nc" id="L365">          .body(new Response&lt;&gt;(null, &quot;Errore durante l'operazione: &quot; + re.getMessage()));</span>
+    }
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.9.202303310957</span></div></body></html>

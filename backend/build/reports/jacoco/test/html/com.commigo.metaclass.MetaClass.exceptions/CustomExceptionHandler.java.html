@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="it"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>CustomExceptionHandler.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">MetaClass</a> &gt; <a href="index.source.html" class="el_package">com.commigo.metaclass.MetaClass.exceptions</a> &gt; <span class="el_source">CustomExceptionHandler.java</span></div><h1>CustomExceptionHandler.java</h1><pre class="source lang-java linenums">package com.commigo.metaclass.MetaClass.exceptions;
+import com.commigo.metaclass.MetaClass.utility.response.types.Response;
+import com.fasterxml.jackson.databind.exc.MismatchedInputException;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MissingPathVariableException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.servlet.NoHandlerFoundException;
+
+
+@RestControllerAdvice
+<span class="nc" id="L14">public class CustomExceptionHandler {</span>
+
+    @ExceptionHandler(MismatchJsonProperty.class)
+    public ResponseEntity&lt;Response&lt;Boolean&gt;&gt; handleMismatchedInputException(MismatchJsonProperty ex) {
+
+        // Restituisci una risposta con uno stato 400 (Bad Request) e il messaggio personalizzato
+<span class="nc" id="L20">        return ResponseEntity.badRequest().body(new Response&lt;&gt;(false,</span>
+<span class="nc" id="L21">                &quot;errore nella richiesta: &quot;+ex.getMessage()));</span>
+    }
+
+    @ExceptionHandler(DataFormatException.class)
+    public ResponseEntity&lt;Response&lt;Object&gt;&gt; handleDataFormatException(DataFormatException ex) {
+<span class="nc" id="L26">        return ResponseEntity.badRequest().body(new Response&lt;&gt;(null, ex.getMessage()));</span>
+    }
+
+    @ExceptionHandler(MissingServletRequestParameterException.class)
+    public ResponseEntity&lt;Response&lt;Object&gt;&gt; handleMissingParamException(MissingServletRequestParameterException ex) {
+<span class="nc" id="L31">        String paramName = ex.getParameterName();</span>
+<span class="nc" id="L32">        String errorMessage = &quot;Il parametro '&quot; + paramName + &quot;' è mancante nella richiesta.&quot;;</span>
+<span class="nc" id="L33">        return ResponseEntity.badRequest().body(new Response&lt;&gt;(null, errorMessage));</span>
+    }
+    @ExceptionHandler(NumberFormatException.class)
+    public ResponseEntity&lt;Response&lt;Object&gt;&gt; handleNumberFormatException(NumberFormatException ex) {
+<span class="nc" id="L37">        return ResponseEntity.badRequest().body(new Response&lt;&gt;(null,</span>
+                &quot;Formato parametri errato&quot;));
+    }
+
+    @ExceptionHandler(NoHandlerFoundException.class)
+    public ResponseEntity&lt;Response&lt;Object&gt;&gt; handleNotFoundException(NoHandlerFoundException ex) {
+<span class="nc" id="L43">        String errorMessage = &quot;URL non trovato: &quot; + ex.getRequestURL();</span>
+<span class="nc" id="L44">        return ResponseEntity.status(HttpStatus.NOT_FOUND)</span>
+<span class="nc" id="L45">                .body(new Response&lt;&gt;(null, errorMessage));</span>
+    }
+
+}
+
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.9.202303310957</span></div></body></html>

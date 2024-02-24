@@ -1,0 +1,538 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="it"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>GestioneMeetingServiceImpl.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">MetaClass</a> &gt; <a href="index.source.html" class="el_package">com.commigo.metaclass.gestionemeeting.service</a> &gt; <span class="el_source">GestioneMeetingServiceImpl.java</span></div><h1>GestioneMeetingServiceImpl.java</h1><pre class="source lang-java linenums">package com.commigo.metaclass.gestionemeeting.service;
+
+import com.commigo.metaclass.entity.FeedbackMeeting;
+import com.commigo.metaclass.entity.Meeting;
+import com.commigo.metaclass.entity.Report;
+import com.commigo.metaclass.entity.Ruolo;
+import com.commigo.metaclass.entity.Scenario;
+import com.commigo.metaclass.entity.Stanza;
+import com.commigo.metaclass.entity.StatoPartecipazione;
+import com.commigo.metaclass.entity.Utente;
+import com.commigo.metaclass.entity.UtenteInMeeting;
+import com.commigo.metaclass.exceptions.RuntimeException401;
+import com.commigo.metaclass.exceptions.RuntimeException403;
+import com.commigo.metaclass.exceptions.ServerRuntimeException;
+import com.commigo.metaclass.gestioneamministrazione.repository.ScenarioRepository;
+import com.commigo.metaclass.gestionemeeting.repository.FeedbackMeetingRepository;
+import com.commigo.metaclass.gestionemeeting.repository.MeetingRepository;
+import com.commigo.metaclass.gestionemeeting.repository.ReportRepository;
+import com.commigo.metaclass.gestionemeeting.repository.UtenteInMeetingRepository;
+import com.commigo.metaclass.gestionestanza.repository.StanzaRepository;
+import com.commigo.metaclass.gestionestanza.repository.StatoPartecipazioneRepository;
+import com.commigo.metaclass.gestionestimaduratameeting.service.GestioneStimaMeetingService;
+import com.commigo.metaclass.gestioneutenza.repository.UtenteRepository;
+import com.commigo.metaclass.utility.response.types.Response;
+import com.commigo.metaclass.webconfig.JwtTokenUtil;
+import com.commigo.metaclass.webconfig.ValidationToken;
+import jakarta.transaction.Transactional;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
+
+/** Service per la gestione meeting. */
+@Service
+<span class="nc" id="L43">@RequiredArgsConstructor</span>
+<span class="nc" id="L44">@Slf4j</span>
+@Transactional // ogni operazione è una transazione
+public class GestioneMeetingServiceImpl implements GestioneMeetingService {
+
+  private final MeetingRepository meetingRepository;
+  private final StanzaRepository stanzaRepository;
+  private final UtenteRepository utenteRepository;
+  private final ScenarioRepository scenarioRepository;
+  private final UtenteInMeetingRepository utenteInMeetingRepository;
+  private final StatoPartecipazioneRepository statoPartecipazioneRepository;
+  private final FeedbackMeetingRepository feedbackMeetingRepository;
+  private final ReportRepository reportRepository;
+
+  @Autowired GestioneStimaMeetingService gestioneStimaMeetingService;
+
+  @Autowired private ValidationToken validationToken;
+
+  @Autowired private JwtTokenUtil jwtTokenUtil;
+
+  /**
+   * Metodo che permette la schedulazione di un meeting.
+   *
+   * @param meeting meeting che si vuole schedulare
+   * @param metaId metaId dell'utente che vuole schedulare il meeting
+   * @return valore booleano che identifica il successo dell'operazione
+   */
+  @Override
+  public boolean creaScheduling(Meeting meeting, String metaId)
+      throws ServerRuntimeException, RuntimeException403 {
+    // cerca il meeting per verificare se registrato o meno
+<span class="nc" id="L74">    Optional&lt;Meeting&gt; m = meetingRepository.findById(meeting.getId());</span>
+<span class="nc bnc" id="L75" title="All 2 branches missed.">    if (m.isEmpty()) {</span>
+
+      // ricerca della stanza da associare a meeting
+<span class="nc" id="L78">      Stanza s = stanzaRepository.findStanzaById(meeting.getStanza().getId());</span>
+<span class="nc bnc" id="L79" title="All 2 branches missed.">      if (s == null) {</span>
+<span class="nc" id="L80">        throw new ServerRuntimeException(&quot;errore nella ricerca della stanza&quot;);</span>
+      }
+
+      // controllo esistenza dell'utente
+      Utente u;
+<span class="nc bnc" id="L85" title="All 2 branches missed.">      if ((u = utenteRepository.findFirstBymetaId(metaId)) == null) {</span>
+<span class="nc" id="L86">        throw new RuntimeException403(&quot;utente non trovato&quot;);</span>
+      }
+
+      // controllo del ruolo di organizzatore o organizzatore master
+      StatoPartecipazione sp;
+<span class="nc bnc" id="L91" title="All 2 branches missed.">      if ((sp = statoPartecipazioneRepository.findStatoPartecipazioneByUtenteAndStanza(u, s))</span>
+          == null) {
+<span class="nc" id="L93">        throw new ServerRuntimeException(&quot;errore nella ricerca del ruolo&quot;);</span>
+      }
+<span class="nc bnc" id="L95" title="All 2 branches missed.">      if (sp.getRuolo().getNome().equalsIgnoreCase(Ruolo.PARTECIPANTE)) {</span>
+<span class="nc" id="L96">        throw new RuntimeException403(&quot;non hai i permessi per schedulare un meeting&quot;);</span>
+      }
+
+      // controllo dei meeting sovrapponibili
+<span class="nc bnc" id="L100" title="All 2 branches missed.">      if (meetingRepository.hasOverlappingMeetings(meeting.getInizio(), meeting.getFine())) {</span>
+<span class="nc" id="L101">        throw new RuntimeException403(&quot;il meeting si accavalla con un altro meeting&quot;);</span>
+      }
+<span class="nc" id="L103">      meeting.setStanza(s);</span>
+
+      // salvo lo scenario iniziale
+<span class="nc" id="L106">      meeting.setScenarioIniziale(s.getScenario());</span>
+
+      // Meeting non presente nel database, lo salva
+<span class="nc" id="L109">      meetingRepository.save(meeting);</span>
+<span class="nc" id="L110">    } else {</span>
+<span class="nc" id="L111">      throw new ServerRuntimeException(&quot;meeting già schedulato in precedenza&quot;);</span>
+    }
+
+<span class="nc" id="L114">    return true;</span>
+  }
+
+  /**
+   * metodo che consente la modifica dei dati del meeting.
+   *
+   * @param params nuovi dati del meeting
+   * @param id id del meeting da modificare
+   */
+  @Override
+  public boolean modificaScheduling(Map&lt;String, Object&gt; params, Long id)
+      throws RuntimeException403, RuntimeException401 {
+
+    // controllo del ruolo di ogm
+<span class="nc" id="L128">    String metaId = jwtTokenUtil.getmetaIdFromToken(validationToken.getToken());</span>
+<span class="nc" id="L129">    Utente ogm = utenteRepository.findFirstBymetaId(metaId);</span>
+<span class="nc" id="L130">    Meeting existingMeeting = meetingRepository.findMeetingById(id);</span>
+
+    // verifico meeting se esiste
+<span class="nc bnc" id="L133" title="All 2 branches missed.">    if (existingMeeting == null) {</span>
+<span class="nc" id="L134">      throw new RuntimeException403(&quot;Il meeting non esiste&quot;);</span>
+    }
+<span class="nc bnc" id="L136" title="All 2 branches missed.">    if (ogm == null) {</span>
+<span class="nc" id="L137">      throw new RuntimeException403(&quot;Utente non esiste&quot;);</span>
+    }
+
+<span class="nc" id="L140">    StatoPartecipazione statoutente =</span>
+<span class="nc" id="L141">        statoPartecipazioneRepository.findStatoPartecipazioneByUtenteAndStanza(</span>
+<span class="nc" id="L142">            ogm, existingMeeting.getStanza());</span>
+
+<span class="nc bnc" id="L144" title="All 2 branches missed.">    if (statoutente == null) {</span>
+<span class="nc" id="L145">      throw new RuntimeException403(&quot;Non hai acceduto alla stanza&quot;);</span>
+    }
+
+<span class="nc bnc" id="L148" title="All 2 branches missed.">    if (!statoutente.getRuolo().getNome().equalsIgnoreCase(Ruolo.PARTECIPANTE)) {</span>
+<span class="nc bnc" id="L149" title="All 2 branches missed.">      return meetingRepository.updateAttributes(id, params) &gt; 0;</span>
+    } else {
+<span class="nc" id="L151">      throw new RuntimeException401(&quot;devi essere almeno un organizzatore&quot;);</span>
+    }
+  }
+
+  /**
+   * Metodo che permette di fare accesso ad un meeting.
+   *
+   * @param metaId metaId dell'utente che vuole effettuare l'accesso all'interno del meeting
+   * @param idmeeting id del meeting a cui si vuole fare accesso
+   * @return valore booleano che identifica il successo dell'operazione
+   */
+  @Override
+  public Boolean accediMeeting(String metaId, Long idmeeting)
+      throws ServerRuntimeException, RuntimeException403 {
+
+    Utente u;
+    Meeting m;
+<span class="nc bnc" id="L168" title="All 2 branches missed.">    if ((u = utenteRepository.findFirstBymetaId(metaId)) == null) {</span>
+<span class="nc" id="L169">      throw new RuntimeException403(&quot;utente non trovato&quot;);</span>
+    }
+<span class="nc bnc" id="L171" title="All 2 branches missed.">    if ((m = meetingRepository.findMeetingById(idmeeting)) == null) {</span>
+<span class="nc" id="L172">      throw new RuntimeException403(&quot;meeting non trovato&quot;);</span>
+    }
+
+    // verifica se il meeting e' avviato
+<span class="nc bnc" id="L176" title="All 2 branches missed.">    if (!m.isAvviato()) {</span>
+<span class="nc" id="L177">      throw new RuntimeException403(&quot;Il meeting non e' stato avviato&quot;);</span>
+    }
+
+    // salvataggio dell'accesso al meeting
+<span class="nc" id="L181">    UtenteInMeeting uim = new UtenteInMeeting(u, m, true);</span>
+    try {
+
+      // verifico se l'utente ha era già entrato in precedenza
+      UtenteInMeeting existingUim;
+<span class="nc bnc" id="L186" title="All 2 branches missed.">      if ((existingUim = utenteInMeetingRepository.findUtenteInMeetingsByMeetingAndUtente(m, u))</span>
+          != null) {
+<span class="nc bnc" id="L188" title="All 2 branches missed.">        if (!existingUim.isOnline()) { // per poi verificare se è già presente</span>
+
+          // se era uscito e sta rieffettuando l'accesso allora bisogna aggiornare
+          // le sue azioni in FeedBackMeeting
+<span class="nc" id="L192">          FeedbackMeeting fm =</span>
+<span class="nc" id="L193">              feedbackMeetingRepository.findFeedbackMeetingByUtenteAndMeeting(u, m);</span>
+
+          // agiornamento di dataUltimoAccesso
+<span class="nc" id="L196">          fm.setDataUltimoAccesso(LocalDateTime.now());</span>
+<span class="nc" id="L197">          feedbackMeetingRepository.save(fm);</span>
+
+<span class="nc" id="L199">        } else {</span>
+<span class="nc" id="L200">          throw new RuntimeException403(&quot;già sei all'interno del meeting&quot;);</span>
+        }
+      } else {
+<span class="nc" id="L203">        utenteInMeetingRepository.save(uim);</span>
+
+        // creazione del feedback meeting
+<span class="nc" id="L206">        Report rep = reportRepository.findByMeeting(m);</span>
+<span class="nc" id="L207">        FeedbackMeeting fm = new FeedbackMeeting(u, m, rep);</span>
+<span class="nc" id="L208">        feedbackMeetingRepository.save(fm);</span>
+      }
+
+<span class="nc" id="L211">      return true;</span>
+<span class="nc" id="L212">    } catch (DataIntegrityViolationException e) {</span>
+<span class="nc" id="L213">      throw new ServerRuntimeException(&quot;errore nel salvataggio dei dati nel database&quot;);</span>
+    }
+  }
+
+  /**
+   * metodo che permette di avviare un meeting.
+   *
+   * @param metaId metaId dell'utente che vuole avviare il meeting
+   * @param idmeeting id del meeting che deve essere avviato
+   * @return valore booleano che identifica il successo dell'operazione
+   */
+  @Override
+  public Boolean avviaMeeting(String metaId, Long idmeeting)
+      throws ServerRuntimeException, RuntimeException403 {
+
+    Utente org;
+    Meeting m;
+<span class="nc bnc" id="L230" title="All 2 branches missed.">    if ((org = utenteRepository.findFirstBymetaId(metaId)) == null) {</span>
+<span class="nc" id="L231">      throw new RuntimeException403(&quot;organizzatore non trovato&quot;);</span>
+    }
+<span class="nc bnc" id="L233" title="All 2 branches missed.">    if ((m = meetingRepository.findMeetingById(idmeeting)) == null) {</span>
+<span class="nc" id="L234">      throw new RuntimeException403(&quot;meeting non trovato&quot;);</span>
+    }
+
+    // controllo ruolo organizzatore
+    // ricerca della stanza
+    Stanza s;
+<span class="nc bnc" id="L240" title="All 2 branches missed.">    if ((s = stanzaRepository.findStanzaById(m.getStanza().getId())) == null) {</span>
+<span class="nc" id="L241">      throw new ServerRuntimeException(&quot;stanza non trovata&quot;);</span>
+    }
+    // ricerca della stato partecipazione
+    StatoPartecipazione sp;
+<span class="nc bnc" id="L245" title="All 2 branches missed.">    if ((sp = statoPartecipazioneRepository.findStatoPartecipazioneByUtenteAndStanza(org, s))</span>
+        == null) {
+<span class="nc" id="L247">      throw new ServerRuntimeException(</span>
+          &quot;Errore nella verifica dell'utente in stanza, &quot;
+              + &quot;probabilmente non ha acceduto alla stanza&quot;);
+    }
+    // verifica ruolo
+<span class="nc bnc" id="L252" title="All 2 branches missed.">    if (sp.getRuolo().getNome().equalsIgnoreCase(&quot;Partecipante&quot;)) {</span>
+<span class="nc" id="L253">      throw new ServerRuntimeException(&quot;non puoi avviare il metting. Sei un partecipante&quot;);</span>
+    }
+
+    // AVVIO MEETING
+<span class="nc" id="L257">    m.setAvviato(true);</span>
+<span class="nc bnc" id="L258" title="All 2 branches missed.">    if (meetingRepository.updateAttributes(m.getId(), m) == 0) {</span>
+<span class="nc" id="L259">      throw new ServerRuntimeException(&quot;errore nell'avvio del meeting&quot;);</span>
+    }
+
+    try {
+      // creazione del report che sarà aggiornato a fine meeting
+<span class="nc" id="L264">      Report report = new Report(m, org);</span>
+<span class="nc" id="L265">      reportRepository.save(report);</span>
+
+      // registro l'organizzatore come presente al meeting
+<span class="nc" id="L268">      return accediMeeting(metaId, m.getId());</span>
+
+<span class="nc" id="L270">    } catch (DataIntegrityViolationException e) {</span>
+<span class="nc" id="L271">      throw new ServerRuntimeException(&quot;errore nel salvataggio del report&quot;);</span>
+    }
+  }
+
+  /**
+   * metodo che permette di terminare un meeting precedentemente avviato.
+   *
+   * @param metaId metaId
+   */
+  @Override
+  public Boolean terminaMeeting(String metaId, Long idmeeting)
+      throws ServerRuntimeException, RuntimeException403 {
+
+    Utente org;
+    Meeting m;
+<span class="nc bnc" id="L286" title="All 2 branches missed.">    if ((org = utenteRepository.findFirstBymetaId(metaId)) == null) {</span>
+<span class="nc" id="L287">      throw new RuntimeException403(&quot;organizzatore non trovato&quot;);</span>
+    }
+<span class="nc bnc" id="L289" title="All 2 branches missed.">    if ((m = meetingRepository.findMeetingById(idmeeting)) == null) {</span>
+<span class="nc" id="L290">      throw new RuntimeException403(&quot;meeting non trovato&quot;);</span>
+    }
+
+    // controllo ruolo organizzatore
+    // ricerca della stanza
+    Stanza s;
+<span class="nc bnc" id="L296" title="All 2 branches missed.">    if ((s = stanzaRepository.findStanzaById(m.getStanza().getId())) == null) {</span>
+<span class="nc" id="L297">      throw new ServerRuntimeException(&quot;stanza non trovata&quot;);</span>
+    }
+    // ricerca della stato partecipazione
+    StatoPartecipazione sp;
+<span class="nc bnc" id="L301" title="All 2 branches missed.">    if ((sp = statoPartecipazioneRepository.findStatoPartecipazioneByUtenteAndStanza(org, s))</span>
+        == null) {
+<span class="nc" id="L303">      throw new ServerRuntimeException(</span>
+          &quot;Errore nella verifica dell'utente in stanza, &quot;
+              + &quot;probabilmente non ha acceduto alla stanza&quot;);
+    }
+    // verifica ruolo
+<span class="nc bnc" id="L308" title="All 2 branches missed.">    if (sp.getRuolo().getNome().equalsIgnoreCase(&quot;Partecipante&quot;)) {</span>
+<span class="nc" id="L309">      throw new ServerRuntimeException(&quot;non puoi terminare il metting. Sei un partecipante&quot;);</span>
+    }
+
+    // TERMINAZIONE MEETING
+<span class="nc" id="L313">    m.setAvviato(false);</span>
+<span class="nc bnc" id="L314" title="All 2 branches missed.">    if (meetingRepository.updateAttributes(m.getId(), m) == 0) {</span>
+<span class="nc" id="L315">      throw new ServerRuntimeException(</span>
+          &quot;errore nella terminazione del meeting, &quot; + &quot;l'entità meeting non si è aggiornata&quot;);
+    }
+
+    // Prelevo la lista di utenti presenti nel meeting
+<span class="nc" id="L320">    List&lt;UtenteInMeeting&gt; uimList = utenteInMeetingRepository.findUtenteInMeetingsByMeeting(m);</span>
+
+    // richiamo la funzione uscitaMeeting per far uscire ogni utente
+<span class="nc" id="L323">    int count = 0;</span>
+<span class="nc bnc" id="L324" title="All 2 branches missed.">    for (UtenteInMeeting uim : uimList) {</span>
+<span class="nc bnc" id="L325" title="All 2 branches missed.">      if (uim.isOnline()) {</span>
+<span class="nc" id="L326">        uscitaMeeting(uim.getUtente().getMetaId(), m.getId());</span>
+<span class="nc" id="L327">        count++;</span>
+      }
+<span class="nc" id="L329">    }</span>
+
+    // aggiorno il report ai nuovi dati sul meeting terminato
+<span class="nc" id="L332">    Report rep = reportRepository.findByMeeting(m);</span>
+<span class="nc" id="L333">    rep.setNumPartecipanti(count);</span>
+<span class="nc" id="L334">    rep.setMaxPartecipanti(uimList.size());</span>
+
+    // calcolo tempo trascorso del meeting
+<span class="nc" id="L337">    Duration tempoTrascorso = Duration.between(rep.getDataCreazione(), LocalDateTime.now());</span>
+<span class="nc" id="L338">    rep.setDurataMeeting(tempoTrascorso);</span>
+
+    // prelevo la lista di utenti
+<span class="nc" id="L341">    List&lt;Utente&gt; utentiList =</span>
+<span class="nc" id="L342">        uimList.stream().map(UtenteInMeeting::getUtente).collect(Collectors.toList());</span>
+
+<span class="nc" id="L344">    rep.setListaPartecipanti(utentiList);</span>
+
+    try {
+<span class="nc" id="L347">      reportRepository.save(rep);</span>
+<span class="nc" id="L348">      return true;</span>
+<span class="nc" id="L349">    } catch (DataIntegrityViolationException e) {</span>
+<span class="nc" id="L350">      throw new ServerRuntimeException(&quot;errore nel salvataggio del report&quot;);</span>
+    }
+  }
+
+  /**
+   * metodo che consente ad un utente di uscire da un meeting.
+   *
+   * @param metaId metaId dell'utente che deve uscire dal meeting
+   * @param idmeeting id del meeting da cui l'utente ha intenzione di uscire
+   * @return valore boolean che identifica l'esito dell'operazione
+   */
+  @Override
+  public Boolean uscitaMeeting(String metaId, Long idmeeting)
+      throws ServerRuntimeException, RuntimeException403 {
+    Utente u;
+    Meeting m;
+<span class="nc bnc" id="L366" title="All 2 branches missed.">    if ((u = utenteRepository.findFirstBymetaId(metaId)) == null) {</span>
+<span class="nc" id="L367">      throw new RuntimeException403(&quot;organizzatore non trovato&quot;);</span>
+    }
+<span class="nc bnc" id="L369" title="All 2 branches missed.">    if ((m = meetingRepository.findMeetingById(idmeeting)) == null) {</span>
+<span class="nc" id="L370">      throw new RuntimeException403(&quot;meeting non trovato&quot;);</span>
+    }
+
+    try {
+      // USCITA DAL MEETING
+      // si aggiorna in UtenteInMeeting il campo isOnline
+<span class="nc" id="L376">      UtenteInMeeting uim = utenteInMeetingRepository.findUtenteInMeetingsByMeetingAndUtente(m, u);</span>
+<span class="nc" id="L377">      uim.setOnline(false);</span>
+<span class="nc" id="L378">      utenteInMeetingRepository.save(uim);</span>
+
+      // Aggiornamento della durata totale del meeting
+<span class="nc" id="L381">      FeedbackMeeting fm = feedbackMeetingRepository.findFeedbackMeetingByUtenteAndMeeting(u, m);</span>
+
+      // Calcolo la differenza tra DataPrimoAccesso e LocalDateTime.now()
+<span class="nc" id="L384">      Duration tempoTrascorso = Duration.between(fm.getDataPrimoAccesso(), LocalDateTime.now());</span>
+<span class="nc" id="L385">      fm.setTempoTotale(tempoTrascorso);</span>
+<span class="nc" id="L386">      feedbackMeetingRepository.save(fm);</span>
+
+<span class="nc" id="L388">      return true;</span>
+
+<span class="nc" id="L390">    } catch (DataIntegrityViolationException e) {</span>
+<span class="nc" id="L391">      throw new ServerRuntimeException(&quot;errore nel salvataggio dei dati nel database&quot;);</span>
+    }
+  }
+
+  /**
+   * metodo che consente di visualizzare la lista dei meeting schedulati all'interno della stanza.
+   *
+   * @param idStanza id della stanza di cui vogliamo visualizzare i meeting schedulati
+   * @return lista di meeting schedulati all'interno della stanza selezionata
+   */
+  @Override
+  public ResponseEntity&lt;Response&lt;List&lt;Meeting&gt;&gt;&gt; visualizzaSchedulingMeeting(Long idStanza) {
+
+<span class="nc" id="L404">    Stanza s = stanzaRepository.findStanzaById(idStanza);</span>
+<span class="nc bnc" id="L405" title="All 2 branches missed.">    if (s == null) {</span>
+<span class="nc" id="L406">      return ResponseEntity.status(403).body(new Response&lt;&gt;(null, &quot;stanza non trovata&quot;));</span>
+    } else {
+<span class="nc" id="L408">      List&lt;Meeting&gt; meetings = meetingRepository.findMeetingByStanza(s);</span>
+<span class="nc bnc" id="L409" title="All 2 branches missed.">      if (meetings != null) {</span>
+<span class="nc" id="L410">        return ResponseEntity.ok(</span>
+            new Response&lt;&gt;(
+                meetings, &quot;Questi sono tutti i meeting schedulati nella stanza selezionata&quot;));
+      } else {
+<span class="nc" id="L414">        return ResponseEntity.ok(</span>
+            new Response&lt;&gt;(null, &quot;Non ci sono meeting schedulati in questa stanza&quot;));
+      }
+    }
+  }
+
+  /**
+   * metodo che consente di visualizzare i questionari di un determinato utente.
+   *
+   * @param metaId metaId dell'utente che deve visualizzare i meeting
+   * @return lista di meeting di cui l'utente possiede un questionari
+   */
+  @Override
+  public List&lt;Meeting&gt; visualizzaQuestionari(String metaId)
+      throws ServerRuntimeException, RuntimeException403 {
+
+    Utente u;
+<span class="nc bnc" id="L431" title="All 2 branches missed.">    if ((u = utenteRepository.findFirstBymetaId(metaId)) == null) {</span>
+<span class="nc" id="L432">      throw new ServerRuntimeException(&quot;errore nella ricerca dell'utente&quot;);</span>
+    }
+
+<span class="nc" id="L435">    List&lt;FeedbackMeeting&gt; feedbacks = feedbackMeetingRepository.findFeedbackMeetingByUtente(u);</span>
+<span class="nc bnc" id="L436" title="All 2 branches missed.">    if (feedbacks == null) {</span>
+<span class="nc" id="L437">      throw new RuntimeException403(&quot;non hai partecipato ancora a nessun meeting&quot;);</span>
+    }
+
+<span class="nc" id="L440">    return feedbacks.stream()</span>
+<span class="nc bnc" id="L441" title="All 2 branches missed.">        .filter(feedbackMeeting -&gt; !feedbackMeeting.isCompiledQuestionario())</span>
+<span class="nc" id="L442">        .map(FeedbackMeeting::getMeeting)</span>
+<span class="nc bnc" id="L443" title="All 2 branches missed.">        .filter(meeting -&gt; !meeting.isAvviato())</span>
+<span class="nc" id="L444">        .collect(Collectors.toList());</span>
+  }
+
+  /**
+   * Metodo che consente la visualizzazione di tutti i meeting a cui ha già partecipato un
+   * determinato utente.
+   *
+   * @param metaId metaId dell'utente che ha partecipato ai meeting.
+   * @return lista di tutti i meeting a cui l'utente ha già partecipato.
+   */
+  @Override
+  public List&lt;Meeting&gt; getMeetingPrecedenti(String metaId)
+      throws ServerRuntimeException, RuntimeException403 {
+
+    Utente u;
+<span class="nc bnc" id="L459" title="All 2 branches missed.">    if ((u = utenteRepository.findFirstBymetaId(metaId)) == null) {</span>
+<span class="nc" id="L460">      throw new ServerRuntimeException(&quot;errore nella ricerca dell'utente&quot;);</span>
+    }
+
+<span class="nc" id="L463">    List&lt;UtenteInMeeting&gt; uim = utenteInMeetingRepository.findUtenteInMeetingsByUtente(u);</span>
+<span class="nc bnc" id="L464" title="All 2 branches missed.">    if (uim == null) {</span>
+<span class="nc" id="L465">      throw new RuntimeException403(&quot;non hai partecipato ancora a nessun meeting&quot;);</span>
+    }
+
+<span class="nc" id="L468">    return uim.stream()</span>
+<span class="nc" id="L469">        .map(UtenteInMeeting::getMeeting)</span>
+<span class="nc bnc" id="L470" title="All 2 branches missed.">        .filter(meeting -&gt; !meeting.isAvviato())</span>
+<span class="nc" id="L471">        .collect(Collectors.toList());</span>
+  }
+
+  /**
+   * Metodo che consente la compilazione di un questionario da parte di un determinato utente.
+   *
+   * @param value la valutazione dello scenario inserita dall'utente all'interno del questionario
+   * @param motionSickness livello di nausea dopo l'uscita dal meeting
+   * @param metaId metaId dell'utente che compila il questionario
+   * @param idmeeting id del meeting a cui fa riferimento il questionario
+   * @return valore boolean che identifica l'esito dell'operazione
+   */
+  @Override
+  public boolean compilaQuestionario(
+      Integer value, Integer motionSickness, String metaId, Long idmeeting)
+      throws ServerRuntimeException, RuntimeException403 {
+
+    Utente u;
+<span class="nc bnc" id="L489" title="All 2 branches missed.">    if ((u = utenteRepository.findFirstBymetaId(metaId)) == null) {</span>
+<span class="nc" id="L490">      throw new ServerRuntimeException(&quot;errore nella ricerca dell'utente&quot;);</span>
+    }
+
+    Meeting m;
+<span class="nc bnc" id="L494" title="All 2 branches missed.">    if ((m = meetingRepository.findMeetingById(idmeeting)) == null) {</span>
+<span class="nc" id="L495">      throw new RuntimeException403(&quot;meeting non trovato&quot;);</span>
+    }
+
+    // controllo se esiste il feedbackmeeting
+<span class="nc" id="L499">    FeedbackMeeting fm = feedbackMeetingRepository.findFeedbackMeetingByUtenteAndMeeting(u, m);</span>
+<span class="nc bnc" id="L500" title="All 2 branches missed.">    if (fm == null) {</span>
+<span class="nc" id="L501">      throw new ServerRuntimeException(&quot;errore nella ricerca del feedback meeting&quot;);</span>
+    }
+
+    // controllo se il questionario già è stato compilato
+<span class="nc bnc" id="L505" title="All 2 branches missed.">    if (fm.isCompiledQuestionario()) {</span>
+<span class="nc" id="L506">      throw new RuntimeException403(&quot;questionario già compilato&quot;);</span>
+    }
+
+    // determino che il questionario è salvato
+<span class="nc" id="L510">    fm.setCompiledQuestionario(true);</span>
+    // aggiungo il livello di immersività e il motionSickness
+<span class="nc" id="L512">    fm.setImmersionLevel(value);</span>
+<span class="nc" id="L513">    fm.setMotionSickness(motionSickness);</span>
+
+<span class="nc" id="L515">    feedbackMeetingRepository.save(fm);</span>
+
+    // se non è compilato allora procedo con la compilazione
+<span class="nc" id="L518">    Scenario sc = m.getScenarioIniziale();</span>
+<span class="nc bnc" id="L519" title="All 2 branches missed.">    if (sc == null) {</span>
+<span class="nc" id="L520">      throw new ServerRuntimeException(&quot;errore nella ricerca dello scenario&quot;);</span>
+    }
+
+    // prelevo media e numero dei voti
+<span class="nc" id="L524">    float media = sc.getMediaValutazione();</span>
+<span class="nc" id="L525">    int numVoti = sc.getNumVoti();</span>
+
+    // calcolo media
+<span class="nc" id="L528">    float newMedia = ((media * numVoti) + value) / (numVoti + 1);</span>
+
+    // inserimento della media nello scenario
+<span class="nc" id="L531">    sc.setMediaValutazione(newMedia);</span>
+<span class="nc" id="L532">    sc.setNumVoti(numVoti + 1);</span>
+<span class="nc" id="L533">    scenarioRepository.save(sc);</span>
+
+<span class="nc" id="L535">    return true;</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.9.202303310957</span></div></body></html>

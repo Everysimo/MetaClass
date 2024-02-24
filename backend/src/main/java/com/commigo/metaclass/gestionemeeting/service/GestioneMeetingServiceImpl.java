@@ -533,6 +533,9 @@ public class GestioneMeetingServiceImpl implements GestioneMeetingService {
     sc.setNumVoti(numVoti + 1);
     scenarioRepository.save(sc);
 
+    //aggiornamento del dataset con nuovi valori
+    gestioneStimaMeetingService.addUtenteInDataset(u,fm.getTempoTotale(),value,motionSickness);
+
     return true;
   }
 }

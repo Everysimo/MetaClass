@@ -113,7 +113,7 @@ public class GestioneStimaMeetingServiceImpl implements GestioneStimaMeetingServ
    */
   private Double requestPrediction(Utente utente) {
 
-    try (InputStream is = getClass().getResourceAsStream("/RegressoreDurataMeeting.pmml")) {
+    try (InputStream is = getClass().getResourceAsStream("/MetaClassAI/RegressoreDurataMeeting.pmml")) {
       evaluator = new LoadingModelEvaluatorBuilder().load(is).build();
     } catch (Exception e) {
       e.printStackTrace();
@@ -173,11 +173,12 @@ public class GestioneStimaMeetingServiceImpl implements GestioneStimaMeetingServ
    * @param u Istanza di Utente-
    * @param durata Durata del meeting dell'utente.
    * @param immersionLevel Livello di immersività dell'utente.
+   * @param motionSickness Livello di fastidio.
    * @throws ServerRuntimeException Eccezione generata da errori server.
    */
   @Override
-  public void addUtenteInDataset(Utente u, Duration durata, int immersionLevel)
+  public void addUtenteInDataset(Utente u, Duration durata, int immersionLevel, int motionSickness)
       throws ServerRuntimeException {
-    stimaProgressiAdapter.addUtenteInDataset(u, durata, immersionLevel);
+    stimaProgressiAdapter.addUtenteInDataset(u, durata, immersionLevel, motionSickness);
   }
 }

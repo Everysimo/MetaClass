@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="it"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>FeedbackMeeting.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">MetaClass</a> &gt; <a href="index.source.html" class="el_package">com.commigo.metaclass.entity</a> &gt; <span class="el_source">FeedbackMeeting.java</span></div><h1>FeedbackMeeting.java</h1><pre class="source lang-java linenums">package com.commigo.metaclass.entity;
+
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+
+/** Entità Feedback Meeting. */
+@Entity
+<span class="nc bnc" id="L25" title="All 72 branches missed.">@Data</span>
+<span class="nc" id="L26">@NoArgsConstructor</span>
+<span class="nc" id="L27">@AllArgsConstructor</span>
+public class FeedbackMeeting {
+
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+<span class="nc" id="L32">  private long id;</span>
+
+  @Column(updatable = false)
+<span class="nc" id="L35">  private LocalDateTime dataCompilazione;</span>
+
+  @Column
+  @NotNull(message = &quot;Il tempo non può essere nullo&quot;)
+<span class="nc" id="L39">  private Duration tempoTotale;</span>
+
+  // da definire la regola inizio&lt;fine
+  @Column(updatable = false)
+  @CreationTimestamp
+<span class="nc" id="L44">  private LocalDateTime dataPrimoAccesso;</span>
+
+  @NotNull(message = &quot;La data dell'ultimo accesso non può essere nulla&quot;)
+  @Column
+<span class="nc" id="L48">  private LocalDateTime dataUltimoAccesso;</span>
+
+  /** Chiave Esterna sull' utente. */
+  @NotNull(message = &quot;L'utente non può essere nullo&quot;)
+  @ManyToOne()
+  @JoinColumn(name = &quot;id_utente&quot;)
+  @OnDelete(action = OnDeleteAction.CASCADE)
+<span class="nc" id="L55">  private Utente utente;</span>
+
+  @NotNull(message = &quot;Il meeting non può essere nullo&quot;)
+  @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.REFRESH})
+  @JoinColumn(name = &quot;idMeeting&quot;)
+  @OnDelete(action = OnDeleteAction.CASCADE)
+<span class="nc" id="L61">  private Meeting meeting;</span>
+
+  @NotNull(message = &quot;Il report non può essere nullo&quot;)
+  @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.REFRESH})
+  @JoinColumn(name = &quot;id_report&quot;)
+  @OnDelete(action = OnDeleteAction.CASCADE)
+<span class="nc" id="L67">  private Report report;</span>
+
+  @Column(name = &quot;immersionLevel&quot;)
+  @NotNull(message = &quot;Il livello di immersività non può essere mai nullo&quot;)
+  @Min(value = 1, message = &quot;Il livello di immersività non può essere inferiore a 1&quot;)
+  @Max(value = 5, message = &quot;Il livello di immersività non può essere superiore a 5&quot;)
+<span class="nc" id="L73">  private int immersionLevel;</span>
+
+  @Column(name = &quot;motionSickness&quot;)
+  @NotNull(message = &quot;Il motionSickness non può essere mai nullo&quot;)
+  @Min(value = 1, message = &quot;Il motionSickness non può essere inferiore a 1&quot;)
+  @Max(value = 10, message = &quot;Il motionSickness non può essere superiore a 10&quot;)
+<span class="nc" id="L79">  private int motionSickness;</span>
+
+  @NotNull(message = &quot;il questionario non può essere nullo&quot;)
+<span class="nc" id="L82">  private boolean compiledQuestionario;</span>
+
+  /**
+   * Costruttore.
+   *
+   * @param utente Istanza dell'utente.
+   * @param meeting Istanza del meeting.
+   * @param report Istanza del report.
+   */
+<span class="fc" id="L91">  public FeedbackMeeting(Utente utente, Meeting meeting, Report report) {</span>
+<span class="fc" id="L92">    this.utente = utente;</span>
+<span class="fc" id="L93">    this.meeting = meeting;</span>
+<span class="fc" id="L94">    this.report = report;</span>
+<span class="fc" id="L95">    this.tempoTotale = Duration.ZERO;</span>
+<span class="fc" id="L96">    this.dataUltimoAccesso = LocalDateTime.now();</span>
+<span class="fc" id="L97">    this.compiledQuestionario = false;</span>
+<span class="fc" id="L98">    this.motionSickness = 1;</span>
+<span class="fc" id="L99">    this.immersionLevel = 1;</span>
+<span class="fc" id="L100">  }</span>
+
+  /** Costruttore. */
+  public FeedbackMeeting(
+      Utente utente,
+      Meeting meeting,
+      Report report,
+      Duration tempoTotale,
+      LocalDateTime ultimo,
+<span class="nc" id="L109">      boolean compiled) {</span>
+<span class="nc" id="L110">    this.utente = utente;</span>
+<span class="nc" id="L111">    this.meeting = meeting;</span>
+<span class="nc" id="L112">    this.report = report;</span>
+<span class="nc" id="L113">    this.tempoTotale = tempoTotale;</span>
+<span class="nc" id="L114">    this.dataUltimoAccesso = ultimo;</span>
+<span class="nc" id="L115">    this.compiledQuestionario = compiled;</span>
+<span class="nc" id="L116">    this.motionSickness = 1;</span>
+<span class="nc" id="L117">    this.immersionLevel = 1;</span>
+<span class="nc" id="L118">  }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.9.202303310957</span></div></body></html>

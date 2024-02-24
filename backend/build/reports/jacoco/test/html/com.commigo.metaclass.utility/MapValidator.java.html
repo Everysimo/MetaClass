@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="it"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MapValidator.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">MetaClass</a> &gt; <a href="index.source.html" class="el_package">com.commigo.metaclass.utility</a> &gt; <span class="el_source">MapValidator.java</span></div><h1>MapValidator.java</h1><pre class="source lang-java linenums">package com.commigo.metaclass.utility;
+
+import com.commigo.metaclass.entity.Meeting;
+import com.commigo.metaclass.entity.Stanza;
+import com.commigo.metaclass.entity.Utente;
+import com.commigo.metaclass.exceptions.ClientRuntimeException;
+import com.commigo.metaclass.exceptions.RuntimeException403;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Validation;
+import jakarta.validation.ValidationException;
+import jakarta.validation.Validator;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import lombok.NoArgsConstructor;
+import org.springframework.stereotype.Component;
+
+/** Classe di validazione. */
+@Component
+<span class="nc" id="L25">@NoArgsConstructor</span>
+public class MapValidator {
+
+<span class="fc" id="L28">  private static final Validator validator =</span>
+<span class="fc" id="L29">      Validation.buildDefaultValidatorFactory().getValidator();</span>
+
+  /**
+   * Validatore stanza.
+   *
+   * @param params mappa con i dati stanza.
+   * @return conferma validazione
+   * @throws RuntimeException403 eccezione di errori nella richiesta.
+   */
+  public static boolean stanzaValidate(Map&lt;String, Object&gt; params) throws ClientRuntimeException {
+
+<span class="nc bnc" id="L40" title="All 2 branches missed.">    for (Map.Entry&lt;String, Object&gt; entry : params.entrySet()) {</span>
+<span class="nc" id="L41">      String attributeName = entry.getKey();</span>
+<span class="nc" id="L42">      Object attributeValue = entry.getValue();</span>
+
+      try {
+<span class="nc" id="L45">        Set&lt;ConstraintViolation&lt;Stanza&gt;&gt; violations =</span>
+<span class="nc" id="L46">            validator.validateValue(Stanza.class, attributeName, attributeValue);</span>
+
+<span class="nc bnc" id="L48" title="All 2 branches missed.">        if (!violations.isEmpty()) {</span>
+          // Handle validation errors for the specific attribute
+<span class="nc" id="L50">          throw new ClientRuntimeException(</span>
+<span class="nc" id="L51">              &quot;Errore nella richiesta: &quot; + violations.iterator().next().getMessage());</span>
+        }
+<span class="nc" id="L53">      } catch (IllegalArgumentException e) {</span>
+<span class="nc" id="L54">        throw new ClientRuntimeException(</span>
+            &quot;Errore nella richiesta: L'attributo '&quot;
+                + attributeName
+                + &quot;' non è presente nell'entità Stanza&quot;);
+<span class="nc" id="L58">      } catch (ValidationException ve) {</span>
+<span class="nc" id="L59">        throw new ClientRuntimeException(</span>
+            &quot;Errore nella richiesta: L'attributo '&quot;
+                + attributeName
+                + &quot;' ha un valore che non rispetta il suo tipo di dato&quot;);
+<span class="nc" id="L63">      }</span>
+<span class="nc" id="L64">    }</span>
+<span class="nc" id="L65">    return true;</span>
+  }
+
+  /**
+   * Validatore utente.
+   *
+   * @param params mappa con i dati utente.
+   * @return conferma validazione
+   * @throws RuntimeException403 eccezione di errori nella richiesta.
+   */
+  public static boolean utenteValidate(Map&lt;String, Object&gt; params) throws RuntimeException403 {
+
+<span class="fc bfc" id="L77" title="All 2 branches covered.">    for (Map.Entry&lt;String, Object&gt; entry : params.entrySet()) {</span>
+<span class="fc" id="L78">      String attributeName = entry.getKey();</span>
+<span class="fc" id="L79">      Object attributeValue = entry.getValue();</span>
+
+      try {
+
+<span class="fc bfc" id="L83" title="All 2 branches covered.">        if (attributeName.equalsIgnoreCase(&quot;dataDiNascita&quot;)) {</span>
+<span class="fc" id="L84">          DateTimeFormatter formatter = DateTimeFormatter.ofPattern(&quot;MM/dd/yyyy&quot;);</span>
+
+          try {
+<span class="fc" id="L87">            LocalDate data = LocalDate.parse((CharSequence) attributeValue, formatter);</span>
+
+            // Creare un DateTimeFormatter per il formato di output
+<span class="fc" id="L90">            DateTimeFormatter formatterOutput = DateTimeFormatter.ofPattern(&quot;yyyy-MM-dd&quot;);</span>
+
+            // Formattare la data di uscita nel nuovo formato
+<span class="fc" id="L93">            String outputDate = data.format(formatterOutput);</span>
+
+<span class="fc" id="L95">            params.put(attributeName, outputDate);</span>
+
+<span class="fc" id="L97">          } catch (DateTimeParseException e) {</span>
+<span class="fc" id="L98">            throw new RuntimeException403(</span>
+                &quot;Errore nella richiesta: Formato della data di nascita non valido. &quot;
+                    + &quot;Formato richiesto: MM/dd/yyyy&quot;);
+<span class="fc" id="L101">          }</span>
+<span class="fc" id="L102">        } else {</span>
+<span class="fc" id="L103">          Set&lt;ConstraintViolation&lt;Utente&gt;&gt; violations =</span>
+<span class="fc" id="L104">              validator.validateValue(Utente.class, attributeName, attributeValue);</span>
+
+<span class="fc bfc" id="L106" title="All 2 branches covered.">          if (!violations.isEmpty()) {</span>
+            // Handle validation errors for the specific attribute
+<span class="fc" id="L108">            throw new RuntimeException403(</span>
+<span class="fc" id="L109">                &quot;Errore nella richiesta: &quot; + violations.iterator().next().getMessage());</span>
+          }
+        }
+
+<span class="nc" id="L113">      } catch (IllegalArgumentException e) {</span>
+<span class="nc" id="L114">        throw new RuntimeException403(</span>
+            &quot;Errore nella richiesta: L'attributo '&quot;
+                + attributeName
+                + &quot;' non è presente nell'entità Utente&quot;);
+<span class="nc" id="L118">      } catch (ValidationException ve) {</span>
+<span class="nc" id="L119">        throw new RuntimeException403(</span>
+            &quot;Errore nella richiesta: L'attributo '&quot;
+                + attributeName
+                + &quot;' ha un valore che non rispetta il suo tipo di dato&quot;);
+<span class="fc" id="L123">      }</span>
+<span class="fc" id="L124">    }</span>
+<span class="fc" id="L125">    return true;</span>
+  }
+
+  /**
+   * Metodo che mi valida gli attributi del meeting presi da una mappa.
+   *
+   * @param params mappa di attributi
+   * @return controllo di validazione avvenuta con successo
+   * @throws ClientRuntimeException errore di bad request
+   */
+  public static boolean meetingValidate(Map&lt;String, Object&gt; params) throws ClientRuntimeException {
+
+<span class="nc" id="L137">    List&lt;LocalDateTime&gt; dates = new ArrayList&lt;&gt;();</span>
+<span class="nc bnc" id="L138" title="All 2 branches missed.">    for (Map.Entry&lt;String, Object&gt; entry : params.entrySet()) {</span>
+<span class="nc" id="L139">      String attributeName = entry.getKey();</span>
+<span class="nc" id="L140">      Object attributeValue = entry.getValue();</span>
+
+      try {
+<span class="nc bnc" id="L143" title="All 2 branches missed.">        if (!attributeName.equalsIgnoreCase(&quot;nome&quot;)) {</span>
+<span class="nc" id="L144">          DateTimeFormatter formatter = DateTimeFormatter.ofPattern(&quot;yyyy-MM-dd HH:mm&quot;);</span>
+
+          try {
+<span class="nc" id="L147">            dates.add(LocalDateTime.parse((CharSequence) attributeValue, formatter));</span>
+<span class="nc" id="L148">            System.out.println(dates.get(0));</span>
+<span class="nc" id="L149">          } catch (DateTimeParseException e) {</span>
+<span class="nc" id="L150">            throw new ClientRuntimeException(</span>
+                &quot;Errore nella richiesta: L'attributo '&quot;
+                    + attributeName
+                    + &quot;' Formato richiesto: yyyy-MM-dd HH:mm&quot;);
+<span class="nc" id="L154">          }</span>
+
+<span class="nc" id="L156">        } else {</span>
+<span class="nc" id="L157">          Set&lt;ConstraintViolation&lt;Meeting&gt;&gt; violations =</span>
+<span class="nc" id="L158">              validator.validateValue(Meeting.class, attributeName, attributeValue);</span>
+
+<span class="nc bnc" id="L160" title="All 2 branches missed.">          if (!violations.isEmpty()) {</span>
+            // Handle validation errors for the specific attribute
+<span class="nc" id="L162">            throw new ClientRuntimeException(</span>
+<span class="nc" id="L163">                &quot;Errore nella richiesta: &quot; + violations.iterator().next().getMessage());</span>
+          }
+        }
+<span class="nc" id="L166">      } catch (IllegalArgumentException e) {</span>
+<span class="nc" id="L167">        throw new ClientRuntimeException(</span>
+            &quot;Errore nella richiesta: L'attributo '&quot;
+                + attributeName
+                + &quot;' non è presente nell'entità Stanza&quot;);
+<span class="nc" id="L171">      } catch (ValidationException ve) {</span>
+<span class="nc" id="L172">        throw new ClientRuntimeException(</span>
+            &quot;Errore nella richiesta: L'attributo '&quot;
+                + attributeName
+                + &quot;' ha un valore che non rispetta il suo tipo di dato&quot;);
+<span class="nc" id="L176">      }</span>
+<span class="nc" id="L177">    }</span>
+    // controllo l'ordine delle date
+<span class="nc bnc" id="L179" title="All 2 branches missed.">    if (isStartDateBeforeEndDate(dates)) {</span>
+<span class="nc" id="L180">      throw new ClientRuntimeException(</span>
+          &quot;Errore nella richiesta: inizio deve essere minore di fine o viceversa&quot;);
+    }
+<span class="nc bnc" id="L183" title="All 2 branches missed.">    if (isBeforeOfNow(dates.get(0))) {</span>
+<span class="nc" id="L184">      throw new ClientRuntimeException(</span>
+          &quot;Errore nella richiesta: inizio è precedente alla data odierna&quot;);
+    }
+<span class="nc bnc" id="L187" title="All 2 branches missed.">    if (isBeforeOfNow(dates.get(1))) {</span>
+<span class="nc" id="L188">      throw new ClientRuntimeException(</span>
+          &quot;Errore nella richiesta: fine è precedente alla data odierna&quot;);
+    }
+<span class="nc" id="L191">    return true;</span>
+  }
+
+  private static boolean isStartDateBeforeEndDate(List&lt;LocalDateTime&gt; dates) {
+    // La validazione sarà passata solo se la data di inizio è precedente a quella di fine
+<span class="nc bnc" id="L196" title="All 6 branches missed.">    return dates.get(0) == null || dates.get(1) == null || !dates.get(0).isBefore(dates.get(1));</span>
+  }
+
+  private static boolean isBeforeOfNow(LocalDateTime data) {
+    // La validazione sarà passata solo se la data di inizio è precedente a quella di fine
+<span class="nc" id="L201">    return data.isBefore(LocalDateTime.now());</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.9.202303310957</span></div></body></html>

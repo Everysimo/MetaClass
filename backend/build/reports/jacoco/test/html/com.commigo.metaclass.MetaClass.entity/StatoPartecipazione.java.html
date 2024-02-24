@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="it"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>StatoPartecipazione.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">MetaClass</a> &gt; <a href="index.source.html" class="el_package">com.commigo.metaclass.MetaClass.entity</a> &gt; <span class="el_source">StatoPartecipazione.java</span></div><h1>StatoPartecipazione.java</h1><pre class="source lang-java linenums">package com.commigo.metaclass.MetaClass.entity;
+
+import com.commigo.metaclass.MetaClass.utility.multipleid.StatoPartecipazioneId;
+import jakarta.persistence.*;
+import jakarta.persistence.CascadeType;
+import jakarta.validation.constraints.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.hibernate.annotations.*;
+import org.springframework.transaction.TransactionSystemException;
+
+import java.io.Serializable;
+import java.time.LocalDateTime;
+
+@Entity
+<span class="nc bnc" id="L17" title="All 66 branches missed.">@Data</span>
+<span class="nc" id="L18">@NoArgsConstructor</span>
+<span class="nc" id="L19">@AllArgsConstructor</span>
+@IdClass(StatoPartecipazioneId.class)
+public class StatoPartecipazione implements Serializable {
+
+
+    /**
+     * Costante per valore intero di 50.
+     */
+    public static final int MAX_NAME_LENGTH = 50;
+
+    /**
+     *Chiave Esterna sulla stanza
+     */
+    @Id
+    @NotNull(message = &quot;La stanza non può essere nulla&quot;)
+    @ManyToOne(cascade = CascadeType.MERGE)
+    @JoinColumn(name = &quot;id_stanza&quot;)
+    @OnDelete(action = OnDeleteAction.CASCADE)
+<span class="nc" id="L37">    private Stanza stanza;</span>
+
+    /**
+     *Chiave Esterna sull'utente
+     */
+    @Id
+    @NotNull(message = &quot;L'utente non può essere nullo&quot;)
+    @ManyToOne(cascade = CascadeType.MERGE)
+    @JoinColumn(name = &quot;id_utente&quot;)
+    @OnDelete(action = OnDeleteAction.CASCADE)
+<span class="nc" id="L47">    private Utente utente;</span>
+
+    /**
+     *Chiave Esterna sulla ruolo dell'utente
+     */
+    @NotNull(message = &quot;Il ruolo  non può essere nullo&quot;)
+    @ManyToOne(cascade = {CascadeType.MERGE})
+    @JoinColumn(name = &quot;id_ruolo&quot;)
+<span class="nc" id="L55">    private Ruolo ruolo;</span>
+
+    /**
+     *isInAttesa per verificare se l'utente è in attesa di entrare nella stanza
+     */
+    @NotNull(message = &quot;isInAttesa non può essere nullo&quot;)
+<span class="nc" id="L61">    private boolean isInAttesa;</span>
+
+    /**
+     *isBannato per verificare se l'utente è stato bannato da una stanza
+     */
+    @NotNull(message = &quot;isBannato non può essere nullo&quot;)
+<span class="nc" id="L67">    private boolean isBannato;</span>
+
+
+    /**
+     * isSilenziato per verificare se l'utente è silenziato in una stanza
+     */
+
+    @NotNull(message = &quot;isSilenziato non può essere nullo&quot;)
+<span class="nc" id="L75">    private boolean isSilenziato;</span>
+
+    /**
+     *NomeInStanza identifica il nome dell'utente nella stanza specifica
+     */
+    @NotNull(message = &quot;Il nome nella stanza non può essere nullo&quot;)
+    @Column(length = MAX_NAME_LENGTH)
+    @Pattern(regexp = &quot;^[A-Z][A-Za-z0-9]*$&quot;)
+    @Size(min = 1, max = MAX_NAME_LENGTH, message = &quot;Lunghezza del NomeInStanza non valida&quot;)
+    @NotBlank(message = &quot;Il nome nella stanza non può essere vuota&quot;)
+<span class="nc" id="L85">    private String nomeInStanza;</span>
+
+    //data creazione e aggiornamento dei dati
+    @Column(name = &quot;Data_Creazione&quot;, updatable = false)
+    @CreationTimestamp
+<span class="nc" id="L90">    private LocalDateTime data_Creazione;</span>
+
+    @Column(name = &quot;Data_Aggiornamento&quot;)
+    @UpdateTimestamp
+<span class="nc" id="L94">    private LocalDateTime data_Aggiornamento;</span>
+
+    public void checkRule(){
+        try{
+
+<span class="nc bnc" id="L99" title="All 4 branches missed.">            if(this.utente.isAdmin() &amp;&amp; this.isBannato)</span>
+<span class="nc" id="L100">                throw new TransactionSystemException(&quot;un'amministratore se viene bannato &quot;+</span>
+                        &quot;se lo può recovare!&quot;);
+
+<span class="nc bnc" id="L103" title="All 2 branches missed.">            if(!this.ruolo.getNome().equalsIgnoreCase(Ruolo.PARTECIPANTE)){</span>
+<span class="nc bnc" id="L104" title="All 2 branches missed.">                if(this.isInAttesa){</span>
+
+<span class="nc" id="L106">                    throw new TransactionSystemException(&quot;non puoi inserire un ruolo &quot; +</span>
+                            &quot;diverso da partecipante che sia in attesa&quot;);
+
+<span class="nc bnc" id="L109" title="All 4 branches missed.">                }else if(this.ruolo.getNome().equalsIgnoreCase(Ruolo.ORGANIZZATORE_MASTER) &amp;&amp;</span>
+                        this.isBannato){
+
+<span class="nc" id="L112">                    throw new TransactionSystemException(&quot;L'organizzatore master non può &quot; +</span>
+                            &quot;essere inserito come bannato&quot;);
+
+                }
+            }
+<span class="nc" id="L117">        }catch(TransactionSystemException e){</span>
+<span class="nc" id="L118">            System.err.println(e.getMessage());</span>
+<span class="nc" id="L119">        }</span>
+<span class="nc" id="L120">    }</span>
+
+    public StatoPartecipazione(Stanza stanza, Utente utente, Ruolo ruolo,
+<span class="nc" id="L123">                               boolean isInAttesa, boolean isBannato, String nomeInStanza, boolean isSilenziato) throws TransactionSystemException {</span>
+<span class="nc" id="L124">        this.stanza = stanza;</span>
+<span class="nc" id="L125">        this.utente = utente;</span>
+<span class="nc" id="L126">        this.ruolo = ruolo;</span>
+<span class="nc" id="L127">        this.isInAttesa = isInAttesa;</span>
+<span class="nc" id="L128">        this.isBannato = isBannato;</span>
+<span class="nc" id="L129">        this.nomeInStanza = nomeInStanza;</span>
+<span class="nc" id="L130">        this.isSilenziato = isSilenziato;</span>
+<span class="nc" id="L131">        checkRule();</span>
+<span class="nc" id="L132">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.9.202303310957</span></div></body></html>

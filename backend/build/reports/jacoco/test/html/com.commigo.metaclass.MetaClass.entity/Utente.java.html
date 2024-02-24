@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="it"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Utente.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">MetaClass</a> &gt; <a href="index.source.html" class="el_package">com.commigo.metaclass.MetaClass.entity</a> &gt; <span class="el_source">Utente.java</span></div><h1>Utente.java</h1><pre class="source lang-java linenums">package com.commigo.metaclass.MetaClass.entity;
+
+import com.commigo.metaclass.MetaClass.exceptions.DataFormatException;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
+import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+import org.springframework.format.annotation.DateTimeFormat;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+
+@Entity
+<span class="nc bnc" id="L19" title="All 100 branches missed.">@Data</span>
+<span class="nc" id="L20">@NoArgsConstructor</span>
+<span class="nc" id="L21">@AllArgsConstructor</span>
+@JsonInclude(JsonInclude.Include.NON_NULL)
+public class Utente {
+
+    /**
+     * Costante per valore intero di 254.
+     */
+    public static final int MAX_NAME_LENGTH = 254;
+
+    /**
+     * Costante per valore intero di 3.
+     */
+    public static final int MIN_NAME_LENGTH = 3;
+
+    /**
+     * Lunghezza campo sesso.
+     */
+    public static final int SEX_LENGTH = 1;
+
+    /**
+     * Costante per valore intero di 114.
+     */
+    public static final int MAX_ETA_LENGTH = 114;
+
+    /**
+     * Costante per valore intero di 10.
+     */
+    public static final int MIN_ETA_LENGTH = 10;
+
+    /**
+     * Costante per valore intero di 10.
+     */
+    private static final int MAX_PHONE_LENGTH = 10;
+
+    /**
+     * Costante per valore intero di 10.
+     */
+    private static final int MIN_TOKEN_LENGTH = 1;
+
+    /**
+     * Costante per valore intero di 10.
+     */
+    private static final int MAX_TOKEN_LENGTH = 1024;
+
+    public static final String DEFAULT_TOKEN = &quot;TODO&quot;;
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+<span class="nc" id="L69">    @Getter</span>
+<span class="nc" id="L70">    @Setter</span>
+    private long id;
+
+
+    @NotNull(message = &quot;Il nome non può essere nullo&quot;)
+    @Column(length = MAX_NAME_LENGTH)
+    @Size(min = MIN_NAME_LENGTH,
+            max = MAX_NAME_LENGTH,
+            message = &quot;Lunghezza nome errata&quot;)
+    @Pattern(regexp=&quot;^[A-Z][a-z]*&quot;,
+            message=&quot;Formato nome errato&quot;)
+    @NotBlank(message = &quot;Il nome non può essere vuoto&quot;)
+<span class="nc" id="L82">    private String nome;</span>
+
+    @NotNull(message = &quot;Il cognome non può essere nullo&quot;)
+    @Column(length = MAX_NAME_LENGTH)
+    @Size(min = MIN_NAME_LENGTH,
+            max = MAX_NAME_LENGTH,
+            message = &quot;Lunghezza cognome errata&quot;)
+    @Pattern(regexp =&quot;^[A-Z][a-z]*&quot;,
+            message=&quot;Formato cognome errato&quot;)
+    @NotBlank(message = &quot;Il cognome non può essere vuoto&quot;)
+<span class="nc" id="L92">    private String cognome;</span>
+
+    @NotNull(message = &quot;Il sesso non può essere nullo&quot;)
+    @Column(length = SEX_LENGTH)
+    @Size(min = SEX_LENGTH,
+            max = SEX_LENGTH,
+            message = &quot;Lunghezza sesso non valida&quot;)
+    @NotBlank(message = &quot;Il sesso non può essere vuoto&quot;)
+    @Pattern(regexp = &quot;^[MFO]*$&quot;,
+            message = &quot;Il genere deve essere 'M', 'F' o 'O'&quot;)
+<span class="nc" id="L102">    private String sesso;</span>
+
+    @NotNull(message = &quot;La data di nascita non può essere nulla&quot;)
+    @Past(message = &quot;La data di nascita deve essere passata&quot;)
+    @DateTimeFormat(pattern = &quot;MM/dd/yyyy&quot;)
+<span class="nc" id="L107">    private LocalDate dataDiNascita;</span>
+
+    @NotNull(message = &quot;IsAdmin non può essere nullo&quot;)
+<span class="nc" id="L110">    private boolean isAdmin;</span>
+
+    @NotNull(message = &quot;L'email non può essere nulla&quot;)
+    @Email(message = &quot;Formato email non valido&quot;)
+<span class="nc" id="L114">    private String email;</span>
+
+    @Column(length = MAX_PHONE_LENGTH)
+    @Size(min = MAX_PHONE_LENGTH,
+            max = MAX_PHONE_LENGTH,
+            message = &quot;Lunghezza telefono non valida&quot;)
+    @Pattern(regexp = &quot;^[0-9]*$&quot;,
+            message = &quot;Formato telefono non valido&quot;)
+<span class="nc" id="L122">    private String telefono;</span>
+
+    //da valutare la lunghezza della stringa
+    @NotNull(message = &quot;IdMeta non può essere nulla&quot;)
+    @Column(length = MAX_NAME_LENGTH, unique = true)
+    @Size(min = MIN_NAME_LENGTH,
+            max = MAX_NAME_LENGTH,
+            message = &quot;Lunghezza IdMeta non valida&quot;)
+    @NotBlank(message = &quot;Il IdMeta non può essere vuoto&quot;)
+<span class="fc" id="L131">    private String metaId;</span>
+
+    //da valutare la lunghezza della stringa
+    @NotNull(message = &quot;TokenAuth non può essere nulla&quot;)
+    @Column(length = MAX_TOKEN_LENGTH, unique = true)
+    @Size(min = MIN_TOKEN_LENGTH,
+            max = MAX_TOKEN_LENGTH,
+            message = &quot;Lunghezza TokenAuth non valida&quot;)
+    @NotBlank(message = &quot;Il TokenAuth non può essere vuoto&quot;)
+<span class="nc" id="L140">    private String tokenAuth;</span>
+
+    @Column(updatable = false)
+    @CreationTimestamp
+<span class="nc" id="L144">    private LocalDateTime dataCreazione;</span>
+
+    @UpdateTimestamp
+<span class="nc" id="L147">    private LocalDateTime dataAggiornamento;</span>
+
+    @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.DETACH})
+    @JoinColumn(name = &quot;report_id&quot;)
+<span class="nc" id="L151">    private Report report;</span>
+
+    @JsonCreator(mode = JsonCreator.Mode.DEFAULT)
+    public Utente(@JsonProperty(&quot;nome&quot;) String Nome,
+                  @JsonProperty(&quot;cognome&quot;) String Cognome,
+                  @JsonProperty(&quot;email&quot;) String Email,
+                  @JsonProperty(&quot;eta&quot;) String Data,
+                  @JsonProperty(&quot;sesso&quot;) String Sesso,
+<span class="nc" id="L159">                  @JsonProperty(&quot;metaId&quot;) String IdMeta) throws DataFormatException {</span>
+<span class="nc" id="L160">        this.nome = Nome;</span>
+<span class="nc" id="L161">        this.cognome = Cognome;</span>
+
+        //stringa messa quando si da errore durante l'email non trovata
+<span class="nc bnc" id="L164" title="All 4 branches missed.">        if(Email == null || Email.isEmpty())</span>
+<span class="nc" id="L165">            this.email = &quot;d.cavaliere13@studenti.unisa.it&quot;;</span>
+        else
+<span class="nc" id="L167">            this.email = Email;</span>
+
+<span class="nc" id="L169">        this.metaId = IdMeta;</span>
+<span class="nc" id="L170">        this.sesso = Sesso;</span>
+
+<span class="nc bnc" id="L172" title="All 4 branches missed.">        if (Data != null &amp;&amp; !Data.isEmpty()) {</span>
+            try {
+<span class="nc" id="L174">                DateTimeFormatter formatter = DateTimeFormatter.ofPattern(&quot;MM/dd/yyyy&quot;);</span>
+<span class="nc" id="L175">                this.dataDiNascita = LocalDate.parse(Data, formatter);</span>
+<span class="nc" id="L176">            } catch (DateTimeParseException e) {</span>
+<span class="nc" id="L177">                throw new DataFormatException(&quot;Formato della data di nascita non valido. Formato richiesto: MM/dd/yyyy&quot;);</span>
+<span class="nc" id="L178">            }</span>
+        }
+
+<span class="nc" id="L181">    }</span>
+
+<span class="fc" id="L183">    public Utente(Long id, String Nome, String Cognome, String Email, String Data, String Sesso, String IdMeta, String token, boolean Is_Admin) throws DataFormatException {</span>
+<span class="fc" id="L184">        this.id = id;</span>
+<span class="fc" id="L185">        this.nome = Nome;</span>
+<span class="fc" id="L186">        this.cognome = Cognome;</span>
+<span class="fc" id="L187">        this.email = Email;</span>
+<span class="fc" id="L188">        this.metaId = IdMeta;</span>
+<span class="fc" id="L189">        this.sesso = Sesso;</span>
+<span class="fc" id="L190">        this.tokenAuth = token;</span>
+<span class="fc" id="L191">        this.isAdmin = Is_Admin;</span>
+
+<span class="pc bpc" id="L193" title="2 of 4 branches missed.">        if (Data != null &amp;&amp; !Data.isEmpty()) {</span>
+            try {
+<span class="fc" id="L195">                DateTimeFormatter formatter = DateTimeFormatter.ofPattern(&quot;MM/dd/yyyy&quot;);</span>
+<span class="fc" id="L196">                this.dataDiNascita = LocalDate.parse(Data, formatter);</span>
+<span class="nc" id="L197">            } catch (DateTimeParseException e) {</span>
+<span class="nc" id="L198">                throw new DataFormatException(&quot;Formato della data di nascita non valido. Formato richiesto: MM/dd/yyyy&quot;);</span>
+<span class="fc" id="L199">            }</span>
+        }
+
+<span class="fc" id="L202">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.9.202303310957</span></div></body></html>
