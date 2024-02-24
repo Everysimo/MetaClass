@@ -1,0 +1,7 @@
+\babel@toc {italian}{}\relax 
+\babel@toc {italian}{}\relax 
+\contentsline {section}{\numberline {1}Definizione del problema}{1}{section.1}%
+\contentsline {subsection}{\numberline {1.1}Obiettivi}{1}{subsection.1.1}%
+\contentsline {subsection}{\numberline {1.2}Specifica PEAS}{1}{subsection.1.2}%
+\contentsline {subsubsection}{\numberline {1.2.1}Caratteristche dell'ambiente}{1}{subsubsection.1.2.1}%
+\contentsline {subsection}{\numberline {1.3}Analisi del problema}{1}{subsection.1.3}%
