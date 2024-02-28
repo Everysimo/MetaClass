@@ -10,6 +10,9 @@ import com.commigo.metaclass.gestionestanza.repository.StanzaRepository;
 import com.commigo.metaclass.gestionestanza.repository.StatoPartecipazioneRepository;
 import com.commigo.metaclass.gestionestimaduratameeting.adapter.StimaDurataMeetingAdapter;
 import com.commigo.metaclass.gestionestimaduratameeting.adapter.StimaDurataMeetingAdapterImpl;
+
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.InputStream;
 import java.time.Duration;
 import java.time.LocalDate;
@@ -37,6 +40,9 @@ public class GestioneStimaMeetingServiceImpl implements GestioneStimaMeetingServ
   @Autowired private StatoPartecipazioneRepository statoPartecipazioneRepository;
   @Autowired private FeedbackMeetingRepository feedbackMeetingRepository;
   private Evaluator evaluator;
+
+  private static final String REGRESSOR_ROOT = System.getProperty("user.dir") + File.separator + "ModuloAI"
+          + File.separator + "RegressoreDurataMeeting.pmml";
 
   /** constructor. */
   public GestioneStimaMeetingServiceImpl() {
@@ -113,58 +119,62 @@ public class GestioneStimaMeetingServiceImpl implements GestioneStimaMeetingServ
    */
   private Double requestPrediction(Utente utente) {
 
-    try (InputStream is = getClass().getResourceAsStream("/MetaClassAI/RegressoreDurataMeeting.pmml")) {
+    try (InputStream is = new FileInputStream(REGRESSOR_ROOT)) {
       evaluator = new LoadingModelEvaluatorBuilder().load(is).build();
+
+      // calcolo l'età
+      Period periodo = Period.between(utente.getDataDiNascita(), LocalDate.now());
+
+      // conversione sesso
+      int sex;
+      if (utente.getSesso().equalsIgnoreCase("M")) {
+        sex = 2;
+      } else if (utente.getSesso().equalsIgnoreCase("F")) {
+        sex = 1;
+      } else {
+        sex = 0;
+      }
+
+      // ricavo la media dei vari ImmersionLevel dell'utente
+      List<FeedbackMeeting> feeds = feedbackMeetingRepository.findFeedbackMeetingByUtente(utente);
+      double immersionLevelAverage =
+              feeds.stream()
+                      .mapToInt(
+                              FeedbackMeeting::getImmersionLevel) // Estrae gli immersionLevel come IntStream
+                      .average() // Calcola la media degli immersionLevel
+                      .orElse(0.0); // Valore di default se la lista è vuota
+
+      // ricavo la media dei motionSickness
+      double motionSicknessAverage =
+              feeds.stream()
+                      .mapToInt(FeedbackMeeting::getMotionSickness) // Estrae motionSickness come IntStream
+                      .average() // Calcola la media dei motionSickness
+                      .orElse(0.0); // Valore di default se la lista è vuota
+
+      // Esempio di utilizzo
+      Map<String, Object> input = new HashMap<>();
+      input.put("Age", periodo.getYears()); // Sostituisci con il valore effettivo
+      input.put("Gender", sex); // Sostituisci con il valore effettivo (0"O", 1"F" o 2"M")
+      input.put(
+              "ImmersionLevel",
+              (int) immersionLevelAverage); // Sostituisci con il valore effettivo (da 1 a 5)
+      input.put(
+              "MotionSickness",
+              (int) motionSicknessAverage); // Sostituisci con il valore effettivo (da 1 a 10)
+
+      Map<FieldName, FieldValue> arguments = prepareArguments(input);
+
+      Map<String, ?> results = predict(arguments);
+
+      // Stampa i risultati
+      return (Double) results.get("y");
+
     } catch (Exception e) {
       e.printStackTrace();
+      return null;
     }
 
-    // calcolo l'età
-    Period periodo = Period.between(utente.getDataDiNascita(), LocalDate.now());
 
-    // conversione sesso
-    int sex;
-    if (utente.getSesso().equalsIgnoreCase("M")) {
-      sex = 2;
-    } else if (utente.getSesso().equalsIgnoreCase("F")) {
-      sex = 1;
-    } else {
-      sex = 0;
-    }
-
-    // ricavo la media dei vari ImmersionLevel dell'utente
-    List<FeedbackMeeting> feeds = feedbackMeetingRepository.findFeedbackMeetingByUtente(utente);
-    double immersionLevelAverage =
-        feeds.stream()
-            .mapToInt(
-                FeedbackMeeting::getImmersionLevel) // Estrae gli immersionLevel come IntStream
-            .average() // Calcola la media degli immersionLevel
-            .orElse(0.0); // Valore di default se la lista è vuota
-
-    // ricavo la media dei motionSickness
-    double motionSicknessAverage =
-        feeds.stream()
-            .mapToInt(FeedbackMeeting::getMotionSickness) // Estrae motionSickness come IntStream
-            .average() // Calcola la media dei motionSickness
-            .orElse(0.0); // Valore di default se la lista è vuota
-
-    // Esempio di utilizzo
-    Map<String, Object> input = new HashMap<>();
-    input.put("Age", periodo.getYears()); // Sostituisci con il valore effettivo
-    input.put("Gender", sex); // Sostituisci con il valore effettivo (0"O", 1"F" o 2"M")
-    input.put(
-        "ImmersionLevel",
-        (int) immersionLevelAverage); // Sostituisci con il valore effettivo (da 1 a 5)
-    input.put(
-        "MotionSickness",
-        (int) motionSicknessAverage); // Sostituisci con il valore effettivo (da 1 a 10)
-
-    Map<FieldName, FieldValue> arguments = prepareArguments(input);
-
-    Map<String, ?> results = predict(arguments);
-
-    // Stampa i risultati
-    return (Double) results.get("Duration");
   }
 
   /**

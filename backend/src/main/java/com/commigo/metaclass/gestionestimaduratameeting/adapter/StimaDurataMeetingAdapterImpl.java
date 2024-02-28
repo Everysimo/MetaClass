@@ -22,11 +22,12 @@ import org.springframework.stereotype.Service;
 @Service
 public class StimaDurataMeetingAdapterImpl implements StimaDurataMeetingAdapter {
 
-  private static final String CSV_FILE_NAME = "MetaClassAI/data.csv";
+  private static final String CSV_FILE_NAME = "ModuloAI/data.csv";
   private static final String PROJECT_ROOT = System.getProperty("user.dir");
   private static final String RESOURCES_PATH =
           PROJECT_ROOT + File.separator + "src" + File.separator + "main" + File.separator + "resources";
 
+  private static int counter = 0;
 
   /**
    * Metodo che permette di aggiungere le informazioni di un utente nel dataset.
@@ -73,8 +74,13 @@ public class StimaDurataMeetingAdapterImpl implements StimaDurataMeetingAdapter 
             immersionLevel, // ImmersionLevel
             motionSickness); // MotionSickness
 
-        //ri-training del modello
+      //incremento il contatore che mi tiene traccia di quante tuple vengono aggiunte
+        counter++;
+      //ogni 100 inserimenti avviene il retraining
+      //if ((counter% 100) == 0) {
+        // ri-training del modello
         trainingModel();
+     // }
 
       } catch (IOException e) {
         e.printStackTrace();
@@ -118,8 +124,44 @@ public class StimaDurataMeetingAdapterImpl implements StimaDurataMeetingAdapter 
   }
 
   //metodo per il riallenamento del modello
-  private void trainingModel() {
+  private String trainingModel() throws ServerRuntimeException {
+    String scriptPath = "trainingModel.py";
+    String workingDirectory = "ModuloAI"; // Directory relativa alla posizione corrente del progetto
 
+    try {
+      ProcessBuilder processBuilder = new ProcessBuilder("python", scriptPath);
+      processBuilder.directory(new File(workingDirectory)); // Imposta la directory di lavoro
+      Process process = processBuilder.start();
+
+      // Leggi lo stream di output e di errore del processo
+      BufferedReader readerOutput = new BufferedReader(new InputStreamReader(process.getInputStream()));
+      BufferedReader readerError = new BufferedReader(new InputStreamReader(process.getErrorStream()));
+      StringBuilder output = new StringBuilder();
+      String line;
+
+      while ((line = readerOutput.readLine()) != null) {
+        output.append(line).append("\n");
+      }
+
+      StringBuilder errorOutput = new StringBuilder();
+      while ((line = readerError.readLine()) != null) {
+        errorOutput.append(line).append("\n");
+      }
+
+      int exitCode = process.waitFor();
+
+      if (exitCode != 0) {
+        // Se l'esecuzione ha generato un errore, restituisci sia l'output che i messaggi di errore
+        throw new ServerRuntimeException("Errore nell'esecuzione del modulo Python. Messaggio di errore: " + errorOutput.toString());
+      }
+
+      // Restituisci l'output generato dal modulo Python
+      return output.toString().trim();
+
+    } catch (Exception e) {
+      e.printStackTrace();
+      throw new ServerRuntimeException("Errore nell'esecuzione del modulo Python");
+    }
   }
 
 
@@ -127,4 +169,7 @@ public class StimaDurataMeetingAdapterImpl implements StimaDurataMeetingAdapter 
 
 
 
+
 }
+
+
